@@ -1,0 +1,205 @@
+"""
+smoke_repro.py — Tái lập SMOKE TEST của đề xuất FSE-2027-15 (Sentinel).
+
+MỤC ĐÍCH: tái lập *cơ chế và thứ hạng* của 4 kiểm tra trong smoke test gốc,
+trên một trò chơi Stackelberg hữu hạn giải bằng liệt kê best-response của attacker
+(đúng phạm vi mà đề xuất gốc tuyên bố cho smoke test).
+
+KHÔNG phải: tái lập chính xác từng chữ số của đề xuất gốc. Mã nguồn Sentinel
+(~9.1k dòng Python) không công khai; mọi số trong manuscript là *projected*.
+
+Chạy:  python3 smoke_repro.py
+Phụ thuộc: numpy, scipy
+"""
+import itertools, json, sys
+import numpy as np
+from scipy.optimize import linprog
+
+# ----------------------------------------------------------------- CẤU HÌNH
+CFG = dict(
+    K=4,            # số carrier: memory, cached skill, tool queue, branch
+    H=8,            # số task trong một workflow (đề xuất: 6–14)
+    psi=0.95,       # true-positive rate của detector (gamma = psi - phi)
+    kappa_bar=2.00, # chi phí audit trung bình của một carrier (HIỆU CHUẨN, xem README)
+    kappa_commit=4.1,  # chi phí audit commit (đo được trong đề xuất)
+    commit_cov_at_B=0.52,  # hiệu chuẩn: audit-at-commit phải cho harm = 0.48
+    het_model="mean",  # "mean": chi giữ nguyên tổng chi phí · "min": chi làm tăng tổng chi phí
+    seed=42,
+)
+CARRIER_NAMES = ["memory", "skill", "queue", "branch"]
+
+def carrier_costs(chi, K, kappa_bar, model="mean", kappa_lo=None):
+    """Hai cách hiện thực hóa cùng một định nghĩa chi = (max-min)/mean.
+
+    model="mean": neo GIÁ TRỊ TRUNG BÌNH. Tổng chi phí phủ đều mọi carrier
+                  không đổi theo chi => chi KHÔNG ảnh hưởng kết quả.
+    model="min":  neo GIÁ TRỊ NHỎ NHẤT (= chi phí audit rẻ nhất đo được, 0.4
+                  CPU-min). Tăng chi = làm sâu thêm các carrier đắt => tổng
+                  chi phí tăng => chi LÀM THU HẸP độ lợi, đúng như smoke test gốc.
+    """
+    if K == 1:
+        return np.array([kappa_bar])
+    off = np.linspace(-0.5, 0.5, K)
+    if model == "mean":
+        return kappa_bar * (1.0 + chi * off)
+    lo = kappa_bar if kappa_lo is None else kappa_lo
+    r = (2.0 + chi) / (2.0 - chi)          # kappa_hi / kappa_lo
+    return np.linspace(lo, lo * r, K)
+
+def budget(cfg):
+    """Ngân sách hiệu chuẩn để audit-at-commit đạt đúng worst-case harm 0.48.
+    harm_commit = 1 - psi*v, v = B/(kappa_commit*H)  =>  B sao cho psi*v = 0.52"""
+    v_needed = cfg["commit_cov_at_B"] / cfg["psi"]
+    return v_needed * cfg["kappa_commit"] * cfg["H"]
+
+def attacker_actions(K, H, delta):
+    """a = (k, iota, sigma) với sigma = iota + delta, sigma <= H-1."""
+    return [(k, i, i + delta) for k in range(K) for i in range(H - delta)]
+
+def harm(u, v, a, psi):
+    """u[k,t]: coverage upstream. v[t]: coverage commit.
+    Audit upstream bắt được poison nếu iota <= t < sigma.
+    Audit commit tại sigma bắt được poison đúng lúc harm hiện ra."""
+    k, i, s = a
+    cov = u[k, i:s].sum() + v[s]
+    return 1.0 - psi * min(1.0, cov)
+
+def worst_case(u, v, K, H, delta, psi):
+    return max(harm(u, v, a, psi) for a in attacker_actions(K, H, delta))
+
+# ----------------------------------------------------------------- BASELINE
+def p_commit(K, H, B, kap, kc, **_):
+    u = np.zeros((K, H)); v = np.full(H, min(1.0, B / (kc * H)))
+    return u, v
+
+def p_deterministic(K, H, B, kap, kc, **_):
+    """Lịch trình tất định: xoay vòng carrier theo task, coverage = 1."""
+    u = np.zeros((K, H)); v = np.zeros(H); spent = 0.0
+    for t in range(H):
+        k = t % K
+        if spent + kap[k] <= B:
+            u[k, t] = 1.0; spent += kap[k]
+    return u, v
+
+def p_on_insertion(K, H, B, kap, kc, **_):
+    """Dồn toàn bộ ngân sách vào kênh memory (kênh bị chèn 'điển hình')."""
+    u = np.zeros((K, H)); v = np.zeros(H)
+    u[0, :] = min(1.0, B / (kap[0] * H))
+    return u, v
+
+def p_cost_greedy(K, H, B, kap, kc, **_):
+    """Phân bổ tỉ lệ nghịch với chi phí: audit kênh rẻ nhiều hơn."""
+    w = (1.0 / kap); w = w / w.sum()
+    u = np.zeros((K, H)); v = np.zeros(H)
+    for k in range(K):
+        u[k, :] = min(1.0, (B * w[k]) / (kap[k] * H))
+    return u, v
+
+def p_uniform(K, H, B, kap, kc, **_):
+    """Ngẫu nhiên đồng đều = COVERAGE bằng nhau trên mọi ô, không phải chi phí
+    bằng nhau. c * (H*sum(kap) + H*kc) = B."""
+    total = H * (kap.sum() + kc)
+    c = min(1.0, B / total)
+    u = np.full((K, H), c); v = np.full(H, c)
+    return u, v
+
+def p_minimax(K, H, B, kap, kc, delta=0, psi=1.0, **_):
+    """LP: min z  s.t.  z >= 1 - psi*cov(a) với mọi a;  ràng buộc ngân sách."""
+    nU, nV = K * H, H
+    n = nU + nV + 1                      # + z
+    iz = n - 1
+    c = np.zeros(n); c[iz] = 1.0
+    A, b = [], []
+    for (k, i, s) in attacker_actions(K, H, delta):
+        row = np.zeros(n)
+        for t in range(i, s):
+            row[k * H + t] = -psi
+        row[nU + s] = -psi
+        row[iz] = -1.0
+        A.append(row); b.append(-1.0)
+    row = np.zeros(n)                     # ngân sách
+    for k in range(K):
+        for t in range(H):
+            row[k * H + t] = kap[k]
+    for t in range(H):
+        row[nU + t] = kc
+    A.append(row); b.append(B)
+    bounds = [(0, 1)] * (n - 1) + [(0, 1)]
+    r = linprog(c, A_ub=np.array(A), b_ub=np.array(b), bounds=bounds, method="highs")
+    assert r.success, r.message
+    u = r.x[:nU].reshape(K, H); v = r.x[nU:nU + nV]
+    return u, v
+
+POLICIES = [
+    ("audit-on-insertion", p_on_insertion),
+    ("deterministic",      p_deterministic),
+    ("cost-greedy",        p_cost_greedy),
+    ("audit-at-commit",    p_commit),
+    ("uniform random",     p_uniform),
+    ("minimax",            p_minimax),
+]
+
+def run(chi, delta, cfg=CFG, het_model=None):
+    K, H, psi = cfg["K"], cfg["H"], cfg["psi"]
+    kap = carrier_costs(chi, K, cfg["kappa_bar"], het_model or cfg["het_model"])
+    B = budget(cfg)
+    out = {}
+    for name, fn in POLICIES:
+        u, v = fn(K=K, H=H, B=B, kap=kap, kc=cfg["kappa_commit"], delta=delta, psi=psi)
+        out[name] = worst_case(u, v, K, H, delta, psi)
+    return out
+
+def main():
+    print("=" * 74)
+    print("KIỂM TRA 2 — ngẫu nhiên hóa quan trọng hơn thích nghi   (chi=1.34, delta=2)")
+    print("Đích của đề xuất gốc: commit 0.48 · tất định 1.00 · cost-greedy 0.74 ·")
+    print("                      đồng đều 0.45 · minimax 0.43")
+    print("=" * 74)
+    r = run(chi=1.34, delta=2)
+    for name, val in r.items():
+        print(f"  {name:22s} worst-case harm = {val:.3f}")
+    order_ok = (r["audit-on-insertion"] >= r["cost-greedy"] >= r["audit-at-commit"]
+                >= r["uniform random"] >= r["minimax"])
+    print(f"  → thứ hạng đúng như smoke test gốc: {'PASS' if order_ok else 'FAIL'}")
+
+    print()
+    print("=" * 74)
+    print("KIỂM TRA 1 & 3 — ranh giới chế độ (% giảm harm của minimax so với commit)")
+    print("Đích: chi=0    d=0:+0  d=1:+2   d=2:+44  d=4:+86")
+    print("      chi=1.34 d=0:+0  d=1:-4   d=2:+12  d=4:+62")
+    print("=" * 74)
+    for model, desc in (("mean", "neo TRUNG BÌNH — chi không đổi tổng chi phí"),
+                        ("min",  "neo NHỎ NHẤT  — chi làm tăng tổng chi phí")):
+        print(f"  [het_model = {model}]  {desc}")
+        print(f"    {'chi':>6} | " + " | ".join(f"d={d:<5}" for d in (0, 1, 2, 4)))
+        rows = {}
+        for chi in (0.0, 1.34):
+            cells = []
+            for d in (0, 1, 2, 4):
+                rr = run(chi=chi, delta=d, het_model=model)
+                cells.append(100.0 * (rr["audit-at-commit"] - rr["minimax"]) / rr["audit-at-commit"])
+            rows[chi] = cells
+            print(f"    {chi:>6.2f} | " + " | ".join(f"{g:+6.1f}%" for g in cells))
+        zero = abs(rows[0.0][0]) < 1e-6 and abs(rows[1.34][0]) < 1e-6
+        inc = all(rows[c][i] <= rows[c][i + 1] + 1e-9 for c in rows for i in range(3))
+        nar = any(rows[1.34][i] < rows[0.0][i] - 1e-9 for i in range(4))
+        print(f"    +0 tại delta=0: {'PASS' if zero else 'FAIL'} · "
+              f"tăng theo delta: {'PASS' if inc else 'FAIL'} · "
+              f"THU HẸP theo chi: {'PASS' if nar else 'FAIL (không có hiệu ứng)'}")
+        print()
+
+    print()
+    print("=" * 74)
+    print("KIỂM TRA 4 — audit-on-insertion là chính sách tệ nhất")
+    print("=" * 74)
+    worst_always = True
+    for chi in (0.0, 0.5, 1.34):
+        for d in (0, 1, 2, 4):
+            rr = run(chi=chi, delta=d)
+            if rr["audit-on-insertion"] < max(rr.values()) - 1e-9:
+                worst_always = False
+    print(f"  audit-on-insertion tệ nhất trên toàn lưới: {'PASS' if worst_always else 'FAIL'}")
+    print(f"  worst-case harm của nó (chi=1.34, d=2)   : {run(1.34,2)['audit-on-insertion']:.3f}")
+
+if __name__ == "__main__":
+    main()
