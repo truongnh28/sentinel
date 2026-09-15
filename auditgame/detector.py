@@ -76,6 +76,13 @@ class Detector:
     def phi(self) -> float:
         return _N.cdf(-self.tau_det)
 
+    @property
+    def gamma(self) -> float:
+        """Detector MARGIN, psi - phi.  The quantity the theoretical bounds are
+        written in, and it had no code -- so nothing connected the three declared
+        settings to the theory that is supposed to describe them."""
+        return self.psi - self.phi
+
     def at_depth(self, depth: int) -> "Detector":
         """The SAME detector run deeper: more independent evidence, same threshold.
 
