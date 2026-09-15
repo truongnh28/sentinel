@@ -8,6 +8,7 @@ Methodological constraint: EVERY policy runs on the SAME budget B and the SAME
 detector.  Otherwise the comparison means nothing.
 """
 from __future__ import annotations
+import math
 import random
 from dataclasses import dataclass, field
 from core import CARRIERS, seed_of
@@ -35,6 +36,34 @@ QUARANTINE_ALL = "quarantine:all"
 #: Action spelling: "memory@2".  A bare "memory" means depth 1.
 DEPTHS = (1, 2)
 DEPTH_SEP = "@"
+
+#: Belief UPDATE RULES.  Each maps a carrier posterior p_c to an evidence weight.
+#:
+#: These exist because RQ3's answer turned out to depend on which one is used.
+#: Three implementations of this benchmark reported randomisation +0.184 / belief
+#: +0.099, randomisation +0.131 / belief -0.025, and randomisation +0.069 / belief
+#: +0.161 -- not a disagreement about the world, a disagreement about calibration.
+#: The old "1 + 2*p" was tuned for a [0,1] score centred at 0.38/0.62; on the
+#: posterior scale it spans a belief range of 1.86 against a 1/kappa range of 10.2,
+#: so cost dominates and the belief contributes exactly 0.0000.
+#:
+#: Sweeping them and reporting the RANGE is what makes RQ3 a statement one can
+#: check.  Naming one and freezing it would also be honest; quoting a number
+#: without saying which rule produced it is not.
+UPDATE_RULES = {
+    # posterior ratio -- 1.0 under no evidence, proportional to evidence strength,
+    # so the range is ~[0, 5] and comparable with 1/kappa.
+    "ratio":  lambda p: p / scoring.PI0,
+    # the pre-N1 rule, kept so the historical number stays reproducible.
+    "linear": lambda p: 1.0 + 2.0 * p,
+    # compresses strong evidence: a carrier ten times more likely is not ten times
+    # more worth auditing once the cheap ones are already covered.
+    "log":    lambda p: 1.0 + math.log(max(p, 1e-12) / scoring.PI0),
+    # flat -- identical to C4 by construction, and the control that proves the
+    # sweep is wired to something.
+    "flat":   lambda p: 1.0,
+}
+
 
 @dataclass(frozen=True)
 class CarrierSignal:
@@ -92,6 +121,10 @@ class Policy:
     #: manuscript never published.
     tau_quarantine: float = 0.0
     eta_Q: float = 0.0
+
+    #: Which UPDATE_RULES entry Sentinel's belief uses.  Declared per policy so a
+    #: results table can say which rule produced it.
+    update_rule: str = "ratio"
 
     def can(self, cost: float) -> bool:
         return self.spent + cost <= self.budget + 1e-9
@@ -202,10 +235,11 @@ class Sentinel(Policy):
         p_c/pi0 equals 1.0 under no evidence and scales with evidence strength, so
         the range becomes ~[0, 5] -- comparable to the cost range.
         """
+        rule = UPDATE_RULES[self.update_rule]
         for c in CARRIERS:
             sig = signals.get(c)
-            evidence = (sig.p / scoring.PI0) if sig is not None else 1.0
-            self.belief[c] = (1 - self.BETA) * self.belief[c] + self.BETA * evidence
+            evidence = rule(sig.p) if sig is not None else 1.0
+            self.belief[c] = (1 - self.BETA) * self.belief[c] + self.BETA * max(evidence, 0.0)
 
     def choose(self, t, retrieved_carriers, signals):
         self.observe(signals)
@@ -285,14 +319,15 @@ REGISTRY = {
 }
 
 def make_policy(name: str, budget: float, rng_seed: int = 0,
-                setting: str = "mid") -> Policy:
+                setting: str = "mid", update_rule: str = "ratio") -> Policy:
     """Factory -- N2.  The old runner used `lambda n, b: cls(n, b)`, so rng_seed
     fell back to 0 for EVERY workflow: we were measuring ONE dice roll repeated 40
     times, not 40 samples.  For a thesis whose central claim is "randomisation is
     the strongest lever", that has to be fixed before stating any confidence
     interval at all.
     """
-    return REGISTRY[name](name=name, budget=budget, rng_seed=rng_seed, setting=setting)
+    return REGISTRY[name](name=name, budget=budget, rng_seed=rng_seed,
+                          setting=setting, update_rule=update_rule)
 
 
 def chi_of(kappa: dict) -> float:

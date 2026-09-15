@@ -220,12 +220,28 @@ def survives(wf, ps, det, ag, seed) -> bool:
     return _SURVIVORS[key]
 
 
-def paired(wf, ps, policy_name, det, ag, seed, budget, setting):
+def paired(wf, ps, policy_name, det, ag, seed, budget, setting,
+           update_rule="ratio"):
     """One paired run.  Returns None if the instance is INVALID (clean run failed)."""
     if not survives(wf, ps, det, ag, seed):
         return None                     # the agent could not solve it anyway -> drop the instance
-    rng_seed = seed_of(wf.wf_id, seed, policy_name)     # N2 -- factory, no dropped seed
-    return run_once(wf, ps, P.make_policy(policy_name, budget, rng_seed, setting),
+    # PAIRED across policies, varied across workflows and seeds.
+    #
+    # N2 fixed the original bug -- rng_seed fell back to 0 for EVERY workflow, so we
+    # measured one dice roll repeated N times -- by seeding on (wf_id, seed,
+    # policy_name).  Including the policy name fixed that and broke something else:
+    # two policies that are BEHAVIOURALLY IDENTICAL then draw different streams, so
+    # every ablation carries a noise floor for free.  Measured with the `flat`
+    # update rule, where Sentinel and C4 are identical by construction, the spurious
+    # difference reached 0.069 at three seeds -- the same size as the randomisation
+    # contribution the thesis reports.
+    #
+    # Dropping the policy name makes ablation pairs face the SAME draws, which is
+    # the paired design already used for clean/injected, applied to the other axis.
+    # It does not reintroduce N2: the seed still varies with workflow and seed.
+    rng_seed = seed_of(wf.wf_id, seed)
+    return run_once(wf, ps, P.make_policy(policy_name, budget, rng_seed, setting,
+                                          update_rule),
                     det, ag, seed, do_inject=True)
 
 
@@ -248,7 +264,7 @@ class GridCell:
 
 
 def worst_case(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
-               setting) -> GridCell:
+               setting, update_rule="ratio") -> GridCell:
     """Worst-case harm = MAX over the attacker class, averaged over seeds and workflows."""
     per_wf, qf, tl, sp = [], [], [], []
     kept = runs = 0
@@ -264,7 +280,8 @@ def worst_case(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
                 hs, qs, ts, ss = [], [], [], []
                 for s in seeds:
                     runs += 1
-                    r = paired(wf, ps, policy_name, det, ag, s, budget, setting)
+                    r = paired(wf, ps, policy_name, det, ag, s, budget,
+                               setting, update_rule)
                     if r is None:
                         continue
                     kept += 1
@@ -290,7 +307,7 @@ def worst_case(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
 
 
 def best_response_gap(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
-                      setting) -> float:
+                      setting, update_rule="ratio") -> float:
     """How much an attacker gains by best-responding instead of playing blind.
 
         gap(pi) = max_a E[harm(pi, a)] - mean_a E[harm(pi, a)]
@@ -321,7 +338,8 @@ def best_response_gap(policy_name, wfs, deltas, carriers, det, ag, budget, seeds
                 if ps is None:
                     continue
                 for s in seeds:
-                    r = paired(wf, ps, policy_name, det, ag, s, budget, setting)
+                    r = paired(wf, ps, policy_name, det, ag, s, budget,
+                               setting, update_rule)
                     if r is not None:
                         hs.append(r.harm)
             if hs:
