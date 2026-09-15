@@ -12,7 +12,7 @@ not.
 """
 from __future__ import annotations
 import argparse, json, random, sys
-import build, agent, detector, metrics, runner
+import build, agent, datasets, detector, metrics, runner
 import policies as P
 
 def gain(row):
@@ -65,10 +65,32 @@ def main():
     ap.add_argument("--H", type=int, default=8, help="tasks per workflow")
     ap.add_argument("--budget", type=float, default=17.95)
     ap.add_argument("--seeds", type=int, default=3)
+    ap.add_argument("--dataset", choices=("mock", "swebench"), default="mock",
+                    help="mock: synthetic workflows, numbers unchanged from "
+                         "before. swebench: real SWE-bench metadata via "
+                         "datasets.REGISTRY -- the agent is still MockAgent; "
+                         "a real agent plugs in at this same spot via "
+                         "agents.REGISTRY (Task 16), no separate code path.")
     ap.add_argument("--json", metavar="FILE")
     a = ap.parse_args()
 
-    wfs = make_corpus(a.n, a.H, seed=2026)
+    # `--dataset mock` (the default) MUST keep calling make_corpus, not
+    # datasets.REGISTRY["mock"].workflows(): MockDataset.workflows() seeds each
+    # workflow independently via seed_of(seed, i), while make_corpus shares ONE
+    # rng across the whole corpus -- routing the default path through the
+    # registry would move every existing number in the mock table.
+    if a.dataset == "mock":
+        wfs = make_corpus(a.n, a.H, seed=2026)
+        scope = datasets.REGISTRY["mock"].scope()
+    else:
+        if a.dataset not in datasets.REGISTRY:
+            _, reason = datasets.PENDING.get(a.dataset, (None, "not registered"))
+            print(f"dataset {a.dataset!r} is not available: {reason}")
+            return 1
+        ds = datasets.REGISTRY[a.dataset]
+        wfs = list(ds.workflows(a.n, a.H, seed=2026))
+        scope = ds.scope()
+
     seeds = tuple(range(1, a.seeds + 1))
     deltas = (0, 1, 2, 4)
     # D5 -- the attacker class must cover ALL FOUR carriers.  Sweeping only
@@ -79,6 +101,8 @@ def main():
 
     print("=" * 78)
     print("AuditGame-SE -- grid sweep (mock agent, no LLM spend)")
+    # Real and mock numbers must NEVER share one unlabeled table (a3 Bước 3.6b).
+    print(f"dataset={a.dataset} is_mock={scope.is_mock}")
     print(f"{a.n} workflows - H={a.H} - B={a.budget} - {a.seeds} seeds - "
           f"injection carriers: {', '.join(carriers)}")
     print("=" * 78)

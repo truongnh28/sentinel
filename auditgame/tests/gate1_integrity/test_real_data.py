@@ -112,5 +112,57 @@ class RealData(unittest.TestCase):
         self.assertEqual((d["n"], d["median"], d["hist"]), (2, 3, {3: 2}))
 
 
+class WorkflowGrouping(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        import pathlib
+        f = pathlib.Path(__file__).resolve().parents[2] / "data" / "swebench_verified.jsonl"
+        if not f.exists():
+            raise unittest.SkipTest("no data/ yet -- run swebench_fetch.py")
+
+    def test_a_workflow_only_groups_instances_from_ONE_repo(self):
+        """Chaining instances across repos makes the workflow's "history" fake, and
+        a shared topic is then a coincidence rather than a causal link.
+
+        Thesis claim (vi): "carrier tich luy chi co nghia khi cung codebase".
+        """
+        import swebench_dataset
+        for wf in swebench_dataset.SWEBenchDataset().workflows(5, 8, seed=1):
+            repos = {t.repo for t in wf.tasks}
+            self.assertEqual(len(repos), 1, f"{wf.wf_id} mixes repos: {repos}")
+
+    def test_statistics_answer_question_4(self):
+        """SPEC-P1a Part 0 argues from the division 500 < 800.  The REAL constraint
+        is that each repo must hold >= H instances.  This test forces that number to
+        exist.
+
+        Thesis claim (vi): "cau 4 tra loi bang SO, khong bang phan doan".
+        """
+        import swebench_dataset
+        st = swebench_dataset.SWEBenchDataset().stats(H=8)
+        for k in ("repos", "repos_with_H", "non_reused_workflows", "instances"):
+            self.assertIsInstance(st.get(k), int, f"missing or wrong type: {k}")
+        self.assertGreater(st["repos"], 0)
+
+    def test_topic_never_stringifies_in_frozenset_hash_order(self):
+        """A SWE-bench topic is a frozenset, and frozenset's own str()/repr() walks
+        its internal hash table in an order that depends on Python's per-process
+        string-hash randomisation (PYTHONHASHSEED).  Every place a topic reaches
+        core.seed_of or an f-string content template (agent.py's memory/skill/
+        branch/queue notes, build.py's payload content) goes through str(topic) --
+        so if that ever fell back to frozenset's own order-dependent form, the SAME
+        command would print a DIFFERENT number on two separate runs, exactly the
+        failure class the project's hash() ban exists to prevent.
+
+        Thesis claim (vi): "topic frozenset khong duoc roi thang vao chuoi hay seed".
+        """
+        import swebench_dataset
+        wf = next(iter(swebench_dataset.SWEBenchDataset().workflows(1, 8, seed=1)))
+        topic = wf.tasks[0].topic
+        self.assertIsInstance(topic, frozenset)
+        self.assertEqual(str(topic), "|".join(sorted(topic)))
+
+
 if __name__ == "__main__":
     unittest.main()

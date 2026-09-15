@@ -61,10 +61,18 @@ REGISTRY: dict = {d.name: d for d in (MockDataset(),)}
 
 #: Datasets not yet built, each WITH ITS REASON -- never dropped silently
 #: (rule N3 lifted to the pipeline level).
-PENDING: dict = {
-    "swebench-verified": (
-        None,
-        "needs P1a: a real carrier store separated from the repo, plus SWE-bench "
-        "Verified metadata (base_commit, gold patch, FAIL_TO_PASS/PASS_TO_PASS). "
-        "See pipelines/SPEC-Phan-ra-Pipeline.md."),
-}
+PENDING: dict = {}
+
+
+def _register_swebench() -> None:
+    """Register only once the data is downloaded; otherwise PENDING WITH A REASON."""
+    import pathlib
+    if (pathlib.Path(__file__).resolve().parent / "data" / "swebench_verified.jsonl").exists():
+        import swebench_dataset
+        REGISTRY["swebench"] = swebench_dataset.SWEBenchDataset()
+    else:
+        PENDING["swebench"] = (
+            None, "data/swebench_verified.jsonl not downloaded -- run swebench_fetch.py")
+
+
+_register_swebench()
