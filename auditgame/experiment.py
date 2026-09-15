@@ -12,7 +12,7 @@ not.
 """
 from __future__ import annotations
 import argparse, json, random, sys
-import build, agent, detector, runner
+import build, agent, detector, metrics, runner
 import policies as P
 
 def gain(row):
@@ -81,6 +81,28 @@ def main():
               + "".join(f"{grid[d]['Sentinel'].q_false:9.2f}" for d in deltas))
         print(f"  {'T_lost / wf  B1 (lam_T)':24s}"
               + "".join(f"{grid[d]['B1 audit-at-commit'].t_lost:9.2f}" for d in deltas))
+        # A4 -- what each policy actually SPENT, not just its cap.  "Equal budget"
+        # is true of the cap and false of the spend: measured, B5 reaches B1's harm
+        # on 2% of the budget.  A harm table without this reads policies as
+        # comparable when one of them declined to play.
+        print()
+        print(metrics.spend_table(
+            {nm: grid[deltas[0]][nm].spent_mean for nm in names
+             if grid[deltas[0]][nm].spent_mean == grid[deltas[0]][nm].spent_mean},
+            a.budget))
+
+        # A1 -- the composite loss, and the weight at which the ranking flips.
+        cells = {nm: (grid[deltas[0]][nm].harm, grid[deltas[0]][nm].q_false,
+                      grid[deltas[0]][nm].t_lost) for nm in names}
+        star = metrics.lambda_q_star(cells)
+        print(f"\n  lambda_Q* = {star:.4f}" if star is not None else
+              "\n  lambda_Q* = none (one policy dominates on every term)")
+        print(f"  {'policy':<28}{'L(0)':>9}{'L(lQ*)':>10}")
+        for nm in sorted(names, key=lambda k: metrics.loss(*cells[k])):
+            l0 = metrics.loss(*cells[nm], lambda_Q=0.0)
+            ls = metrics.loss(*cells[nm], lambda_Q=(star or 0.0) + 1e-6)
+            print(f"  {nm:<28}{l0:>9.3f}{ls:>10.3f}")
+
         for d in deltas:
             lo, hi = runner.bootstrap_paired(grid[d]["B1 audit-at-commit"].per_wf,
                                              grid[d]["Sentinel"].per_wf)

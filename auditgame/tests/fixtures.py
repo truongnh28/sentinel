@@ -18,6 +18,32 @@ from core import Item, CarrierStore, Task, Workflow, PoisonSpec
 from agent import Outcome
 import policies as P
 
+# ------------------------------------------------------------ AST helpers ----
+
+def identifiers(obj) -> set:
+    """Every NAME the code actually uses -- docstrings and comments excluded.
+
+    Structural prohibitions (K3, A3, I2) used to grep raw source text, which reads
+    prose as if it were code: a docstring saying "distinguishability budget"
+    tripped the budget check, and one saying "nothing reads Item.poisoned" tripped
+    the ground-truth check.  Both were the test failing, not the code.
+
+    A structural rule has to look at structure, so this walks the AST and collects
+    Name and Attribute nodes only.
+    """
+    import ast, inspect, textwrap
+    tree = ast.parse(textwrap.dedent(inspect.getsource(obj)))
+    out = set()
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Name):
+            out.add(n.id)
+        elif isinstance(n, ast.Attribute):
+            out.add(n.attr)
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            out.update(a.arg for a in n.args.args)
+    return out
+
+
 # ---------------------------------------------------------------- detector ----
 
 _LEGACY = object()

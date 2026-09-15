@@ -18,6 +18,17 @@ import scoring
 KAPPA = {"memory": 0.4, "skill": 0.9, "queue": 1.6, "branch": 4.1}
 KAPPA_COMMIT = 4.1
 
+#: Cost of a QUARANTINE action.  Toan-canh SS3: "besides auditing the defender has a
+#: second tool -- quarantine, which removes a carrier from the loop entirely, at a
+#: fixed cost eta_Q".  It is a SEPARATE ACTION, not only a threshold: modelling it
+#: as a threshold alone makes the degenerate policy of SSA.4 inexpressible, so the
+#: test that rules that policy out cannot be written.
+#: Prefix used in the action space: "quarantine:<carrier>", or "quarantine:all"
+#: for the wholesale sweep that Toan-canh SSA.4's degenerate policy performs.
+ETA_Q_COST = 2.0
+QUARANTINE_PREFIX = "quarantine:"
+QUARANTINE_ALL = "quarantine:all"
+
 @dataclass(frozen=True)
 class CarrierSignal:
     """The ONLY thing a policy ever sees about a carrier.
@@ -63,6 +74,17 @@ class Policy:
     rng_seed: int = 0
     setting: str = "mid"          # for the tau_sel lookup; NOT ground truth
     _rot: int = 0
+
+    #: Algorithm 1 line 8 -- the TWO-CONDITION quarantine rule.
+    #:     Pr[poisoned | b] > tau_quarantine   AND   E[harm] > eta_Q
+    #: math-foundation SS8.2: the second condition is what prevents "quarantine
+    #: everything".  Both default to 0.0, which reproduces the old unconditional
+    #: behaviour EXACTLY, so every number recorded before this change still holds.
+    #: They are SWEPT and reported, not assigned -- the same treatment as eps* and
+    #: lambda_Q*.  Picking a value here would be inventing a constant the
+    #: manuscript never published.
+    tau_quarantine: float = 0.0
+    eta_Q: float = 0.0
 
     def can(self, cost: float) -> bool:
         return self.spent + cost <= self.budget + 1e-9
@@ -192,6 +214,56 @@ class Sentinel(Policy):
             if r <= acc: return c
         return opts[-1]
 
+# --------------------------------------------------------------------------
+# Controls.  Not competitors -- instruments.
+# --------------------------------------------------------------------------
+
+class BlindSentinel(Sentinel):
+    """C4 -- drop the belief, KEEP randomisation and the 1/kappa weighting.
+
+    Whatever gain survives is PURE PRICE DIFFERENTIAL.
+    """
+    READS_SCORES = False
+    def observe(self, signals):
+        pass                                  # belief frozen at 1.0
+
+
+class DeterministicSentinel(Sentinel):
+    """C8 -- KEEP the belief, drop randomisation.  The complement of C4.
+
+    Without C8 the ablation RQ3 rests on is absent from gate 2.  And RQ3 turns out
+    to be unstable across implementations: three independent measurements give
+    randomisation > belief, belief harmful, and belief > randomisation. The
+    ablation measures the CALIBRATION of the update rule, not the value of state.
+    """
+    RANDOMIZED = False
+    def choose(self, t, retrieved_carriers, signals):
+        self.observe(signals)
+        opts = [c for c in CARRIERS if self.can(KAPPA[c])]
+        if not opts:
+            return None
+        return max(opts, key=lambda c: self.belief[c] / KAPPA[c])
+
+
+class QuarantineEverything(Policy):
+    """NC1 -- the null control from Toan-canh SSA.4: quarantine every carrier, at once.
+
+    It uses the QUARANTINE action, not the audit action.  An earlier version audited
+    the cheapest carrier each task, which is not the degenerate policy at all -- it
+    is B3 under another name, and measured, it did not even win on harm (0.913
+    against B1's 0.720) because the poison propagated to carriers it never touched.
+    A control that fails to exhibit the behaviour it exists to rule out proves
+    nothing.
+
+    It MUST LOSE under L.  On harm alone it is unbeatable by construction -- an
+    empty store carries no payload -- which is exactly why SSA.4 rejects the
+    one-term model.
+    """
+    ACTIONS = frozenset({QUARANTINE_ALL})
+    def choose(self, t, retrieved_carriers, signals):
+        return QUARANTINE_ALL if self.can(cost_of(QUARANTINE_ALL)) else None
+
+
 REGISTRY = {
     "B1 audit-at-commit": AuditAtCommit,
     "B2 uniform random":  UniformRandom,
@@ -200,6 +272,9 @@ REGISTRY = {
     "B5 risk-score":      RiskScore,
     "B6 two-stage":       TwoStage,
     "Sentinel":           Sentinel,
+    "C4 blind sentinel":         BlindSentinel,
+    "C8 deterministic sentinel": DeterministicSentinel,
+    "NC1 quarantine-everything": QuarantineEverything,
 }
 
 def make_policy(name: str, budget: float, rng_seed: int = 0,
@@ -214,5 +289,10 @@ def make_policy(name: str, budget: float, rng_seed: int = 0,
 
 
 def cost_of(action: str | None) -> float:
-    if action is None: return 0.0
+    if action is None:
+        return 0.0
+    if action == QUARANTINE_ALL:
+        return ETA_Q_COST * len(CARRIERS)      # one eta_Q per carrier swept
+    if action.startswith(QUARANTINE_PREFIX):
+        return ETA_Q_COST
     return KAPPA_COMMIT if action == "commit" else KAPPA[action]
