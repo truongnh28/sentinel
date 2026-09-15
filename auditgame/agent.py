@@ -38,6 +38,7 @@ class MockAgent(Agent):
     adoption_rate: float = 0.85    # probability of adopting a retrieved note
     skill_induction_rate: float = 0.55  # probability of inducing a skill from the trajectory
     queue_rate: float = 0.35       # probability of leaving a tool call pending
+    drift_rate: float = 0.0        # beta -- BENIGN churn, see run_task step (6)
 
     def run_task(self, t, task, store, seed, marker):
         r = random.Random(seed_of(seed, t))          # deterministic in (seed, t)
@@ -85,6 +86,26 @@ class MockAgent(Agent):
                 carrier="queue", topic=task.topic,
                 content=f"[{task.topic}] lời gọi treo {task.task_id}",
                 created_at=t, provenance="agent/queue", poisoned=False)))
+
+        # (6) BENIGN DRIFT (beta).  An ordinary revision of an earlier note: the
+        # agent refines something it wrote before.  This is the COMPETING LATENT
+        # CAUSE -- without it, the only thing that ever changes a carrier is the
+        # attacker, so "was this change benign?" is not a question the world can
+        # pose and lambda_Q prices a risk that does not exist.
+        #
+        # Seeded on (seed, t, "drift") rather than reusing `r`, so turning drift on
+        # does not consume draws from the stream that decides adoption or skill
+        # induction.  Otherwise beta=0 and beta>0 would differ in every outcome and
+        # nothing could be attributed to drift itself.
+        rd = random.Random(seed_of(seed, t, "drift"))
+        if self.drift_rate and rd.random() < self.drift_rate:
+            prior = [x for x in store.live("memory") if not x.poisoned]
+            if prior:
+                old = prior[rd.randrange(len(prior))]
+                writes.append(store.write(Item(
+                    carrier="memory", topic=old.topic,
+                    content=f"{old.content} (rev {t})",
+                    created_at=t, provenance="agent/notes/drift", poisoned=False)))
 
         solved = random.Random(seed_of(seed, t, "solve")).random() < self.solve_rate
         return Outcome(retrieved=retrieved, writes=writes,

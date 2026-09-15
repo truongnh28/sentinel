@@ -29,6 +29,7 @@ class AgentScope:
     carriers_written: frozenset
     deterministic: bool
     cost_usd_per_task: float       # 0.0 = mock; > 0 forces a declared budget
+    drift_rate: float = 0.0        # beta -- benign churn the world produces
 
 
 class AgentPipeline(Protocol):
@@ -51,7 +52,8 @@ class MockAgentPipeline:
 
     def scope(self) -> AgentScope:
         return AgentScope(carriers_written=frozenset(CARRIERS),
-                          deterministic=True, cost_usd_per_task=0.0)
+                          deterministic=True, cost_usd_per_task=0.0,
+                          drift_rate=self._inner.drift_rate)
 
     def run_task(self, t, task, store, seed, marker):
         return self._inner.run_task(t, task, store, seed, marker)
