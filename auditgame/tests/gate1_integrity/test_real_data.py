@@ -134,16 +134,102 @@ class WorkflowGrouping(unittest.TestCase):
 
     def test_statistics_answer_question_4(self):
         """SPEC-P1a Part 0 argues from the division 500 < 800.  The REAL constraint
-        is that each repo must hold >= H instances.  This test forces that number to
-        exist.
+        is that each repo must hold >= H instances.  This test pins the EXACT
+        measured numbers, not just their types: on SWE-bench Verified at H=8 the
+        grouping must yield 500 instances across 12 repos, of which 10 hold >= 8
+        instances, giving 58 non-reused workflows and therefore a minimum reuse of
+        42% (computed the same way the Buoc 3.6 command computes it) to reach
+        N=100.  A mismatch here means the dataset changed underneath us, or
+        tokenization drifted away from retrieval.topic_of -- STOP and find the
+        cause. Do NOT edit the expected numbers below to make this test pass;
+        that would defeat the reason this test exists.
 
         Thesis claim (vi): "cau 4 tra loi bang SO, khong bang phan doan".
         """
         import swebench_dataset
         st = swebench_dataset.SWEBenchDataset().stats(H=8)
-        for k in ("repos", "repos_with_H", "non_reused_workflows", "instances"):
-            self.assertIsInstance(st.get(k), int, f"missing or wrong type: {k}")
-        self.assertGreater(st["repos"], 0)
+
+        self.assertEqual(
+            st["instances"], 500,
+            "instances != 500: the SWE-bench Verified data on disk changed. "
+            "Stop and find out why before touching this expected number.")
+        self.assertEqual(
+            st["repos"], 12,
+            "repos != 12: the set of repos in the Verified pool changed. "
+            "Stop and find out why before touching this expected number.")
+        self.assertEqual(
+            st["repos_with_H"], 10,
+            "repos_with_H != 10 at H=8: either the data changed, or "
+            "tokenization drifted away from retrieval.topic_of and is "
+            "grouping instances differently. Stop and find the cause -- do "
+            "not update this expected number to match a new run.")
+        self.assertEqual(
+            st["non_reused_workflows"], 58,
+            "non_reused_workflows != 58 at H=8: this is the exact number "
+            "question 4 exists to answer. Either the dataset changed or "
+            "tokenization drifted away from retrieval.topic_of. Stop and "
+            "find the cause -- do not update this expected number.")
+
+        # Same derivation as the Buoc 3.6 command, so the two cannot drift apart.
+        can = 100
+        thieu = max(0, can - st["non_reused_workflows"])
+        min_reuse_pct = 100 * thieu / can
+        self.assertEqual(
+            min_reuse_pct, 42,
+            "minimum reuse to reach N=100 != 42%: this follows directly "
+            "from non_reused_workflows via max(0, 100 - non_reused)/100, "
+            "the same formula the Buoc 3.6 command uses. If this drifted "
+            "while non_reused_workflows == 58, the formula itself changed "
+            "-- stop and find the cause, do not update this number.")
+
+    def test_workflows_refuses_to_reuse_an_instance_beyond_the_cap(self):
+        """bootstrap_paired resamples BY WORKFLOW and assumes independence across
+        resamples. Two workflows that share an instance have CORRELATED clean-run
+        results, so reusing an instance beyond swebench_dataset.MAX_INSTANCE_REUSE
+        produces a falsely narrow confidence interval -- silently, if `workflows()`
+        just wraps around with `%`. This test uses a tiny in-memory stand-in
+        dataset (2 repos, independent of the gitignored data/ files) but drives it
+        through the REAL SWEBenchDataset.workflows() code path, not a
+        reimplementation of it: a request exactly at the cap must still succeed,
+        and a request one workflow past it must raise, naming the numbers.
+
+        Thesis claim (vi): "moi instance duoc dung lai toi da 2 lan, khong hon".
+        """
+        import swebench_dataset
+
+        def row(repo: str, idx: int) -> dict:
+            return {
+                "instance_id": f"{repo}-{idx}",
+                "repo": repo,
+                "created_at": f"2022-01-{idx:02d}T00:00:00Z",
+                "base_commit": "deadbeef",
+                "patch": f"diff --git a/pkg/mod{idx}.py b/pkg/mod{idx}.py\n",
+                "problem_statement": "",
+            }
+
+        rows = [row("org/one", i) for i in range(1, 3)] + \
+               [row("org/two", i) for i in range(1, 3)]
+        ds = swebench_dataset.SWEBenchDataset.__new__(swebench_dataset.SWEBenchDataset)
+        ds.pool = "in-memory-stub"
+        ds._rows = rows
+
+        # H=1 -> each row is its own non-overlapping segment: 2 segments per
+        # repo, 4 segments total. cap = MAX_INSTANCE_REUSE * 4 = 8.
+        n_segments = len(ds._segments(H=1))
+        self.assertEqual(n_segments, 4, "stand-in fixture no longer yields 4 segments")
+        cap = swebench_dataset.MAX_INSTANCE_REUSE * n_segments
+
+        at_cap = list(ds.workflows(cap, 1, seed=7))
+        self.assertEqual(len(at_cap), cap,
+                          f"a request exactly at the cap ({cap}) must succeed")
+
+        with self.assertRaises(ValueError) as ctx:
+            list(ds.workflows(cap + 1, 1, seed=7))
+        msg = str(ctx.exception)
+        self.assertIn(str(cap + 1), msg, "error must name the requested n")
+        self.assertIn(str(n_segments), msg, "error must name the available segments")
+        self.assertIn(str(swebench_dataset.MAX_INSTANCE_REUSE), msg,
+                       "error must name the cap")
 
     def test_topic_never_stringifies_in_frozenset_hash_order(self):
         """A SWE-bench topic is a frozenset, and frozenset's own str()/repr() walks

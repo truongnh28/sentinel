@@ -34,6 +34,18 @@ if TYPE_CHECKING:
 
 DATA = pathlib.Path(__file__).resolve().parent / "data"
 
+# Question 4's signed-off answer ("42% minimum reuse to reach N=100") is
+# conditional on each instance appearing in at most this many workflows.
+# Two workflows that share an instance have CORRELATED clean-run results,
+# while `bootstrap_paired` resamples BY WORKFLOW and assumes independence
+# across resamples.  Reuse beyond this cap therefore produces a falsely
+# NARROW confidence interval -- the very error `bootstrap_paired` was
+# introduced to fix, arriving one layer earlier, at corpus construction
+# instead of at the statistics.  Do not raise this value to make a larger N
+# fit; the fix for a larger N is a larger pool (more repos / more history),
+# not a larger cap.
+MAX_INSTANCE_REUSE = 2
+
 
 class Topic(frozenset):
     """`topics.topic_of_instance` returns a plain `frozenset` of path tokens, and
@@ -102,10 +114,22 @@ class SWEBenchDataset:
 
     def workflows(self, n: int, H: int, seed: int) -> Iterator[Workflow]:
         segments = self._segments(H)
+        cap = MAX_INSTANCE_REUSE * len(segments)
+        if n > cap:
+            reuse_factor = n / len(segments) if segments else float("inf")
+            raise ValueError(
+                f"workflows(n={n}) would reuse each of the {len(segments)} "
+                f"available segments {reuse_factor:.1f}x, above the cap of "
+                f"{MAX_INSTANCE_REUSE}x (max n at this cap is {cap}). "
+                "bootstrap_paired resamples by workflow and assumes "
+                "independence across resamples; reusing an instance beyond "
+                "the cap correlates their clean-run results and understates "
+                "the confidence interval. Fix: use a larger pool or a "
+                "smaller n -- do not raise MAX_INSTANCE_REUSE.")
         rng = random.Random(seed_of(seed, "wf", self.pool))
         rng.shuffle(segments)
         for i in range(n):
-            repo, rows = segments[i % len(segments)]   # `%` = reuse when segments run out
+            repo, rows = segments[i % len(segments)]   # `%` = reuse, bounded by the cap above
             yield Workflow(
                 wf_id=f"swe-{i:03d}", repo=repo,
                 tasks=[Task(task_id=r["instance_id"], repo=r["repo"],
