@@ -289,6 +289,48 @@ def worst_case(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
                     per_wf=per_wf)
 
 
+def best_response_gap(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
+                      setting) -> float:
+    """How much an attacker gains by best-responding instead of playing blind.
+
+        gap(pi) = max_a E[harm(pi, a)] - mean_a E[harm(pi, a)]
+
+    NOT the same thing as exploitability, and the distinction matters. Standard
+    exploitability is max_a L(pi,a) - V*, measured against the minimax ceiling; see
+    game.regret(). This one is measured against the policy's OWN mean, so a policy
+    that loses uniformly everywhere scores LOW -- being bad in every cell is not the
+    same as being hard to route around. Measured: B4 has the smallest gap (0.288)
+    and the worst harm (0.913). Read the two together or neither.
+
+    What an attacker gains by OBSERVING the committed policy and routing to its
+    weakest configuration, instead of drawing from the class blind. This is the
+    quantity randomisation exists to reduce -- "commit to a distribution, reveal
+    only the distribution, never the draw" -- and it had never been measured, so
+    the central mechanism of Sentinel had no direct evidence at all. The ablation
+    measures average harm, which is a different question.
+
+    Non-negative by construction: a max over a set cannot fall below the mean over
+    that same set. If it ever does, the two are being computed over different sets.
+    """
+    per_cfg = []
+    for d in deltas:
+        for k in carriers:
+            hs = []
+            for wf in wfs:
+                ps = build.plan_poison(wf, k, d, random.Random(seed_of(wf.wf_id, d, k)))
+                if ps is None:
+                    continue
+                for s in seeds:
+                    r = paired(wf, ps, policy_name, det, ag, s, budget, setting)
+                    if r is not None:
+                        hs.append(r.harm)
+            if hs:
+                per_cfg.append(sum(hs) / len(hs))
+    if not per_cfg:
+        return float("nan")
+    return max(per_cfg) - sum(per_cfg) / len(per_cfg)
+
+
 def bootstrap_paired(a_per_wf, b_per_wf, n_boot=10000, seed=2026):
     """CI95 of Delta-harm, RESAMPLED BY WORKFLOW -- not by case.
 
