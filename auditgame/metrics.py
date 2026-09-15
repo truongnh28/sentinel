@@ -38,17 +38,18 @@ def gain(h_b1: float, h_sentinel: float, floor: float = GAIN_FLOOR):
 
 
 def report_header(config_sha: str, n_feasible: int, n_total: int,
-                  n_survived: int) -> str:
-    """The four mandatory lines of every results table (SS8.3).
+                  n_survived: int, lock_sha: str) -> str:
+    """The five mandatory lines of every results table (SS8.3).
 
-    They pre-answer the first four questions a reviewer asks.  A bare number
+    They pre-answer the first five questions a reviewer asks.  A bare number
     without them FORCES THE READER TO TRUST US -- which is the very thing this
     framework exists to avoid having to beg for.
     """
     pct = (100.0 * n_survived / n_feasible) if n_feasible else float("nan")
     return (f"config     sha256:{config_sha[:12]}...\n"
             f"feasible   {n_feasible}/{n_total}\n"
-            f"survived   {n_survived}/{n_feasible} ({pct:.0f}%)")
+            f"survived   {n_survived}/{n_feasible} ({pct:.0f}%)\n"
+            f"env        lock:{lock_sha[:12]}")
 
 
 def loss(harm: float, q_false: float, t_lost: float,

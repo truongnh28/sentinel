@@ -34,21 +34,21 @@ class Gate3StrongEnough(unittest.TestCase):
         self.assertIsNone(metrics.gain(h_b1=0.0, h_sentinel=0.0),
                           "gain% must be None below the 0.05 floor")
 
-    def test_results_table_carries_all_four_mandatory_lines(self):
+    def test_results_table_carries_all_five_mandatory_lines(self):
         """Gate 3 is enforced by FORMAT, not by assertions.
 
         Thesis claim (vi): moi bang ket qua phai tu mang theo bang chung.
 
         A table missing these lines is not a results table:
-            config sha256 . feasible n/N . survived n/N . Delta-harm + CI95
+            config sha256 . feasible n/N . survived n/N . env lock . Delta-harm + CI95
         """
         try:
             import metrics
         except ImportError:
             self.fail("metrics.py missing (B5) -- nowhere to enforce format.")
         hdr = metrics.report_header(config_sha="a" * 64, n_feasible=38,
-                                    n_total=40, n_survived=26)
-        for line in ("sha256", "feasible", "survived"):
+                                    n_total=40, n_survived=26, lock_sha="b" * 64)
+        for line in ("sha256", "feasible", "survived", "lock"):
             self.assertIn(line, hdr, f"header is missing the line: {line}")
 
 
