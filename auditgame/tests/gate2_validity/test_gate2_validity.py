@@ -54,7 +54,7 @@ class Gate2Validity(unittest.TestCase):
         chi (the COST spread between carriers) and n_c (item DENSITY) are two
         DIFFERENT evasion axes.  An empty carrier erases the second one.
 
-        Thesis claim (vi): "chi lon => loi the lon" (RQ2) -- and "nap trong dam dong".
+        Thesis claim (vi): "chi day diem giao CHAM LAI", he so (1+chi) -- and "nap trong dam dong".
         """
         import random, build, agent
         from core import CarrierStore, seed_of, CARRIERS
@@ -80,7 +80,7 @@ class Gate2Validity(unittest.TestCase):
         fixed => RQ2 was never actually tested, even though the table kept printing
         numbers.
 
-        Thesis claim (vi): "chi lon => loi the lon" (RQ2).
+        Thesis claim (vi): "chi day diem giao CHAM LAI", he so (1+chi).
         """
         import experiment, inspect
         src = inspect.getsource(experiment.main)

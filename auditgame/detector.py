@@ -76,6 +76,20 @@ class Detector:
     def phi(self) -> float:
         return _N.cdf(-self.tau_det)
 
+    def at_depth(self, depth: int) -> "Detector":
+        """The SAME detector run deeper: more independent evidence, same threshold.
+
+        d' grows like sqrt(depth) because depth means more independent looks at the
+        same item, and the separability of a mean of n independent observations
+        scales that way.  tau_det is untouched, so phi is unchanged -- a deep audit
+        must not be a DIFFERENT detector, or the one-shared-detector constraint
+        breaks and we would be measuring detection quality again.
+
+        depth=1 returns an identical operating point, so every number recorded
+        before depth existed still holds.
+        """
+        return Detector(self.d_prime * (depth ** 0.5), self.tau_det)
+
     def score(self, item, now: int, seed: int) -> float:
         """Raw score ~ N(d' if poisoned else 0, sd 1).
 

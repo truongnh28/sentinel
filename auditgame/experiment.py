@@ -24,16 +24,40 @@ def make_corpus(n, H, seed):
     rng = random.Random(seed)
     return [build.make_workflow(f"wf-{i:03d}", "django", H, rng) for i in range(n)]
 
-def sweep_delta(wfs, deltas, det_name, budget, seeds, carriers):
+def sweep_delta(wfs, deltas, det_name, budget, seeds, carriers, chi=None):
+    """One (policy x Delta) grid at one detector setting and one chi.
+
+    `chi` patches policies.KAPPA for the duration.  It is a module-level dict, so
+    there is no way to pass a cost table in -- the same reason fixtures.Profile
+    patches it rather than parameterising.
+    """
     det, ag = detector.Detector.from_setting(det_name), agent.MockAgent()
-    out = {}
-    for d in deltas:
-        row = {}
-        for name in P.REGISTRY:
-            row[name] = runner.worst_case(name, wfs, (d,), carriers, det, ag,
-                                          budget, seeds, det_name)
-        out[d] = row
-    return out
+    old = dict(P.KAPPA)
+    if chi is not None:
+        P.KAPPA.clear(); P.KAPPA.update(P.kappa_for_chi(chi, old))
+    try:
+        out = {}
+        for d in deltas:
+            row = {}
+            for name in P.REGISTRY:
+                runner.reset_survivor_cache()
+                row[name] = runner.worst_case(name, wfs, (d,), carriers, det, ag,
+                                              budget, seeds, det_name)
+            out[d] = row
+        return out
+    finally:
+        P.KAPPA.clear(); P.KAPPA.update(old)
+
+
+def sweep_chi(wfs, deltas, det_name, budget, seeds, carriers, chis):
+    """RQ2's axis, swept for the first time.
+
+    experiment.py's docstring claimed a (Delta x chi x detector) grid while the code
+    looped over deltas and detector settings only -- chi was a property of one fixed
+    KAPPA table, so RQ2 had never been tested even though tables kept printing.
+    """
+    return {c: sweep_delta(wfs, deltas, det_name, budget, seeds, carriers, chi=c)
+            for c in chis}
 
 def main():
     ap = argparse.ArgumentParser()

@@ -35,8 +35,8 @@ class ScoreInterface(unittest.TestCase):
         This is B0.5's PRIMARY test.  Red under noisy-OR and max-p, green under
         mean-Lambda.
 
-        Thesis claim (vi): "chi lon => loi the lon" (RQ2) and "phan bo bu cho chat
-        luong phat hien" (RQ4).
+        Thesis claim (vi): "chi day diem giao CHAM LAI" (1+chi) va "phan bo bu cho
+        chat luong phat hien" (RQ4).
         """
         for setting in SETTINGS:
             dp = scoring.d_prime_of(setting)

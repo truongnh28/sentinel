@@ -87,6 +87,21 @@ class ScriptedDetector:
             self.legacy_calls += 1      # WARNING: ground truth is still being passed in
         return score > self.tau
 
+    def at_depth(self, depth: int) -> "ScriptedDetector":
+        """Depth is DELIBERATELY inert here.
+
+        The real Detector buys separability with depth (d' scales like sqrt(depth)).
+        A scripted detector has no sampling noise to average away, so there is
+        nothing for depth to buy -- returning a scaled copy would invent a
+        difference the script does not have.
+
+        This is the same reasoning as scripting scores at all: these fixtures exist
+        to isolate the BUDGET mechanism from the DETECTION mechanism, and depth
+        belongs to the second one.  It is tested against the real Detector in
+        tests/gate1_integrity/test_cost_axes.py.
+        """
+        return self
+
     def score_patch(self, has_marker: bool, task_id: str = "", seed: int = 0) -> float:
         """D2: score the PATCH, not writes[0].  Deterministic in has_marker."""
         return self.poisoned_score if has_marker else self.clean_score

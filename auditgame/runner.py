@@ -146,16 +146,18 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True) -> RunResult:
                             detected_at = t
                     else:
                         fq += 1
-            elif act != "commit":                    # upstream audit of that carrier
+            elif not act.startswith("commit"):       # upstream audit of that carrier
+                carrier, depth = P.split_action(act)
+                deep = det.at_depth(depth)           # kappa(k, depth) bought this
                 remaining = len(wf.tasks) - t - 1
-                for it in list(store.live(act)):
-                    s_raw = det.score(it, t, seed)
-                    if not det.fires(s_raw):
+                for it in list(store.live(carrier)):
+                    s_raw = deep.score(it, t, seed)
+                    if not deep.fires(s_raw):
                         continue
                     # Algorithm 1 line 8 -- BOTH conditions.  With the defaults
                     # (0.0, 0.0) this is exactly the old unconditional behaviour.
                     p_item = scoring.posterior(
-                        scoring.likelihood_ratio(s_raw, det.d_prime))
+                        scoring.likelihood_ratio(s_raw, deep.d_prime))
                     if p_item <= pol.tau_quarantine:
                         continue
                     if expected_harm(p_item, it.topic, topic_counts,

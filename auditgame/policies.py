@@ -29,6 +29,13 @@ ETA_Q_COST = 2.0
 QUARANTINE_PREFIX = "quarantine:"
 QUARANTINE_ALL = "quarantine:all"
 
+#: Audit DEPTH.  The model's action is (audit, k, depth) and its cost is the
+#: two-argument kappa(k, depth); the code had a bare carrier name and a
+#: one-argument lookup, so "a deeper audit costs more and sees more" did not exist.
+#: Action spelling: "memory@2".  A bare "memory" means depth 1.
+DEPTHS = (1, 2)
+DEPTH_SEP = "@"
+
 @dataclass(frozen=True)
 class CarrierSignal:
     """The ONLY thing a policy ever sees about a carrier.
@@ -288,6 +295,45 @@ def make_policy(name: str, budget: float, rng_seed: int = 0,
     return REGISTRY[name](name=name, budget=budget, rng_seed=rng_seed, setting=setting)
 
 
+def chi_of(kappa: dict) -> float:
+    """chi = max_{k,k'} |kappa(k) - kappa(k')| / kappa_bar.
+
+    DERIVED from the table, never declared beside it.  Declaring it separately is
+    how the manuscript came to carry two values for one table: SS7 lists costs
+    0.4 / 0.9 / 1.6 / 4.1 and says "giving chi = 1.34", while the formula on those
+    same numbers gives 3.7 / 1.75 = 2.11.
+    """
+    vals = list(kappa.values())
+    mean = sum(vals) / len(vals)
+    return (max(vals) - min(vals)) / mean if mean else 0.0
+
+
+def kappa_for_chi(chi: float, base: dict | None = None) -> dict:
+    """A cost table with the requested chi and the SAME mean as `base`.
+
+        kappa_c(chi) = kappa_bar + s * (kappa_c - kappa_bar),   s = chi / chi(base)
+
+    The mean is held fixed on purpose.  If it moved, sweeping chi would secretly
+    sweep the effective budget as well, and the RQ2 axis would be confounded with
+    the very quantity RQ1 holds constant -- the same class of error as per-carrier
+    alpha drifting along Delta.
+    """
+    base = dict(KAPPA if base is None else base)
+    vals = list(base.values())
+    mean = sum(vals) / len(vals)
+    chi0 = chi_of(base)
+    s = 0.0 if chi0 == 0 else chi / chi0
+    return {k: mean + s * (v - mean) for k, v in base.items()}
+
+
+def split_action(action: str) -> tuple:
+    """"memory@2" -> ("memory", 2).  A bare name means depth 1."""
+    if DEPTH_SEP in action:
+        k, d = action.rsplit(DEPTH_SEP, 1)
+        return k, int(d)
+    return action, 1
+
+
 def cost_of(action: str | None) -> float:
     if action is None:
         return 0.0
@@ -295,4 +341,6 @@ def cost_of(action: str | None) -> float:
         return ETA_Q_COST * len(CARRIERS)      # one eta_Q per carrier swept
     if action.startswith(QUARANTINE_PREFIX):
         return ETA_Q_COST
-    return KAPPA_COMMIT if action == "commit" else KAPPA[action]
+    carrier, depth = split_action(action)
+    base = KAPPA_COMMIT if carrier == "commit" else KAPPA[carrier]
+    return base * depth                        # kappa(k, depth), linear in depth
