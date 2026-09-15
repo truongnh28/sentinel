@@ -27,8 +27,8 @@ policies see the carrier-level POSTERIOR (scoring.carrier_score), not raw scores
 """
 from __future__ import annotations
 import random
-from dataclasses import dataclass
-from core import CARRIERS, CarrierStore, seed_of
+from dataclasses import dataclass, field
+from core import CARRIERS, CarrierStore, TaskTrace, seed_of
 from agent import MockAgent
 from detector import Detector
 import build, oracle, scoring, policies as P
@@ -46,6 +46,7 @@ class RunResult:
     true_quarantine: int      # accounting -- does NOT enter the decision loop
     false_quarantine: int     # Q_false: a CLEAN item quarantined.  The mechanism behind lambda_Q
     t_lost: int               # T_lost: a CLEAN patch wrongly blocked by the commit audit
+    traces: list = field(default_factory=list)    # one TaskTrace per task -- I9
 
 
 def expected_harm(p_item: float, topic, topic_counts: dict,
@@ -110,8 +111,10 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True) -> RunResult:
     solved_final = False
     tq = fq = t_lost = 0
     topic_counts: dict = {}            # topic -> how many PAST tasks carried it
+    traces = []
 
     for t, task in enumerate(wf.tasks):
+        truoc = store.snapshot()
         if do_inject and ps is not None and t == ps.iota:
             build.inject(store, wf, ps)
         o = ag.run_task(t, task, store, seed=seed, marker=ps.marker if ps else "x")
@@ -119,10 +122,12 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True) -> RunResult:
         # CARRIER-level score = the mean-Lambda posterior over live items.
         # NOT the max raw score: E[max_n N(0,1)] grows with n, so a clean 9-item
         # carrier reads as hot as one holding the payload (SPEC SS2.5).
-        signals = {}
+        signals, raw_scores = {}, {}
         for c in CARRIERS:
             items = store.live(c)
             raw = [det.score(i, t, seed) for i in items]
+            for i, s in zip(items, raw):
+                raw_scores[i.item_id] = s
             signals[c] = P.CarrierSignal(p=scoring.carrier_score(raw, det.d_prime),
                                          n=len(items))
 
@@ -178,6 +183,19 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True) -> RunResult:
                     else:
                         t_lost += 1                  # CI wrongly blocked a GOOD patch
 
+        traces.append(TaskTrace(
+            t=t, task_id=task.task_id, topic=task.topic,
+            before=truoc, after=store.snapshot(),
+            writes=[i.item_id for i in o.writes],
+            retrieved=[i.item_id for i in o.retrieved],
+            alarms=raw_scores,
+            patch_has_marker=o.patch_has_marker,
+            public_ok=o.solved, hidden_ok=not o.patch_has_marker,
+            audit_seconds={} if act is None else {act: 0.0},
+            n_c={c: s.n for c, s in signals.items()},
+            signals={c: s.p for c, s in signals.items()},
+            is_sigma=(ps is not None and t == ps.sigma)))
+
         if ps is not None and t == ps.sigma:
             fired_at = t if o.patch_has_marker else None
             marker_final, solved_final = o.patch_has_marker, o.solved
@@ -186,7 +204,7 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True) -> RunResult:
                      solved=solved_final, marker=marker_final, spent=pol.spent,
                      detected_at=detected_at, quarantined=len(store.quarantined),
                      fired_at=fired_at, true_quarantine=tq, false_quarantine=fq,
-                     t_lost=t_lost)
+                     t_lost=t_lost, traces=traces)
 
 
 class _NoAudit(P.Policy):

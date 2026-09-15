@@ -147,6 +147,9 @@ class TaskTrace:
     public_ok: bool
     hidden_ok: bool
     audit_seconds: dict        # audit kind -> MEASURED seconds (to derive kappa, not assign it)
+    n_c: dict = field(default_factory=dict)       # carrier -> number of live items
+    signals: dict = field(default_factory=dict)   # carrier -> posterior p_c
+    is_sigma: bool = False                        # is this the task the payload fires at
 
 
 def dumps(obj) -> str:
