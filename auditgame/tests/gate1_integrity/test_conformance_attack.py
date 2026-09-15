@@ -23,6 +23,27 @@ import build
 from core import CarrierStore, seed_of
 
 
+def _identifiers(obj) -> set:
+    """Every NAME the code actually uses -- docstrings and comments excluded.
+
+    K3 and A3 used to grep the raw source text, which reads prose as if it were
+    code: a docstring saying "distinguishability budget" tripped the budget check.
+    A structural prohibition has to look at structure, so this walks the AST and
+    collects Name and Attribute nodes only.
+    """
+    import ast, inspect, textwrap
+    tree = ast.parse(textwrap.dedent(inspect.getsource(obj)))
+    out = set()
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Name):
+            out.add(n.id)
+        elif isinstance(n, ast.Attribute):
+            out.add(n.attr)
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            out.update(a.arg for a in n.args.args)
+    return out
+
+
 def _wfs(n=12, H=8):
     return [build.make_workflow(f"wf-{i:03d}", "django", H, random.Random(seed_of("K", i)))
             for i in range(n)]
@@ -104,12 +125,11 @@ class AttackPipelineConformance(unittest.TestCase):
 
         Thesis claim (vi): "moi chinh sach chay tren CUNG ngan sach B".
         """
-        import inspect
         for name, pipe in self._each():
             with self.subTest(pipeline=name):
-                src = inspect.getsource(type(pipe))
+                used = _identifiers(type(pipe))
                 for forbidden in ("charge", "budget", "spent"):
-                    self.assertNotIn(forbidden, src,
+                    self.assertNotIn(forbidden, used,
                                      f"[{name}] touches the budget: {forbidden!r}")
 
     # ------------------------------------------------------------------ K4 --

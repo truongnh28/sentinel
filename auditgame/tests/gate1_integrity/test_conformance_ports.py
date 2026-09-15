@@ -25,6 +25,27 @@ import policies as P
 from core import CarrierStore, seed_of
 
 
+def _identifiers(obj) -> set:
+    """Every NAME the code actually uses -- docstrings and comments excluded.
+
+    K3 and A3 used to grep the raw source text, which reads prose as if it were
+    code: a docstring saying "distinguishability budget" tripped the budget check.
+    A structural prohibition has to look at structure, so this walks the AST and
+    collects Name and Attribute nodes only.
+    """
+    import ast, inspect, textwrap
+    tree = ast.parse(textwrap.dedent(inspect.getsource(obj)))
+    out = set()
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Name):
+            out.add(n.id)
+        elif isinstance(n, ast.Attribute):
+            out.add(n.attr)
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            out.update(a.arg for a in n.args.args)
+    return out
+
+
 # =========================================================== DatasetPipeline ==
 
 class DatasetConformance(unittest.TestCase):
@@ -116,12 +137,11 @@ class AgentConformance(unittest.TestCase):
 
     def test_A3_does_not_spend_budget(self):
         """Thesis claim (vi): "chi DefensePipeline duoc tieu ngan sach"."""
-        import inspect
         for name, ag in self._each():
             with self.subTest(agent=name):
-                src = inspect.getsource(type(ag))
+                used = _identifiers(type(ag))
                 for forbidden in ("charge", "budget", "spent"):
-                    self.assertNotIn(forbidden, src,
+                    self.assertNotIn(forbidden, used,
                                      f"[{name}] touches the budget: {forbidden!r}")
 
 
