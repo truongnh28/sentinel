@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+"""
+experiment.py -- The AuditGame-SE experiment driver.
+
+Sweeps the grid (Delta x chi x detector) and prints the table the way the
+manuscript requires: REPORT ON THE GRID, DO NOT POOL.  A single pooled number
+averages the regime where the method helps together with the regime where it does
+not.
+
+    python3 experiment.py                  # defaults
+    python3 experiment.py --n 60 --json r.json
+"""
+from __future__ import annotations
+import argparse, json, random, sys
+import build, agent, detector, runner
+import policies as P
+
+def gain(row):
+    """Percent reduction in worst-case harm, Sentinel vs B1 audit-at-commit."""
+    b1 = row["B1 audit-at-commit"].harm
+    return 100.0 * (b1 - row["Sentinel"].harm) / max(b1, 1e-9)
+
+def make_corpus(n, H, seed):
+    rng = random.Random(seed)
+    return [build.make_workflow(f"wf-{i:03d}", "django", H, rng) for i in range(n)]
+
+def sweep_delta(wfs, deltas, det_name, budget, seeds, carriers):
+    det, ag = detector.Detector.from_setting(det_name), agent.MockAgent()
+    out = {}
+    for d in deltas:
+        row = {}
+        for name in P.REGISTRY:
+            row[name] = runner.worst_case(name, wfs, (d,), carriers, det, ag,
+                                          budget, seeds, det_name)
+        out[d] = row
+    return out
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--n", type=int, default=40, help="number of workflows")
+    ap.add_argument("--H", type=int, default=8, help="tasks per workflow")
+    ap.add_argument("--budget", type=float, default=17.95)
+    ap.add_argument("--seeds", type=int, default=3)
+    ap.add_argument("--json", metavar="FILE")
+    a = ap.parse_args()
+
+    wfs = make_corpus(a.n, a.H, seed=2026)
+    seeds = tuple(range(1, a.seeds + 1))
+    deltas = (0, 1, 2, 4)
+    # D5 -- the attacker class must cover ALL FOUR carriers.  Sweeping only
+    # {memory, skill} takes the two CHEAPEST carriers (0.4 and 0.9), so chi -- the
+    # cost spread BETWEEN carriers -- is nearly fixed, and RQ2 was never actually
+    # tested even though the table kept printing numbers.
+    carriers = ("memory", "skill", "queue", "branch")
+
+    print("=" * 78)
+    print("AuditGame-SE -- grid sweep (mock agent, no LLM spend)")
+    print(f"{a.n} workflows - H={a.H} - B={a.budget} - {a.seeds} seeds - "
+          f"injection carriers: {', '.join(carriers)}")
+    print("=" * 78)
+
+    results = {}
+    for det_name in ("weak", "mid", "strong"):
+        psi, phi = detector.SETTINGS[det_name]
+        print(f"\n[detector = {det_name}]  psi={psi} phi={phi}")
+        grid = sweep_delta(wfs, deltas, det_name, a.budget, seeds, carriers)
+        results[det_name] = grid
+        names = list(P.REGISTRY)
+        print(f"  {'policy':24s}" + "".join(f"{'D='+str(d):>9s}" for d in deltas))
+        print("  " + "-" * (24 + 9 * len(deltas)))
+        for nm in names:
+            print(f"  {nm:24s}" + "".join(f"{grid[d][nm].harm:9.3f}" for d in deltas))
+        print(f"  {'-> Sentinel vs B1':24s}"
+              + "".join(f"{gain(grid[d]):+8.1f}%" for d in deltas))
+
+        # N3 -- harm never travels alone; and CI95 is resampled BY WORKFLOW
+        c0 = grid[deltas[0]]["Sentinel"]
+        print(f"  {'feasible':24s}" + "".join(
+            f"{grid[d]['Sentinel'].n_feasible:>4d}/{grid[d]['Sentinel'].n_total:<4d}" for d in deltas))
+        print(f"  {'Q_false / wf (lambda_Q)':24s}"
+              + "".join(f"{grid[d]['Sentinel'].q_false:9.2f}" for d in deltas))
+        print(f"  {'T_lost / wf  B1 (lam_T)':24s}"
+              + "".join(f"{grid[d]['B1 audit-at-commit'].t_lost:9.2f}" for d in deltas))
+        for d in deltas:
+            lo, hi = runner.bootstrap_paired(grid[d]["B1 audit-at-commit"].per_wf,
+                                             grid[d]["Sentinel"].per_wf)
+            b1, sn = grid[d]["B1 audit-at-commit"], grid[d]["Sentinel"]
+            print(f"     D={d}  d-harm = {b1.harm - sn.harm:+.3f}"
+                  f"  CI95 [{lo:+.3f} ; {hi:+.3f}]"
+                  f"   {'excludes 0' if lo > 0 else 'CI COVERS 0'}")
+
+    print("\n" + "=" * 78)
+    print("READING THE TABLE")
+    print("=" * 78)
+    g = results["mid"]
+    gains = [gain(g[d]) for d in deltas]
+    print(f"  Gain by Delta (detector mid): "
+          + " - ".join(f"D={d}:{gv:+.0f}%" for d, gv in zip(deltas, gains)))
+    print(f"  Monotone increasing in Delta: {'YES' if all(gains[i] <= gains[i+1]+1e-9 for i in range(len(gains)-1)) else 'NO'}"
+          "   <- this is RQ1 / Corollary 5")
+    w = [gain(results[s][d]) for s in ("weak", "strong") for d in (4,)]
+    print(f"  Gain at Delta=4:  WEAK detector {w[0]:+.0f}%  -  STRONG detector {w[1]:+.0f}%")
+    print(f"  Largest advantage when the detector is weakest: {'YES' if w[0] >= w[1] else 'NO'}"
+          "   <- RQ4, allocation COMPENSATES for detection quality")
+
+    if a.json:
+        from dataclasses import asdict
+        dump = {s: {str(d): {nm: asdict(c) for nm, c in row.items()}
+                    for d, row in grid.items()} for s, grid in results.items()}
+        json.dump(dump, open(a.json, "w"), indent=2, ensure_ascii=False)
+        print(f"\n  wrote {a.json}")
+
+if __name__ == "__main__":
+    sys.exit(main())
