@@ -14,7 +14,7 @@ the tests below trace configuration A, re-score under a DIFFERENT configuration 
 and compare against a direct run of B -- a cell that was never run.
 """
 from __future__ import annotations
-import pathlib, random, subprocess, sys, tempfile, unittest
+import json, pathlib, random, subprocess, sys, tempfile, unittest
 
 import agent, build, core, datasets, detector, runner
 import policies as P
@@ -141,13 +141,37 @@ class TraceRecording(unittest.TestCase):
         """SPEC-P1b Part 1: record the RAW score, BEFORE thresholding.  Record it
         after the threshold and rescanning (psi, phi) means RE-RUNNING THE LLM.
 
+        `assertIsInstance(v, float)` cannot support that sentence: a POST-threshold
+        indicator recorded as 0.0 / 1.0 is a float too, so the check passed on the
+        exact recording this test exists to forbid -- a scope narrower than the
+        claim.  What separates raw from thresholded is the RANGE, so assert the
+        range: the scores are drawn from N(d' * 1[poisoned], 1), which straddles
+        zero and is continuous, and no two-point set can imitate both properties.
+
         Thesis claim (vi): "chi phi giam hai bac nho replay".
         """
         _, r = _run()
         with_alarms = [t for t in r.traces if t.alarms]
         self.assertTrue(with_alarms, "no trace recorded a raw alarm score")
-        for v in with_alarms[0].alarms.values():
+        scores = [v for t in with_alarms for v in t.alarms.values()]
+        for v in scores:
             self.assertIsInstance(v, float)
+        # A thresholded indicator is one-sided (0.0 and 1.0 are both >= 0); a raw
+        # N(mu, 1) draw is not.
+        self.assertTrue(any(v < 0.0 for v in scores),
+                        f"no recorded score is strictly negative, so these cannot "
+                        f"be raw N(mu, 1) draws -- they look thresholded: "
+                        f"{sorted(set(round(v, 6) for v in scores))[:8]}")
+        self.assertTrue(any(v > 0.0 for v in scores),
+                        "no recorded score is strictly positive")
+        # ... and it takes at most two distinct values, however many items exist.
+        distinct = {round(v, 6) for v in scores}
+        self.assertGreater(
+            len(distinct), 2,
+            f"only {len(distinct)} distinct score value(s) across {len(scores)} "
+            f"recorded items: {sorted(distinct)[:8]}. A raw score is continuous; "
+            f"a two-point set is a threshold that has already been applied, and "
+            f"(psi, phi) can no longer be rescanned from it.")
 
     def test_trace_records_n_c_to_separate_chi_from_item_density(self):
         """chi (the COST spread) and n_c (item DENSITY) are TWO different evasion
@@ -310,6 +334,27 @@ class TraceSerialisation(unittest.TestCase):
     core.dumps must be able to write that trace to disk, or the whole point of
     TaskTrace (replay without re-running the LLM) does not hold for real data.
     """
+
+    def test_a_plain_set_serialises_in_sorted_order_not_iteration_order(self):
+        """`frozenset` is not a subclass of `set`, so the sorted-list branch added
+        for Topic did NOT cover the plain `set` beside it -- and
+        CarrierStore.quarantined IS a plain set of item_ids.  Iteration order of a
+        hash-backed collection depends on PYTHONHASHSEED, so an unsorted list(o)
+        makes the SAME run serialise to a DIFFERENT byte string across processes,
+        which is the exact failure the frozenset branch was written to close.
+        Tuples are left alone: derived_from is a propagation trail and its order
+        carries meaning.
+
+        Thesis claim (vi): "cung mot run phai ra cung mot chuoi byte".
+        """
+        ids = ["mem-0000000a", "ski-ffffffff", "que-00000001", "bra-7fffffff"]
+        forward = core.dumps({"q": set(ids)})
+        backward = core.dumps({"q": set(reversed(ids))})
+        self.assertEqual(forward, backward,
+                         "two sets with the same members serialise differently")
+        self.assertEqual(json.loads(forward)["q"], sorted(ids))
+        # order-carrying containers must NOT be reordered
+        self.assertEqual(json.loads(core.dumps({"d": tuple(ids)}))["d"], ids)
 
     def test_a_trace_carrying_a_real_frozenset_topic_serialises(self):
         """isinstance(frozenset(), set) is False, so the old encoder's `isinstance(o,
