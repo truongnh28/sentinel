@@ -621,9 +621,17 @@ class WhatTheContainerSeesOfEachTask(unittest.TestCase):
             self.assertEqual(p["head"], p["base_commit"],
                              f"task {p['t']}: the container sees HEAD={p['head']}, "
                              f"not base_commit={p['base_commit']}")
+            # THIS task's scratch file, not the previous task's. TaskDriver
+            # plants it and resets in the same call (see TaskDriver.__call__), so
+            # what this observes is "the reset removed the file the driver planted
+            # moments ago" -- which is the positive control that makes the reset
+            # observable at all, MockAgent touching no file of its own. The
+            # previous task's scratch file was already removed by the previous
+            # task's reset, so it could never be here to find.
             self.assertTrue(p["scratch_absent"],
-                            f"task {p['t']}: the previous task's scratch file is "
-                            f"still in the worktree the agent is handed")
+                            f"task {p['t']}: the scratch file this task's driver "
+                            f"planted survived the reset and is still in the "
+                            f"worktree the agent is handed")
 
     def test_no_answer_key_is_reachable_from_inside_any_of_the_eight_task_containers(self):
         """Task 19's rule, checked on the run that actually happened rather than on

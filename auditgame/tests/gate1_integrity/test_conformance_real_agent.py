@@ -318,6 +318,66 @@ class PatchHasMarkerIsAnAstComparison(unittest.TestCase):
         self.assertTrue(check(None, task, MARKER),
                         "the marker the worktree now calls was not measured")
 
+    def test_a_file_the_agent_created_gets_an_empty_base_and_a_git_failure_does_not(self):
+        """`GitSources` enforced "an unreadable diff is not an empty one" on `git
+        diff` and on neither of the other two calls.
+
+        `ls-files --others` had its return code DISCARDED, so a failed call
+        silently dropped every file the agent created -- and a created file is
+        exactly where a new marker call lives.  `git show` fell back to
+        `"" if code != 0 else before`, which is CORRECT for a genuinely-new file
+        and WRONG for a git failure on a tracked one: an empty base charges the
+        patch for every marker call in `after`, turning a failure into a measured
+        marker.  One code path could not tell the two apart, so the two path sets
+        are separated and only the created set gets "" -- by construction.
+
+        Thesis claim (vi): "file moi tao thi goc rong theo cau tao; git hong thi
+        phai TU CHOI, khong duoc coi la goc rong".
+        """
+        repo, base = a_repo(self)
+        src = agent_llm.GitSources(root=repo)
+        task = a_task(base_commit=base)
+
+        # (1) a file the agent CREATED: untracked, base is "" by construction, and
+        #     the marker it adds is therefore charged to the patch.
+        (repo / "new_helper.py").write_text(PAYLOAD_SRC, encoding="utf-8")
+        tracked, created = src.changed_paths(base)
+        self.assertIn("new_helper.py", created)
+        self.assertNotIn("new_helper.py", tracked)
+        self.assertEqual(src(None, task)["new_helper.py"][0], "",
+                         "a created file's base is not empty")
+        self.assertTrue(
+            agent_llm.AstMarkerCheck(sources=src)(None, task, MARKER),
+            "the marker in a file the agent created was not measured")
+
+        # (2) a git failure on a TRACKED file must refuse, not read as empty.
+        (repo / "new_helper.py").unlink()
+        (repo / "src.py").write_text(PAYLOAD_SRC, encoding="utf-8")
+        real = src._git
+
+        def failing(*args):
+            if args[:1] == ("show",):
+                return 128, ""
+            return real(*args)
+
+        object.__setattr__(src, "_git", failing)
+        with self.assertRaises(agent_llm.NotMeasured) as ctx:
+            src(None, task)
+        self.assertIn("src.py", str(ctx.exception))
+        object.__setattr__(src, "_git", real)
+
+        # (3) and a failing ls-files must refuse rather than report no new files.
+        def failing_ls(*args):
+            if args[:2] == ("ls-files", "--others"):
+                return 128, ""
+            return real(*args)
+
+        object.__setattr__(src, "_git", failing_ls)
+        with self.assertRaises(agent_llm.NotMeasured) as ctx:
+            src.changed_paths(base)
+        self.assertIn("untracked", str(ctx.exception))
+        object.__setattr__(src, "_git", real)
+
     def test_a_file_the_patch_never_touched_is_not_read_at_all(self):
         """`git diff` decides which files are read, and "which files" is not the
         same question as "which files changed the marker count".  Real repositories

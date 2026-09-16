@@ -503,6 +503,24 @@ class TaskDriver:
         return len(git(self.repo_path, "status", "--porcelain").splitlines())
 
     def __call__(self, t, task, store):
+        """Plant the control, reset, reopen, probe -- IN THAT ORDER, IN ONE CALL.
+
+        WHAT `scratch_absent` CAN AND CANNOT MEAN, because the sentence around it
+        has been wider than the check.  The scratch file is planted by `_dirty()`
+        at the top of THIS call and the reset happens a few lines below it, so a
+        container probe finding it absent has observed "the reset removed the file
+        the driver planted 0.2 seconds ago".  It has NOT observed "the PREVIOUS
+        task's scratch file is gone", which is what the probe's own message and
+        spikes/M3.md section 8 used to say: the previous task's file was already
+        removed by the previous task's reset, so nothing carries across.
+
+        The check is right and worth keeping -- it is the positive control that
+        makes the reset observable at all, and without it MockAgent touches no
+        file and the reset destroys nothing. It is the CLAIM that was too wide.
+        Reading it as cross-task persistence would credit the reset with
+        destroying state that the carriers are supposed to survive, which is the
+        opposite of what B-1 is about.
+        """
         base = self.base_commit or task.base_commit
         dirty = self._dirty()
         if dirty < 2:

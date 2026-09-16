@@ -179,17 +179,23 @@ def inject_sealed(store, wf: Workflow, ps: PoisonSpec, *, auc_match_ci: tuple,
     the module that plants payloads.  `store` is duck-typed for the same reason:
     this file must not import `carrier_store_fs` to plant an item into it.
 
-    OWED TO TASK 16/17, AND SAID SO HERE.  This function has no production call
-    site yet -- `runner.py` plants with `inject()` into the in-RAM store, where
-    there is no sealed area to seal a manifest into, so the only callers today are
-    the two gate-1 test modules.  That is the same state the paragraph above
-    indicts `sealed_manifest` for having been in, one level up, and it is left
-    deliberately rather than by oversight: the call site belongs in the real-agent
-    run loop (Task 16 wires the agent, Task 17 the workflow driver), which is the
-    first place a filesystem store and a planted payload meet outside a test.
-    Until that lands, no filesystem run has a sealed manifest, and no harm figure
-    from one is scorable -- which is the sentence this note exists to make
-    impossible to rediscover by accident.
+    THE CALL SITE THIS NOTE ONCE SAID DID NOT EXIST IS `m3.py`.  The paragraph
+    here used to read "this function has no production call site yet ... no
+    filesystem run has a sealed manifest, and no harm figure from one is
+    scorable", closing with "the sentence this note exists to make impossible to
+    rediscover by accident".  Task 17 landed it: `runner.run_once` takes a `seal`
+    argument, and when it is given -- which `m3.run_workflow` does, from
+    `m3.manifest_evidence` -- the payload is planted THROUGH THIS FUNCTION, into a
+    filesystem store with a real sealed area.  `results/M3-run-sealed.json` holds
+    the manifest that call produced.
+
+    A note asserting the opposite of the truth is worse than no note: it is the
+    same claim the paragraph above indicts `sealed_manifest` for, one level up
+    again, so it is corrected rather than deleted.  What remains owed is narrower
+    and is recorded where it belongs: three of the four evidence fields are
+    unmeasured in an M3 run and carry their reasons (m3.MANIFEST_PENDING), so a
+    filesystem run HAS a sealed manifest and that manifest still says which of its
+    numbers do not exist yet.
     """
     injected = inject(store, wf, ps)
     manifest = sealed_manifest(wf, ps, injected, auc_match_ci=auc_match_ci,
