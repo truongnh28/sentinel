@@ -20,8 +20,9 @@ Two things make the reset test able to fail, rather than merely able to pass:
     the reset could plausibly reach.
 """
 from __future__ import annotations
-import json, pathlib, shutil, subprocess, sys, tempfile, unittest
+import json, os, pathlib, shutil, subprocess, sys, tempfile, time, unittest
 
+import carrier_store_fs
 import core
 import retrieval
 from core import CARRIERS, Item
@@ -264,6 +265,51 @@ class CarriersOutsideTheRepo(unittest.TestCase):
             fs.write(an_item("memory", t=7))
         self.assertEqual(len(FSCarrierStore(self.root, repo=self.repo).live("memory")), 1,
                          "the refused write still reached the file")
+
+    def test_a_git_call_that_never_returns_is_killed_and_reported_instead_of_hanging(self):
+        """`subprocess.run` with no timeout does not fail on a wedged git, it WAITS.
+        A stale `.git/index.lock` -- what a killed container or an interrupted run
+        leaves behind -- makes every branch write block forever, and gate 1 then
+        produces neither a green line nor a red one, which is the one outcome a gate
+        may not produce.  Exactly the failure `harness.DOCKER_RUN_TIMEOUT` was added
+        to prevent, one subprocess down.
+
+        Run for real against a `git` that never answers, because a test that reads
+        the source for the word `timeout` finds it in this docstring too.  BOTH
+        sides are checked: the store's own `_git` and the fixtures' `git`, which is
+        inside gate 1 and can hang it the same way.
+
+        Thesis claim (vi): "git treo phai thanh loi NHIN THAY duoc, khong duoc lam
+        treo ca bo test".
+        """
+        store = FSCarrierStore(self.root, repo=self.repo)     # opened with real git
+        fake = self.tmp / "fakebin"
+        fake.mkdir()
+        wedged = fake / "git"
+        wedged.write_text("#!/bin/sh\nsleep 8\n", encoding="utf-8")
+        wedged.chmod(0o755)
+
+        old_path = os.environ["PATH"]
+        old_timeout = carrier_store_fs.GIT_TIMEOUT
+        try:
+            os.environ["PATH"] = f"{fake}:{old_path}"
+            carrier_store_fs.GIT_TIMEOUT = 2
+            t0 = time.monotonic()
+            with self.assertRaises(RuntimeError,
+                                   msg="a git call that never returns was waited on "
+                                       "for as long as it liked"):
+                store._git("for-each-ref")
+            with self.assertRaises(RuntimeError,
+                                   msg="the FIXTURES' git has no limit: gate 1 hangs "
+                                       "in setUp instead of in the store"):
+                git(self.repo, "status")
+            waited = time.monotonic() - t0
+        finally:
+            os.environ["PATH"] = old_path
+            carrier_store_fs.GIT_TIMEOUT = old_timeout
+        self.assertLess(waited, 8.0,
+                        f"both calls together waited {waited:.1f}s for a git that "
+                        f"sleeps 8s each time: the limit is not being applied")
 
     def test_a_detached_copy_refuses_to_invent_a_branch_carrier(self):
         """`clone()` is a DETACHED copy: it has no repo, so by B-1 it has nowhere

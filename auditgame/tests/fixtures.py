@@ -17,6 +17,7 @@ import pathlib
 import subprocess
 from dataclasses import dataclass, field
 
+import carrier_store_fs
 from core import Item, CarrierStore, Task, Workflow, PoisonSpec
 from agent import Outcome, _query
 import policies as P
@@ -47,9 +48,32 @@ GIT_ENV = {
 BASE_SRC = "def f():\n    return 1\n"
 
 
+def _run_git(argv: list, **kw) -> subprocess.CompletedProcess:
+    """One git call, with a TIMEOUT, reported as an error rather than as a hang.
+
+    A git command with no timeout does not fail, it WAITS: a stale
+    `.git/index.lock` -- what a killed run or an interrupted container leaves
+    behind -- makes `git commit` block forever, and a gate that hangs produces
+    neither a green line nor a red one.  The three git calls in this file are
+    inside gate 1 and could hang it exactly the way the untimed `docker run` could.
+
+    The limit is READ OFF `carrier_store_fs.GIT_TIMEOUT` at each call rather than
+    copied: one fact, one place, and a test that turns the limit down to watch this
+    fire must not have to turn it down twice.
+    """
+    try:
+        return subprocess.run(argv, timeout=carrier_store_fs.GIT_TIMEOUT,
+                              env={**os.environ, **GIT_ENV}, **kw)
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(
+            f"the fixture's git call did not finish within "
+            f"{carrier_store_fs.GIT_TIMEOUT}s and was killed: "
+            f"{' '.join(map(str, argv))[:200]}. Treat this as a RED gate, not as a "
+            f"slow machine -- most often a stale .git/index.lock.") from e
+
+
 def git(repo: pathlib.Path, *args: str) -> str:
-    r = subprocess.run(["git", "-C", str(repo), *args], capture_output=True,
-                       text=True, env={**os.environ, **GIT_ENV})
+    r = _run_git(["git", "-C", str(repo), *args], capture_output=True, text=True)
     if r.returncode != 0:
         raise RuntimeError(f"git {' '.join(args)} failed: {r.stderr.strip()}")
     return r.stdout
@@ -59,8 +83,7 @@ def make_repo(path: pathlib.Path) -> str:
     """A one-commit repo standing in for a SWE-bench instance.  Returns base_commit."""
     path = pathlib.Path(path)
     path.mkdir(parents=True, exist_ok=True)
-    subprocess.run(["git", "init", "-q", str(path)], check=True, capture_output=True,
-                   env={**os.environ, **GIT_ENV})
+    _run_git(["git", "init", "-q", str(path)], check=True, capture_output=True)
     (path / "src.py").write_text(BASE_SRC, encoding="utf-8")
     git(path, "add", "-A")
     git(path, "commit", "-q", "-m", "base")
@@ -79,9 +102,9 @@ def all_git_objects(repo: pathlib.Path) -> str:
     Decoded with errors="replace": object contents are bytes, and the question
     being asked is whether two repos hold the SAME bytes.
     """
-    r = subprocess.run(
+    r = _run_git(
         ["git", "-C", str(repo), "cat-file", "--batch-all-objects", "--batch"],
-        capture_output=True, env={**os.environ, **GIT_ENV})
+        capture_output=True)
     if r.returncode != 0:
         raise RuntimeError(f"git cat-file --batch-all-objects failed: "
                            f"{r.stderr.decode('utf-8', 'replace').strip()}")
