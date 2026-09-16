@@ -19,6 +19,11 @@ read -- and rewritten -- the answer to the question being put to it.  Since Task
 `forbidden_roots()` names all three places so that ONE list, checked in ONE place
 (`docker_argv`), decides what may not be mounted.
 
+Blocking the mount closes the front door.  `hidden_leaks` closes the other one:
+an agent that ever sees a hidden path can WRITE IT INTO A CARRIER at task t and
+read it back at t+1 -- the persistence this thesis studies, turned against the
+oracle.
+
 The image is the AGENT's environment, not the measurement's.  This module is part
 of the measurement, so it shells out to `docker` with subprocess rather than
 importing a Docker SDK: the measurement core has to import on a bare stdlib
@@ -177,6 +182,58 @@ def last_run_store() -> Optional[core.CarrierStore]:
         return None
     store = carrier_store_fs.FSCarrierStore(CARRIER_ROOT)
     return store if any(store.items[c] for c in core.CARRIERS) else None
+
+
+# --------------------------------------------------------------------- tier 2
+
+def hidden_needles() -> list:
+    """Strings whose presence in a carrier means an answer key travelled.
+
+    Three kinds, because a leak can be written down three ways: the directory
+    NAME (`hidden_suites`), the absolute PATH, and the name of a FILE inside --
+    `hidden_tests/h1_deprecation.py` is the more useful half of the leak, since it
+    names the suite the agent is about to be graded by, and a needle list holding
+    only directory names misses it entirely.
+
+    File names keep their extension on purpose.  The bare stem would match an
+    ordinary agent note ("agreement", "diffutil" are English words a SE agent
+    writes), and a gate that cries wolf on honest runs is a gate somebody turns
+    off.  `__init__.py` and dotfiles are dropped for the same reason, and so are
+    needles under four characters.
+    """
+    needles = set()
+    for root in forbidden_roots():
+        needles.update({root.name, str(root), str(root.resolve())})
+        if root.is_dir():
+            for p in root.rglob("*"):
+                if p.is_file() and "__pycache__" not in p.parts \
+                        and not p.name.startswith(("__", ".")):
+                    needles.add(p.name)
+    return sorted(n.casefold() for n in needles if len(n) >= 4)
+
+
+def hidden_leaks(store) -> list:
+    """(carrier, item_id, needle) for every carrier item that names an answer key.
+
+    Scans the FULL serialised record of every item, not `content` and `provenance`
+    alone: a path smuggled in the topic or in the propagation trail is the same
+    leak, and a field list is exactly the kind of check that goes green because
+    its scope is narrower than the sentence it stands for.
+
+    Scans `store.items`, not `store.live()`.  Quarantine is the DEFENDER's action;
+    an item the defence removed still travelled and still proves the path leaked,
+    so filtering it out would let the oracle's own audit conceal the oracle's own
+    leak.  All four carriers, because `skill` items are induced from trajectories
+    and inherit whatever the trajectory saw -- and because `branch` is the one
+    carrier a directory walk would miss (it lives in the repo's object database).
+    """
+    needles = hidden_needles()
+    leaks = []
+    for c in core.CARRIERS:
+        for it in store.items[c]:
+            blob = core.dumps(core.item_record(it)).casefold()
+            leaks += [(c, it.item_id, n) for n in needles if n in blob]
+    return leaks
 
 
 # ------------------------------------------------------------- ground truth
