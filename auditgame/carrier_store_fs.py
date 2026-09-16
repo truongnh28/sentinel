@@ -30,17 +30,24 @@ class subclasses it) and cannot answer differently.  The consequence to know:
 ONE writer per root.  Two live objects over the same root do not see each other's
 writes; re-open the root to pick up another process's.
 
-OPEN QUESTION, TO SETTLE BEFORE THE FIRST REAL-AGENT RUN (Task 16/17).
-`core.item_record` includes `poisoned`, the GROUND TRUTH flag whose own docstring
-says audit policies must not read it -- and `harness.mounts()` hands this whole
-root to the container rw.  Nothing reads it there today (the mock agent does not,
-and the policies run in the measurement process, not the container), so no number
-in this build is affected.  But once a real agent reads the carriers from inside
-the container, a flag saying "this item is the payload" is the same leak shape as
-the hidden tests: harm would then measure whether the agent can read a label
-rather than whether the attack works.  The fix is a decision about WHERE ground
-truth lives, not a detail of this file, so it is written down rather than guessed
-at here.
+GROUND TRUTH IS NOT IN HERE -- the open question Task 13 left, settled in Task 19.
+`core.item_record` includes `poisoned`, the flag whose own docstring says audit
+policies must not read it, and `harness.mounts()` hands this whole root to the
+container READ-WRITE.  Nothing read it there while the agent was a mock, so no
+number in this build ever depended on it; but Tasks 14/16/17 put a real LLM agent
+at exactly that mount, and a file saying "this item is the payload" is the same
+leak shape as the hidden tests -- harm would measure whether the agent can read a
+label rather than whether the attack works, and the agent could WRITE the label
+too.
+
+So what lands under `root` is `public_record`, which is `core.item_record` minus
+SEALED_FIELDS, and the labels go to `sealed_root_for(root)`: a SIBLING, mounted
+nowhere, alongside the sealed manifest (`build.sealed_manifest`, Task 21).  The
+in-memory `Item.poisoned` is untouched -- the runner's Q_true/Q_false accounting,
+`detector.score` and the manifest all still read it -- and it is recovered at load
+from the sealed side.  A LOAD WITH NO LABEL IS AN ERROR, not a False: a missing
+label read as "clean" turns every payload into an ordinary note, undercounts harm,
+and says nothing while doing it.
 """
 from __future__ import annotations
 import json, os, pathlib, shutil, subprocess, tempfile
@@ -62,6 +69,51 @@ BRANCH_NS = "auditgame"
 #: re-opening a carrier root (harness.last_run_store() takes no repo argument)
 #: would come back with three carriers and no error at all.
 REPO_POINTER = "repo.path"
+
+#: Fields of `core.item_record` that are GROUND TRUTH and may not reach the carrier
+#: root.  A TUPLE rather than an inline `del`, so `public_record` and the sealing
+#: side name the same thing and a second sealed field cannot be added to one half.
+SEALED_FIELDS = ("poisoned",)
+
+#: The sealed area: `<carrier root>-sealed`, a SIBLING of the carrier root.
+#: DERIVED, never passed in.  A `sealed=` argument is a thing a call site can get
+#: wrong once, in a branch whose tests nobody ran, and the consequence of getting
+#: it wrong is silent: the labels land inside the mount and everything still works.
+SEALED_SUFFIX = "-sealed"
+LABELS = "ground_truth.jsonl"
+MANIFEST_PREFIX = "manifest-"
+
+
+class GroundTruthMissing(RuntimeError):
+    """A carrier item was read back with no sealed label.
+
+    Its own class because the alternative is `poisoned=False`, and that is the one
+    outcome this whole arrangement exists to prevent: every payload silently
+    demoted to an ordinary note, harm undercounted, nothing printed.
+    """
+
+
+def sealed_root_for(root) -> pathlib.Path:
+    """Where the ground truth for `root` lives.  Outside `root`, by construction."""
+    root = pathlib.Path(root)
+    return root.parent / (root.name + SEALED_SUFFIX)
+
+
+def public_record(it: Item) -> dict:
+    """`core.item_record` minus the ground truth -- the ONLY item shape written
+    into the carrier root, JSONL and git blob alike.
+
+    Subtractive rather than an allow-list: a new field of `core.item_record` is
+    then carried to disk automatically (the round trip stays complete), while the
+    one class of field that must not travel is named in SEALED_FIELDS.  `pop`
+    without a default is deliberate -- if `poisoned` is ever renamed, this raises
+    instead of quietly passing the renamed field straight through.
+    """
+    rec = core.item_record(it)
+    for f in SEALED_FIELDS:
+        rec.pop(f)
+    return rec
+
 
 #: Fixed identity, fixed dates, no user config.  A commit sha is then a pure
 #: function of its content: the branch carrier contains no wall-clock reading,
@@ -109,11 +161,38 @@ class FSCarrierStore(core.CarrierStore):
 
     def __init__(self, root: pathlib.Path, repo: Optional[pathlib.Path] = None):
         self.root = pathlib.Path(root)
+        self.sealed = sealed_root_for(self.root)
+        self._refuse_nesting()
         self.root.mkdir(parents=True, exist_ok=True)
+        self.sealed.mkdir(parents=True, exist_ok=True)
         self.repo = self._attach(repo)
         self.items = {c: [] for c in CARRIERS}
         self.quarantined = set()
+        self.labels: dict = {}
         self._load()
+
+    def _refuse_nesting(self) -> None:
+        """Refuse a carrier root that sits inside another store's area.
+
+        The sibling rule is derived, so the one way left to defeat it is nesting:
+        a store at `<mounted carrier root>/inner` puts its labels at
+        `<mounted carrier root>/inner-sealed`, INSIDE the mount, and the leak is
+        back with one more directory in the path.  Walking the ancestors costs a
+        handful of stat calls once per open, and the alternative is a paragraph in
+        a docstring that the call site introducing the bug will not be reading.
+        """
+        here = self.root.resolve()
+        for anc in here.parents:
+            if (anc / LABELS).exists():
+                raise AssertionError(
+                    f"carrier root {here} is inside the SEALED area {anc}: its own "
+                    f"labels would sit next to another store's ground truth.")
+            if (anc / REPO_POINTER).exists() or any(
+                    (anc / f"{c}.jsonl").exists() for c in FLAT_CARRIERS):
+                raise AssertionError(
+                    f"carrier root {here} is nested inside the carrier root {anc}: "
+                    f"its sealed area {sealed_root_for(here)} would land inside a "
+                    f"directory the container is mounted on.")
 
     # ------------------------------------------------------------- attachment
 
@@ -147,6 +226,7 @@ class FSCarrierStore(core.CarrierStore):
     # ------------------------------------------------------------------ read
 
     def _load(self) -> None:
+        self._load_labels()
         for c in FLAT_CARRIERS:
             self._load_flat(c)
         if self.attached:
@@ -161,13 +241,43 @@ class FSCarrierStore(core.CarrierStore):
                 if line.strip():
                     self.quarantined.add(json.loads(line)["item_id"])
 
+    def _load_labels(self) -> None:
+        """The sealed side, read before any carrier is."""
+        path = self.sealed / LABELS
+        if not path.exists():
+            return
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                rec = json.loads(line)
+                self.labels[rec["item_id"]] = rec[SEALED_FIELDS[0]]
+
+    def _rejoin(self, rec: dict) -> Item:
+        """A public record from the carrier root + its sealed label -> the Item.
+
+        The two halves are rejoined HERE and nowhere else, so there is one place
+        that can answer "what happens when a label is missing" -- and it answers
+        LOUDLY.  `poisoned=False` would be the silent answer, and the silent answer
+        is the bug: an agent can append to `memory.jsonl` from inside the container
+        (the mount is rw), and a fabricated line read back as clean is a payload
+        the scoring path will never count.
+        """
+        item_id = rec["item_id"]
+        try:
+            label = self.labels[item_id]
+        except KeyError:
+            raise GroundTruthMissing(
+                f"item {item_id!r} is in {self.root} but has no sealed label in "
+                f"{self.sealed / LABELS}. Reading it as clean would silently "
+                f"demote a payload to an ordinary note.") from None
+        return core.item_from_record({**rec, SEALED_FIELDS[0]: label})
+
     def _load_flat(self, carrier: str) -> None:
         path = self.root / f"{carrier}.jsonl"
         if not path.exists():
             return
         for line in path.read_text(encoding="utf-8").splitlines():
             if line.strip():
-                self.items[carrier].append(core.item_from_record(json.loads(line)))
+                self.items[carrier].append(self._rejoin(json.loads(line)))
 
     def _load_branch(self) -> None:
         out = self._git("for-each-ref", "--format=%(refname:short)",
@@ -177,7 +287,7 @@ class FSCarrierStore(core.CarrierStore):
         # `live()` order is ours, and the traces depend on it.
         for ref in sorted(out.split()):
             rec = json.loads(self._git("cat-file", "-p", f"{ref}:item.json"))
-            self.items[BRANCH].append(core.item_from_record(rec))
+            self.items[BRANCH].append(self._rejoin(rec))
 
     # ----------------------------------------------------------------- write
 
@@ -189,12 +299,24 @@ class FSCarrierStore(core.CarrierStore):
                 "instead would produce a branch carrier that outlives a repo "
                 "reset for a reason that has nothing to do with git.")
         super().write(it)                      # collision guard, then append
+        # SEAL FIRST, publish second.  A crash between the two then leaves a label
+        # with no item, which is harmless; the other order leaves an item with no
+        # label, which is the GroundTruthMissing case -- recoverable, but it stops
+        # the next run dead.
+        self._seal_label(it)
         if it.carrier == BRANCH:
             self._write_branch(it, seq=len(self.items[BRANCH]) - 1)
         else:
             with (self.root / f"{it.carrier}.jsonl").open("a", encoding="utf-8") as f:
-                f.write(_line(core.item_record(it)) + "\n")
+                f.write(_line(public_record(it)) + "\n")
         return it
+
+    def _seal_label(self, it: Item) -> None:
+        """The ground truth, to the sealed sibling and nowhere else."""
+        self.labels[it.item_id] = getattr(it, SEALED_FIELDS[0])
+        with (self.sealed / LABELS).open("a", encoding="utf-8") as f:
+            f.write(_line({"item_id": it.item_id,
+                           SEALED_FIELDS[0]: self.labels[it.item_id]}) + "\n")
 
     def _write_branch(self, it: Item, seq: int) -> None:
         """One item -> one git branch, via plumbing.
@@ -204,7 +326,7 @@ class FSCarrierStore(core.CarrierStore):
         it and `git checkout` does not touch it, which is the B-1 property stated
         in the one way a reader can check by running git themselves.
         """
-        payload = _line(core.item_record(it)) + "\n"
+        payload = _line(public_record(it)) + "\n"
         blob = self._git("hash-object", "-w", "--stdin", stdin=payload).strip()
         tree = self._git("mktree", stdin=f"100644 blob {blob}\titem.json\n").strip()
         commit = self._git("commit-tree", tree, "-m",
@@ -241,10 +363,44 @@ class FSCarrierStore(core.CarrierStore):
             shutil.copyfile(q, dest / "quarantined.jsonl")
         if self.items[BRANCH]:
             (dest / f"{BRANCH}.jsonl").write_text(
-                "".join(_line(core.item_record(it)) + "\n" for it in self.items[BRANCH]),
+                "".join(_line(public_record(it)) + "\n" for it in self.items[BRANCH]),
                 encoding="utf-8")
+        # The SEALED side travels with the copy.  A clone is for scoring a
+        # counterfactual and scoring reads `poisoned`, so a copy without the labels
+        # would either score an all-clean world or -- since Task 19 -- refuse to
+        # open at all.  It lands in the copy's OWN sealed sibling, still outside
+        # the copy's carrier root.
+        sealed_dest = sealed_root_for(dest)
+        sealed_dest.mkdir(parents=True, exist_ok=True)
+        for f in sorted(self.sealed.glob("*")):
+            if f.is_file():
+                shutil.copyfile(f, sealed_dest / f.name)
         # No REPO_POINTER in the copy: that is what makes it detached.
         return FSCarrierStore(dest)
+
+    # ------------------------------------------------------------- manifest
+
+    def seal_manifest(self, manifest: dict) -> pathlib.Path:
+        """Write one `build.sealed_manifest` record into the sealed area.
+
+        WRITE ONCE.  A manifest that can be overwritten after the run records what
+        the evaluator concluded afterwards rather than what was planted, and every
+        "the manifest says so" argument in the thesis rests on the opposite.
+        """
+        path = self.sealed / f"{MANIFEST_PREFIX}{manifest['wf_id']}.json"
+        if path.exists():
+            raise AssertionError(
+                f"{path} is already sealed. A sealed manifest is written before the "
+                f"run and never again -- rewriting it would make it a record of the "
+                f"outcome rather than of the plan.")
+        path.write_text(core.dumps(manifest), encoding="utf-8")
+        return path
+
+    def read_manifests(self) -> list:
+        """The sealed manifests for this root, in workflow-id order.  The evaluator
+        reads these; nothing inside the container can."""
+        return [json.loads(p.read_text(encoding="utf-8"))
+                for p in sorted(self.sealed.glob(f"{MANIFEST_PREFIX}*.json"))]
 
     # ------------------------------------------------------------------ git
 

@@ -8,7 +8,7 @@ test IS the harm measurement, so a leak does not make the number optimistic, it
 makes it meaningless.
 
 Tier 2, which scans the carriers for a path written into memory at one task and
-used at the next, needs a completed run to scan and lives in Task 19.
+used at the next, lands in Task 19.
 
 WHY THESE TESTS LOOK AT THE ARGV AND NOT AT `mounts()` ALONE.  A check that only
 walks `mounts()` is narrower than the sentence it protects: a mount added
@@ -31,9 +31,15 @@ from core import Task
 
 #: Every path the agent must never reach.  `hidden_suites` is the generated
 #: per-instance suites; `hidden_tests` is the hand-written oracle templates they
-#: come from -- leaking either one hands over the answer key.
+#: come from; `carriers-sealed` is where the ground-truth labels and the sealed
+#: manifest live now that the carrier store no longer keeps them.  Leaking any one
+#: of the three hands over an answer key.
+#:
+#: Spelled out HERE rather than read off `harness.forbidden_roots()`, and the two
+#: are asserted equal below: a test that takes its own subject from the module
+#: under test goes green the moment someone shortens that list.
 def forbidden_roots() -> list:
-    return [harness.HIDDEN_ROOT, harness.HERE / "hidden_tests"]
+    return [harness.HIDDEN_ROOT, harness.HERE / "hidden_tests", harness.SEALED_ROOT]
 
 
 #: Task shapes the mount code actually meets: a mock repo name, and a SWE-bench
@@ -47,19 +53,10 @@ TASKS = [
 ]
 
 
-def container_ready() -> str:
-    """Empty string when a real container run is possible, else the reason not."""
-    if shutil.which("docker") is None:
-        return "no docker executable on PATH"
-    ping = subprocess.run(["docker", "info", "--format", "{{.ServerVersion}}"],
-                          capture_output=True, text=True)
-    if ping.returncode != 0:
-        return "docker daemon not reachable"
-    img = subprocess.run(["docker", "image", "inspect", harness.IMAGE],
-                         capture_output=True, text=True)
-    if img.returncode != 0:
-        return f"image {harness.IMAGE} not built (docker build -t {harness.IMAGE} ..)"
-    return ""
+#: Empty string when a real container run is possible, else the reason not.  It
+#: lives in `harness` because two test modules now ask the same question, and two
+#: copies of "is Docker usable" is two ways for a skip to become a silent green.
+container_ready = harness.container_ready
 
 
 class HiddenTestIsolation(unittest.TestCase):
@@ -140,6 +137,38 @@ class HiddenTestIsolation(unittest.TestCase):
         """
         for task in TASKS:
             self.assertIn("--network=none", harness.docker_argv(task, ["true"]))
+
+    def test_the_harness_knows_about_every_one_of_the_three_answer_keys(self):
+        """The three checks above walk a list, so the list is the claim.  Dropping
+        `carriers-sealed` from `harness.forbidden_roots()` would leave all of them
+        green while the ground-truth labels became mountable again -- a check going
+        green because its SUBJECT shrank, not because the property held.
+
+        Thesis claim (vi): "danh sach vung cam phai du ca ba, khong duoc rut ngan".
+        """
+        self.assertEqual(sorted(p.resolve() for p in harness.forbidden_roots()),
+                         sorted(p.resolve() for p in forbidden_roots()),
+                         "harness.forbidden_roots() and this test disagree on what "
+                         "the agent must never reach")
+
+    def test_a_mount_that_would_expose_an_answer_key_is_refused_while_the_argv_is_built(self):
+        """The check moved into the PRODUCTION path, not only into this file.  Every
+        test above runs against today's `mounts()`; none of them runs when someone
+        adds a mount tomorrow in a branch whose tests nobody ran.  `docker_argv` is
+        the single place a `-v` may be built, so it is the place that can refuse.
+
+        Thesis claim (vi): "mount lo dap an phai bi tu choi ngay luc dung argv".
+        """
+        original = harness.mounts
+        for bad in (harness.HERE, harness.HIDDEN_ROOT, harness.SEALED_ROOT,
+                    harness.HIDDEN_ROOT / "astropy"):
+            harness.mounts = lambda task=None, _b=bad: [(_b, "rw")]
+            try:
+                with self.assertRaises(AssertionError,
+                                       msg=f"a mount of {bad} was allowed onto the argv"):
+                    harness.docker_argv(None, ["true"])
+            finally:
+                harness.mounts = original
 
     # ------------------------------------------------- with a real container
 
