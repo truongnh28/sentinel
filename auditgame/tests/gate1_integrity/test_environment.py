@@ -8,12 +8,12 @@ Thiet-ke-Framework-Test.md SS4 gives up a lot to keep.
 from __future__ import annotations
 import pathlib, subprocess, sys, unittest
 
-#: Modules that must import with site-packages stripped.  `replay` is NOT here:
-#: it is created in Task 5, and listing it now makes Step 0.5 fail with
-#: ModuleNotFoundError -- red for the wrong reason, which the TDD cycle treats as
-#: "fix the error and re-run", not as a passing gate.  Step 5.5 adds it.
+#: Modules that must import with site-packages stripped.  `replay` joins the
+#: measurement core in Task 5: it consumes `RunResult.traces` and `oracle`, and
+#: nothing about offline re-scoring justifies a non-stdlib dependency.
 CORE_MODULES = ("core", "detector", "scoring", "policies", "runner", "oracle",
-                "metrics", "retrieval", "attacks", "datasets", "agents")
+                "metrics", "retrieval", "attacks", "datasets", "agents",
+                "replay")
 
 
 class Environment(unittest.TestCase):

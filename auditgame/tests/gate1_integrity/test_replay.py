@@ -16,12 +16,12 @@ def _wf():
     return build.make_workflow("wf-000", "django", 6, random.Random(seed_of("rp", 0)))
 
 
-def _run(carrier="memory"):
+def _run(carrier="memory", delta=2, pp_seed=1, run_seed=1):
     wf = _wf()
-    ps = build.plan_poison(wf, carrier, 2, random.Random(1))
+    ps = build.plan_poison(wf, carrier, delta, random.Random(pp_seed))
     return wf, runner.run_once(
         wf, ps, P.make_policy("Sentinel", 17.95, 1, "mid"),
-        detector.Detector.from_setting("mid"), agent.MockAgent(), seed=1)
+        detector.Detector.from_setting("mid"), agent.MockAgent(), seed=run_seed)
 
 
 class TraceRecording(unittest.TestCase):
@@ -108,6 +108,58 @@ class TraceSerialisation(unittest.TestCase):
             outs.add(r.stdout)
         self.assertEqual(len(outs), 1,
                          f"serialised trace changes with PYTHONHASHSEED:\n{chr(10).join(sorted(outs))}")
+
+
+class ReplayEquivalence(unittest.TestCase):
+
+    def test_I9_replay_from_trace_matches_the_direct_run(self):
+        """Without this test replay is only a promise, and the budget figure in the
+        proposal has nothing holding it up.
+
+        Thesis claim (vi): "chi phi giam hai bac nho replay".
+        """
+        import replay
+        _, r = _run()
+        self.assertEqual(replay.rescore(r.traces), r.harm,
+                         "replay scores differently from the direct run")
+
+    def test_rescanning_the_threshold_needs_no_agent_rerun(self):
+        """RAW scores on the trace make a (psi, phi) sweep a FREE post-processing
+        step.  A low threshold must fire MORE than a high one -- otherwise the
+        recorded score carries no information at all.
+
+        Thesis claim (vi): "quet lai (psi, phi) la hau ky MIEN PHI".
+        """
+        import replay
+        _, r = _run()
+        low = replay.rescan_threshold(r.traces, tau_det=-1.0)["fires"]
+        high = replay.rescan_threshold(r.traces, tau_det=3.0)["fires"]
+        self.assertGreater(low, high, f"tau -1.0 fired {low}; tau 3.0 fired {high}")
+
+    def test_I9_matches_the_direct_run_even_when_sigma_is_not_the_last_task(self):
+        """The default `_run()` fixture already has sigma (t=2) != H-1 (t=5), but
+        at those particular parameters traces[-1] and the sigma trace happen to
+        score the SAME harm (both 0.0) -- so a `traces[-1]` bug would slip past
+        the equivalence test above by coincidence, not because it is correct.
+
+        This configuration (carrier="memory", delta=0, pp_seed=0, run_seed=0)
+        was picked because sigma (t=3) and the last task (t=5) score OPPOSITE
+        harm values (1.0 vs 0.0): reading the wrong task flips the answer, so a
+        `traces[-1]` regression cannot hide behind a lucky coincidence here.
+
+        Thesis claim (vi): "chi phi giam hai bac nho replay".
+        """
+        import replay
+        _, r = _run(carrier="memory", delta=0, pp_seed=0, run_seed=0)
+        sigma_t = next(tr for tr in r.traces if tr.is_sigma).t
+        last_t = r.traces[-1].t
+        self.assertNotEqual(
+            sigma_t, last_t,
+            "fixture drifted: sigma now equals the last task, no longer a "
+            "discriminating case for the traces[-1] bug")
+        self.assertEqual(replay.rescore(r.traces), r.harm,
+                         "replay scores differently from the direct run when "
+                         "sigma is not the last task")
 
 
 if __name__ == "__main__":
