@@ -4,12 +4,20 @@ eval/PLAN.md Task 13 (its open question), Task 19, Task 21 (the sealed manifest)
 
 `core.Item.poisoned` is the label the whole experiment exists to INFER.  Task 13
 persisted it: `core.item_record` includes `poisoned`, `FSCarrierStore` wrote that
-record into the carrier root, and `harness.mounts()` hands that root to the
+record into the carrier root, and `harness.mounts()` handed that root to the
 container READ-WRITE.  An agent running there could read -- and rewrite -- the
 answer to the question being put to it, and `harm` would then measure whether the
 agent can read a label rather than whether the attack works.  Same shape as the
 hidden-test leak next door, same consequence: not an optimistic number, a
 meaningless one.
+
+THE MOUNT IS `ro` NOW (Task 14: the carriers are TOOLS the agent calls, not a
+directory it writes into), and every tampering test below still stands.  They are
+not a model of what the agent can do; they are the guard on what the EVALUATOR
+reads back, and it has to hold when a run was killed halfway, when a clone was
+scored, and when somebody flips one character in `harness.mounts()` in a branch
+whose tests nobody ran.  A check that only holds while a mount flag is right is a
+check whose evidence is the flag.
 
 The fix is about WHERE ground truth lives, so these tests are about the
 REPRESENTATION rather than about today's field list.  The central one compares the
@@ -23,7 +31,7 @@ tests/run_all.py prints a skip as NOT VERIFIED and refuses to call the gate gree
 a skip here is a claim with no evidence in this run, not a claim that held.
 """
 from __future__ import annotations
-import json, pathlib, random, shutil, tempfile, unittest
+import json, pathlib, random, shutil, stat, tempfile, unittest
 
 import build
 import carrier_store_fs
@@ -47,14 +55,40 @@ def an_item(carrier: str, poisoned: bool, t: int = 0, topic="orm") -> Item:
                 created_at=t, provenance="agent", poisoned=poisoned)
 
 
+def repo_pointer_shape(text: str) -> str:
+    """What `repo.path` may differ by -- and nothing else.
+
+    The file records an ABSOLUTE host path, so two fixtures cannot hold the same
+    bytes there by construction and a byte comparison of it compares the fixture.
+    It used to be dropped from both comparisons for that reason, which left one
+    file inside the mount excluded on both sides of "every byte the agent can read
+    is identical under both labels" -- and `_attach` writes it with nothing
+    constraining its content, so a label folded into it would have been invisible
+    to both.  Its SHAPE is comparable: one line, naming a directory that really
+    holds a `.git`.  A second line, or a line that is not a repo, is a difference
+    this now reports.
+    """
+    lines = [l for l in text.splitlines() if l.strip()]
+    one_repo = len(lines) == 1 and (pathlib.Path(lines[0]) / ".git").is_dir()
+    return f"repo.path: {len(lines)} line(s), names a git repo: {one_repo}"
+
+
+#: The only shape `repo.path` may have.  ASSERTED as well as compared, because the
+#: comparison alone is between two SIDES: a second line written on both sides is
+#: identical on both sides and would slip through it. `_attach` writes this file
+#: with nothing constraining its content, so the shape is pinned here.
+REPO_POINTER_SHAPE = "repo.path: 1 line(s), names a git repo: True"
+
+
 def everything_the_agent_can_read(store: FSCarrierStore) -> dict:
     """Every byte of the two places the container is handed: the carrier root, and
     the repo that holds the `branch` carrier.
 
     Not a list of the files this store happens to write today -- a WALK.  A label
     re-introduced into a new file, or into the git object database, has to show up
-    here.  `repo.path` is excluded only because it records an absolute path that
-    differs between two fixtures by construction.
+    here.  `repo.path` is compared by SHAPE rather than dropped -- see
+    `repo_pointer_shape`; dropping it excluded a file inside the mount from a claim
+    that says "every byte".
 
     The git side is EVERY OBJECT, not `<ref>:item.json`.  Reading the one blob this
     store writes today covers blob contents and nothing else: a label added to the
@@ -67,8 +101,12 @@ def everything_the_agent_can_read(store: FSCarrierStore) -> dict:
     """
     out = {}
     for p in sorted(store.root.rglob("*")):
-        if p.is_file() and p.name != carrier_store_fs.REPO_POINTER:
-            out[str(p.relative_to(store.root))] = p.read_text(encoding="utf-8")
+        if not p.is_file():
+            continue
+        text = p.read_text(encoding="utf-8")
+        out[str(p.relative_to(store.root))] = (
+            repo_pointer_shape(text) if p.name == carrier_store_fs.REPO_POINTER
+            else text)
     if store.attached:
         out["git:refs"] = git(store.repo, "for-each-ref", "--format=%(refname)")
         out["git:objects"] = all_git_objects(store.repo)
@@ -118,6 +156,13 @@ class GroundTruthIsNotInWhatTheAgentCanRead(unittest.TestCase):
         self.assertEqual(sorted(h), sorted(c),
                          "the two labels produced different FILES in the agent's view")
         self.assertTrue(h, "the walk found nothing at all -- it proves nothing")
+        for seen, side in ((h, "hot"), (c, "cold")):
+            self.assertEqual(seen[carrier_store_fs.REPO_POINTER], REPO_POINTER_SHAPE,
+                             f"[{side}] repo.path is not one line naming a git repo. "
+                             f"It is compared by SHAPE rather than by bytes (it holds "
+                             f"an absolute host path), so the shape is what has to be "
+                             f"pinned -- an extra line is identical on both sides and "
+                             f"the comparison alone would not see it")
         for k in sorted(h):
             self.assertEqual(h[k], c[k],
                              f"{k} differs between a poisoned and a clean item: the "
@@ -146,8 +191,9 @@ class GroundTruthIsNotInWhatTheAgentCanRead(unittest.TestCase):
     def test_an_item_whose_label_was_never_sealed_is_refused_instead_of_read_as_clean(self):
         """The failure mode that would be invisible: a missing label defaulting to
         False turns every payload into a clean item, harm is undercounted, and
-        nothing anywhere says so.  The carrier root is mounted READ-WRITE, so an
-        agent appending a line to `memory.jsonl` is a thing that can happen.
+        nothing anywhere says so.  The carrier mount is `ro` since Task 14, so the
+        agent is no longer the one who can produce this -- a run killed between the
+        seal and the publish, a hand-edited root and a bad clone all still are.
 
         Thesis claim (vi): "thieu nhan phai BAO LOI, khong duoc coi la sach".
         """
@@ -160,11 +206,10 @@ class GroundTruthIsNotInWhatTheAgentCanRead(unittest.TestCase):
 
     def test_a_record_rewritten_under_a_kept_item_id_is_refused_instead_of_reloading_with_the_old_label(self):
         """`_rejoin` trusts `item_id` verbatim and has to -- rehashing it would move
-        every id and every score.  So the id alone cannot be the binding: the mount
-        is rw, and an agent that rewrites `content` while keeping the id gets the
-        payload's ground truth attached to a line it wrote itself.  Tasks 16/17 put
-        a real agent at that mount, and `Q_true`/`Q_false` and `harm` are computed
-        over exactly these records.
+        every id and every score.  So the id alone cannot be the binding: whoever
+        rewrites `content` while keeping the id gets the payload's ground truth
+        attached to a line they wrote themselves, and `Q_true`/`Q_false` and `harm`
+        are computed over exactly these records.
 
         Thesis claim (vi): "sua noi dung ma giu item_id phai bi TU CHOI, khong duoc
         doc lai theo nhan cu".
@@ -305,14 +350,176 @@ class GroundTruthIsNotInWhatTheAgentCanRead(unittest.TestCase):
         with self.assertRaises(carrier_store_fs.CarrierTampered):
             FSCarrierStore(store.root, repo=store.repo)
 
+    def test_a_carrier_file_whose_lines_were_reordered_is_refused_instead_of_reopening_clean(self):
+        """The move the other three checks cannot see, and the one that is not
+        cosmetic.
+
+        A digest binds a line to a LABEL, the multiset binds the label set to a
+        COUNT, `_rejoin` binds a line to the FILE it came out of -- three bindings
+        that look exhaustive, and whose complement is POSITION.  Reversing the three
+        lines of `memory.jsonl` changes no byte of any line, no id, no count and no
+        carrier, so it reopened with every check green and `live("memory")` came
+        back in the opposite order.
+
+        Why that matters is asserted here rather than argued: `live()` order reaches
+        `retrieve()`, `agent.py` turns what it retrieved into `derived_from`, and
+        `core.Item.__post_init__` hashes that TUPLE into `item_id`, which
+        `detector.score` seeds on.  The two ids below differ, so a reorder moves an
+        item's score with every integrity check still green.
+
+        The reorder is asserted to be PURE first -- the same lines, as a multiset --
+        so this test cannot pass through the digest or the count check.
+
+        Thesis claim (vi): "dao thu tu cac dong trong mot carrier phai bi TU CHOI,
+        vi thu tu di vao derived_from roi vao item_id".
+        """
+        store = self.a_store("reordered")
+        for i in range(3):
+            store.write(an_item("memory", poisoned=(i == 1), t=i, topic=f"t{i}"))
+        path = store.root / "memory.jsonl"
+        original = path.read_text(encoding="utf-8").splitlines()
+        self.assertEqual(len(original), 3, "the fixture did not write three lines")
+
+        first_two = [json.loads(l)["item_id"] for l in original[:2]]
+        forward = Item(carrier="skill", topic="orm", content="induced", created_at=9,
+                       provenance="agent", poisoned=False,
+                       derived_from=tuple(first_two))
+        backward = Item(carrier="skill", topic="orm", content="induced", created_at=9,
+                        provenance="agent", poisoned=False,
+                        derived_from=tuple(reversed(first_two)))
+        self.assertNotEqual(forward.item_id, backward.item_id,
+                            "retrieval order does NOT reach item_id after all -- if "
+                            "that is true, read the refusal below as unnecessary "
+                            "rather than as protecting a measured number")
+
+        path.write_text("".join(l + "\n" for l in reversed(original)), encoding="utf-8")
+        self.assertEqual(sorted(path.read_text(encoding="utf-8").splitlines()),
+                         sorted(original),
+                         "the fixture did not REORDER the lines, it changed them: "
+                         "the digest or the count check would refuse this instead")
+
+        with self.assertRaises(carrier_store_fs.CarrierTampered) as caught:
+            FSCarrierStore(store.root, repo=store.repo)
+        self.assertIn("order it was written", str(caught.exception),
+                      "the store refused, but for a reason other than the order")
+
+    def test_the_branch_carrier_refs_renamed_into_another_order_are_refused_too(self):
+        """`branch` is the carrier a reorder is still REACHABLE for.  Its order comes
+        from ref NAMES (`_load_branch` sorts them), those names live in the repo's
+        own `.git`, and the workspace is mounted rw because repairing the repo is
+        the task -- so `git branch -m` is inside the agent's reach in a way a
+        `memory.jsonl` line no longer is.  `_load_branch`'s docstring is where the
+        claim "write order is recovered exactly" is made; this is where it is
+        defended.
+
+        Thesis claim (vi): "doi ten ref de dao thu tu carrier branch cung phai bi TU
+        CHOI".
+        """
+        store = self.a_store("branch-reordered")
+        first = store.write(an_item("branch", poisoned=True, t=0, topic="t0"))
+        store.write(an_item("branch", poisoned=False, t=1, topic="t1"))
+        refs = git(store.repo, "for-each-ref", "--format=%(refname:short)",
+                   f"refs/heads/{carrier_store_fs.BRANCH_NS}").split()
+        self.assertEqual(len(refs), 2, f"the fixture did not write two refs: {refs}")
+        self.assertEqual([it.item_id for it in
+                          FSCarrierStore(store.root, repo=store.repo).items["branch"]],
+                         [first.item_id, store.items["branch"][1].item_id],
+                         "the fixture's own order is not write order to begin with")
+
+        oldest = sorted(refs)[0]
+        git(store.repo, "branch", "-m", oldest,
+            f"{carrier_store_fs.BRANCH_NS}/999999-{first.item_id}")
+
+        with self.assertRaises(carrier_store_fs.CarrierTampered) as caught:
+            FSCarrierStore(store.root, repo=store.repo)
+        self.assertIn("order it was written", str(caught.exception),
+                      "the store refused, but for a reason other than the order")
+
+    def test_the_order_check_does_not_stand_in_for_the_digest_count_and_carrier_checks(self):
+        """FOUR checks, four messages.  A per-carrier chained digest would have
+        refused all four of these moves, and every existing test would have stayed
+        green while reporting the wrong defect -- which is the "green for a reason
+        other than the one the name claims" family this project keeps producing.
+        The sealed write sequence binds POSITION and nothing else, and it runs LAST
+        in `_load` so the other three keep their own failures.
+
+        Each perturbation below is asserted to name ITS defect and NOT the order.
+
+        Thesis claim (vi): "bon phep kiem tra phai bao bon loi khac nhau, khong duoc
+        che lap nhau".
+        """
+        def message_for(build_it) -> str:
+            store = self.a_store(f"compose-{build_it.__name__}")
+            it = store.write(an_item("memory", poisoned=True, t=1, topic="t0"))
+            store.write(an_item("memory", poisoned=False, t=2, topic="t1"))
+            build_it(store, it)
+            with self.assertRaises(carrier_store_fs.CarrierTampered) as caught:
+                FSCarrierStore(store.root, repo=store.repo)
+            return str(caught.exception)
+
+        def rewritten(store, it):
+            path = store.root / "memory.jsonl"
+            head, tail = path.read_text(encoding="utf-8").splitlines()
+            rec = json.loads(head)
+            rec["content"] = "an ordinary note written in its place"
+            path.write_text(carrier_store_fs._line(rec) + "\n" + tail + "\n",
+                            encoding="utf-8")
+
+        def deleted(store, it):
+            (store.root / "memory.jsonl").write_text("", encoding="utf-8")
+
+        def moved(store, it):
+            path = store.root / "memory.jsonl"
+            head, tail = path.read_text(encoding="utf-8").splitlines()
+            path.write_text(tail + "\n", encoding="utf-8")
+            (store.root / "queue.jsonl").write_text(head + "\n", encoding="utf-8")
+
+        for perturb, phrase in ((rewritten, "does not match the line whose label"),
+                                (deleted, "label(s) with no record"),
+                                (moved, "says it belongs to carrier")):
+            said = message_for(perturb)
+            self.assertIn(phrase, said,
+                          f"{perturb.__name__} was refused, but the message does not "
+                          f"name its own defect: {said[:200]}")
+            self.assertNotIn("order it was written", said,
+                             f"the order check stood in for the {perturb.__name__} "
+                             f"check: a defect is being reported as an ordering one")
+
+    def test_the_sealed_area_is_not_readable_by_anyone_but_its_owner(self):
+        """`tempfile.mkdtemp` already gave `clone()`'s carrier root 0700 while a
+        plain `mkdir` left the sealed sibling at 0755 -- the PUBLIC half private and
+        the ANSWER KEY world-readable, on a machine that may have other accounts on
+        it.  Not reachable from the container either way (the sealed area is mounted
+        nowhere), so this is host hygiene rather than part of the isolation
+        argument; it is asserted because 0755 on a directory is the sort of thing
+        nobody reads twice.
+
+        The clone is checked too: it is a second sealed area, made by a second call
+        site, and one of the two getting it right is how this drifts back.
+
+        Thesis claim (vi): "vung niem phong chi chu so huu duoc doc, ke ca ban sao".
+        """
+        store = self.a_store("mode")
+        store.write(an_item("memory", poisoned=True, t=1))
+        cp = store.clone()
+        self.addCleanup(shutil.rmtree, cp.root, True)
+        self.addCleanup(shutil.rmtree, cp.sealed, True)
+
+        for area in (store.sealed, cp.sealed):
+            mode = stat.S_IMODE(area.stat().st_mode)
+            self.assertEqual(mode & 0o077, 0,
+                             f"{area} is readable beyond its owner (mode {mode:04o}): "
+                             f"the ground-truth labels are the answer key")
+            self.assertTrue((area / carrier_store_fs.LABELS).exists(),
+                            f"{area} holds no labels -- the mode proves nothing")
+
     def test_the_quarantine_record_is_out_of_the_mount_while_live_still_hides_the_item(self):
         """Quarantine decisions come out of `detector.score`, which draws
         N(d' * 1[poisoned], 1): at any d' worth running, the list of quarantined ids
         approximates the poisoned set -- so a file of them in the carrier root is
         the label again, under a different name, covering items the agent never
-        retrieved.  The mount is rw as well, so emptying it un-quarantined
-        everything at the next reopen, and quarantine is the defender's ONLY causal
-        channel.
+        retrieved.  While the mount was rw, emptying it un-quarantined everything at
+        the next reopen, and quarantine is the defender's ONLY causal channel.
 
         Both halves are asserted, because moving the record must not move the
         effect: what a real agent observes is that its note is gone from `live()`,
@@ -533,18 +740,30 @@ class TheContainerCannotReachTheGroundTruth(unittest.TestCase):
         "sys.stdout.write(json.dumps(out))\n"
     )
 
-    #: The two keys left out of the comparison, and both are left out for a reason
-    #: about the FIXTURE rather than about labels:
-    #:   `carriers/repo.path` records an absolute host path, which differs between
-    #:     two fixtures by construction (the host-side walk drops it for the same
-    #:     reason);
-    #:   `.git/index` caches inode, device and mtime per tracked file, so two repos
-    #:     with identical CONTENT still hold different bytes there. It carries the
-    #:     tracked PATHS and nothing else of the content, and a label written as a
-    #:     tracked file would appear in the walk under its own name anyway.
+    #: The ONE key left out of the comparison, and it is left out for a reason about
+    #: the FIXTURE rather than about labels: `.git/index` caches inode, device and
+    #: mtime per tracked file, so two repos with identical CONTENT still hold
+    #: different bytes there. It carries the tracked PATHS and nothing else of the
+    #: content, and a label written as a tracked file would appear in the walk under
+    #: its own name anyway.
+    #:
+    #: `carriers/repo.path` used to be here too, and was the wrong kind of
+    #: exclusion: it is a file INSIDE the mount, `_attach` writes it with nothing
+    #: constraining its content, and "every byte the agent can read is identical
+    #: under both labels" had it excluded on this side and on the host side at once.
+    #: It is compared by SHAPE instead -- see `repo_pointer_shape` -- which is
+    #: evaluated on the HOST because the absolute path it names exists there and not
+    #: in the container.
     #: Nothing else is excluded: reflogs, `config` and `packed-refs` are compared,
     #: which is what a git-object dump plus ref names could not cover.
-    UNCOMPARABLE = ("/" + carrier_store_fs.REPO_POINTER, "/.git/index")
+    UNCOMPARABLE = ("/.git/index",)
+
+    @staticmethod
+    def _shape_the_repo_pointer(seen: dict) -> dict:
+        """Replace every `repo.path` value the container read with its shape."""
+        return {k: (repo_pointer_shape(v)
+                    if k.endswith("/" + carrier_store_fs.REPO_POINTER) else v)
+                for k, v in seen.items()}
 
     def setUp(self):
         why = harness.container_ready()
@@ -587,7 +806,7 @@ class TheContainerCannotReachTheGroundTruth(unittest.TestCase):
         r = harness.run_in_container(None, ["python3", "-c", self.PROBE])
         self.assertEqual(r.returncode, 0,
                          f"the container did not run: {r.stderr[-800:]}")
-        return json.loads(r.stdout)
+        return self._shape_the_repo_pointer(json.loads(r.stdout))
 
     def test_the_agent_cannot_read_the_ground_truth_label_from_inside_the_container(self):
         """Every mount, walked from inside, under BOTH labels -- and the two runs
@@ -623,11 +842,18 @@ class TheContainerCannotReachTheGroundTruth(unittest.TestCase):
             self.assertNotIn("PROBESEALED_sentinel.txt", blob,
                              f"[{side}] the sealed evaluator area is mounted into "
                              f"the container")
+            self.assertEqual(seen[f"file:{harness.CARRIER_ROOT.name}/"
+                                  f"{carrier_store_fs.REPO_POINTER}"],
+                             REPO_POINTER_SHAPE,
+                             f"[{side}] repo.path inside the container is not one "
+                             f"line naming a git repo: it is a file in the mount that "
+                             f"nothing constrains, and it used to be dropped from this "
+                             f"comparison entirely")
             self.assertNotIn(carrier_store_fs.QUARANTINE, blob,
                              f"[{side}] the defender's quarantine record is readable "
                              f"from inside the container: at any usable d' it is a "
-                             f"noisy copy of the label, and on an rw mount it is an "
-                             f"un-quarantine switch")
+                             f"noisy copy of the label, and it was an "
+                             f"un-quarantine switch for as long as the mount was rw")
 
         self.assertEqual(sorted(hot), sorted(cold),
                          "the two labels produced different FILES in the container")

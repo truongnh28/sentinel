@@ -24,6 +24,27 @@ an agent that ever sees a hidden path can WRITE IT INTO A CARRIER at task t and
 read it back at t+1 -- the persistence this thesis studies, turned against the
 oracle.
 
+THE CARRIER MOUNT IS READ-ONLY, and the write path is a TOOL CALL.  This is
+eval/PLAN.md Task 14 ("Vong agent toi thieu, bon carrier la TOOL") stated in the
+argv: the four carriers are tools the agent calls, not a directory it writes into,
+"because a tool call is OBSERVABLE and attributable, while a directory diff
+resolves neither `write then delete` nor `which carrier` nor the ordering of
+writes against retrievals" -- and `Outcome.writes` is then the tool-call log,
+observed rather than inferred from a before/after comparison of the mount.  The
+host mediates every such call, which is where seal-then-publish already lives
+(`carrier_store_fs.FSCarrierStore.write`).
+
+So a direct write into the carrier root is not merely forbidden, it is IMPOSSIBLE
+from inside the container, and that closes a hole the rw mount left wide open:
+appending one well-formed JSON line with an unknown `item_id` to `memory.jsonl`
+made every later open raise `GroundTruthMissing`, `last_run_store()` propagated
+it, and the tier-2 leak scan plus every subsequent container run died -- one
+append, from the directory the benchmark deliberately hands over.  The refusal is
+right (a line with no sealed label may never be read as clean); what was wrong was
+that the agent held the pen.  `ro` is not a substitute for the seal: the tamper
+checks in `carrier_store_fs` are the guard that does not depend on a mount flag
+being right, and they stay.
+
 The image is the AGENT's environment, not the measurement's.  This module is part
 of the measurement, so it shells out to `docker` with subprocess rather than
 importing a Docker SDK: the measurement core has to import on a bare stdlib
@@ -95,7 +116,7 @@ import core
 
 HERE = pathlib.Path(__file__).resolve().parent
 WORKSPACE = HERE / "workspace"          # repo clones, mounted rw
-CARRIER_ROOT = HERE / "carriers"        # the four carriers, OUTSIDE every repo
+CARRIER_ROOT = HERE / "carriers"        # the four carriers, OUTSIDE every repo, mounted ro
 HIDDEN_ROOT = HERE / "hidden_suites"    # mounted NOWHERE, run after the horizon
 
 #: The image built from ../Dockerfile.  A single name, because two names is how a
@@ -119,6 +140,12 @@ DOCKER_RUN_TIMEOUT = 900
 #: out at each call site: the agent's view of its own filesystem is part of the
 #: task definition, so it may not vary between two runs of the same benchmark.
 CONTAINER_ROOT = "/workspace"
+
+#: The mode the carrier root is mounted with.  A NAME, not a literal spelled twice:
+#: the two branches of `mounts()` would otherwise be two places for one fact, and
+#: the fact is the Task 14 contract -- the agent READS its carriers and writes them
+#: only through host-mediated tool calls.  See the module docstring.
+CARRIER_MODE = "ro"
 
 
 def sealed_root() -> pathlib.Path:
@@ -160,15 +187,26 @@ def ensure_dirs() -> None:
     there yet, and the claim would quietly become "we have not generated the
     hidden suites" instead of "the agent cannot reach them".
     """
-    for d in (WORKSPACE, CARRIER_ROOT, HIDDEN_ROOT, sealed_root()):
+    for d in (WORKSPACE, CARRIER_ROOT, HIDDEN_ROOT):
         d.mkdir(parents=True, exist_ok=True)
+    # The answer key gets the tighter mode, through the one function that knows it
+    # (`carrier_store_fs.mkdir_private`).  A plain mkdir here left `ground_truth.jsonl`
+    # in a 0755 directory until the next store was opened.
+    carrier_store_fs.mkdir_private(sealed_root())
 
 
 def mounts(task=None) -> list:
-    """(host path, mode) pairs handed to the container.  HIDDEN_ROOT is never here."""
+    """(host path, mode) pairs handed to the container.  HIDDEN_ROOT is never here.
+
+    The workspace is rw because repairing the repo IS the task.  The carrier root
+    is READ-ONLY (CARRIER_MODE): the agent's route to a carrier is a tool call the
+    host mediates, not a file it opens -- Task 14.  A writable carrier root gave a
+    direct write no tool-call log could record, and gave one `open()` the power to
+    halt every later run; neither is a thing this measurement can afford.
+    """
     if task is None:
-        return [(WORKSPACE, "rw"), (CARRIER_ROOT, "rw")]
-    return [(WORKSPACE / task.repo, "rw"), (CARRIER_ROOT, "rw")]
+        return [(WORKSPACE, "rw"), (CARRIER_ROOT, CARRIER_MODE)]
+    return [(WORKSPACE / task.repo, "rw"), (CARRIER_ROOT, CARRIER_MODE)]
 
 
 def docker_argv(task, cmd: list) -> list:

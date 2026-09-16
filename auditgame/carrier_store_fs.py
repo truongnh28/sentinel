@@ -32,8 +32,8 @@ writes; re-open the root to pick up another process's.
 
 GROUND TRUTH IS NOT IN HERE -- the open question Task 13 left, settled in Task 19.
 `core.item_record` includes `poisoned`, the flag whose own docstring says audit
-policies must not read it, and `harness.mounts()` hands this whole root to the
-container READ-WRITE.  Nothing read it there while the agent was a mock, so no
+policies must not read it, and `harness.mounts()` used to hand this whole root to
+the container READ-WRITE.  Nothing read it there while the agent was a mock, so no
 number in this build ever depended on it; but Tasks 14/16/17 put a real LLM agent
 at exactly that mount, and a file saying "this item is the payload" is the same
 leak shape as the hidden tests -- harm would measure whether the agent can read a
@@ -49,8 +49,8 @@ from the sealed side.  A LOAD WITH NO LABEL IS AN ERROR, not a False: a missing
 label read as "clean" turns every payload into an ordinary note, undercounts harm,
 and says nothing while doing it.
 
-THE MOUNT IS RW, so moving the label out is only half of it.  A label bound to an
-`item_id` and to nothing else is a label bound to a string an agent can retype:
+MOVING THE LABEL OUT IS ONLY HALF OF IT.  A label bound to an `item_id` and to
+nothing else is a label bound to a string a writer can retype:
 rewrite `content` and keep the id, and the payload's ground truth attaches to what
 the agent wrote; delete the line, and the payload leaves every count in silence.
 So the sealed record carries `line_digest` of the exact public line as well as the
@@ -71,11 +71,34 @@ and per-carrier accounting (kappa, n_c) mis-attributes it.  So the load path
 counts as a MULTISET and compares it for equality with the labels, and every line
 must agree with the FILE it was read from about which carrier it is in.
 
+A DIGEST, A COUNT AND A CARRIER LOOK EXHAUSTIVE, AND THEIR COMPLEMENT IS POSITION.
+A line is bound to a label, the label set is bound to a count, and a line is bound
+to the file it was found in -- and none of the three is bound to WHERE IN THE FILE
+the line sits.  Reversing the three lines of `memory.jsonl` therefore reopened with
+every check green and `live("memory")` reading back in the opposite order, which is
+not cosmetic: retrieval order reaches `agent.py`'s `poisoned_seen`, which becomes
+`derived_from`, which `core.Item.__post_init__` hashes into `item_id`, which
+`detector.score` seeds on.  A reorder moved an item's score.  `_load_branch`'s own
+docstring claimed the property ("write order is recovered exactly ... `live()`
+order is ours, and the traces depend on it") and nothing defended it.  So each
+sealed record carries a WRITE SEQUENCE NUMBER as well, and
+`_refuse_an_order_that_moved` refuses a carrier whose lines no longer come back in
+the order they were written.
+
 `quarantined.jsonl` is sealed too, for the same reason and one more: quarantine
 decisions come from a detector drawing N(d' * 1[poisoned], 1), so the list of
-quarantined ids is a noisy copy of the label -- and in the mount it was also an
-un-quarantine switch.  What a real agent observes is absence from `live()`, which
-is untouched.
+quarantined ids is a noisy copy of the label -- and while the mount was rw it was
+also an un-quarantine switch.  What a real agent observes is absence from `live()`,
+which is untouched.
+
+WHY ALL OF THIS SURVIVES A READ-ONLY MOUNT.  `harness.mounts()` now hands the
+carrier root over `ro` and the agent's only write path is a host-mediated tool call
+(Task 14), so the agent has no route to any of the moves above.  The checks stay
+regardless: they are the guard that does not depend on a mount flag being right,
+and the mount flag is exactly the kind of one-character fact that gets changed in a
+branch whose tests nobody ran.  They also catch what a mount flag never could -- a
+half-written store left by a killed run, and a `.git` reordered through the
+workspace mount, which IS still rw because repairing the repo is the task.
 """
 from __future__ import annotations
 import collections, hashlib, json, os, pathlib, shutil, subprocess, tempfile
@@ -115,13 +138,28 @@ MANIFEST_PREFIX = "manifest-"
 #: `quarantine`.  It used to sit in the carrier root, where it was both a noisy
 #: copy of the label (`detector.score` draws N(d' * 1[poisoned], 1), so at a usable
 #: d' the quarantined id list approximates the poisoned set) and a writable
-#: un-quarantine switch on an rw mount.
+#: un-quarantine switch while that mount was still rw.
 QUARANTINE = "quarantined.jsonl"
 
 #: The field of a sealed record holding the digest of the PUBLIC line it belongs
 #: to.  Without it a label is bound to an `item_id` and to nothing else, and
-#: `item_id` is a string an agent with an rw mount can retype onto any line.
+#: `item_id` is a string anyone holding the file can retype onto any line.
 DIGEST_FIELD = "line_digest"
+
+#: The field of a sealed record fixing WHERE the line sits among its carrier's
+#: lines: a strictly increasing counter over every `write` this root has seen.
+#: The digest binds a line to a label, the multiset binds the label set to a count
+#: and `_rejoin` binds a line to a file -- the complement of those three is
+#: position, and position is not cosmetic here: `live()` order reaches
+#: `retrieve()`, then `derived_from`, then `item_id`, then the detector's seed.
+#:
+#: GLOBAL, not per carrier.  Per-carrier would need a second counter to survive a
+#: line MOVED between files, and `_rejoin`'s carrier check already refuses that;
+#: one counter over the whole root is the smaller thing to get right.  It is also
+#: NOT the `seq` baked into a branch ref name (`_write_branch`), which is that
+#: carrier's own index and exists to make `sorted()` recover write order -- see
+#: `_load_branch`.
+SEQ_FIELD = "write_seq"
 
 #: Written into every sealed area at construction, and the thing the mount walk
 #: actually looks for.  The walk used to ask "is a file NAMED like a sealed file
@@ -172,6 +210,57 @@ def sealed_root_for(root) -> pathlib.Path:
     return root.parent / (root.name + SEALED_SUFFIX)
 
 
+#: The two sealed file names NO REPOSITORY CARRIES.  `ground_truth.jsonl` and
+#: `quarantined.jsonl` are this project's own words; `manifest-*.json` is not, and
+#: it was the whole of the false positive that made the walk refuse an ordinary
+#: `docs/manifest-frontend.json`.  So the two halves are named apart: these two are
+#: evidence on their own, the manifest glob is evidence only inside a directory
+#: already named like a sealed area.
+SEALED_ONLY_NAMES = (LABELS, QUARANTINE)
+
+
+#: Mode for a sealed area: OWNER ONLY.  `tempfile.mkdtemp` already gives `clone()`
+#: its carrier root at 0700 while a plain `mkdir` left the sealed sibling at 0755 --
+#: the public half private and the answer key world-readable, which is the wrong way
+#: round.  Not reachable from the container either way (the sealed area is mounted
+#: nowhere), so this is host hygiene on a shared machine, not part of the isolation
+#: argument; it is here because 0755 on `ground_truth.jsonl`'s directory is the kind
+#: of detail nobody looks at twice.
+SEALED_MODE = 0o700
+
+
+def mkdir_private(path) -> pathlib.Path:
+    """`mkdir -p` at SEALED_MODE, and tighten one that is already there.
+
+    BOTH halves are needed and each is useless alone: `mkdir(mode=...)` is masked
+    by the process umask and does nothing at all when the directory already exists,
+    which is every reopen of an existing store.
+    """
+    path = pathlib.Path(path)
+    path.mkdir(parents=True, exist_ok=True)
+    path.chmod(SEALED_MODE)
+    return path
+
+
+# --------------------------------------------------------------------------
+# NAMED SEAM -- `is_sealed_file`, `is_sealed_area`, `sealed_area_under`,
+# SEALED_ONLY_NAMES and WALK_SKIP are a MOUNT PREDICATE.  They answer "may this
+# host directory be handed to a container", which is `harness.docker_argv`'s
+# question and nobody else's -- no method of `FSCarrierStore` calls any of them.
+# They live here because the names they match (LABELS, QUARANTINE,
+# MANIFEST_PREFIX, SEALED_SUFFIX) are this module's, and splitting them out would
+# put a list of sealed file names in two modules, which is the drift the
+# `is_sealed_file` docstring exists to prevent.
+#
+# The cost is that this file now carries five jobs -- persistence, sealing, tamper
+# detection, a mount predicate and git plumbing -- in ~900 lines.  The clean split
+# is `sealed_names.py` holding the NAMES, imported by both halves; it is not done
+# in this pass because nothing in the round-3 findings made it natural and a move
+# with no behavioural reason is a diff a reviewer cannot check.  Do it the next
+# time either half is opened for its own sake.
+# --------------------------------------------------------------------------
+
+
 def is_sealed_file(name: str) -> bool:
     """True for a file name that belongs in the sealed area and nowhere else.
 
@@ -179,13 +268,12 @@ def is_sealed_file(name: str) -> bool:
     two modules is one rename away from a guard that watches for a file nobody
     writes any more.
 
-    NOT a mount check on its own, and that distinction is the whole of the fix
-    above: `manifest-*.json` is an ordinary repository file name, so "a file named
-    like this is present" is a question an agent can answer YES to at will.  It is
-    used only as corroboration INSIDE a directory that is already named like a
-    sealed area -- see `is_sealed_area`.
+    NOT a mount check on its own: `manifest-*.json` is an ordinary repository file
+    name, so "a file named like this is present" is a question an agent can answer
+    YES to at will.  `is_sealed_area` uses the two halves differently -- see
+    SEALED_ONLY_NAMES.
     """
-    return name in (LABELS, QUARANTINE) or (
+    return name in SEALED_ONLY_NAMES or (
         name.startswith(MANIFEST_PREFIX) and name.endswith(".json"))
 
 
@@ -193,34 +281,51 @@ def is_sealed_area(path) -> bool:
     """True when `path` IS a sealed area, not when it merely holds a file named
     like one.
 
-    Two ways in, and both are shapes the SEALING side produces:
+    Three ways in, and all three are shapes the SEALING side produces:
 
       * it carries `SEALED_MARKER`, which `FSCarrierStore.__init__` writes into
         `self.sealed` -- the primary answer, and the only one for an area that is
         still empty (a store opened but not yet written to);
+      * it holds `ground_truth.jsonl` or `quarantined.jsonl` (SEALED_ONLY_NAMES),
+        at ANY directory name -- these are names no repository carries, so the file
+        alone is the answer;
       * its NAME ends in SEALED_SUFFIX (which is how `sealed_root_for` names every
-        one of them) AND it holds a sealed file -- the answer for an area put
-        there by hand, e.g. labels copied into place without opening a store.
+        one of them) AND it holds a sealed file -- which adds the manifest glob,
+        for an area put there by hand without opening a store.
 
-    The second is a conjunction on purpose.  Either half alone is something an
-    ordinary repository produces: `docs/manifest-frontend.json` satisfies the file
-    test, and a directory called `assets-sealed` satisfies the name test.  Both at
-    once, in an rw mount, is no longer a file an agent writes by accident -- and
-    the residual (an agent that deliberately builds `x-sealed/ground_truth.jsonl`
-    to halt the run) is a DoS it can reach a dozen other ways, not a way to make a
-    real sealed area invisible.
+    Only the THIRD is a conjunction, and only because of `manifest-*.json`:
+    `docs/manifest-frontend.json` is an ordinary repository file, and matching it
+    anywhere handed an adversarial agent a way to halt the benchmark with one
+    `open()`.  Requiring the directory name too was the fix -- but applied to all
+    three names it refused STRICTLY LESS than the filename walk it replaced:
+    `ground_truth.jsonl` copied into `<mount>/django/docs/` answered False here
+    while `is_sealed_file` answered True for the same name, and
+    `harness.docker_argv`'s refusal stands for "ground truth is under this mount",
+    which is the wider question.  Keeping the two unambiguous names as a direct
+    file match costs nothing an agent can exploit and restores the claim.
+
+    The residual is unchanged: an agent that deliberately builds
+    `x-sealed/ground_truth.jsonl` to halt the run is doing a DoS it can reach a
+    dozen other ways, not making a real sealed area invisible.  Since Task 14 it
+    cannot even do that through the carrier mount, which is `ro`.
     """
     p = pathlib.Path(path)
     if not p.is_dir():
         return False
     if (p / SEALED_MARKER).is_file():
         return True
-    if not p.name.endswith(SEALED_SUFFIX):
-        return False
+    named_like_one = p.name.endswith(SEALED_SUFFIX)
     try:
-        return any(e.is_file() and is_sealed_file(e.name) for e in p.iterdir())
+        for e in p.iterdir():
+            if not e.is_file():
+                continue
+            if e.name in SEALED_ONLY_NAMES:
+                return True
+            if named_like_one and is_sealed_file(e.name):
+                return True
     except OSError:
         return False
+    return False
 
 
 def sealed_area_under(path) -> Optional[pathlib.Path]:
@@ -340,7 +445,7 @@ class FSCarrierStore(core.CarrierStore):
         self.sealed = sealed_root_for(self.root)
         self._refuse_nesting()
         self.root.mkdir(parents=True, exist_ok=True)
-        self.sealed.mkdir(parents=True, exist_ok=True)
+        mkdir_private(self.sealed)
         # The mark the mount walk looks for, written before anything is sealed:
         # an area with a store open on it but nothing written yet is still an area
         # the next `write` will put labels into, and the walk has to refuse the
@@ -353,6 +458,11 @@ class FSCarrierStore(core.CarrierStore):
         self.quarantined = set()
         self.labels: dict = {}
         self.digests: dict = {}
+        self.seqs: dict = {}
+        # The next write's sequence number, recovered from the sealed side at the
+        # end of `_load`.  An int rather than itertools.count: this module may hold
+        # no process-local counter whose value a re-open cannot reproduce.
+        self._next_seq = 0
         self._load()
 
     def _refuse_nesting(self) -> None:
@@ -420,6 +530,14 @@ class FSCarrierStore(core.CarrierStore):
             # it is a snapshot for analysis, not a second repo.
             self._load_flat(BRANCH)
         self._refuse_a_record_count_that_moved()
+        # LAST of the four, and deliberately so.  It is the only one that needs
+        # every other to have held: it reads `self.seqs` for items it has already
+        # rejoined, in the order the files gave them back.  Running it here means a
+        # deleted, duplicated, moved or rewritten record still raises with the
+        # message about ITS defect rather than being re-described as an ordering
+        # one -- the four compose instead of shadowing each other.
+        self._refuse_an_order_that_moved()
+        self._next_seq = max(self.seqs.values(), default=-1) + 1
         qpath = self.sealed / QUARANTINE
         if qpath.exists():
             for line in qpath.read_text(encoding="utf-8").splitlines():
@@ -434,16 +552,20 @@ class FSCarrierStore(core.CarrierStore):
         for line in path.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 rec = json.loads(line)
-                if DIGEST_FIELD not in rec:
-                    # A label with no digest binds to an item_id and to nothing
-                    # else, which is the state this field exists to end.  Refused
-                    # rather than defaulted: a default would re-open exactly the
-                    # hole for every store written before the field existed.
-                    raise CarrierTampered(
-                        f"a sealed label in {path} carries no {DIGEST_FIELD!r}: "
-                        f"it cannot be bound to the public record it belongs to.")
+                for field in (DIGEST_FIELD, SEQ_FIELD):
+                    if field not in rec:
+                        # A label with no digest binds to an item_id and to nothing
+                        # else, and a label with no sequence number binds to no
+                        # POSITION -- each is the state its field exists to end.
+                        # Refused rather than defaulted: a default would re-open
+                        # exactly the hole for every store written before the
+                        # field existed, which is the quietest way to keep a bug.
+                        raise CarrierTampered(
+                            f"a sealed label in {path} carries no {field!r}: it "
+                            f"cannot be bound to the public record it belongs to.")
                 self.labels[rec["item_id"]] = rec[SEALED_FIELDS[0]]
                 self.digests[rec["item_id"]] = rec[DIGEST_FIELD]
+                self.seqs[rec["item_id"]] = rec[SEQ_FIELD]
 
     def _refuse_a_record_count_that_moved(self) -> None:
         """One sealed label, one public record.  COUNTED, and compared for equality.
@@ -455,7 +577,7 @@ class FSCarrierStore(core.CarrierStore):
 
           * a line DELETED (or `memory.jsonl` truncated to nothing) removes the
             payload from every count with no error at all, which is the quietest
-            way to defeat the harm measurement from inside an rw mount;
+            way to defeat the harm measurement from inside the mount;
           * a line COPIED -- a second time into its own file, or verbatim into
             another carrier's -- puts the SAME item_id into `live()` twice. Harm is
             built on these counts: `Q_true`/`Q_false` double-count the payload, and
@@ -493,20 +615,67 @@ class FSCarrierStore(core.CarrierStore):
             f"anything being printed; a copied one is counted twice, in two "
             f"carriers at once if it was copied across.")
 
+    def _refuse_an_order_that_moved(self) -> None:
+        """One carrier, one write order.  COMPARED, not assumed.
+
+        The move none of the other three can see.  A digest binds a line to a
+        label, the multiset binds the label set to a count, `_rejoin` binds a line
+        to the file it came out of -- and the complement of all three is WHERE IN
+        THE FILE the line sits.  Reversing the three lines of `memory.jsonl` changes
+        no byte of any line, no id, no count and no carrier, so it reopened with
+        every check green.
+
+        Why that is not cosmetic.  `live()` hands its list to `retrieve()`
+        (core.py), `agent.py` turns what it retrieved into `derived_from`, and
+        `core.Item.__post_init__` hashes `derived_from` into `item_id` -- a TUPLE,
+        because a propagation trail has an order, so the two orderings of one pair
+        give two different ids.  That is asserted rather than asserted-about, in
+        `test_a_carrier_file_whose_lines_were_reordered_is_refused_instead_of_
+        reopening_clean`, which builds both and refuses to proceed if they agree.
+        `detector.score` seeds on `item_id`, so a reorder moves an item's score,
+        and `agent.py` indexes its retrieval list positionally besides.
+        `_load_branch`'s docstring already claims this property -- "write order is
+        recovered exactly ... `live()` order is ours, and the traces depend on it"
+        -- and until now nothing defended it.
+
+        STRICTLY increasing, per carrier, over the sealed counter.  Equal is
+        impossible (one counter, one write) and would mean two labels claiming one
+        position, so `<=` is the refusal rather than `<`.  Both the flat carriers
+        and `branch` are checked: the branch order comes from ref NAMES, which live
+        in the repo's `.git` under a mount that is rw because repairing the repo is
+        the task -- it is the one carrier whose order a container can still reach.
+        """
+        for c in CARRIERS:
+            items = self.items[c]
+            for i in range(1, len(items)):
+                prev, cur = items[i - 1], items[i]
+                if self.seqs[cur.item_id] <= self.seqs[prev.item_id]:
+                    raise CarrierTampered(
+                        f"carrier {c!r} under {self.root} comes back in an order "
+                        f"that is not the order it was written: position {i - 1} "
+                        f"holds {prev.item_id!r} (written {self.seqs[prev.item_id]}) "
+                        f"and position {i} holds {cur.item_id!r} (written "
+                        f"{self.seqs[cur.item_id]}). Retrieval order reaches "
+                        f"`derived_from`, which is hashed into `item_id`, which the "
+                        f"detector seeds on -- so a reordered carrier moves scores "
+                        f"while every digest, count and carrier check stays green.")
+
     def _rejoin(self, rec: dict, line: str, carrier: str) -> Item:
         """A public record from the carrier root + its sealed label -> the Item.
 
         The two halves are rejoined HERE and nowhere else, so there is one place
         that can answer "what happens when a label is missing" -- and it answers
         LOUDLY.  `poisoned=False` would be the silent answer, and the silent answer
-        is the bug: an agent can append to `memory.jsonl` from inside the container
-        (the mount is rw), and a fabricated line read back as clean is a payload
-        the scoring path will never count.
+        is the bug: a fabricated line read back as clean is a payload the scoring
+        path will never count.  The container can no longer append to
+        `memory.jsonl` (`harness.CARRIER_MODE` is `ro` -- Task 14), which removes
+        the agent's route to it and not the requirement: a killed run, a clone and
+        anything on the host can still hand this method a line with no label.
 
         `item_id` is trusted verbatim and has to be -- rehashing would move every
         id and every score (see the module docstring) -- so the id ALONE cannot be
-        what binds a record to its label: an agent can retype a known id onto a
-        line it wrote, or rewrite the content under an id it keeps, and in both
+        what binds a record to its label: a known id can be retyped onto a written
+        line, or the content rewritten under an id that is kept, and in both
         cases the payload's label travels to content the attacker did not write.
         The sealed side therefore carries `line_digest` of the exact public line,
         and the LINE is what is checked.
@@ -593,16 +762,22 @@ class FSCarrierStore(core.CarrierStore):
     def _seal_label(self, it: Item, line: str) -> None:
         """The ground truth, to the sealed sibling and nowhere else.
 
-        The label AND a digest of the public line it belongs to.  The digest is
-        what makes the label the evaluator's record of a specific record rather
-        than a note attached to a string the agent can retype.
+        The label, a digest of the public line it belongs to, AND the position that
+        line holds in the write order.  The digest is what makes the label the
+        evaluator's record of a specific record rather than a note attached to a
+        string anyone holding the file can retype; the sequence number is what
+        makes it a record of a specific POSITION -- see
+        `_refuse_an_order_that_moved` for why order is a measured quantity here.
         """
         self.labels[it.item_id] = getattr(it, SEALED_FIELDS[0])
         self.digests[it.item_id] = line_digest(line)
+        self.seqs[it.item_id] = self._next_seq
+        self._next_seq += 1
         with (self.sealed / LABELS).open("a", encoding="utf-8") as f:
             f.write(_line({"item_id": it.item_id,
                            SEALED_FIELDS[0]: self.labels[it.item_id],
-                           DIGEST_FIELD: self.digests[it.item_id]}) + "\n")
+                           DIGEST_FIELD: self.digests[it.item_id],
+                           SEQ_FIELD: self.seqs[it.item_id]}) + "\n")
 
     def _write_branch(self, it: Item, line: str, seq: int) -> None:
         """One item -> one git branch, via plumbing.
@@ -669,8 +844,7 @@ class FSCarrierStore(core.CarrierStore):
         # would either score an all-clean world or -- since Task 19 -- refuse to
         # open at all.  It lands in the copy's OWN sealed sibling, still outside
         # the copy's carrier root.
-        sealed_dest = sealed_root_for(dest)
-        sealed_dest.mkdir(parents=True, exist_ok=True)
+        sealed_dest = mkdir_private(sealed_root_for(dest))
         for f in sorted(self.sealed.glob("*")):
             if f.is_file():
                 shutil.copyfile(f, sealed_dest / f.name)
