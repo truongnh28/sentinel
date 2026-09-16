@@ -576,7 +576,13 @@ class TheInfraTierStaysOutOfTheImport(unittest.TestCase):
 
         Thesis claim (vi): "tang do luong khong duoc phu thuoc tang ha tang luc import".
         """
-        allowed = {"__future__", "json", "pathlib", "dataclasses", "typing",
+        # `ast` joined the list at Task 16 and it is not a widening of the CLAIM:
+        # the AST comparison IS the measurement of patch_has_marker, and `ast` is
+        # stdlib, which is exactly what this tier allows.  The tier that moved is
+        # the other one -- `subprocess` (git, docker) and `harness` reach OUT OF
+        # THIS PROCESS, so they belong with the HTTP client, imported inside the
+        # function that uses them, and they are named in the refusal list below.
+        allowed = {"__future__", "ast", "json", "pathlib", "dataclasses", "typing",
                    "collections", "core", "agent", "retrieval"}
         tree = ast.parse(pathlib.Path(inspect.getfile(agent_llm)).read_text(encoding="utf-8"))
         top = set()
@@ -587,7 +593,8 @@ class TheInfraTierStaysOutOfTheImport(unittest.TestCase):
                 top.add(node.module.split(".")[0])
         self.assertFalse(top - allowed,
                          f"agent_llm imports {sorted(top - allowed)} at module level")
-        for infra in ("urllib", "http", "os", "socket", "requests", "litellm"):
+        for infra in ("urllib", "http", "os", "socket", "requests", "litellm",
+                      "subprocess", "harness", "carrier_store_fs"):
             self.assertNotIn(infra, top,
                              f"{infra!r} is an import-time dependency of the loop")
 
