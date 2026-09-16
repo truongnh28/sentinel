@@ -11,9 +11,14 @@ import pathlib, subprocess, sys, unittest
 #: Modules that must import with site-packages stripped.  `replay` joins the
 #: measurement core in Task 5: it consumes `RunResult.traces` and `oracle`, and
 #: nothing about offline re-scoring justifies a non-stdlib dependency.
+#: `carrier_store_fs` and `harness` join it in Task 13.  They are the tempting
+#: place to reach for a Docker SDK -- they are the only modules that talk to the
+#: daemon at all -- and that is exactly why they belong on this list: they shell
+#: out with subprocess so "reproduce our numbers" never starts with "pip install
+#: a Docker client".
 CORE_MODULES = ("core", "detector", "scoring", "policies", "runner", "oracle",
                 "metrics", "retrieval", "attacks", "datasets", "agents",
-                "replay")
+                "replay", "carrier_store_fs", "harness")
 
 
 class Environment(unittest.TestCase):
