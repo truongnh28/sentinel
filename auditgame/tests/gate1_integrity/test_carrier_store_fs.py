@@ -325,6 +325,10 @@ class CarriersOutsideTheRepo(unittest.TestCase):
             fs.write(an_item(c, t=4))
         cp = fs.clone()
         self.addCleanup(shutil.rmtree, cp.root, True)
+        # The clone's SEALED sibling as well: it is outside `cp.root`, it holds the
+        # labels this store was carrying, and cleaning only `cp.root` left a
+        # labelled answer key behind in /tmp on every run of the suite.
+        self.addCleanup(shutil.rmtree, cp.sealed, True)
 
         self.assertEqual(cp.snapshot(), fs.snapshot(), "the copy lost state")
         cp.write(an_item("memory", t=9))                      # allowed

@@ -178,6 +178,18 @@ def inject_sealed(store, wf: Workflow, ps: PoisonSpec, *, auc_match_ci: tuple,
     behind `import harness` made the module every isolation test imports drag in
     the module that plants payloads.  `store` is duck-typed for the same reason:
     this file must not import `carrier_store_fs` to plant an item into it.
+
+    OWED TO TASK 16/17, AND SAID SO HERE.  This function has no production call
+    site yet -- `runner.py` plants with `inject()` into the in-RAM store, where
+    there is no sealed area to seal a manifest into, so the only callers today are
+    the two gate-1 test modules.  That is the same state the paragraph above
+    indicts `sealed_manifest` for having been in, one level up, and it is left
+    deliberately rather than by oversight: the call site belongs in the real-agent
+    run loop (Task 16 wires the agent, Task 17 the workflow driver), which is the
+    first place a filesystem store and a planted payload meet outside a test.
+    Until that lands, no filesystem run has a sealed manifest, and no harm figure
+    from one is scorable -- which is the sentence this note exists to make
+    impossible to rediscover by accident.
     """
     injected = inject(store, wf, ps)
     manifest = sealed_manifest(wf, ps, injected, auc_match_ci=auc_match_ci,
