@@ -106,7 +106,13 @@ class DatasetConformance(unittest.TestCase):
         """The body of D2, factored out so D2b can prove it goes RED."""
         kind = ds.scope().topic_kind
         self.assertIn(kind, ("exact", "graded"))
-        tasks = [t for w in ds.workflows(3, 4, seed=3) for t in w.tasks]
+        # H=8, not H=4. SPEC-P1a Part 4 step 4 asks a workflow to host every
+        # Delta in the sweep, and the sweep reaches Delta=4: a 4-task workflow
+        # has no pair (i, i+4) at all, so NO corpus can host it and a real
+        # dataset rightly refuses to build one. That refusal is correct
+        # behaviour, not a dataset defect, and it is pinned in test_real_data;
+        # asking for it here would test the refusal instead of topic_kind.
+        tasks = [t for w in ds.workflows(3, 8, seed=3) for t in w.tasks]
         topic = tasks[0].topic
         if isinstance(topic, str):
             # No partial overlap exists, so retrieval CANNOT be graded.
@@ -158,22 +164,15 @@ class DatasetConformance(unittest.TestCase):
                 f"declaration is now understating the retrieval, which REFUSES "
                 f"attacks that would in fact work.")
 
-    def test_D2b_the_topic_kind_check_goes_red_on_a_false_graded_declaration(self):
-        """D2 must be able to FAIL for the reason its name claims, and after
-        swebench was corrected to "exact" no dataset in REGISTRY declares
-        "graded" any more -- so D2's graded branch would never execute again and
-        could rot green.  This drives the same check over two stand-in datasets
-        that differ ONLY in the declaration, with identical token-set topics: the
-        one declaring "exact" must pass and the one declaring "graded" must fail,
-        because core.CarrierStore.retrieve is still equality.
-
-        Thesis claim (vi): "phep kiem phai do duoc CAI NO NOI, khong phai kieu du lieu".
-        """
+    @staticmethod
+    def _stub(kind):
+        """A dataset that is nothing but a topic_kind declaration over fixed
+        token-set topics -- so the declaration is the ONLY thing that varies."""
         from core import Task, Workflow
 
         class _Stub:
-            def __init__(self, kind):
-                self.name, self._kind = f"stub-{kind}", kind
+            def __init__(self, k):
+                self.name, self._kind = f"stub-{k}", k
 
             def scope(self):
                 return datasets.DatasetScope(
@@ -189,11 +188,58 @@ class DatasetConformance(unittest.TestCase):
                                     topic=frozenset({"pkg", "sub", f"mod{t}"}),
                                     problem="")
                                for t in range(H)])
+        return _Stub(kind)
 
-        self._assert_topic_kind_truthful("stub-exact", _Stub("exact"))
+    def test_D2b_the_topic_kind_check_goes_red_on_a_false_exact_declaration(self):
+        """D2 must be able to FAIL for the reason its name claims, and WHICH
+        declaration can now be false has flipped.
+
+        While core.CarrierStore.retrieve was `==`, a token-set dataset declaring
+        "graded" was the lie, and this test pinned that. Retrieval now goes
+        through retrieval.retrieved() at the frozen theta, so the lie available
+        today is the opposite one: a token-set dataset declaring "exact" while
+        the store happily returns partial matches. That is not a harmless
+        understatement -- attacks.usable_with REFUSES every pipeline with
+        requires_graded_retrieval=True on an "exact" dataset, so the false
+        declaration would silently drop a whole attacker class from a corpus that
+        can in fact host it, and worst_case takes a MAX over that class.
+
+        Two stand-ins differing ONLY in the declaration, identical token-set
+        topics: "graded" must pass, "exact" must go red.
+
+        Thesis claim (vi): "phep kiem phai do duoc CAI NO NOI, khong phai kieu du lieu".
+        """
+        self._assert_topic_kind_truthful("stub-graded", self._stub("graded"))
         with self.assertRaises(AssertionError) as ctx:
-            self._assert_topic_kind_truthful("stub-graded", _Stub("graded"))
-        self.assertIn("FAKE harm=0", str(ctx.exception))
+            self._assert_topic_kind_truthful("stub-exact", self._stub("exact"))
+        self.assertIn("understating the retrieval", str(ctx.exception))
+
+    def test_D2c_the_graded_branch_goes_red_if_retrieval_is_un_wired(self):
+        """The half of D2 that stands behind swebench's "graded" declaration is
+        the graded branch, and a green branch proves nothing unless it can go red.
+        The failure it exists to catch is a REVERT of the wiring: if
+        core.CarrierStore.retrieve went back to `==` (equivalently, theta back to
+        1.0) while swebench still declared "graded", GradedAttack would be
+        re-admitted and every epsilon < 1 would report harm == 0, because a strict
+        subset of sigma's topic is never returned by equality.
+
+        Raising retrieval.THETA to 1.0 reproduces exactly that world -- for
+        one-token sets Jaccard is {0,1}, so theta=1.0 IS the old `==` -- and the
+        graded stub must go red naming the fake zero.
+
+        Thesis claim (vi): "khai 'graded' ma truy xuat van la == thi harm=0 la so GIA".
+        """
+        old = retrieval.THETA
+        try:
+            retrieval.THETA = 1.0
+            with self.assertRaises(AssertionError) as ctx:
+                self._assert_topic_kind_truthful("stub-graded", self._stub("graded"))
+            self.assertIn("FAKE harm=0", str(ctx.exception))
+            # and with retrieval un-wired, "exact" becomes the honest declaration
+            # again -- the check tracks the retrieval, not the fixture.
+            self._assert_topic_kind_truthful("stub-exact", self._stub("exact"))
+        finally:
+            retrieval.THETA = old
     def test_D4_the_results_header_says_what_scored_the_harm_column(self):
         """`has_hidden_tests` was declared on DatasetScope, set twice, and read
         NOWHERE.  Harm is (public tests PASS) AND (hidden test FAILS), so on a
@@ -227,7 +273,10 @@ class DatasetConformance(unittest.TestCase):
         """Thesis claim (vi): "so workflow dung nhu yeu cau"."""
         for name, ds in self._each():
             with self.subTest(dataset=name):
-                self.assertEqual(len(list(ds.workflows(5, 4, seed=1))), 5)
+                # H=8 for the same reason as D2: at H=4 no workflow can hold a
+                # pair (i, i+4), so step 4 empties every corpus and this would
+                # measure the refusal rather than the count.
+                self.assertEqual(len(list(ds.workflows(5, 8, seed=1))), 5)
 
 
 # ============================================================= AgentPipeline ==

@@ -9,6 +9,15 @@ The scope's most important field is `topic_kind`:
     exact   topic is a STRING, retrieval matches exactly   -> sim in {0,1}
     graded  topic is a TOKEN SET, Jaccard retrieval        -> sim continuous
 
+Note what the two names are defined by: the RETRIEVAL, not the type of `topic`.
+A dataset handing out token sets while the store still compares them with `==`
+is `exact`, and declaring it `graded` would be a false declaration even though
+every type check passes -- which is exactly what happened once, and what
+test_D2_topic_kind_is_declared_truthfully probes BEHAVIOURALLY rather than by
+isinstance.  Both kinds are live today: MockDataset is `exact` because its topic
+is a single token (Jaccard on one-token sets takes only {0,1}, so no theta can
+grade it), SWEBenchDataset is `graded`.
+
 It decides which AttackPipeline may be used.  An attack declaring
 `requires_graded_retrieval=True` running on an `exact` dataset is a MEANINGLESS
 combination -- epsilon has no surface to act on -- so the framework must REFUSE it
@@ -103,13 +112,13 @@ def _register_swebench() -> None:
             f"workflows and ALL {rep['dropped']} of them are dropped: none holds "
             f"a pair of tasks (i, i+Delta) whose topics match at theta="
             f"{rep['theta']} for every Delta in {rep['sweep_deltas']}. Workflows "
-            f"that can host each Delta on its own: {rep['per_delta']}. The "
-            f"payload was reaching sigma only because build.inject stamps it with "
-            f"sigma's own topic, so the harm column was measuring the injection, "
-            f"not the repo's history. theta is 1.0 because "
-            f"core.CarrierStore.retrieve compares topics with `==` -- this "
-            f"unblocks when retrieval becomes graded (retrieval.py, advisor "
-            f"question 3), not by weakening theta."))
+            f"that can host each Delta on its own: {rep['per_delta']}. This is "
+            f"N3 at dataset level: a workflow the attack cannot be built on "
+            f"leaves the DENOMINATOR, it does not enter it with harm 0. theta "
+            f"is retrieval.THETA, derived from the measured |topic| "
+            f"distribution (spikes/chot_theta.md) and shared with the retrieval "
+            f"the runner performs -- so the fix for this refusal is a pool whose "
+            f"workflows contain genuinely related tasks, NOT a smaller theta."))
     else:
         REGISTRY["swebench"] = ds
 

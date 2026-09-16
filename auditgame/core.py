@@ -11,6 +11,8 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional
 import json
 
+import retrieval
+
 CARRIERS = ("memory", "skill", "queue", "branch")
 
 
@@ -79,9 +81,36 @@ class CarrierStore:
         return [it for c in cs for it in self.items[c]
                 if it.item_id not in self.quarantined]
 
-    def retrieve(self, topic: str):
-        """Retrieval = every live item whose topic matches the current task."""
-        return [it for it in self.live() if it.topic == topic]
+    def retrieve(self, topic, theta: Optional[float] = None):
+        """Retrieval = every live item whose topic MATCHES the current task's,
+        where "matches" is Jaccard over module tokens at the frozen
+        `retrieval.THETA` (SPEC-R-Truy-xuat.md Part 2.2).
+
+        This used to be `it.topic == topic`, i.e. theta = 1.0, and that single
+        `==` was the bottleneck under advisor question 3:
+
+          * `epsilon` had NO SURFACE.  The payload's topic is a subset of task
+            sigma's, and a strict subset never equals it, so every epsilon < 1
+            would have reported harm 0 -- one of the attacker's four knobs
+            (k, iota, sigma, epsilon) reduced to decoration.
+          * On real data the join key almost never fires: only 1.79% of
+            intra-workflow task pairs shared a topic exactly, so SPEC-P1a Part 4
+            step 4 dropped all 58 Verified workflows and the corpus was empty.
+
+        Exact matching is NOT replaced, it is the special case theta = 1.0 with
+        equal token sets -- and on the mock, whose topics are single tokens, it
+        is the special case at EVERY theta in (0, 1]: Jaccard on one-token sets
+        takes only {0, 1}.  So the mock table must not move by a single digit;
+        see retrieval.as_topic.
+
+        `theta` is exposed only so a test can perturb it and watch the claim go
+        red.  The runner never passes it: a per-call threshold would be a free
+        parameter sitting in the measurement path, and theta is frozen.
+        """
+        th = retrieval.THETA if theta is None else theta
+        want = retrieval.as_topic(topic)
+        return [it for it in self.live()
+                if retrieval.retrieved(retrieval.as_topic(it.topic), want, th)]
 
     def quarantine(self, item_id: str):
         self.quarantined.add(item_id)
@@ -245,8 +274,15 @@ def _thaw_topic(v):
 
     dumps() writes a frozenset as a SORTED list, so the reverse is frozenset(v).
     It must be a frozenset and not a list: replay uses the topic as a dict key
-    (topic_counts) and CarrierStore.retrieve compares it for equality, and a list
-    is unhashable.  The plain-string topics of the mock dataset pass through.
+    (topic_counts) and CarrierStore.retrieve runs Jaccard set operations over it
+    (`a & b`, `a | b`), neither of which a list supports.  The plain-string topics
+    of the mock dataset pass through and are normalised at the comparison site by
+    retrieval.as_topic.
+
+    Note what is NOT recovered: a swebench_dataset.Topic comes back a plain
+    frozenset, so its str() is the hash-order form rather than the canonical one.
+    That is why item_from_record passes item_id EXPLICITLY instead of letting
+    __post_init__ rehash it -- see that function.
     """
     return frozenset(v) if isinstance(v, list) else v
 

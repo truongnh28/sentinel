@@ -53,48 +53,48 @@ MAX_INSTANCE_REUSE = 2
 #: parameter: change them here only when experiment.py's `deltas` changes.
 SWEEP_DELTAS = (0, 1, 2, 4)
 
-#: Retrieval threshold used by step 4.  It is 1.0 because the retrieval the
-#: runner actually performs, core.CarrierStore.retrieve, is `it.topic == topic`
-#: -- set equality, i.e. sim >= 1.0.  See SWEBenchDataset.scope() for why
-#: topic_kind is declared "exact" for the same reason.
+#: Retrieval threshold used by step 4.  It is not a number of its own: it is
+#: `retrieval.THETA`, the SAME threshold core.CarrierStore.retrieve applies, so
+#: step 4 cannot admit a workflow the runner's retrieval would then refuse to act
+#: on (or refuse one it would).  Binding the two together is the point -- two
+#: independent copies of theta is how a filter and a measurement quietly stop
+#: describing the same world.
 #:
-#: DO NOT LOWER THIS TO KEEP THE WORKFLOW COUNT UP.  theta is a property of the
-#: retrieval, not a knob for corpus size: a workflow admitted at theta=0.5 whose
-#: tasks are then matched with `==` still cannot host the attack, so lowering it
-#: here would put back exactly the workflows step 4 exists to remove, and the
-#: harm they report would again be an artifact of build.inject stamping the
-#: payload with sigma's own topic. theta moves when retrieval moves.
-THETA = 1.0
+#: It reads 0.5 rather than 1.0 because RETRIEVAL MOVED, which is the only reason
+#: the previous note here allowed: "theta moves when retrieval moves."
+#: core.CarrierStore.retrieve now goes through retrieval.retrieved() instead of
+#: `==`, and theta was fixed from the measured |topic| distribution
+#: (spikes/chot_theta.md), written down and committed BEFORE the surviving
+#: workflow count was looked at.
+#:
+#: DO NOT MOVE THIS TO KEEP THE WORKFLOW COUNT UP.  The count is a consequence of
+#: theta; theta is not a consequence of the count.  If it ever needs to change,
+#: the derivation in spikes/chot_theta.md is what changes first, from data.
+THETA = retrieval.THETA
 
 
-class Topic(frozenset):
-    """`topics.topic_of_instance` returns a plain `frozenset` of path tokens, and
+class Topic(retrieval.Topic):
+    """`topics.topic_of_instance` returns a token set of path tokens, and
     Task.topic here MUST stay a real frozenset, not a string: it is what
     retrieval.sim / retrieval.payload_topic are written against, and it is the
-    only form from which a graded retrieval can ever be built (scope() explains
-    why the DECLARATION is still "exact" until that retrieval is actually wired
-    in -- a token-set type is not graded retrieval).
+    form the graded retrieval in core.CarrierStore.retrieve is built on.  A
+    token-set TYPE was never graded RETRIEVAL on its own, which is why scope()
+    declared "exact" until the wiring landed; it declares "graded" now because
+    the retrieval behind it changed, not because the type did.
 
-    But frozenset's own str()/repr() walks its internal hash table, whose layout
-    depends on Python's per-process string-hash randomisation (PYTHONHASHSEED).
-    Every consumer downstream of Task.topic embeds it straight into an f-string
-    (agent.py's memory/skill/branch/queue notes, build.py's payload content) or
-    hands it to core.seed_of, which stringifies its arguments -- so a bare
-    frozenset here would make the SAME command print a DIFFERENT number on two
-    separate runs.  That is exactly the failure class the project's hash() ban
-    exists to prevent (see core.seed_of's docstring), just arriving through
-    frozenset ordering instead of hash() itself.
+    The canonical "|".join(sorted(...)) stringification that makes this safe --
+    against a bare frozenset's PYTHONHASHSEED-dependent str(), which would give
+    the same run a different item_id and therefore a different detector score --
+    now lives on retrieval.Topic, and this class inherits it.  It moved there
+    because retrieval CONSTRUCTS topics too: build.inject stamps the payload with
+    retrieval.payload_topic_like(sigma_topic, eps), a subset no dataset ever
+    handed out, so a canonical form defined only here would not have covered it.
 
-    Overriding __str__/__repr__ to the canonical "|".join(sorted(...)) form fixes
-    every one of those call sites WITHOUT touching any of them: isinstance(topic,
-    frozenset) is still True, and set equality / Jaccard similarity / use as a
-    dict key (runner.py's topic_counts) are all unaffected, because none of them
-    depend on iteration order -- only string conversion does.
+    The distinct subclass is kept rather than aliased away so that the DATASET's
+    topics stay identifiable as such at a glance in a traceback, and so
+    retrieval.payload_topic_like's `type(target)(...)` hands back a topic of this
+    same type instead of silently widening it.
     """
-    def __str__(self) -> str:
-        return "|".join(sorted(self))
-
-    __repr__ = __str__
 
 
 class SWEBenchDataset:
@@ -165,8 +165,19 @@ class SWEBenchDataset:
         real tasks in the workflow have anything to do with each other -- "two
         related tasks" becomes an artifact of the injection rather than a property
         of the repo's history, which is precisely the causal reading the
-        created_at sort was introduced to earn. Measured on SWE-bench Verified,
-        only 1.25% of intra-workflow task pairs share a topic at all.
+        created_at sort was introduced to earn.
+
+        Both halves of that have now moved, and step 4 stayed. build.inject
+        narrows the payload to payload_topic_like(sigma_topic, eps), so it is no
+        longer stamped with sigma's whole topic; and retrieval is graded, so
+        "related" is sim >= theta rather than set equality. Measured on the 58
+        grouped workflows of SWE-bench Verified at H=8 (1624 intra-workflow task
+        pairs): 281 of them clear theta=0.5, i.e. 17.30%, against 29 (1.79%)
+        under `==`. For scale, the synthetic mock sits at 282/1624 = 17.36% --
+        the real corpus's relatedness now measures like the mock's instead of an
+        order of magnitude below it. 14 of the 58 workflows survive this filter,
+        against 0 before. Step 4 is what keeps the other 44 out of the
+        DENOMINATOR.
         """
         segs = self._raw_segments(H)
         if not self.sweep_deltas:
@@ -211,31 +222,27 @@ class SWEBenchDataset:
                 "dropped_by_step4": rep["dropped"]}
 
     def scope(self) -> "DatasetScope":
-        # topic_kind="exact", NOT "graded", even though Task.topic here is a token
-        # set. datasets.py defines the two values by the RETRIEVAL they imply:
-        # "graded" means Jaccard retrieval and a continuous sim; "exact" means sim
-        # in {0,1}. The retrieval the runner actually performs is
-        # core.CarrierStore.retrieve, which is `it.topic == topic` -- set equality,
-        # so sim is two-valued and epsilon has no surface to act on.
-        # retrieval.py's Jaccard functions exist but its own module note says they
-        # are "not yet wired into core.CarrierStore. Blocked on advisor question
-        # 3." A token-set TYPE is not graded RETRIEVAL.
+        # topic_kind="graded".  This was downgraded to "exact" while the
+        # declaration was false, and the note left here listed the two conditions
+        # under which it could go back up. BOTH now hold, which is why it does:
         #
-        # Declaring "graded" while retrieval is equality was not cosmetic. It made
-        # attacks.usable_with admit GradedAttack, whose payload topic is a strict
-        # SUBSET of sigma's; under `==` that item can never be retrieved, so every
-        # epsilon < 1 would have reported harm == 0 -- a fake zero in the exact
-        # cell this framework exists to refuse.
+        #   1. core.CarrierStore.retrieve goes through
+        #      retrieval.retrieved(item.topic, task.topic, theta) instead of `==`;
+        #   2. theta was FIXED FROM THE MEASURED |topic| distribution
+        #      (spikes/chot_theta.md, derived and committed before the surviving
+        #      workflow count was looked at), not guessed.
         #
-        # TO CHANGE THIS BACK, both must hold:
-        #   1. CarrierStore.retrieve goes through retrieval.retrieved(item.topic,
-        #      task.topic, theta) rather than ==, and
-        #   2. theta is FIXED FROM THE MEASURED |topic| distribution (see
-        #      spikes/phan_bo_topic.md), not guessed.
-        # Flipping the string alone re-arms the fake zero.
+        # Neither of those is asserted here, and the declaration is not what makes
+        # it true. test_D2_topic_kind_is_declared_truthfully plants items whose
+        # similarity to the query is strictly between 0 and 1 and checks that the
+        # retrieval the RUNNER uses returns the closer one and not the farther
+        # one. That test is the thing standing behind this string; if the wiring
+        # is ever reverted it goes red here rather than letting the old fake zero
+        # back in (GradedAttack's payload is a strict SUBSET of sigma's topic, so
+        # under `==` every epsilon < 1 reports harm == 0).
         from datasets import DatasetScope
         return DatasetScope(repos=frozenset(self._by_repo()),
-                            topic_kind="exact", has_hidden_tests=False,
+                            topic_kind="graded", has_hidden_tests=False,
                             is_mock=False, instance_pool=self.pool)
 
     def workflows(self, n: int, H: int, seed: int) -> Iterator[Workflow]:
@@ -250,10 +257,13 @@ class SWEBenchDataset:
                 f"Per Delta, the workflows that CAN host it: {rep['per_delta']}. "
                 f"This is N3 at dataset level: a workflow on which the attack "
                 f"cannot be built leaves the denominator, it does not enter it "
-                f"with harm 0. Do NOT lower theta to make this pass -- theta is "
-                f"1.0 because CarrierStore.retrieve compares topics with `==`. "
-                f"The corpus becomes usable when retrieval becomes graded, or "
-                f"with a pool whose workflows contain genuinely related tasks.")
+                f"with harm 0. Do NOT lower theta to make this pass: theta is "
+                f"retrieval.THETA, derived from the measured |topic| "
+                f"distribution in spikes/chot_theta.md and shared with the "
+                f"retrieval the runner performs, so lowering it here would "
+                f"admit workflows that retrieval then cannot act on. The fix "
+                f"for an empty corpus is a pool whose workflows contain "
+                f"genuinely related tasks.")
         cap = MAX_INSTANCE_REUSE * len(segments)
         if n > cap:
             reuse_factor = n / len(segments) if segments else float("inf")

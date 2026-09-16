@@ -306,63 +306,119 @@ class WorkflowGrouping(unittest.TestCase):
             "while non_reused_workflows == 58, the formula itself changed "
             "-- stop and find the cause, do not update this number.")
 
-    def test_step4_drops_every_workflow_on_the_verified_pool(self):
+    def test_step4_keeps_14_of_58_workflows_on_the_verified_pool(self):
         """SPEC-P1a Part 4 step 4 -- "LOAI workflow khong co cap (i, i+Delta)
         cung topic vuot theta cho Delta can quet", which the spec itself calls
-        "N3 o muc dataset" -- was never implemented, and the premise it protects
-        is NOT satisfied by the real corpus.
+        "N3 o muc dataset".
 
-        build.plan_poison never requires iota and sigma to be related; it only
-        forbids sigma's topic in [iota, sigma). build.inject then stamps the
-        payload with sigma's OWN topic, so it is retrieved at sigma whether or
-        not any two real tasks in the workflow have anything to do with each
-        other. Measured: 7 of 560 intra-workflow task pairs share a topic
-        (1.25%), and the agent retrieves prior state on 3.8% of clean tasks
-        against 37.5-45% on the mock. So "two related tasks" was an artifact of
-        the injection, which is exactly the causal reading the created_at sort
-        exists to earn.
+        This test used to pin feasible == 0: under `==` retrieval only 29 of the
+        1624 intra-workflow task pairs (1.79%) shared a topic, so ALL 58 grouped
+        workflows were dropped and the real corpus was empty. Two things changed,
+        and NEITHER of them is theta being weakened to rescue the count:
 
-        These numbers are a RESULT, not a detail: at H=8 on SWE-bench Verified,
-        ALL 58 grouped workflows fail step 4, and per Delta only 8 / 6 / 2 can
-        host Delta = 1 / 2 / 4 at all. If this test moves, the corpus or the
-        tokenization changed -- STOP and find out which. Do NOT lower theta to
-        make it pass: theta is 1.0 because core.CarrierStore.retrieve compares
-        topics with `==`, and a workflow admitted at a lower theta still cannot
-        host the attack under `==`.
+          * core.CarrierStore.retrieve now goes through retrieval.retrieved(),
+            so "related" is sim >= theta rather than set equality;
+          * theta is retrieval.THETA = 0.5, derived from the measured |topic|
+            distribution in spikes/chot_theta.md and COMMITTED BEFORE these
+            counts were looked at. The old note here said "theta moves when
+            retrieval moves"; retrieval moved.
+
+        The numbers below are a RESULT. At theta=0.5, 281/1624 = 17.30% of
+        intra-workflow pairs clear theta -- for scale the synthetic mock sits at
+        282/1624 = 17.36%, so the real corpus's relatedness now measures like the
+        mock's rather than an order of magnitude below it -- and 14 of the 58
+        workflows survive. If this test moves, the corpus, the tokenization, or
+        theta changed: STOP and find out which. Do NOT edit these numbers to make
+        it pass, and in particular do not move theta to restore one -- theta is
+        fixed from data, and the count is its consequence, never its reason.
 
         Thesis claim (vi): "workflow khong dung duoc attack phai RA KHOI mau so".
         """
-        import swebench_dataset
+        import retrieval, swebench_dataset
+        self.assertEqual(
+            swebench_dataset.THETA, retrieval.THETA,
+            "step 4 and the runner's retrieval are using DIFFERENT thetas, so "
+            "the filter no longer describes the retrieval it filters for")
+        self.assertEqual(retrieval.THETA, 0.5,
+                         "theta moved away from the value derived in "
+                         "spikes/chot_theta.md -- re-derive it from the |topic| "
+                         "distribution before touching this test")
         rep = swebench_dataset.SWEBenchDataset().grouping_report(H=8)
         self.assertEqual(rep["grouped"], 58)
         self.assertEqual(
-            rep["feasible"], 0,
-            "a workflow now survives step 4 on the Verified pool. Either the "
-            "data changed, tokenization drifted, or theta was weakened. Find "
-            "out which before reporting any swebench number.")
-        self.assertEqual(rep["dropped"], 58)
-        self.assertEqual(rep["per_delta"], {0: 58, 1: 8, 2: 6, 4: 2},
+            rep["feasible"], 14,
+            "the number of workflows surviving step 4 on the Verified pool "
+            "moved. Either the data changed, tokenization drifted, or theta "
+            "changed. Find out which before reporting any swebench number.")
+        self.assertEqual(rep["dropped"], 44)
+        self.assertEqual(rep["per_delta"], {0: 58, 1: 37, 2: 28, 4: 28},
                          "the per-Delta hosting counts moved")
+
+    def test_step4_still_empties_the_corpus_under_exact_retrieval(self):
+        """The 14 above must be attributable to GRADED RETRIEVAL and to nothing
+        else. Same data, same tokenization, same code path, theta back at 1.0 --
+        which for equal token sets IS the `==` the store used to do -- and the
+        count has to fall back to the 0 / {0:58, 1:8, 2:6, 4:2} this file pinned
+        before. If it does not, something other than theta moved between the two
+        readings and the gain cannot be credited to retrieval.
+
+        Thesis claim (vi): "khop chinh xac la CA RIENG theta=1, khong bi thay the".
+        """
+        import swebench_dataset
+        rep = swebench_dataset.SWEBenchDataset(theta=1.0).grouping_report(H=8)
+        self.assertEqual(rep["grouped"], 58)
+        self.assertEqual(rep["feasible"], 0,
+                         "theta=1.0 no longer reproduces the exact-matching "
+                         "corpus, so graded retrieval is NOT a generalisation "
+                         "of it and the old table cannot be recovered")
+        self.assertEqual(rep["per_delta"], {0: 58, 1: 8, 2: 6, 4: 2})
 
     def test_a_corpus_that_cannot_host_the_sweep_is_refused_with_a_reason(self):
         """N3 at dataset level: "could not be built" must never arrive as harm 0.
-        With every workflow dropped by step 4, `workflows()` raises and names the
-        numbers, and datasets.py records swebench in PENDING WITH ITS REASON
-        rather than in REGISTRY -- so experiment.py prints a refusal instead of a
-        grid.
+
+        The Verified pool at H=8 now survives step 4, so the refusal has to be
+        driven by a corpus that genuinely cannot host the sweep rather than by
+        the one that happens to be broken this week -- otherwise the refusal
+        machinery goes untested the moment the data improves. H=4 is such a
+        corpus for a structural reason, not a statistical one: the sweep reaches
+        Delta=4 and a 4-task workflow has no pair (i, i+4) at all, so NO amount
+        of relatedness can host it.
+
+        `workflows()` must raise and NAME THE NUMBERS, so a reader is told what
+        was dropped and why instead of receiving a grid of zeros.
 
         Thesis claim (vi): "o ngoai pham vi thi ghi LY DO, khong ghi harm=0".
         """
-        import datasets, swebench_dataset
+        import swebench_dataset
+        ds = swebench_dataset.SWEBenchDataset()
+        self.assertEqual(ds.grouping_report(H=4)["feasible"], 0,
+                         "fixture drifted: H=4 can now host Delta=4, which is "
+                         "structurally impossible -- check sweep_deltas")
         with self.assertRaises(ValueError) as ctx:
-            list(swebench_dataset.SWEBenchDataset().workflows(1, 8, seed=1))
+            list(ds.workflows(1, 4, seed=1))
         msg = str(ctx.exception)
         self.assertIn("step 4", msg)
-        self.assertIn("58", msg, "the refusal must name how many were dropped")
-        self.assertNotIn("swebench", datasets.REGISTRY,
-                         "an unusable dataset is still registered as usable")
-        self.assertIn("swebench", datasets.PENDING)
-        self.assertIn("step 4", datasets.PENDING["swebench"][1])
+        self.assertIn("120", msg, "the refusal must name how many were dropped")
+        self.assertIn("harm 0", msg,
+                      "the refusal must say what it is refusing to print")
+
+    def test_a_usable_corpus_is_registered_rather_than_left_pending(self):
+        """The mirror of the refusal, and the reason it has to be tested: a
+        dataset that CAN host the sweep must reach datasets.REGISTRY, or
+        experiment.py prints a stale refusal for a corpus that works. swebench
+        sat in PENDING for exactly as long as step 4 emptied it; it is registered
+        now because 14 workflows survive, and the PENDING entry must be gone
+        rather than kept as a contradictory second opinion.
+
+        Thesis claim (vi): "tu choi phai co ly do, va ly do phai het han duoc".
+        """
+        import datasets
+        self.assertIn("swebench", datasets.REGISTRY,
+                      "a corpus that survives step 4 is still refused")
+        self.assertNotIn("swebench", datasets.PENDING,
+                         "swebench is registered AND pending -- two answers to "
+                         "one question, and experiment.py reads the wrong one")
+        self.assertEqual(datasets.REGISTRY["swebench"].scope().topic_kind, "graded")
 
     def test_workflows_refuses_to_reuse_an_instance_beyond_the_cap(self):
         """bootstrap_paired resamples BY WORKFLOW and assumes independence across

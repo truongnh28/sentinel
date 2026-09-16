@@ -533,12 +533,24 @@ class ReplayReDerivesANeverRunCell(unittest.TestCase):
 
     #: Floors, not exact counts: they must fail loudly if the sweep silently
     #: shrinks (the defect family this batch keeps producing), while leaving the
-    #: fixture free to grow.  Measured on the sweep as written: 1440 cases, 592
-    #: of them re-derived, 848 declared invalid; 298 of the re-derived cells
-    #: score DIFFERENTLY from the cell whose trace produced them, and 445 of the
-    #: declared-invalid ones would have carried a wrong number.
+    #: fixture free to grow.  Measured on the sweep as written: 1440 cases, 448
+    #: of them re-derived, 992 declared invalid, and 215 of the re-derived cells
+    #: score DIFFERENTLY from the cell whose trace produced them.
+    #:
+    #: MIN_VALID came down from 450 when retrieval became graded, and the drop is
+    #: CAUSAL, not a shrinking fixture.  The mock arm did not move at all (148
+    #: valid / 572 invalid, before and after -- its topics are single tokens, so
+    #: no theta can change them).  The whole difference is on the swebench arm,
+    #: 444 valid -> 300, and every one of the 992 invalid verdicts is a
+    #: QUARANTINE FIRED: under `==` a quarantined item was usually not in the
+    #: retrieval set anyway, so removing it changed nothing and the cell replayed;
+    #: under Jaccard it much more often IS in that set, so the quarantine really
+    #: does change what the agent could retrieve and replay correctly REFUSES to
+    #: score the cell.  Fewer free cells is the honest price of the retrieval
+    #: being able to see more -- and a replay that kept scoring them would be
+    #: reporting configuration A's retrieval as configuration B's.
     MIN_CASES = 1200
-    MIN_VALID = 450
+    MIN_VALID = 400
     MIN_INVALID = 600
     MIN_CELLS_THAT_MOVED = 200
 
