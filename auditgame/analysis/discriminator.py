@@ -33,6 +33,7 @@ a disjointness check at the level of NAMES passes while the substance overlaps.
 from __future__ import annotations
 import math
 import random
+import statistics
 
 F_MATCH = frozenset({"size", "depth", "recency", "derived"})
 F_DETECT = frozenset({"semantic_anomaly", "provenance_legitimacy", "lineage_consistency"})
@@ -91,6 +92,95 @@ def _hanley_mcneil(auc: float, n_pos: int, n_neg: int) -> tuple:
     return max(0.0, auc - 1.96 * se), min(1.0, auc + 1.96 * se)
 
 
+#: The DECLARED SET of train/test splits every published AUC is summarised over.
+#:
+#: WHY A SET AND NOT A CONSTANT.  `auc_with_ci` shuffles once, under `seed`, and
+#: everything downstream -- the point estimate, the Hanley-McNeil interval, the
+#: verdict -- is conditional on that one shuffle.  Pinning it to a single literal
+#: makes the published criterion read "AUC_upper <= 0.56 AT SPLIT SEED 7", and the
+#: split's own noise is LARGER than the margin that criterion was clearing by.
+#: MEASURED on the certify corpus (pool=full, eps*=0, per_event=4), 20 splits:
+#:
+#:     Delta   CI upper at seed 7   CI upper across SPLIT_SEEDS
+#:       0           0.5532            0.4978 .. 0.5791
+#:       2           0.5413            0.4888 .. 0.5684
+#:       4           0.5383            0.4994 .. 0.5655
+#:
+#: The bound swings +/- 0.04 on nothing but the shuffle, while Delta=0 was
+#: published as clearing the 0.56 ceiling by 0.0068.  Advisor question 8 adopted
+#: the CI upper bound PRECISELY because "the threshold sits inside sampling
+#: noise"; leaving a second, larger noise source pinned to a literal and then
+#: quoting four decimals defeats the reason the criterion was chosen.
+#:
+#: TWENTY, and they are 1..20 rather than a hand-picked list: a set somebody chose
+#: is a seed 7 with more steps.  The number is declared here so that adding or
+#: removing a seed is a visible edit to the criterion rather than a quiet one.
+SPLIT_SEEDS = tuple(range(1, 21))
+
+
+def summarise_splits(per_seed: dict, ceiling: float) -> dict:
+    """Collapse {seed -> (auc, lo, hi)} into the summary a verdict is read off.
+
+    WHICH SUMMARY IS THE CRITERION, and why it is the MEAN of the upper bounds
+    rather than their MAXIMUM.  Both are properties of the declared set, so both
+    answer the "arbitrary constant" objection; they do not answer the same
+    question.
+
+      max(hi)   asks "is there a split at which the interval fails to close".
+                Its expectation GROWS WITH len(SPLIT_SEEDS) -- it converges to the
+                supremum, not to a population quantity -- so the criterion would
+                change every time somebody adds a seed.  It is also dominated by
+                the fold SIZE rather than by the payload: measured on the screen
+                corpus (80 events), max(auc) at epsilon = 0 reaches 0.6220 at
+                Delta = 2, and at epsilon = 0 the payload is byte-length matched
+                to the agent's note BY CONSTRUCTION.  A statistic that reports an
+                indistinguishable payload as separable because the fold is small
+                is measuring the fold -- the same confound class age-matching
+                exists to remove.
+
+      mean(hi)  asks "where does the interval sit once the shuffle is averaged
+                out".  Stable in len(SPLIT_SEEDS), and it keeps every bit of the
+                sample-size honesty question 8 bought, because each hi still
+                carries the Hanley-McNeil width of a SINGLE test fold: a corpus
+                too small to close the interval still fails.  Measured, it does
+                fail exactly where it should -- pool=verified, eps*=0:
+                Delta=2 mean(hi) 0.5629 (7/20 splits clear), Delta=4 0.5898
+                (5/20) -- which is the power argument the pool decision rests on,
+                restated without seed 7's 0.0038.
+
+    `clear` (how many splits clear the ceiling on their own) is returned BESIDE the
+    criterion, never instead of it: a reader who prefers the max rule can apply it
+    from these fields, and a cell that clears on the mean while failing at 3 of 20
+    splits has to say so out loud.  Nothing here moves the 0.56 ceiling.
+    """
+    aucs = [v[0] for v in per_seed.values()]
+    his = [v[2] for v in per_seed.values()]
+    return dict(
+        k=len(per_seed),
+        auc_mean=statistics.fmean(aucs), auc_median=statistics.median(aucs),
+        auc_min=min(aucs), auc_max=max(aucs),
+        hi_mean=statistics.fmean(his), hi_min=min(his), hi_max=max(his),
+        clear=sum(1 for h in his if h <= ceiling),
+        failing_seeds=sorted(s for s, v in per_seed.items() if v[2] > ceiling),
+    )
+
+
+def auc_over_splits(poisoned: list, benign: list, ceiling: float,
+                    seeds=SPLIT_SEEDS, test_fraction: float = 0.4) -> dict:
+    """`auc_with_ci` over EVERY declared split, summarised -- see SPLIT_SEEDS.
+
+    The corpus is built once by the caller and handed in, so the cost of the whole
+    declared set is len(seeds) logistic fits and no extra harvesting.  MEASURED:
+    the certify phase over 20 splits and three Deltas costs 49s against 2.5s at one
+    split -- which is what "20 is cheap" means here.
+    """
+    per_seed = {s: auc_with_ci(poisoned, benign, seed=s,
+                               test_fraction=test_fraction) for s in seeds}
+    out = summarise_splits(per_seed, ceiling)
+    out["per_seed"] = {s: tuple(round(x, 4) for x in v) for s, v in per_seed.items()}
+    return out
+
+
 def auc_with_ci(poisoned: list, benign: list, seed: int,
                 test_fraction: float = 0.4) -> tuple:
     """HELD-OUT AUC of a logistic regression on F_MATCH, plus its 95% CI.
@@ -100,6 +190,13 @@ def auc_with_ci(poisoned: list, benign: list, seed: int,
     HELD-OUT is not optional: fitting four features to a few dozen samples gives a
     training AUC near 1.0 whatever the corpus looks like, so a training number
     would certify any corpus at all.
+
+    `seed` draws ONE shuffle, so everything this returns is conditional on it.  No
+    published verdict may be read off a single call: the criterion is a property of
+    the DECLARED SPLIT SET (see SPLIT_SEEDS and `auc_over_splits`), because the
+    spread of `hi` across splits is wider than the margin the 0.56 ceiling is
+    cleared by.  This function stays single-split on purpose -- it is the unit
+    `auc_over_splits` is built from, and a test perturbing one split needs it.
     """
     rows = [[float(f[c]) for c in _COLS] for f in poisoned + benign]
     y = [1.0] * len(poisoned) + [0.0] * len(benign)

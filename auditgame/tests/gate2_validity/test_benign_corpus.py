@@ -32,6 +32,16 @@ N_CERTIFY = 900           # phase 2: the event count question 8 fixed (a CAP, se
 DELTAS = (0, 2, 4)
 EPSILONS = (0.0, 0.2, 0.4, 0.7, 1.0)
 
+#: The train/test splits both phases are summarised over -- `discriminator.
+#: SPLIT_SEEDS`, read from there rather than restated, so the criterion and the
+#: thing that computes it cannot drift apart.  Both phases used to pass `seed=7`,
+#: which made the published criterion "AUC_upper <= 0.56 AT SPLIT SEED 7" while
+#: the bound's own spread across splits (+/- 0.04) was six times the margin
+#: Delta=0 was clearing by (0.0068).  See discriminator.summarise_splits for why
+#: the criterion is the MEAN upper bound over this set and not its maximum, and
+#: why `clear` is reported beside it either way.
+SPLIT_SEEDS = D.SPLIT_SEEDS
+
 
 def _matched_corpus(pipe, delta: int, eps: float, n_events: int, per_event: int = 4):
     """(payloads, benign) as F_match feature dicts -- a MATCHED case-control sample.
@@ -177,21 +187,43 @@ class BenignCorpus(unittest.TestCase):
         tightened cells run on what the pool has and the shortfall is reported
         rather than papered over.
 
-        Thesis claim (vi): "epsilon la ngan sach phan biet, co CA HAI dau".
+        AND IT IS A PROPERTY OF `SPLIT_SEEDS`, not of one shuffle.  Both phases
+        used to pass `seed=7` into `auc_with_ci`, so what was actually being
+        published was "AUC_upper <= 0.56 AT SPLIT SEED 7" -- while the upper bound
+        swings +/- 0.04 across splits on the same corpora and Delta=0 was quoted as
+        clearing by 0.0068.  Phase 1 now ranks on the MEDIAN point estimate over
+        the declared set and phase 2 certifies on the MEAN upper bound over it,
+        with the per-split range and the clear-count carried in the message either
+        way.  The 0.56 ceiling is untouched.
+
+        Thesis claim (vi): "tieu chi AUC la tinh chat cua TAP SPLIT da khai, khong
+        phai cua mot seed".
         """
         import attacks
         for name, pipe in attacks.REGISTRY.items():
             # -- phase 1: screen epsilon on the point estimate -------------------
-            passing = []
+            # The MEDIAN point estimate over the declared split set, not seed 7's
+            # and not the maximum. Phase 1 is a RANKING question on a deliberately
+            # small sample (80 events), and on a sample that small the maximum is a
+            # reading of the fold: measured, max(auc) at eps=0 reaches 0.6220 at
+            # Delta=2, where the payload is byte-length matched to the agent's note
+            # BY CONSTRUCTION. The median ranks the epsilons exactly as seed 7 did
+            # -- 0.483 / 0.507 / 0.480 at eps=0 against 0.703 / 0.714 / 0.748 at
+            # eps=0.2 -- without any one shuffle deciding it.
+            screen = {}
             for eps in EPSILONS:
-                if all(D.auc_with_ci(*_matched_corpus(pipe, d, eps, N_SCREEN),
-                                     seed=7)[0] <= AUC_CEILING for d in DELTAS):
-                    passing.append(eps)
+                screen[eps] = {d: D.auc_over_splits(
+                    *_matched_corpus(pipe, d, eps, N_SCREEN), ceiling=AUC_CEILING,
+                    seeds=SPLIT_SEEDS)["auc_median"] for d in DELTAS}
+            passing = [e for e in EPSILONS
+                       if all(v <= AUC_CEILING for v in screen[e].values())]
             with self.subTest(pipeline=name, phase="screen"):
                 self.assertTrue(
                     passing,
-                    f"[{name}] no epsilon in {EPSILONS} even reaches the ceiling on the "
-                    f"POINT estimate. The budget has no near end.")
+                    f"[{name}] no epsilon in {EPSILONS} even reaches the ceiling on "
+                    f"the MEDIAN point estimate over {len(SPLIT_SEEDS)} splits. The "
+                    f"budget has no near end. Medians per (eps, Delta): "
+                    f"{ {e: {d: round(v, 4) for d, v in r.items()} for e, r in screen.items()} }")
             if not passing:
                 # A failed subTest does not stop the method, and phase 2 has
                 # nothing to certify without an eps*. Reporting the screen
@@ -201,19 +233,118 @@ class BenignCorpus(unittest.TestCase):
             eps_star = max(passing)      # largest budget the attacker can still spend
 
             # -- phase 2: certify eps* with the CI upper bound -------------------
-            over, reached = {}, {}
+            # THE CRITERION IS A PROPERTY OF THE DECLARED SPLIT SET: the MEAN CI
+            # upper bound over SPLIT_SEEDS, against the same 0.56 ceiling (the
+            # ceiling is question 8's and is not touched here). `clear` -- how many
+            # of the splits clear on their own -- is carried in the message whether
+            # the cell passes or fails, because a cell that clears on the mean while
+            # failing at 3 of 20 splits is a cell a reader has to be told about.
+            over, reached, report = {}, {}, {}
             for d in DELTAS:
                 pos, neg = _matched_corpus(pipe, d, eps_star, N_CERTIFY)
                 reached[d] = len(pos)
-                auc, _lo, hi = D.auc_with_ci(pos, neg, seed=7)
-                if hi > AUC_CEILING:
-                    over[d] = (round(auc, 4), round(hi, 4))
+                r = D.auc_over_splits(pos, neg, ceiling=AUC_CEILING,
+                                      seeds=SPLIT_SEEDS)
+                report[d] = (f"auc {r['auc_mean']:.4f} [{r['auc_min']:.4f},"
+                             f"{r['auc_max']:.4f}]  ci_hi MEAN {r['hi_mean']:.4f} "
+                             f"[{r['hi_min']:.4f},{r['hi_max']:.4f}]  "
+                             f"clears {r['clear']}/{r['k']} splits"
+                             + (f", fails at {r['failing_seeds']}"
+                                if r["failing_seeds"] else ""))
+                if r["hi_mean"] > AUC_CEILING:
+                    over[d] = report[d]
             with self.subTest(pipeline=name, phase="certify", eps=eps_star):
                 self.assertEqual(
                     over, {},
-                    f"[{name}] eps*={eps_star} fails the CI upper bound at Delta "
-                    f"{sorted(over)}: (auc, ci_hi) = {over}, ceiling {AUC_CEILING}. "
-                    f"Events reached per Delta: {reached} (target {N_CERTIFY}).")
+                    f"[{name}] eps*={eps_star} fails the MEAN CI upper bound over "
+                    f"{len(SPLIT_SEEDS)} splits at Delta {sorted(over)}, ceiling "
+                    f"{AUC_CEILING}. Per Delta: {report}. Events reached per Delta: "
+                    f"{reached} (target {N_CERTIFY}). eps* is already the smallest "
+                    f"epsilon in the grid, so SPEC Part 0 step 3's remedy ('reduce "
+                    f"epsilon, regenerate') has nothing left to reduce: a failure "
+                    f"here is either a bigger corpus or a changed attacker.")
+
+class TheSplitIsPartOfTheMeasurement(unittest.TestCase):
+    """The AUC criterion used to rest on one hard-coded shuffle (`seed=7`), and the
+    margins published from it were finer than that shuffle's own noise.  This class
+    is what stops the constant coming back."""
+
+    def test_the_certify_criterion_reads_every_split_in_the_declared_set(self):
+        """A criterion computed at ONE split is a criterion conditional on a
+        literal.  `auc_over_splits` must call the estimator once per declared seed
+        and its answer must MOVE when the set changes -- a summary that is the same
+        for one seed as for twenty is a summary that is still reading seed 7.
+
+        Counted rather than eyeballed: the defect this replaces looked exactly like
+        working code, and the only observable difference between "summarised over
+        20 splits" and "computed at seed 7 and rounded" is how many times the fit
+        ran.
+
+        Thesis claim (vi): "tieu chi phai doc MOI split trong tap da khai, dem duoc".
+        """
+        pos, neg = _matched_corpus(_matched_pipe(), 2, 0.0, N_SCREEN)
+        calls = []
+        real = D.auc_with_ci
+
+        def counting(poisoned, benign, seed, test_fraction=0.4):
+            calls.append(seed)
+            return real(poisoned, benign, seed=seed, test_fraction=test_fraction)
+
+        D.auc_with_ci = counting
+        try:
+            full = D.auc_over_splits(pos, neg, ceiling=AUC_CEILING,
+                                     seeds=SPLIT_SEEDS)
+            self.assertEqual(
+                sorted(calls), sorted(SPLIT_SEEDS),
+                f"the certify summary ran the estimator at {sorted(set(calls))}, "
+                f"not at every seed of the declared set {list(SPLIT_SEEDS)}. A "
+                f"criterion that reads one split is the seed-7 criterion again.")
+            calls.clear()
+            one = D.auc_over_splits(pos, neg, ceiling=AUC_CEILING, seeds=(7,))
+        finally:
+            D.auc_with_ci = real
+        self.assertEqual(full["k"], len(SPLIT_SEEDS))
+        self.assertEqual(one["k"], 1)
+        self.assertNotEqual(
+            round(full["hi_mean"], 6), round(one["hi_mean"], 6),
+            "the summary over the declared set equals the summary at seed 7 "
+            "alone, so the declared set is decorative.")
+
+    def test_one_split_cannot_decide_a_delta_that_the_declared_set_splits_on(self):
+        """The finding, kept measurable.  On the certify corpus the per-split upper
+        bounds STRADDLE the ceiling at at least one Delta -- some shuffles clear
+        0.56 and some do not -- which is exactly why no single shuffle may be
+        quoted as the verdict.
+
+        If a future corpus is strong enough that every split clears at every Delta,
+        this goes red and the message says so: the criterion could then be
+        simplified, and that is a decision to take deliberately rather than by a
+        test quietly staying green.
+
+        Thesis claim (vi): "co Delta ma cac split khong dong y, nen mot split khong
+        duoc quyet".
+        """
+        straddling = {}
+        for d in DELTAS:
+            pos, neg = _matched_corpus(_matched_pipe(), d, 0.0, N_CERTIFY)
+            r = D.auc_over_splits(pos, neg, ceiling=AUC_CEILING, seeds=SPLIT_SEEDS)
+            if 0 < r["clear"] < r["k"]:
+                straddling[d] = (round(r["hi_min"], 4), round(r["hi_mean"], 4),
+                                 round(r["hi_max"], 4), r["failing_seeds"])
+        self.assertTrue(
+            straddling,
+            f"no Delta has splits disagreeing about the {AUC_CEILING} ceiling, so "
+            f"the multi-split criterion is buying nothing on this corpus. Either "
+            f"the corpus grew (good -- say so and simplify deliberately) or the "
+            f"declared set collapsed to one seed (bad).")
+
+
+def _matched_pipe():
+    """The registered pipeline the corpus is built for.  Read from the registry so
+    a renamed entry goes red here rather than silently testing nothing."""
+    import attacks
+    return attacks.REGISTRY["matched"]
+
 
 if __name__ == "__main__":
     unittest.main()
