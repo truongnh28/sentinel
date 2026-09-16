@@ -34,6 +34,44 @@ from agent import MockAgent
 from detector import Detector
 import build, oracle, scoring, policies as P
 
+#: The four audit stages the manuscript costs separately (SS241), in lifecycle
+#: order.  Task 25a's whole job is to make this axis EXIST in the runner --
+#: SPEC: task-25-brief.md, hard gate "25a -> [M3] -> 22 -> 25b -> 23".  No
+#: Policy chooses a stage yet (that is 25b, gated on Task 22): this is an
+#: OBSERVATION layer only, so adding it must not move any measured number --
+#: see runner.run_once's docstring and tests/gate1_integrity/test_audit_stages.py.
+STAGES = ("insertion", "retrieval", "delegation", "commit")
+
+
+def _act_carrier(act: str) -> str:
+    """The carrier (or pseudo-carrier) one action string targets.
+
+    Reuses the SAME extraction each execution branch below already performs on
+    `act` -- P.split_action strips a depth suffix, the quarantine prefix names
+    its own target -- so the stage label always agrees with what actually ran,
+    and "commit" (no carrier of its own) falls out as its own pseudo-carrier.
+    """
+    if act.startswith(P.QUARANTINE_PREFIX):
+        return act[len(P.QUARANTINE_PREFIX):]
+    return P.split_action(act)[0]
+
+
+def _probe_seconds(det, items, t, seed) -> float:
+    """Time-only, side-effect-free: what a real audit's SCORING step would cost
+    if it ran here, on these items.  `det.score` is a PURE function of
+    (seed, item_id) -- a fresh local `random.Random` per call, see
+    detector.Detector.score -- so calling it an extra time here decides
+    nothing, quarantines nothing, spends no budget, and consumes no shared rng
+    stream: the only thing that leaves this function is a DURATION, which every
+    caller stores under a stage:carrier key and nowhere else.  It must never be
+    threaded into seed_of(...) or an Item's content -- see the module docstring
+    and the ObserverInvariant tests in test_audit_stages.py.
+    """
+    t0 = time.perf_counter()
+    for it in items:
+        det.score(it, t, seed)
+    return time.perf_counter() - t0
+
 
 @dataclass
 class RunResult:
@@ -156,6 +194,47 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
         payload_retrieved = any(i.item_id == payload_id for i in o.retrieved)
         agent_marker = o.patch_has_marker      # BEFORE a commit audit may strip it
 
+        # 25a -- three OBSERVATION-only stage markers, in lifecycle order.  No
+        # Policy chooses these yet (that is 25b): they are the runner's own
+        # probe, "audit thăm dò", real det.score work that is TIMED but decides
+        # nothing -- no budget charged, no item quarantined, no effect on `o` or
+        # on any RunResult field.  Gated on record_traces for the same reason
+        # `before` is (see the docstring): survives() calls this in a hot loop
+        # and never reads audit_seconds, so the extra scoring work would be pure
+        # waste there.
+        audit_seconds: dict = {}
+        if record_traces:
+            # insertion -- right after each write this task produced: the
+            # injected payload (if this is iota) plus everything the agent
+            # itself just wrote.  "No lineage yet" (SPEC): score the item alone.
+            by_carrier: dict = {}
+            if injected_rec is not None:
+                by_carrier.setdefault(payload.carrier, []).append(payload)
+            for w in o.writes:
+                by_carrier.setdefault(w.carrier, []).append(w)
+            for c, its in by_carrier.items():
+                key = f"insertion:{c}"
+                audit_seconds[key] = (audit_seconds.get(key, 0.0)
+                                      + _probe_seconds(det, its, t, seed))
+
+            # retrieval -- right after store.retrieve: score what just came back.
+            by_carrier = {}
+            for it in o.retrieved:
+                by_carrier.setdefault(it.carrier, []).append(it)
+            for c, its in by_carrier.items():
+                key = f"retrieval:{c}"
+                audit_seconds[key] = (audit_seconds.get(key, 0.0)
+                                      + _probe_seconds(det, its, t, seed))
+
+            # delegation -- the skill-induction step is the only place a skill
+            # item gets written, and the only "before it is pulled" moment this
+            # black-box agent boundary exposes to the runner.
+            skill_writes = [w for w in o.writes if w.carrier == "skill"]
+            if skill_writes:
+                key = "delegation:skill"
+                audit_seconds[key] = (audit_seconds.get(key, 0.0)
+                                      + _probe_seconds(det, skill_writes, t, seed))
+
         # CARRIER-level score = the mean-Lambda posterior over live items.
         # NOT the max raw score: E[max_n N(0,1)] grows with n, so a clean 9-item
         # carrier reads as hot as one holding the payload (SPEC SS2.5).
@@ -178,7 +257,13 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
         # not recorded as 0.0: rule N3, an out-of-scope cell records a reason, not
         # a zero.  The clock starts AFTER pol.choose -- choosing is the decision,
         # auditing is the work being priced.
-        audit_seconds: dict = {}
+        #
+        # 25a -- every policy alive today makes its ONE decision at this exact
+        # structural point, after writes/retrieval/skill-induction have already
+        # happened for this task -- the same point B1's commit check has always
+        # sat at.  So regardless of which carrier `act` names, it is labelled
+        # stage "commit": that is where it REALLY runs, until 25b (after Task
+        # 22) gives policies a stage to choose.  See runner.STAGES.
         quarantines: list = []
         if act is not None:
             pol.charge(P.cost_of(act))
@@ -231,7 +316,9 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
                         o.patch_has_marker = False   # stopped before the merge
                     else:
                         t_lost += 1                  # CI wrongly blocked a GOOD patch
-            audit_seconds = {act: time.perf_counter() - audit_t0}
+            commit_key = f"commit:{_act_carrier(act)}"
+            audit_seconds[commit_key] = (audit_seconds.get(commit_key, 0.0)
+                                         + (time.perf_counter() - audit_t0))
 
         # P1..P5, on the SIGMA task only.  A CHAIN, not five independent bits:
         # P4 is "carried the payload AND passed the public tests", so the

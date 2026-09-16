@@ -271,6 +271,13 @@ class TraceRecording(unittest.TestCase):
         being invented.  And a task where no audit ran records NOTHING, not 0.0:
         rule N3, an out-of-scope cell records a reason, never a zero.
 
+        25a (task-25-brief.md) adds a STAGE prefix to the key and, separately,
+        real timing probes at the insertion/retrieval/delegation markers that
+        are NOT budget-gated -- see test_audit_stages.py for those.  This test
+        stays scoped to the one thing B1 audit-at-commit actually decides: the
+        commit-stage key, "commit:commit" for this policy, must be absent
+        (never a fabricated 0.0) exactly on the tasks where the budget ran out.
+
         Thesis claim (vi): "kappa do duoc, khong gan tay" (I5).
         """
         wf = _wf()
@@ -284,11 +291,11 @@ class TraceRecording(unittest.TestCase):
                         "bad fixture: need both an audited and an unaudited task "
                         f"(audited {len(ran)}, idle {len(idle)})")
         for tr in ran:
-            self.assertEqual(set(tr.audit_seconds), {tr.action})
-            self.assertGreater(tr.audit_seconds[tr.action], 0.0,
+            self.assertIn("commit:commit", tr.audit_seconds)
+            self.assertGreater(tr.audit_seconds["commit:commit"], 0.0,
                                "audit_seconds is not a measurement")
         for tr in idle:
-            self.assertEqual(tr.audit_seconds, {},
+            self.assertFalse(any(k.startswith("commit:") for k in tr.audit_seconds),
                              "an audit that never ran was priced at 0.0 seconds")
 
     def test_checkpoints_P1_to_P5_are_recorded_at_sigma_and_decrease(self):

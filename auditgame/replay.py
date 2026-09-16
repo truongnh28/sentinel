@@ -214,8 +214,19 @@ def rescore(traces: list, det, pol) -> ReplayResult:
             pol.charge(P.cost_of(act))
             # kappa comes from the trace's MEASURED seconds when this same audit
             # kind was priced during the recorded run; absent when it was not.
-            if act in tr.audit_seconds:
-                seconds[act] = seconds.get(act, 0.0) + tr.audit_seconds[act]
+            # 25a labels that entry by STAGE -- every policy's one decision still
+            # runs at the commit-structural point (see runner.run_once), so the
+            # key this replay's own decision would have produced under the SAME
+            # rule is the one to look up.  Keep this in lockstep with runner's
+            # `_act_carrier` + "commit:" key: the I9 sweep exists to catch it if
+            # the two drift apart.
+            if act.startswith(P.QUARANTINE_PREFIX):
+                carrier_label = act[len(P.QUARANTINE_PREFIX):]
+            else:
+                carrier_label = P.split_action(act)[0]
+            key = f"commit:{carrier_label}"
+            if key in tr.audit_seconds:
+                seconds[key] = seconds.get(key, 0.0) + tr.audit_seconds[key]
             if act.startswith(P.QUARANTINE_PREFIX):
                 target = act[len(P.QUARANTINE_PREFIX):]
                 victims = (list(store.live()) if target == "all"
