@@ -114,7 +114,7 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True) -> RunResult:
     traces = []
 
     for t, task in enumerate(wf.tasks):
-        truoc = store.snapshot()
+        before = store.snapshot()
         if do_inject and ps is not None and t == ps.iota:
             build.inject(store, wf, ps)
         o = ag.run_task(t, task, store, seed=seed, marker=ps.marker if ps else "x")
@@ -185,7 +185,7 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True) -> RunResult:
 
         traces.append(TaskTrace(
             t=t, task_id=task.task_id, topic=task.topic,
-            before=truoc, after=store.snapshot(),
+            before=before, after=store.snapshot(),
             writes=[i.item_id for i in o.writes],
             retrieved=[i.item_id for i in o.retrieved],
             alarms=raw_scores,

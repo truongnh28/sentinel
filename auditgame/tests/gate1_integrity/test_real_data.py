@@ -171,9 +171,9 @@ class WorkflowGrouping(unittest.TestCase):
             "find the cause -- do not update this expected number.")
 
         # Same derivation as the Buoc 3.6 command, so the two cannot drift apart.
-        can = 100
-        thieu = max(0, can - st["non_reused_workflows"])
-        min_reuse_pct = 100 * thieu / can
+        needed = 100
+        shortfall = max(0, needed - st["non_reused_workflows"])
+        min_reuse_pct = 100 * shortfall / needed
         self.assertEqual(
             min_reuse_pct, 42,
             "minimum reuse to reach N=100 != 42%: this follows directly "

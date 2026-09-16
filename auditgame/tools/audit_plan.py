@@ -123,17 +123,115 @@ def check_k_patterns(text: str, findings: list) -> None:
                                  f"-k {tok!r} matches no test, class or module"))
 
 
-def check_vietnamese_identifiers(text: str, findings: list) -> None:
-    """No Vietnamese inside code blocks: the code/comment language is English.
+#: Extracts the literal Python source handed to `python3 -c "..."` / `python
+#: -c "..."`, so a fence that wraps one of these (Buoc 3.6 wraps its command
+#: in a ```bash fence, not ```python) is inspected too. Quote-aware the same
+#: way check_k_patterns is: `[^"\\]|\\.` steps over an escaped `\"` inside an
+#: f-string instead of ending the match there.
+_PY_DASH_C = re.compile(r'python3?\s+-c\s+"((?:[^"\\]|\\.)*)"', re.S)
 
-    Vietnamese in PROSE is correct and expected; only fenced code is checked.
+#: A single-backtick inline code span written straight into a paragraph
+#: instead of inside a fence. PLAN.md:1190 put `truoc = store.snapshot()`
+#: there -- `_blocks` cannot see it at all, fenced or not, is the only thing
+#: it looks for.
+_INLINE_CODE = re.compile(r'(?<!`)`([^`\n]+)`(?!`)')
+
+#: A single-line '...' or "..." string literal. Used to blank out the TEXT a
+#: program prints before scanning a line for Vietnamese: Global Constraints
+#: require identifiers/comments/docstrings/test names to be English, but say
+#: nothing about program OUTPUT, and several of this plan's own
+#: `python3 -c "..."` spikes deliberately print Vietnamese status lines for a
+#: Vietnamese-speaking reader (Buoc 1.3's `print('thieu:', ...)` among them).
+#: Scanning those verbatim would flag legitimate output as a defect -- a scan
+#: WIDER than the claim, the mirror image of the bug this file exists to fix.
+#: Best-effort and line-oriented, not a real tokenizer: it does not track
+#: multi-line triple-quoted strings, which is fine for the one-line spikes
+#: this pattern targets, but would not fully blank a multi-line docstring.
+_STRING_LITERAL = re.compile(r'"(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'')
+
+#: Unaccented Vietnamese tokens seen as real identifiers in this repository's
+#: own history -- see the `truoc`/`can`/`thieu` fixed in runner.py and
+#: tests/gate1_integrity/test_real_data.py. A Python identifier can never
+#: carry a diacritic, so VIETNAMESE above is structurally blind to exactly
+#: the thing this check is named for; this denylist is the other half.
+#:
+#: KNOWN BLIND SPOT, NOT closed by this list: several unaccented Vietnamese
+#: words are ALSO ordinary English words or common short identifiers -- "can"
+#: (the very word the fixed `runner.py`/`test_real_data.py` bug used, still a
+#: legitimate English modal verb elsewhere), "so", "bang", "nam", "la", "de",
+#: "vi", "khong", "trong", "con" all occur as real English or plan text
+#: elsewhere in this document. Putting any of those on this list would fire
+#: on legitimate English code, so they are deliberately left OFF. A future
+#: Vietnamese identifier that happens to spell one of THOSE words will still
+#: pass this check silently -- only the diacritics regex, or a human
+#: reviewer, catches that case. A clean run of this checker means "no
+#: Vietnamese identifier from this list, and none with a diacritic", not "no
+#: Vietnamese identifiers at all".
+VIETNAMESE_WORDS = {"truoc", "thieu"}
+
+
+def _blank_strings(body: str) -> str:
+    return "\n".join(_STRING_LITERAL.sub("", line) for line in body.split("\n"))
+
+
+def _unescape_dash_c(src: str) -> str:
+    """Undo the bash `-c "..."` quoting so what gets scanned is the PYTHON
+    source, which uses plain "quotes" -- not the `\\"`-escaped spelling the
+    markdown fence has to use around it (an f-string closing quote inside
+    `python3 -c "..."` is written `\\"` in the doc, e.g. Buoc 3.6's command).
+    Without this, _STRING_LITERAL below never finds a real closing quote, the
+    "string" it thinks it is matching runs past the actual literal, and a
+    Vietnamese print() message this plan deliberately writes for its
+    Vietnamese-speaking reader reads as an unterminated line and gets
+    flagged -- exactly the false alarm this checker exists to avoid, not
+    produce.
     """
-    for lang, body in _blocks(text):
-        if lang not in ("python", "py"):
-            continue
-        for i, line in enumerate(body.split("\n")):
-            if VIETNAMESE.search(line):
+    return re.sub(r'\\(.)', r'\1', src)
+
+
+def check_vietnamese_identifiers(text: str, findings: list) -> None:
+    """No Vietnamese inside code: the code/comment/identifier language is
+    English. Vietnamese in PROSE is correct and expected.
+
+    THREE surfaces, not one -- the old version only ever saw the first:
+      1. Fenced ```python / ```py blocks.
+      2. A `python3 -c "..."` literal nested inside ANY fence, python-labelled
+         or not. Buoc 3.6's command lives in a ```bash fence wrapping exactly
+         this, invisible to a `lang == "python"` filter.
+      3. Inline single-backtick code spans in prose, never inside a fence at
+         all (PLAN.md:1190).
+
+    Surfaces 1 and 2 get BOTH detectors below (diacritics regex, unaccented
+    denylist), run with string LITERALS blanked out first so a deliberately
+    Vietnamese print() message is not mistaken for a Vietnamese identifier or
+    comment.
+
+    Surface 3 gets the denylist ONLY, not the diacritics regex: a
+    single-backtick span doubles as this document's convention for a
+    Vietnamese conceptual/pseudo-code reference that is not meant to run
+    verbatim (e.g. Buoc 22.6's `chi_of(bang_do_duoc)`, a deliberately
+    Vietnamese-named description of a formula, not code to paste in) --
+    running the diacritics regex there would flag that as a defect, a scan
+    WIDER than the claim, which is the same shape of bug this file exists to
+    catch, just pointed the other way.
+    """
+    def scan(body: str, check_diacritics: bool) -> None:
+        blanked = _blank_strings(body).split("\n")
+        for line, clean in zip(body.split("\n"), blanked):
+            if check_diacritics and VIETNAMESE.search(clean):
                 findings.append((None, "vi-in-code", line.strip()[:70]))
+                continue
+            if any(tok.lower() in VIETNAMESE_WORDS
+                   for tok in re.findall(r'[A-Za-z_]\w*', clean)):
+                findings.append((None, "vi-in-code", line.strip()[:70]))
+
+    for lang, body in _blocks(text):
+        if lang in ("python", "py"):
+            scan(body, check_diacritics=True)
+        for m in _PY_DASH_C.finditer(body):
+            scan(_unescape_dash_c(m.group(1)), check_diacritics=True)
+    for m in _INLINE_CODE.finditer(text):
+        scan(m.group(1), check_diacritics=False)
 
 
 def check_python_parses(text: str, findings: list) -> None:
