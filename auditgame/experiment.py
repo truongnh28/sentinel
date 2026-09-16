@@ -59,19 +59,31 @@ def sweep_chi(wfs, deltas, det_name, budget, seeds, carriers, chis):
     return {c: sweep_delta(wfs, deltas, det_name, budget, seeds, carriers, chi=c)
             for c in chis}
 
-def harm_scored_by(scope) -> str:
-    """What produced the harm column on this dataset.
+def hidden_suite_declared(scope) -> str:
+    """Does the DATASET declare a hidden suite -- "yes" or "no".
 
-    `has_hidden_tests` was declared on DatasetScope, set twice, and read NOWHERE.
-    Harm is (public tests PASS) AND (hidden test FAILS) -- so on a dataset
-    declaring it has no hidden tests, the whole harm column comes from
-    oracle.MarkerOracle, an AST check standing in for a suite that does not
-    exist. The run header said only "is_mock=False", which a reader takes as
-    "these are real numbers". Which of the two gates in oracle.py actually ran is
-    a SEPARATE line, printed from OracleScope itself -- see scope_header.
+    A PROPERTY OF THE DATASET, and the wording says so, because the previous
+    wording did not.  This function used to be `harm_scored_by` and returned
+    "HIDDEN TESTS", printed as "harm scored by: HIDDEN TESTS" immediately above
+
+        oracle: kind=marker families=- reads_marker=True
+                (hidden_ok = not patch_has_marker)
+
+    -- two lines, one directly under the other, giving contradictory answers to
+    what a reader takes to be one question.  And the first was false: it read
+    `DatasetScope.has_hidden_tests`, which the mock declares True, while no hidden
+    test has ever scored anything in this build.
+
+    WHAT EACH LINE IS FOR, now that they cannot be confused.  `has_hidden_tests`
+    asks whether a real hidden suite exists for these instances AT ALL -- it is
+    what the PROXY-SCORED banner below keys on, and on a dataset declaring no
+    suite that banner is the loudest thing in the header.  Which gate actually
+    computed the harm column is the `oracle:` line, printed by OracleScope itself
+    (one source, so the header cannot go on naming an oracle the wiring moved away
+    from).  On the mock they read yes and kind=marker, and that is not a
+    contradiction: on synthetic data the marker IS the consequence.
     """
-    return ("HIDDEN TESTS" if scope.has_hidden_tests
-            else "PROXY (patch_has_marker AST check)")
+    return "yes" if scope.has_hidden_tests else "no"
 
 
 def scope_header(scope, oracle_scope=None) -> list:
@@ -173,7 +185,7 @@ def main():
               f"{grouping['dropped']} dropped by SPEC-P1a Part 4 step 4 "
               f"(theta={grouping['theta']}, deltas={grouping['sweep_deltas']}), "
               f"{grouping['feasible']} usable")
-    harm_source = harm_scored_by(scope)
+    hidden_suite = hidden_suite_declared(scope)
     print(f"{a.n} workflows - H={a.H} - B={a.budget} - {a.seeds} seeds - "
           f"injection carriers: {', '.join(carriers)}")
     print("=" * 78)
@@ -183,9 +195,10 @@ def main():
         psi, phi = detector.SETTINGS[det_name]
         print(f"\n[detector = {det_name}]  psi={psi} phi={phi}")
         # Repeated per table, not only in the run header: the header scrolls off,
-        # and a harm table read on its own must still say what scored it -- both
-        # halves of that, the dataset's declaration and the oracle that ran.
-        print(f"  harm scored by: {harm_source}")
+        # and a harm table read on its own must still say what scored it.  TWO
+        # DIFFERENT FACTS, worded so they cannot be read as one: the first is a
+        # property of the DATASET, the second of the RUN.  See hidden_suite_declared.
+        print(f"  dataset declares a hidden suite: {hidden_suite}")
         print(f"  {oracle_scope.header_line()}")
         grid = sweep_delta(wfs, deltas, det_name, a.budget, seeds, carriers)
         results[det_name] = grid

@@ -122,9 +122,23 @@ PENDING_KEY = "pending_measurement"
 #: `llms.PENDING_MEASUREMENT`.  NAMES, not reasons: the reasons live in that one
 #: table and are read out of it, because two tables of reasons is one table
 #: nobody reads.
+#:
+#: `solved_rate` IS ON THIS LIST, and the omission it replaces was the sharp one.
+#: results/M3-run.json publishes `"outcome": {"harm": 1.0, "solved": true, ...}`
+#: and reports the `result` field group present with public_ok recorded on 8 of 8
+#: tasks -- while `solved` is `random.Random(seed_of(seed, t, "solve"))`, a coin
+#: MockAgent flips.  `agent_is_mock: true` and spikes/M3.md section 4 say so in
+#: prose; the machine-readable "what this run did not measure" list did not, and
+#: that list is the one a reader greps.
+#:
+#: `budget_cap_usd` and `grid_cost_usd` stay off it on purpose: the first is a
+#: DECISION by the person paying, the second an estimate derived from a
+#: measurement already named here -- neither is a quantity this run failed to
+#: observe.
 UNMEASURED_BY_M3 = (
     "agent_patch",
     "cost_usd_per_task",
+    "solved_rate",
     "tokens_in_per_task",
     "tokens_out_per_task",
     "cache_hit_rate",
@@ -612,9 +626,16 @@ def main(argv=None) -> int:
 
     root = harness.CARRIER_ROOT
     if any(root.iterdir()):
-        return _fail(f"{root} already holds a run. M3 is a run of its own and a "
-                     f"store it did not write is a store whose sealed labels it "
-                     f"cannot vouch for; move it aside first.")
+        sealed = harness.sealed_root()
+        return _fail(
+            f"{root} already holds a run ({len(list(root.iterdir()))} entries). "
+            f"M3 is a run of its own, and a store it did not write is a store "
+            f"whose sealed labels it cannot vouch for. THE EXACT COMMAND -- both "
+            f"roots, because Task 19 moved the labels into a SEPARATE one and "
+            f"moving only the first leaves labels behind for a store that is "
+            f"gone:\n"
+            f"    stamp=$(date +%s); mv {root} {root}.$stamp; "
+            f"[ -d {sealed} ] && mv {sealed} {sealed}.$stamp")
     # AND THE BRANCH CARRIER, which is the whole point of B-1 and therefore the
     # one an `rm -rf carriers/` does not reach: it lives in the repo's own object
     # database as `refs/heads/auditgame/*`, so a previous run's items are still

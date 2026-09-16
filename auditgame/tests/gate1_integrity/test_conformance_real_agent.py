@@ -111,7 +111,13 @@ class WritesComeFromTheToolCallLog(unittest.TestCase):
         return agent_llm.LlmAgent(
             client=ScriptedClient(*replies), max_steps=4,
             solved_by=lambda res, task: True,
-            marker_by=lambda res, task, marker: False)
+            marker_by=lambda res, task, marker: False,
+            # A DERIVED write has no ground-truth label without one, and ToolBox
+            # refuses rather than recording False (Rule N3). This class measures
+            # the write path, so it declares a labeller instead of inheriting a
+            # silent zero; see test_agent_tool_surface.inherits_taint.
+            taint=lambda draft, lineage: any(
+                getattr(p, "poisoned", False) for p in lineage))
 
     def test_a_write_the_store_no_longer_holds_is_still_in_the_outcome(self):
         """WRITE-THEN-DELETE.  A before/after picture of the carrier directory is

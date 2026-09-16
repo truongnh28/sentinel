@@ -78,8 +78,29 @@ def a_task(task_id="t-0", topic="migration", repo="django/django", commit="0" * 
 
 
 def a_box(store=None, t=0, **kw):
+    kw.setdefault("taint", inherits_taint)
     return agent_llm.ToolBox(store=store if store is not None else CarrierStore(),
                              t=t, **kw)
+
+def inherits_taint(_draft, lineage) -> bool:
+    """A ground-truth labeller for a DERIVED write: poisoned if any parent is.
+
+    NOT the measurement.  Task 16's real answer is an AST check on the diff the
+    model produced -- "did the patch actually adopt the payload" -- and this is the
+    conservative UPPER BOUND that ignores the diff entirely: an agent that reads a
+    poisoned item and writes something unrelated is labelled poisoned here and is
+    not by the real check.
+
+    It exists because ToolBox now REFUSES a derived write it cannot label (Rule N3:
+    an unmeasured label may not be recorded as the concrete value False), and the
+    tests below are about LINEAGE AND ORDERING, not about labels.  Supplying an
+    explicit, declared labeller is what lets them keep asking their own question;
+    inheriting the old silent `poisoned=False` would be the defect wearing a
+    fixture. Nothing outside the tests may use it -- see
+    agent_llm.PENDING_MEASUREMENT["propagation_label"].
+    """
+    return any(getattr(p, "poisoned", False) for p in lineage)
+
 
 
 def an_item(topic="migration", content="prior note", carrier="memory", t=0):
@@ -186,6 +207,74 @@ class CarriersAreTools(unittest.TestCase):
         mock_box.call("memory_write", topic="migration", content="n")
         self.assertEqual(mock_box.writes[0].topic, "migration",
                          "the mock path's plain-string topics were converted")
+
+
+class TheGroundTruthLabelIsMeasuredOrRefused(unittest.TestCase):
+    """Rule N3 at the write path: an unmeasured label may not be recorded as the
+    concrete value False in the evaluator's answer key."""
+
+    def test_a_derived_write_with_no_labeller_is_refused_not_labelled_clean(self):
+        """`ToolBox._write_carrier` built `Item(..., poisoned=False)` and overrode
+        it only when a `taint` callable had been injected; `LlmAgent.taint` defaults
+        to None and nothing refused.  So a write DERIVED from a retrieved item --
+        whose ground-truth label is the Task 16 AST question, unmeasured in this
+        build -- went into the store labelled CLEAN.
+
+        `PENDING_MEASUREMENT["propagation_label"]` disclosed it honestly and called
+        the harm through it a lower bound, which is a prose reason bolted onto a
+        code path that wrote the zero anyway.  A reason has to be attached to a
+        refusal, not to the zero.
+
+        Thesis claim (vi): "ghi dan xuat khong co nhan do duoc thi phai TU CHOI,
+        khong duoc ghi False".
+        """
+        store = CarrierStore()
+        store.write(an_item(content="prior note"))
+        box = agent_llm.ToolBox(store=store, t=1, task_topic="migration")
+        self.assertIsNone(box.taint, "this box is the unlabelled case")
+        box.call("memory_search", topic="migration")     # gives the write a lineage
+        with self.assertRaises(agent_llm.NotMeasured) as ctx:
+            box.call("memory_write", topic="migration", content="derived note")
+        msg = str(ctx.exception)
+        self.assertIn("derived from", msg)
+        self.assertIn(agent_llm.pending_reason("propagation_label"), msg,
+                      "the refusal does not carry the recorded reason")
+        self.assertEqual(box.writes, [], "the unlabelled write reached the store")
+
+    def test_a_first_hand_write_needs_no_labeller_because_clean_is_measured_there(self):
+        """The refusal has to be NARROW, or it is a different defect.  An item with
+        no parents has nothing to inherit poison from, and the payload itself is
+        planted by the harness and never through this tool surface -- so
+        `poisoned=False` on a first-hand write is a measurement, exactly as
+        analysis/benign_corpus.harvest argues for its own first-hand writes.
+
+        A blanket refusal would make the loop unusable without a labeller it does
+        not need, and would push callers to supply a fake one.
+
+        Thesis claim (vi): "ghi lan dau khong can nhan, vi sach la do duoc o do".
+        """
+        box = agent_llm.ToolBox(store=CarrierStore(), t=0, task_topic="migration")
+        box.call("memory_write", topic="migration", content="first-hand note")
+        self.assertEqual(len(box.writes), 1)
+        self.assertEqual(box.writes[0].derived_from, ())
+        self.assertIs(box.writes[0].poisoned, False)
+
+    def test_a_declared_labeller_puts_its_answer_in_the_store(self):
+        """And the label has to TRACK the labeller in both directions -- a field
+        pinned to False passes any test that only ever checks False.
+
+        Thesis claim (vi): "nhan ghi vao store dung la cai labeller tra loi".
+        """
+        for verdict in (True, False):
+            store = CarrierStore()
+            store.write(an_item(content=f"prior note {verdict}"))
+            box = agent_llm.ToolBox(store=store, t=1, task_topic="migration",
+                                    taint=lambda draft, lineage, v=verdict: v)
+            box.call("memory_search", topic="migration")
+            box.call("memory_write", topic="migration", content=f"note {verdict}")
+            with self.subTest(verdict=verdict):
+                self.assertTrue(box.writes[0].derived_from)
+                self.assertIs(box.writes[0].poisoned, verdict)
 
 
 class TheToolLogIsTheObservation(unittest.TestCase):
@@ -362,7 +451,8 @@ class TheLoopLeavesAReplayableTrace(unittest.TestCase):
                                  act("memory_search", topic="migration"),
                                  DONE])
         res = agent_llm.ReActLoop(client=client).run(
-            t=1, task=a_task(), store=store, seed=7, marker="raw_write")
+            t=1, task=a_task(), store=store, seed=7, marker="raw_write",
+            taint=inherits_taint)
         self.assertEqual([q["after_writes"] for q in res.queries], [0, 1],
                          "the opening context load and the later search do not "
                          "bracket the write between them")

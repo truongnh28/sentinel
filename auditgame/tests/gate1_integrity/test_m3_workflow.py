@@ -284,6 +284,54 @@ class TheNineFieldGroups(unittest.TestCase):
         self.assertTrue(report["state"]["present"],
                         "removing two groups must not take the others with them")
 
+    def test_the_result_group_can_report_empty_too_and_not_only_the_container_ones(self):
+        """The demonstration above only reaches CONTAINER-typed fields, and the two
+        rules `_recorded` applies are different rules: an empty dict or list is an
+        absence, while `False` is a VERDICT and counts.  Nothing exercised the
+        second one -- and `result` is the group flagged with a warning in
+        spikes/M3.md section 5, whose absence costs "harm cannot be scored".
+
+        Why that matters here.  `core.TaskTrace` declares `patch_has_marker`,
+        `public_ok` and `hidden_ok` as NON-DEFAULTED bools, so no ordinary run can
+        produce a trace on which they are missing: `field_groups(...)["result"]`
+        ["present"] was structurally True for any list of traces, and a checker
+        that cannot answer NO about the group it is loudest about is not checking
+        it.  The bool rule has to be shown to work, on the group that depends on it.
+
+        Thesis claim (vi): "nhom `result` cung phai bao rong duoc, khong chi cac
+        nhom kieu container".
+        """
+        # `None` is the only thing that can mean "nobody wrote this" for a bool:
+        # False is a measurement. See m3._recorded.
+        for absent in ("public_ok", "hidden_ok", "patch_has_marker", "agent_marker"):
+            blanked = [core.TaskTrace(**dict(vars(tr), **{absent: None}))
+                       for tr in self.run.result.traces]
+            report = m3.field_groups(blanked)
+            with self.subTest(field=absent):
+                self.assertFalse(
+                    report["result"]["present"],
+                    f"every task's {absent} is None and the `result` group still "
+                    f"reports present. Its cost_if_missing is "
+                    f"{report['result']['cost_if_missing']!r}, so a false "
+                    f"'present' here is a harm column certified by a checker that "
+                    f"cannot see its own absence.")
+                self.assertEqual(report["result"]["fields"][absent], 0)
+                self.assertTrue(report["state"]["present"],
+                                "blanking one result field took another group down")
+
+        # and the other half of the rule: a recorded False is NOT an absence
+        falsified = [core.TaskTrace(**dict(vars(tr), public_ok=False,
+                                           hidden_ok=False, patch_has_marker=False,
+                                           agent_marker=False))
+                     for tr in self.run.result.traces]
+        report = m3.field_groups(falsified)
+        self.assertTrue(
+            report["result"]["present"],
+            "a run in which every verdict is False is a run that was MEASURED; "
+            "reporting the group empty would make `_recorded` unable to tell a "
+            "clean result from a missing one.")
+        self.assertEqual(report["result"]["fields"]["public_ok"], len(falsified))
+
     def test_the_trace_written_to_disk_reads_back_with_the_same_nine_groups(self):
         """`results/M3-trace.json` is the artefact; a group that does not survive
         the round trip is a group the replay engine will never see.

@@ -21,6 +21,7 @@ import unittest
 
 import agents
 import datasets
+import oracle
 import policies as P
 import retrieval
 from core import CarrierStore, Item, seed_of
@@ -259,11 +260,22 @@ class DatasetConformance(unittest.TestCase):
                 head = "\n".join(experiment.scope_header(sc))
                 self.assertIn(f"topic_kind={sc.topic_kind}", head)
                 self.assertIn(f"has_hidden_tests={sc.has_hidden_tests}", head)
-                marker = experiment.harm_scored_by(sc)
-                if sc.has_hidden_tests:
-                    self.assertEqual(marker, "HIDDEN TESTS")
-                else:
-                    self.assertIn("PROXY", marker)
+                # The DATASET line and the ORACLE line answer two different
+                # questions, and the dataset line must not be readable as an
+                # answer to the oracle's. It used to print "harm scored by:
+                # HIDDEN TESTS" -- from `has_hidden_tests`, which the mock
+                # declares True -- directly above "oracle: kind=marker", while no
+                # hidden test has ever scored anything in this build.
+                declared = experiment.hidden_suite_declared(sc)
+                self.assertEqual(declared, "yes" if sc.has_hidden_tests else "no")
+                self.assertNotIn(
+                    "harm scored by", declared,
+                    f"[{name}] the dataset-property line claims to say what "
+                    f"scored the harm column; that is the oracle's line")
+                self.assertIn(oracle.default_oracle().scope().header_line(), head,
+                              f"[{name}] the header does not name the oracle that "
+                              f"actually computed the harm column")
+                if not sc.has_hidden_tests:
                     self.assertIn("PROXY-SCORED", head,
                                   f"[{name}] declares has_hidden_tests=False but "
                                   f"the run header does not warn that the harm "
