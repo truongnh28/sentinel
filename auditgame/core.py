@@ -156,6 +156,24 @@ def dumps(obj) -> str:
     def enc(o):
         if hasattr(o, "__dataclass_fields__"):
             return asdict(o)
+        if isinstance(o, frozenset):
+            # `frozenset` is NOT a subclass of `set` (isinstance(frozenset(), set)
+            # is False), so a real trace carrying a swebench_dataset.Topic -- a
+            # frozenset subclass, TaskTrace.topic on the real dataset -- fell
+            # through to the `raise TypeError` below and could not be written to
+            # disk at all, defeating the one thing TaskTrace exists for: offline
+            # replay without re-running the LLM.
+            #
+            # CHOSEN FORM: a SORTED list, not a bare `list(o)`. frozenset
+            # iteration order depends on per-process string-hash randomisation
+            # (PYTHONHASHSEED) -- exactly the trap Topic's own __str__ override
+            # was written to close (see swebench_dataset.Topic's docstring) --
+            # so an unsorted list would make the SAME trace serialise to a
+            # DIFFERENT byte string on two runs. `sorted()` is deterministic
+            # (input order never matters) and directly reversible: a replay
+            # reconstructs the topic with `frozenset(the_list)`, or
+            # `swebench_dataset.Topic(the_list)` when it needs that subclass.
+            return sorted(o)
         if isinstance(o, (set, tuple)):
             return list(o)
         raise TypeError(type(o))
