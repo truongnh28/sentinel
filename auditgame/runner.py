@@ -101,8 +101,19 @@ def _quarantine_record(it, action: str, stage: str) -> dict:
                 action=action, stage=stage)
 
 
-def run_once(wf, ps, pol, det, ag, seed, do_inject=True) -> RunResult:
-    """One workflow run under one audit policy."""
+def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
+             record_traces=True) -> RunResult:
+    """One workflow run under one audit policy.
+
+    `record_traces=False` returns a RunResult with an EMPTY traces list and skips
+    building them at all.  A TaskTrace carries two full carrier snapshots plus a
+    record of every write, and `survives()` -- which runs on every
+    (workflow, carrier, delta, seed) before any policy is measured -- built H of
+    them per call and dropped the lot, because all it reads back is `.solved`.
+    The switch changes no measured quantity: snapshots and item records are pure
+    reads, and nothing in the trace path draws from an rng.  Callers that replay
+    must leave it at the default.
+    """
     store = CarrierStore()
     # Insert LAZILY at t == iota, NOT before task 0.
     #
@@ -130,11 +141,13 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True) -> RunResult:
     payload_id = None                  # set at iota; drives the P1..P5 checkpoints
 
     for t, task in enumerate(wf.tasks):
-        before = store.snapshot()
+        before = store.snapshot() if record_traces else None
         injected_rec = None
         if do_inject and ps is not None and t == ps.iota:
             payload = build.inject(store, wf, ps)
-            payload_id, injected_rec = payload.item_id, item_record(payload)
+            payload_id = payload.item_id
+            if record_traces:
+                injected_rec = item_record(payload)
         o = ag.run_task(t, task, store, seed=seed, marker=ps.marker if ps else "x")
 
         # P1/P2 are read HERE, before this task's audit can act: "payload still
@@ -233,25 +246,26 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True) -> RunResult:
             checkpoints = {"P1": p1, "P2": p2, "P3": p3, "P4": p4,
                            "P5": p4 and o.patch_has_marker}
 
-        traces.append(TaskTrace(
-            t=t, task_id=task.task_id, topic=task.topic,
-            before=before, after=store.snapshot(),
-            writes=[item_record(i) for i in o.writes],
-            retrieved=[i.item_id for i in o.retrieved],
-            alarms=raw_scores,
-            patch_has_marker=o.patch_has_marker,
-            public_ok=o.solved, hidden_ok=not o.patch_has_marker,
-            audit_seconds=audit_seconds,
-            n_c={c: s.n for c, s in signals.items()},
-            signals={c: s.p for c, s in signals.items()},
-            is_sigma=(ps is not None and t == ps.sigma),
-            seed=seed,
-            queries=list(getattr(o, "queries", ())),
-            injected=injected_rec,
-            quarantines=quarantines,
-            checkpoints=checkpoints,
-            agent_marker=agent_marker,
-            action=act))
+        if record_traces:
+            traces.append(TaskTrace(
+                t=t, task_id=task.task_id, topic=task.topic,
+                before=before, after=store.snapshot(),
+                writes=[item_record(i) for i in o.writes],
+                retrieved=[i.item_id for i in o.retrieved],
+                alarms=raw_scores,
+                patch_has_marker=o.patch_has_marker,
+                public_ok=o.solved, hidden_ok=not o.patch_has_marker,
+                audit_seconds=audit_seconds,
+                n_c={c: s.n for c, s in signals.items()},
+                signals={c: s.p for c, s in signals.items()},
+                is_sigma=(ps is not None and t == ps.sigma),
+                seed=seed,
+                queries=list(getattr(o, "queries", ())),
+                injected=injected_rec,
+                quarantines=quarantines,
+                checkpoints=checkpoints,
+                agent_marker=agent_marker,
+                action=act))
 
         if ps is not None and t == ps.sigma:
             fired_at = t if o.patch_has_marker else None
@@ -290,7 +304,7 @@ def survives(wf, ps, det, ag, seed) -> bool:
     key = (wf.wf_id, ps.carrier, ps.iota, ps.sigma, seed, repr(det), repr(ag))
     if key not in _SURVIVORS:
         clean = run_once(wf, ps, _NoAudit(name="_survivor-probe", budget=0.0),
-                         det, ag, seed, do_inject=False)
+                         det, ag, seed, do_inject=False, record_traces=False)
         _SURVIVORS[key] = clean.solved
     return _SURVIVORS[key]
 
