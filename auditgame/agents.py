@@ -63,6 +63,14 @@ REGISTRY: dict = {a.name: a for a in (MockAgentPipeline(),)}
 
 #: Adapters not yet built, each WITH ITS REASON.
 PENDING: dict = {
+    "llm": (
+        None,
+        "agent_llm.LlmAgent (Task 14) is BUILT but not registered: registration "
+        "puts it under A1-A3, and A1 (deterministic in the seed) is false for an "
+        "LLM while cost_usd_per_task is a MEASUREMENT owed by Task 15 step 15.4 -- "
+        "0.0 would declare it free. There is no API key in this environment, so "
+        "not one real call has been made. Task 16 registers it once solved and "
+        "patch_has_marker are measured rather than declared."),
     "openhands": (
         None,
         "OpenHands is NOT present in code/ (only AgentPoison, MINJA, Sentinel are), "
