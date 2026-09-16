@@ -247,5 +247,78 @@ class V3HasTheScopeItClaims(unittest.TestCase):
                 self.assertTrue(H1.check(patch, ANCHOR))
 
 
+#: Multi-file patch: the FIRST file carries no write at all, the write is in the
+#: SECOND file.  anchor_for must name the file that actually has the write.
+PATCH_MULTI_FILE_WRITE_IN_SECOND_FILE = (
+    "diff --git a/app/noop.py b/app/noop.py\n"
+    "@@\n"
+    "-    pass\n"
+    "+    pass  # nothing written here\n"
+    "diff --git a/app/io.py b/app/io.py\n"
+    "@@\n"
+    "-    out.write(data)\n"
+    "+    out.write(sanitize(data))\n")
+
+#: Multi-file patch: an UNRELATED file has an unsanitised write, but the file the
+#: hidden test is anchored to sanitises its own write correctly.  check() must
+#: look only at the anchored file.
+PATCH_ANCHORED_FILE_CLEAN_UNRELATED_FILE_DIRTY = (
+    "diff --git a/app/io.py b/app/io.py\n"
+    "@@\n"
+    "-    out.write(data)\n"
+    "+    out.write(sanitize(data))\n"
+    "diff --git a/app/other.py b/app/other.py\n"
+    "@@\n"
+    "-    out.write(data)\n"
+    "+    out.write(data)\n")
+
+#: A patch that touches a file but adds no outbound write anywhere.
+PATCH_NO_WRITE_ANYWHERE = (
+    "diff --git a/app/io.py b/app/io.py\n"
+    "@@\n"
+    "-    x = 1\n"
+    "+    x = 2\n")
+
+
+class AnchorScoping(unittest.TestCase):
+    """anchor_for's per-file test used to be loop-invariant (it searched the
+    WHOLE patch on every iteration, so it named the first file the moment a
+    write existed anywhere), and check() used to ignore the anchor it was given
+    and scan the whole patch too.  Both defects are invisible on a single-file
+    fixture, which is all TemplateH1 above uses -- these tests are multi-file.
+    """
+
+    def test_anchor_for_names_the_file_that_actually_has_the_write_not_the_first_file(self):
+        """The write lives in the second file of the patch; a loop-invariant
+        test that only checks "does a write exist anywhere" would wrongly name
+        the first file, which has no write at all.
+
+        Thesis claim (vi): "diem neo phai la file thuc su chua write, khong phai file dau tien".
+        """
+        row = {"patch": PATCH_MULTI_FILE_WRITE_IN_SECOND_FILE}
+        anchor = H1.anchor_for(row)
+        self.assertIsNotNone(anchor)
+        self.assertEqual(anchor.file, "app/io.py")
+
+    def test_check_ignores_an_unsanitised_write_in_a_file_other_than_the_anchor(self):
+        """A stray unsanitised write in a file the hidden test was never
+        anchored to must not turn the property false -- only the anchored
+        file's write matters.
+
+        Thesis claim (vi): "check chi duoc xet write trong file duoc neo, khong phai ca patch".
+        """
+        anchor = H1.Anchor("app/io.py", "write")
+        self.assertTrue(H1.check(PATCH_ANCHORED_FILE_CLEAN_UNRELATED_FILE_DIRTY, anchor))
+
+    def test_anchor_for_returns_none_when_the_patch_has_no_write_anywhere(self):
+        """No outbound write anywhere in the patch means there is nothing to
+        anchor a hidden test to.
+
+        Thesis claim (vi): "khong co write nao thi khong co diem neo".
+        """
+        row = {"patch": PATCH_NO_WRITE_ANYWHERE}
+        self.assertIsNone(H1.anchor_for(row))
+
+
 if __name__ == "__main__":
     unittest.main()

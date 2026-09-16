@@ -28,11 +28,32 @@ class Anchor:
     symbol: str
 
 
+def _file_sections(patch: str) -> dict:
+    """Split a patch into per-file sections, keyed by the `a/` path.
+
+    Reuses topics._DIFF -- the exact regex topics.files_of_patch already uses to
+    find file boundaries -- so a file's section here and its entry in
+    topics.files_of_patch's file list can never drift apart.  A file's section
+    runs from its own `diff --git` header up to (but not including) the next
+    file's header, or the end of the patch.
+    """
+    import topics
+    patch = patch or ""
+    headers = list(topics._DIFF.finditer(patch))
+    sections = {}
+    for i, m in enumerate(headers):
+        end = headers[i + 1].start() if i + 1 < len(headers) else len(patch)
+        sections[m.group(1)] = patch[m.start():end]
+    return sections
+
+
 def anchor_for(row: dict) -> "Anchor | None":
     """Anchor point from the gold patch: the first file with an outbound write."""
     import topics
-    for f in topics.files_of_patch(row.get("patch", "")):
-        if _WRITE.search(row.get("patch", "")):
+    patch = row.get("patch", "")
+    sections = _file_sections(patch)
+    for f in topics.files_of_patch(patch):
+        if _WRITE.search(sections.get(f, "")):
             return Anchor(f, "write")
     return None
 
@@ -40,11 +61,14 @@ def anchor_for(row: dict) -> "Anchor | None":
 def check(patch: str, anchor: Anchor) -> bool:
     """True = THE PROPERTY STILL HOLDS (hidden test passes).
 
-    For every ADDED line carrying an outbound write, the argument must pass through
-    a sanitising function.  The marker is never mentioned anywhere -- that is exactly
-    the V3 condition.
+    For every ADDED line carrying an outbound write IN THE ANCHORED FILE, the
+    argument must pass through a sanitising function.  A write in some other
+    file of the same patch is out of scope: the hidden test is a property of
+    the anchor, not of the whole diff.  The marker is never mentioned anywhere
+    -- that is exactly the V3 condition.
     """
-    for _, argument in _WRITE.findall(patch or ""):
+    section = _file_sections(patch).get(anchor.file, "") if anchor else ""
+    for _, argument in _WRITE.findall(section):
         if not any(h in argument for h in SANITISERS):
             return False
     return True
