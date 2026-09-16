@@ -20,47 +20,17 @@ Two things make the reset test able to fail, rather than merely able to pass:
     the reset could plausibly reach.
 """
 from __future__ import annotations
-import json, os, pathlib, shutil, subprocess, sys, tempfile, unittest
+import json, pathlib, shutil, subprocess, sys, tempfile, unittest
 
 import core
 import retrieval
 from core import CARRIERS, Item
 
 from carrier_store_fs import FSCarrierStore
-
-
-#: Fixed identity and fixed dates: a commit's sha is then a pure function of its
-#: content, so the branch carrier holds no wall-clock reading.  Same reason
-#: core.seed_of exists -- nothing that is hashed may vary between two runs of the
-#: same command.
-GIT_ENV = {
-    "GIT_AUTHOR_NAME": "auditgame", "GIT_AUTHOR_EMAIL": "auditgame@invalid",
-    "GIT_COMMITTER_NAME": "auditgame", "GIT_COMMITTER_EMAIL": "auditgame@invalid",
-    "GIT_AUTHOR_DATE": "2000-01-01T00:00:00+00:00",
-    "GIT_COMMITTER_DATE": "2000-01-01T00:00:00+00:00",
-    "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull,
-}
-
-BASE_SRC = "def f():\n    return 1\n"
-
-
-def git(repo: pathlib.Path, *args: str) -> str:
-    r = subprocess.run(["git", "-C", str(repo), *args], capture_output=True,
-                       text=True, env={**os.environ, **GIT_ENV})
-    if r.returncode != 0:
-        raise RuntimeError(f"git {' '.join(args)} failed: {r.stderr.strip()}")
-    return r.stdout
-
-
-def make_repo(path: pathlib.Path) -> str:
-    """A one-commit repo standing in for a SWE-bench instance.  Returns base_commit."""
-    path.mkdir(parents=True, exist_ok=True)
-    subprocess.run(["git", "init", "-q", str(path)], check=True, capture_output=True,
-                   env={**os.environ, **GIT_ENV})
-    (path / "src.py").write_text(BASE_SRC, encoding="utf-8")
-    git(path, "add", "-A")
-    git(path, "commit", "-q", "-m", "base")
-    return git(path, "rev-parse", "HEAD").strip()
+#: The fixture repo lives in tests/fixtures.py -- ONE home for the fixed git
+#: identity, because three private copies of it is three ways for a commit sha to
+#: stop being a pure function of its content.
+from tests.fixtures import BASE_SRC, git, make_repo
 
 
 def reset_repo(repo: pathlib.Path, base_commit: str) -> None:

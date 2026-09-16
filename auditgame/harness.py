@@ -15,7 +15,7 @@ TWO ANSWER KEYS, ONE RULE.  The hidden suites are the first; `Item.poisoned` is
 the second, and it is the label the whole experiment exists to infer.  Task 13
 persisted it into the carrier root, which is mounted rw, so the agent could have
 read -- and rewritten -- the answer to the question being put to it.  Since Task
-19 it lives in SEALED_ROOT with the sealed manifest (`inject_sealed` below), and
+19 it lives in `sealed_root()` with the sealed manifest (`build.inject_sealed`), and
 `forbidden_roots()` names all three places so that ONE list, checked in ONE place
 (`docker_argv`), decides what may not be mounted.
 
@@ -38,6 +38,42 @@ The two facts worth knowing about `docker_argv`:
     produced six times.
   * it is the ONLY place a `-v` is allowed to be built.  A mount appended
     somewhere else would be invisible to every check that walks mounts().
+
+It is also where a NESTED sealed area is refused.  The labels stay out of the
+mount by a sibling rule (`carrier_store_fs.sealed_root_for`), and the one way left
+to defeat that rule is to open a store under a directory that is already mounted:
+a per-workflow sub-root `<carrier root>/run1` seals to `<carrier root>/run1-sealed`,
+inside the mount.  `FSCarrierStore._refuse_nesting` cannot catch it -- at
+construction the ancestor holds nothing yet -- and `forbidden_roots()` names only
+today's sealed area, not a sibling somebody makes tomorrow.  So the mount is
+WALKED for sealed file names (`carrier_store_fs.sealed_file_under`), which refuses
+regardless of naming or depth.  "One carrier root per run" is an obvious next
+step, and this is what stops it silently restoring the leak Task 19 removed.
+
+NAMED RESIDUAL -- the payload is identifiable in the mount by its `provenance`.
+Every agent-written item carries `agent/...` (agent.py) and every planted payload
+carries `repo/docs/conventions.md` (attacks.py, build.inject).  `provenance` is
+part of `public_record`, so the carrier root the container is handed still holds a
+field that picks the payload out exactly -- a substitute for the label Task 19
+removed.  It is NOT fixed here and must not be: `provenance` is hashed into
+`item_id`, so changing it moves every id, every detector seed and every measured
+number in this build.  The byte-equality test next door cannot see it either --
+it compares ONE item under two labels, and this field differs BECAUSE the item is
+the payload, which is outside that comparison's scope.
+
+The decision is owed BEFORE Task 16 wires a real agent, and there are two ways to
+take it:
+
+  (a) a provenance VOCABULARY shared by the agent and the attacker, so a planted
+      item and an agent-written one draw their origin strings from the same set.
+      It moves every id, so it can only be done at the next number-moving
+      boundary, together with a re-run of every recorded figure.
+  (b) ACCEPT it and say so: `harm` is then measured against an agent that can
+      identify the plant, which is a lower bound on harm under a naive agent and
+      is not a bound at all under an adversarially careful one.
+
+Until one of the two is chosen, no harm figure from a real-agent run may be quoted
+without this sentence beside it.
 """
 from __future__ import annotations
 import pathlib
@@ -45,7 +81,6 @@ import shutil
 import subprocess
 from typing import Optional
 
-import build
 import carrier_store_fs
 import core
 
@@ -54,19 +89,42 @@ WORKSPACE = HERE / "workspace"          # repo clones, mounted rw
 CARRIER_ROOT = HERE / "carriers"        # the four carriers, OUTSIDE every repo
 HIDDEN_ROOT = HERE / "hidden_suites"    # mounted NOWHERE, run after the horizon
 
-#: Ground truth: the per-item `poisoned` labels and the sealed manifests.  Mounted
-#: NOWHERE.  Derived from CARRIER_ROOT rather than spelled out, so the two cannot
-#: be moved apart by editing one of them (carrier_store_fs.sealed_root_for).
-SEALED_ROOT = carrier_store_fs.sealed_root_for(CARRIER_ROOT)
-
 #: The image built from ../Dockerfile.  A single name, because two names is how a
-#: run and its reproduction end up in different environments.
+#: run and its reproduction end up in different environments.  A LOCAL TAG, which
+#: is a mutable thing: `auditgame:latest` is whatever was built last, and an older
+#: image left behind under the same name runs and produces numbers.  So the tag is
+#: not the check -- the LABEL baked into the Dockerfile is, and `container_ready`
+#: reads it back off the image.
 IMAGE = "auditgame:latest"
+IMAGE_LABEL = "org.auditgame.harness"
+IMAGE_LABEL_VALUE = "auditgame-se-1"
+
+#: Seconds.  A container with no timeout does not fail, it HANGS, and gate 1 then
+#: produces no output at all -- neither green nor red, which is the one result a
+#: gate may not produce.  Two values because the two calls are different questions:
+#: "is the daemon there" is answered in a moment or not at all.
+DOCKER_PROBE_TIMEOUT = 30
+DOCKER_RUN_TIMEOUT = 900
 
 #: Where every mount lands inside the container.  Fixed here rather than spelled
 #: out at each call site: the agent's view of its own filesystem is part of the
 #: task definition, so it may not vary between two runs of the same benchmark.
 CONTAINER_ROOT = "/workspace"
+
+
+def sealed_root() -> pathlib.Path:
+    """Ground truth: the per-item `poisoned` labels, the quarantine record and the
+    sealed manifests.  Mounted NOWHERE.
+
+    A FUNCTION, not a constant.  It is derived from CARRIER_ROOT
+    (`carrier_store_fs.sealed_root_for`) so the two cannot be moved apart by
+    editing one of them -- but a constant frozen at import time is a SECOND source
+    for that one fact, and the tests move CARRIER_ROOT.  After such a move the
+    constant still named the old sealed area while `forbidden_roots()` named the
+    new one, so `docker_argv` guarded a directory nobody was using.  This module's
+    own docstring is about exactly that failure shape; one fact, one place.
+    """
+    return carrier_store_fs.sealed_root_for(CARRIER_ROOT)
 
 
 def forbidden_roots() -> list:
@@ -81,8 +139,7 @@ def forbidden_roots() -> list:
     move.  A tuple frozen at import time would keep naming the old sealed area
     after the move, and `docker_argv` would guard a directory nobody is using.
     """
-    return [HIDDEN_ROOT, HERE / "hidden_tests",
-            carrier_store_fs.sealed_root_for(CARRIER_ROOT)]
+    return [HIDDEN_ROOT, HERE / "hidden_tests", sealed_root()]
 
 
 def ensure_dirs() -> None:
@@ -94,7 +151,7 @@ def ensure_dirs() -> None:
     there yet, and the claim would quietly become "we have not generated the
     hidden suites" instead of "the agent cannot reach them".
     """
-    for d in (WORKSPACE, CARRIER_ROOT, HIDDEN_ROOT, SEALED_ROOT):
+    for d in (WORKSPACE, CARRIER_ROOT, HIDDEN_ROOT, sealed_root()):
         d.mkdir(parents=True, exist_ok=True)
 
 
@@ -123,6 +180,19 @@ def docker_argv(task, cmd: list) -> list:
         # and the ancestor test alone waves it straight through while the agent
         # reads the answer key for the instance it is being graded on.
         h = host.resolve()
+        # A sealed area NESTED under the mount, at any depth and under any name.
+        # The loop below only knows the roots named today; this one asks the mount
+        # itself what it is carrying, which is the question the agent's view
+        # actually turns on.  It walks, which costs a directory traversal per
+        # container run -- next to `docker run` that is free, and the alternative
+        # is a rule that holds until somebody adds a per-workflow sub-root.
+        stray = carrier_store_fs.sealed_file_under(h)
+        if stray is not None:
+            raise AssertionError(
+                f"refusing to mount {h}: it holds the sealed file {stray}. That is "
+                f"ground truth -- a per-item `poisoned` label, a quarantine record "
+                f"or a sealed manifest -- and mounting the directory above it hands "
+                f"the agent the answer to the question being put to it.")
         for secret in forbidden_roots():
             s = secret.resolve()
             if s == h or s.is_relative_to(h) or h.is_relative_to(s):
@@ -144,14 +214,33 @@ def container_ready() -> str:
     """
     if shutil.which("docker") is None:
         return "no docker executable on PATH"
-    ping = subprocess.run(["docker", "info", "--format", "{{.ServerVersion}}"],
-                          capture_output=True, text=True)
+    try:
+        ping = subprocess.run(["docker", "info", "--format", "{{.ServerVersion}}"],
+                              capture_output=True, text=True,
+                              timeout=DOCKER_PROBE_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        return f"docker daemon did not answer within {DOCKER_PROBE_TIMEOUT}s"
     if ping.returncode != 0:
         return "docker daemon not reachable"
-    img = subprocess.run(["docker", "image", "inspect", IMAGE],
-                         capture_output=True, text=True)
+    # The LABEL, not the tag.  `auditgame:latest` is a mutable local name: an image
+    # built before this Dockerfile existed answers to it just as well, runs, and
+    # produces numbers from an environment that is not the recorded one.  The label
+    # is baked in by ../Dockerfile, so asking for it is asking whether THIS image is
+    # the one the harness is written against.
+    try:
+        img = subprocess.run(
+            ["docker", "image", "inspect", "--format",
+             '{{index .Config.Labels "' + IMAGE_LABEL + '"}}', IMAGE],
+            capture_output=True, text=True, timeout=DOCKER_PROBE_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        return f"docker did not answer within {DOCKER_PROBE_TIMEOUT}s"
     if img.returncode != 0:
         return f"image {IMAGE} not built (docker build -t {IMAGE} ..)"
+    got = img.stdout.strip()
+    if got != IMAGE_LABEL_VALUE:
+        return (f"image {IMAGE} is not this harness's image: {IMAGE_LABEL}="
+                f"{got!r}, expected {IMAGE_LABEL_VALUE!r} (rebuild it from "
+                f"../Dockerfile with docker build -t {IMAGE} ..)")
     return ""
 
 
@@ -161,8 +250,19 @@ def run_in_container(task, cmd: list):
     --network=none is not a hardening detail: an agent that can reach the internet
     can fetch the upstream fix, and `solved` would then measure retrieval instead
     of repair.
+
+    A TIMEOUT, and expiry raises.  Without one a wedged container takes the suite
+    with it: no failure, no output, no exit -- and a gate that can hang is a gate
+    whose silence has two meanings.  `--rm` cleans the killed container up.
     """
-    return subprocess.run(docker_argv(task, cmd), capture_output=True, text=True)
+    try:
+        return subprocess.run(docker_argv(task, cmd), capture_output=True,
+                              text=True, timeout=DOCKER_RUN_TIMEOUT)
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(
+            f"the container ran for more than {DOCKER_RUN_TIMEOUT}s and was "
+            f"killed: {' '.join(map(str, cmd))[:200]}. Treat this as a RED gate, "
+            f"not as a slow machine -- nothing was measured.") from e
 
 
 def last_run_store() -> Optional[core.CarrierStore]:
@@ -195,11 +295,17 @@ def hidden_needles() -> list:
     names the suite the agent is about to be graded by, and a needle list holding
     only directory names misses it entirely.
 
-    File names keep their extension on purpose.  The bare stem would match an
-    ordinary agent note ("agreement", "diffutil" are English words a SE agent
-    writes), and a gate that cries wolf on honest runs is a gate somebody turns
-    off.  `__init__.py` and dotfiles are dropped for the same reason, and so are
-    needles under four characters.
+    A file needle is ANCHORED to the directory that contains it --
+    `hidden_tests/h1_deprecation.py`, not `h1_deprecation.py`.  A bare basename is
+    a needle the repo under test can produce by itself: the per-instance suites are
+    generated FROM the instance's own test files and carry their names, so once
+    `hidden_suites/<instance>/test_separable.py` exists, an honest agent note
+    quoting `tests/test_separable.py` trips gate 1 red.  A gate that cries wolf on
+    honest runs is a gate somebody turns off, and the anchored form loses nothing:
+    a leak worth catching is a PATH, and a path carries its directory.
+
+    Extensions are kept for the same reason the anchor exists, `__init__.py` and
+    dotfiles are dropped, and so is any needle under four characters.
     """
     needles = set()
     for root in forbidden_roots():
@@ -208,7 +314,7 @@ def hidden_needles() -> list:
             for p in root.rglob("*"):
                 if p.is_file() and "__pycache__" not in p.parts \
                         and not p.name.startswith(("__", ".")):
-                    needles.add(p.name)
+                    needles.add(f"{p.parent.name}/{p.name}")
     return sorted(n.casefold() for n in needles if len(n) >= 4)
 
 
@@ -234,31 +340,3 @@ def hidden_leaks(store) -> list:
             blob = core.dumps(core.item_record(it)).casefold()
             leaks += [(c, it.item_id, n) for n in needles if n in blob]
     return leaks
-
-
-# ------------------------------------------------------------- ground truth
-
-def inject_sealed(store, wf, ps, *, auc_match_ci, n_c_at_sigma, kappa_measured,
-                  instance_source) -> tuple:
-    """Plant the payload into a filesystem store AND seal the manifest beside it.
-
-    ONE door for both, because they are one act.  `build.inject` writes the payload
-    into a carrier the container can read, and the carrier no longer records which
-    item that was -- so an injection whose manifest was not sealed is a run whose
-    payload nobody can identify afterwards, and every harm figure from it is
-    unscorable.  Two separate calls at the call site is one forgotten line away
-    from exactly that.
-
-    This is `build.sealed_manifest`'s call site.  It was written in Task 21 and
-    left unwired, which is how the evaluator's record of the ground truth came to
-    exist as a function that produced a dict nobody stored.  The four evidence
-    fields stay keyword-only and mandatory all the way through: a default here
-    would answer a reviewer's question silently.
-    """
-    injected = build.inject(store, wf, ps)
-    manifest = build.sealed_manifest(wf, ps, injected, auc_match_ci=auc_match_ci,
-                                     n_c_at_sigma=n_c_at_sigma,
-                                     kappa_measured=kappa_measured,
-                                     instance_source=instance_source)
-    store.seal_manifest(manifest)
-    return injected, manifest

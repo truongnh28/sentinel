@@ -4,6 +4,12 @@
 # Mixing them would make "reproduce our numbers" require reproducing every repo
 # under test.
 FROM python:3.11-slim
+# The IMAGE TAG is a mutable local name -- `auditgame:latest` is whatever was built
+# last, and an older image left behind under that name runs and produces numbers.
+# This label is what harness.container_ready() actually checks, so "the image is
+# built" and "the image is THIS image" stop being the same question. Bump the
+# value when the environment changes in a way a recorded run must not inherit.
+LABEL org.auditgame.harness="auditgame-se-1"
 RUN apt-get update && apt-get install -y --no-install-recommends git \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /workspace

@@ -48,9 +48,24 @@ in-memory `Item.poisoned` is untouched -- the runner's Q_true/Q_false accounting
 from the sealed side.  A LOAD WITH NO LABEL IS AN ERROR, not a False: a missing
 label read as "clean" turns every payload into an ordinary note, undercounts harm,
 and says nothing while doing it.
+
+THE MOUNT IS RW, so moving the label out is only half of it.  A label bound to an
+`item_id` and to nothing else is a label bound to a string an agent can retype:
+rewrite `content` and keep the id, and the payload's ground truth attaches to what
+the agent wrote; delete the line, and the payload leaves every count in silence.
+So the sealed record carries `line_digest` of the exact public line as well as the
+label, `_rejoin` refuses a record whose bytes moved, and `_refuse_a_dropped_record`
+refuses a store that came back short.  Both raise `CarrierTampered`, a subclass of
+`GroundTruthMissing`, because the consequence is the one that class already names.
+
+`quarantined.jsonl` is sealed too, for the same reason and one more: quarantine
+decisions come from a detector drawing N(d' * 1[poisoned], 1), so the list of
+quarantined ids is a noisy copy of the label -- and in the mount it was also an
+un-quarantine switch.  What a real agent observes is absence from `live()`, which
+is untouched.
 """
 from __future__ import annotations
-import json, os, pathlib, shutil, subprocess, tempfile
+import hashlib, json, os, pathlib, shutil, subprocess, tempfile
 from typing import Optional
 
 import core
@@ -83,6 +98,18 @@ SEALED_SUFFIX = "-sealed"
 LABELS = "ground_truth.jsonl"
 MANIFEST_PREFIX = "manifest-"
 
+#: The defender's own record of what it removed.  SEALED, not published -- see
+#: `quarantine`.  It used to sit in the carrier root, where it was both a noisy
+#: copy of the label (`detector.score` draws N(d' * 1[poisoned], 1), so at a usable
+#: d' the quarantined id list approximates the poisoned set) and a writable
+#: un-quarantine switch on an rw mount.
+QUARANTINE = "quarantined.jsonl"
+
+#: The field of a sealed record holding the digest of the PUBLIC line it belongs
+#: to.  Without it a label is bound to an `item_id` and to nothing else, and
+#: `item_id` is a string an agent with an rw mount can retype onto any line.
+DIGEST_FIELD = "line_digest"
+
 
 class GroundTruthMissing(RuntimeError):
     """A carrier item was read back with no sealed label.
@@ -93,10 +120,55 @@ class GroundTruthMissing(RuntimeError):
     """
 
 
+class CarrierTampered(GroundTruthMissing):
+    """A public record no longer matches the line whose label was sealed.
+
+    A SUBCLASS, because the consequence is the one GroundTruthMissing names: a
+    record whose bytes changed has no label that belongs to it, and reading it
+    under the label of the line it replaced is worse than reading it as clean --
+    the payload's label would travel to content the agent wrote.  Every call site
+    already written to refuse "no label" refuses this too, which is the point.
+    """
+
+
 def sealed_root_for(root) -> pathlib.Path:
     """Where the ground truth for `root` lives.  Outside `root`, by construction."""
     root = pathlib.Path(root)
     return root.parent / (root.name + SEALED_SUFFIX)
+
+
+def is_sealed_file(name: str) -> bool:
+    """True for a file name that belongs in the sealed area and nowhere else.
+
+    Named here rather than at the check site: `harness.docker_argv` refuses a mount
+    that holds one of these anywhere beneath it, and a list of sealed file names
+    kept in two modules is one rename away from a guard that watches for a file
+    nobody writes any more.
+    """
+    return name in (LABELS, QUARANTINE) or (
+        name.startswith(MANIFEST_PREFIX) and name.endswith(".json"))
+
+
+def sealed_file_under(path) -> Optional[pathlib.Path]:
+    """The first sealed file anywhere beneath `path`, or None.
+
+    A WALK, at any depth, by file name -- not a check on where a particular store
+    put its sealed area.  The sibling rule (`sealed_root_for`) is what keeps the
+    labels out of a mount, and the one way left to defeat it is to open a store
+    UNDER a directory that is already mounted: a per-workflow sub-root
+    `<mounted root>/run1` seals to `<mounted root>/run1-sealed`, inside the mount,
+    and `FSCarrierStore._refuse_nesting` accepts it because at construction time
+    the ancestor holds nothing yet.  What the agent can see is decided when the
+    mount is built, so that is where this is asked.
+    """
+    p = pathlib.Path(path)
+    if not p.is_dir():
+        return None
+    for dirpath, _dirnames, filenames in os.walk(p, followlinks=False):
+        for n in sorted(filenames):
+            if is_sealed_file(n):
+                return pathlib.Path(dirpath) / n
+    return None
 
 
 def public_record(it: Item) -> dict:
@@ -148,6 +220,18 @@ def _line(rec: dict) -> str:
     return json.dumps(rec, default=_jsonable, sort_keys=True, ensure_ascii=False)
 
 
+def line_digest(line: str) -> str:
+    """The digest sealed beside a label, over the EXACT public line.
+
+    blake2b for the same reason `core` uses it: a fixed function of the bytes, no
+    process state, no PYTHONHASHSEED.  Over the serialised line rather than over
+    the parsed record, because the thing being bound is what is on the disk -- a
+    re-serialisation would silently forgive a rewrite that JSON happens to
+    normalise away.
+    """
+    return hashlib.blake2b(line.encode("utf-8"), digest_size=16).hexdigest()
+
+
 class FSCarrierStore(core.CarrierStore):
     """`core.CarrierStore` with the same six methods, persisted.
 
@@ -169,6 +253,7 @@ class FSCarrierStore(core.CarrierStore):
         self.items = {c: [] for c in CARRIERS}
         self.quarantined = set()
         self.labels: dict = {}
+        self.digests: dict = {}
         self._load()
 
     def _refuse_nesting(self) -> None:
@@ -235,7 +320,8 @@ class FSCarrierStore(core.CarrierStore):
             # A detached copy carries its branch carrier as JSONL like the rest;
             # it is a snapshot for analysis, not a second repo.
             self._load_flat(BRANCH)
-        qpath = self.root / "quarantined.jsonl"
+        self._refuse_a_dropped_record()
+        qpath = self.sealed / QUARANTINE
         if qpath.exists():
             for line in qpath.read_text(encoding="utf-8").splitlines():
                 if line.strip():
@@ -249,9 +335,42 @@ class FSCarrierStore(core.CarrierStore):
         for line in path.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 rec = json.loads(line)
+                if DIGEST_FIELD not in rec:
+                    # A label with no digest binds to an item_id and to nothing
+                    # else, which is the state this field exists to end.  Refused
+                    # rather than defaulted: a default would re-open exactly the
+                    # hole for every store written before the field existed.
+                    raise CarrierTampered(
+                        f"a sealed label in {path} carries no {DIGEST_FIELD!r}: "
+                        f"it cannot be bound to the public record it belongs to.")
                 self.labels[rec["item_id"]] = rec[SEALED_FIELDS[0]]
+                self.digests[rec["item_id"]] = rec[DIGEST_FIELD]
 
-    def _rejoin(self, rec: dict) -> Item:
+    def _refuse_a_dropped_record(self) -> None:
+        """Every sealed label must have found its public record.
+
+        The half of the tampering story `_rejoin` cannot see.  `_rejoin` is only
+        ever called on lines that are THERE, so deleting a line -- or truncating
+        `memory.jsonl` to nothing -- removes the payload from every count with no
+        error at all, which is the quietest way to defeat the harm measurement from
+        inside an rw mount.  Checked against the sealed side because that is the
+        side the agent cannot reach.
+
+        It also means a crash between `_seal_label` and the publish that follows it
+        is now DETECTED rather than harmless.  That is the right way round: a store
+        that refuses to open is a stopped run, while a store that opens one item
+        short is a run whose harm figure is wrong and says nothing.
+        """
+        seen = {it.item_id for c in CARRIERS for it in self.items[c]}
+        lost = sorted(set(self.labels) - seen)
+        if lost:
+            raise CarrierTampered(
+                f"{len(lost)} sealed label(s) in {self.sealed / LABELS} have no "
+                f"public record under {self.root} (first: {lost[0]!r}). An item "
+                f"deleted from the carrier root disappears from Q_true/Q_false and "
+                f"from harm without anything being printed.")
+
+    def _rejoin(self, rec: dict, line: str) -> Item:
         """A public record from the carrier root + its sealed label -> the Item.
 
         The two halves are rejoined HERE and nowhere else, so there is one place
@@ -260,6 +379,14 @@ class FSCarrierStore(core.CarrierStore):
         is the bug: an agent can append to `memory.jsonl` from inside the container
         (the mount is rw), and a fabricated line read back as clean is a payload
         the scoring path will never count.
+
+        `item_id` is trusted verbatim and has to be -- rehashing would move every
+        id and every score (see the module docstring) -- so the id ALONE cannot be
+        what binds a record to its label: an agent can retype a known id onto a
+        line it wrote, or rewrite the content under an id it keeps, and in both
+        cases the payload's label travels to content the attacker did not write.
+        The sealed side therefore carries `line_digest` of the exact public line,
+        and the LINE is what is checked.
         """
         item_id = rec["item_id"]
         try:
@@ -269,6 +396,13 @@ class FSCarrierStore(core.CarrierStore):
                 f"item {item_id!r} is in {self.root} but has no sealed label in "
                 f"{self.sealed / LABELS}. Reading it as clean would silently "
                 f"demote a payload to an ordinary note.") from None
+        want, got = self.digests[item_id], line_digest(line)
+        if want != got:
+            raise CarrierTampered(
+                f"item {item_id!r} in {self.root} does not match the line whose "
+                f"label was sealed ({got} != {want}). Loading it anyway would "
+                f"attach the payload's ground truth to a record that is no longer "
+                f"the payload.")
         return core.item_from_record({**rec, SEALED_FIELDS[0]: label})
 
     def _load_flat(self, carrier: str) -> None:
@@ -277,7 +411,7 @@ class FSCarrierStore(core.CarrierStore):
             return
         for line in path.read_text(encoding="utf-8").splitlines():
             if line.strip():
-                self.items[carrier].append(self._rejoin(json.loads(line)))
+                self.items[carrier].append(self._rejoin(json.loads(line), line))
 
     def _load_branch(self) -> None:
         out = self._git("for-each-ref", "--format=%(refname:short)",
@@ -286,8 +420,10 @@ class FSCarrierStore(core.CarrierStore):
         # write order is recovered exactly.  Ref listing order is git's business;
         # `live()` order is ours, and the traces depend on it.
         for ref in sorted(out.split()):
-            rec = json.loads(self._git("cat-file", "-p", f"{ref}:item.json"))
-            self.items[BRANCH].append(self._rejoin(rec))
+            # `_write_branch` stores `_line(...) + "\n"`, so the blob stripped of
+            # that newline is the same string the digest was taken over.
+            line = self._git("cat-file", "-p", f"{ref}:item.json").strip()
+            self.items[BRANCH].append(self._rejoin(json.loads(line), line))
 
     # ----------------------------------------------------------------- write
 
@@ -300,25 +436,34 @@ class FSCarrierStore(core.CarrierStore):
                 "reset for a reason that has nothing to do with git.")
         super().write(it)                      # collision guard, then append
         # SEAL FIRST, publish second.  A crash between the two then leaves a label
-        # with no item, which is harmless; the other order leaves an item with no
-        # label, which is the GroundTruthMissing case -- recoverable, but it stops
-        # the next run dead.
-        self._seal_label(it)
+        # with no item, which `_refuse_a_dropped_record` reports at the next open;
+        # the other order leaves an item with no label, which is the
+        # GroundTruthMissing case.  Both are refusals, and that is the point --
+        # what may never happen is a half-written store that opens quietly.
+        line = _line(public_record(it))
+        self._seal_label(it, line)
         if it.carrier == BRANCH:
-            self._write_branch(it, seq=len(self.items[BRANCH]) - 1)
+            self._write_branch(it, line, seq=len(self.items[BRANCH]) - 1)
         else:
             with (self.root / f"{it.carrier}.jsonl").open("a", encoding="utf-8") as f:
-                f.write(_line(public_record(it)) + "\n")
+                f.write(line + "\n")
         return it
 
-    def _seal_label(self, it: Item) -> None:
-        """The ground truth, to the sealed sibling and nowhere else."""
+    def _seal_label(self, it: Item, line: str) -> None:
+        """The ground truth, to the sealed sibling and nowhere else.
+
+        The label AND a digest of the public line it belongs to.  The digest is
+        what makes the label the evaluator's record of a specific record rather
+        than a note attached to a string the agent can retype.
+        """
         self.labels[it.item_id] = getattr(it, SEALED_FIELDS[0])
+        self.digests[it.item_id] = line_digest(line)
         with (self.sealed / LABELS).open("a", encoding="utf-8") as f:
             f.write(_line({"item_id": it.item_id,
-                           SEALED_FIELDS[0]: self.labels[it.item_id]}) + "\n")
+                           SEALED_FIELDS[0]: self.labels[it.item_id],
+                           DIGEST_FIELD: self.digests[it.item_id]}) + "\n")
 
-    def _write_branch(self, it: Item, seq: int) -> None:
+    def _write_branch(self, it: Item, line: str, seq: int) -> None:
         """One item -> one git branch, via plumbing.
 
         blob -> tree -> root commit -> `git branch auditgame/<seq>-<item_id>`.
@@ -326,7 +471,7 @@ class FSCarrierStore(core.CarrierStore):
         it and `git checkout` does not touch it, which is the B-1 property stated
         in the one way a reader can check by running git themselves.
         """
-        payload = _line(public_record(it)) + "\n"
+        payload = line + "\n"
         blob = self._git("hash-object", "-w", "--stdin", stdin=payload).strip()
         tree = self._git("mktree", stdin=f"100644 blob {blob}\titem.json\n").strip()
         commit = self._git("commit-tree", tree, "-m",
@@ -334,10 +479,23 @@ class FSCarrierStore(core.CarrierStore):
         self._git("branch", f"{BRANCH_NS}/{seq:06d}-{it.item_id}", commit)
 
     def quarantine(self, item_id: str) -> None:
+        """Remove an item from `live()`, and record that in the SEALED area.
+
+        Not in the carrier root, for two reasons that point the same way.  It is a
+        LABEL PROXY: quarantine decisions come out of `detector.score`, which draws
+        N(d' * 1[poisoned], 1), so at any d' worth running the list of quarantined
+        ids approximates the poisoned set -- an explicit id list, in the mount,
+        covering items the agent never retrieved.  And it is a SWITCH: the mount is
+        rw, so emptying the file un-quarantines everything at the next reopen, and
+        quarantine is the defender's only causal channel.
+
+        What a real agent observes is unchanged, because what a real agent observes
+        is that its note is not in `live()` any more -- absence, not an announcement.
+        """
         if item_id in self.quarantined:
             return                             # `set.add` is idempotent; a file append is not
         super().quarantine(item_id)
-        with (self.root / "quarantined.jsonl").open("a", encoding="utf-8") as f:
+        with (self.sealed / QUARANTINE).open("a", encoding="utf-8") as f:
             f.write(_line({"item_id": item_id}) + "\n")
 
     # ----------------------------------------------------------------- copy
@@ -358,9 +516,9 @@ class FSCarrierStore(core.CarrierStore):
             src = self.root / f"{c}.jsonl"
             if src.exists():
                 shutil.copyfile(src, dest / f"{c}.jsonl")
-        q = self.root / "quarantined.jsonl"
-        if q.exists():
-            shutil.copyfile(q, dest / "quarantined.jsonl")
+        # The quarantine record is NOT copied here: it lives in the sealed area
+        # now, and the sealed area travels below.  One copy site, so it cannot land
+        # in the public half of the copy by accident.
         if self.items[BRANCH]:
             (dest / f"{BRANCH}.jsonl").write_text(
                 "".join(_line(public_record(it)) + "\n" for it in self.items[BRANCH]),

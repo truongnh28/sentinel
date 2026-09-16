@@ -154,3 +154,35 @@ def sealed_manifest(wf: Workflow, ps: PoisonSpec, injected: Item, *, auc_match_c
                 topic=injected.topic,
                 auc_match_ci=auc_match_ci, n_c_at_sigma=n_c_at_sigma,
                 kappa_measured=kappa_measured, instance_source=instance_source)
+
+def inject_sealed(store, wf: Workflow, ps: PoisonSpec, *, auc_match_ci: tuple,
+                  n_c_at_sigma: dict, kappa_measured: dict,
+                  instance_source: str) -> tuple:
+    """Plant the payload into a filesystem store AND seal the manifest beside it.
+
+    ONE door for both, because they are one act.  `inject` writes the payload into
+    a carrier the container can read, and the carrier no longer records which item
+    that was -- so an injection whose manifest was not sealed is a run whose
+    payload nobody can identify afterwards, and every harm figure from it is
+    unscorable.  Two separate calls at the call site is one forgotten line away
+    from exactly that.
+
+    This is `sealed_manifest`'s call site.  It was written in Task 21 and left
+    unwired, which is how the evaluator's record of the ground truth came to exist
+    as a function that produced a dict nobody stored.  The four evidence fields
+    stay keyword-only and mandatory all the way through: a default here would
+    answer a reviewer's question silently.
+
+    HERE rather than in `harness`.  `harness` answers one question -- what can the
+    agent see -- and injection is not an answer to it; putting the workflow builder
+    behind `import harness` made the module every isolation test imports drag in
+    the module that plants payloads.  `store` is duck-typed for the same reason:
+    this file must not import `carrier_store_fs` to plant an item into it.
+    """
+    injected = inject(store, wf, ps)
+    manifest = sealed_manifest(wf, ps, injected, auc_match_ci=auc_match_ci,
+                               n_c_at_sigma=n_c_at_sigma,
+                               kappa_measured=kappa_measured,
+                               instance_source=instance_source)
+    store.seal_manifest(manifest)
+    return injected, manifest

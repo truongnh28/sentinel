@@ -12,11 +12,80 @@ by fixed-seed statistical tests (I7).
 """
 from __future__ import annotations
 import contextlib
+import os
+import pathlib
+import subprocess
 from dataclasses import dataclass, field
 
 from core import Item, CarrierStore, Task, Workflow, PoisonSpec
 from agent import Outcome, _query
 import policies as P
+
+# ------------------------------------------------------------ a git repo ----
+#
+# ONE HOME.  Three test modules need a throwaway one-commit repo to stand in for a
+# SWE-bench instance, and all three had their own copy of `GIT_ENV` and
+# `make_repo` -- one of them importing a third module's copy across test files.
+# Three copies of "what a fixture repo looks like" is three ways for the fixed
+# identity below to drift, and the moment it drifts the branch carrier stops being
+# a pure function of its content: commit shas would differ between two runs of the
+# same command, which is the bug `core.seed_of` exists to prevent, arriving through
+# the fixtures instead.
+
+#: Fixed identity, fixed dates, no user config -- so a commit sha is a pure
+#: function of its content and nothing hashed carries a wall-clock reading.
+GIT_ENV = {
+    "GIT_AUTHOR_NAME": "auditgame", "GIT_AUTHOR_EMAIL": "auditgame@invalid",
+    "GIT_COMMITTER_NAME": "auditgame", "GIT_COMMITTER_EMAIL": "auditgame@invalid",
+    "GIT_AUTHOR_DATE": "2000-01-01T00:00:00+00:00",
+    "GIT_COMMITTER_DATE": "2000-01-01T00:00:00+00:00",
+    "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull,
+}
+
+#: The one tracked file of a fixture repo.  Named so a reset test can assert the
+#: worktree came BACK to it, not merely that something changed.
+BASE_SRC = "def f():\n    return 1\n"
+
+
+def git(repo: pathlib.Path, *args: str) -> str:
+    r = subprocess.run(["git", "-C", str(repo), *args], capture_output=True,
+                       text=True, env={**os.environ, **GIT_ENV})
+    if r.returncode != 0:
+        raise RuntimeError(f"git {' '.join(args)} failed: {r.stderr.strip()}")
+    return r.stdout
+
+
+def make_repo(path: pathlib.Path) -> str:
+    """A one-commit repo standing in for a SWE-bench instance.  Returns base_commit."""
+    path = pathlib.Path(path)
+    path.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["git", "init", "-q", str(path)], check=True, capture_output=True,
+                   env={**os.environ, **GIT_ENV})
+    (path / "src.py").write_text(BASE_SRC, encoding="utf-8")
+    git(path, "add", "-A")
+    git(path, "commit", "-q", "-m", "base")
+    return git(path, "rev-parse", "HEAD").strip()
+
+
+def all_git_objects(repo: pathlib.Path) -> str:
+    """EVERY object in the repo, contents and all, as one string.
+
+    `cat-file -p <ref>:item.json` reads the one blob this store happens to write
+    today.  A label added to the commit MESSAGE, to a tree entry NAME, or to a
+    second blob is invisible to it -- and perfectly visible to an agent with `git`,
+    which the image installs.  `--batch-all-objects --batch` asks for all of them,
+    so the comparison covers the object database rather than one path inside it.
+
+    Decoded with errors="replace": object contents are bytes, and the question
+    being asked is whether two repos hold the SAME bytes.
+    """
+    r = subprocess.run(
+        ["git", "-C", str(repo), "cat-file", "--batch-all-objects", "--batch"],
+        capture_output=True, env={**os.environ, **GIT_ENV})
+    if r.returncode != 0:
+        raise RuntimeError(f"git cat-file --batch-all-objects failed: "
+                           f"{r.stderr.decode('utf-8', 'replace').strip()}")
+    return r.stdout.decode("utf-8", errors="replace")
 
 # ------------------------------------------------------------ AST helpers ----
 
