@@ -35,13 +35,15 @@ import policies as P
 
 #: Fixed identity, fixed dates, no user config -- so a commit sha is a pure
 #: function of its content and nothing hashed carries a wall-clock reading.
-GIT_ENV = {
-    "GIT_AUTHOR_NAME": "auditgame", "GIT_AUTHOR_EMAIL": "auditgame@invalid",
-    "GIT_COMMITTER_NAME": "auditgame", "GIT_COMMITTER_EMAIL": "auditgame@invalid",
-    "GIT_AUTHOR_DATE": "2000-01-01T00:00:00+00:00",
-    "GIT_COMMITTER_DATE": "2000-01-01T00:00:00+00:00",
-    "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull,
-}
+#:
+#: READ OFF THE MODULE UNDER TEST, not restated here.  The header above says three
+#: private copies of this dict were three ways for the identity to drift; a fourth
+#: copy sitting beside `carrier_store_fs.GIT_ENV` is the same defect with the same
+#: consequence -- the fixture repo and the store's own branch writes would commit
+#: under two identities, and a commit sha would stop being a pure function of its
+#: content in exactly the half nobody looks at.  `GIT_TIMEOUT` was already taken
+#: from the module for that reason; this is the other name in the same pair.
+GIT_ENV = carrier_store_fs.GIT_ENV
 
 #: The one tracked file of a fixture repo.  Named so a reset test can assert the
 #: worktree came BACK to it, not merely that something changed.

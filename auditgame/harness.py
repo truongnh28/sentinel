@@ -80,6 +80,25 @@ one, and a check it can trip on purpose is a check that hands it a way to halt t
 measurement. What a mount turns on is whether a sealed AREA is under it, so that
 is what is asked; see `carrier_store_fs.is_sealed_area`.
 
+AND THE ANSWER DEPENDS ON WHICH MOUNT IS BEING ASKED ABOUT, which is why
+`names_are_evidence` is decided here. `ground_truth.jsonl` and `quarantined.jsonl`
+are names no repository carries, so under the CARRIER ROOT -- `ro` since Task 14 --
+finding one is enough, at any directory name. Under the WORKSPACE it is not enough,
+because the workspace is rw by design: the very same match meant that writing
+`workspace/django/tests/ground_truth.jsonl` made this function raise for that task's
+mount AND for `mounts(None)`, so every later container run died. That is the
+`manifest-*.json` kill switch again with a narrower trigger set and no `-sealed`
+directory required -- and if a Task 16 run loop wraps its container runs in a broad
+`except`, it is worse than a halt: every task scores unsolved, a wrong number rather
+than a stopped run.
+
+The residual after that, stated the way it actually is: an agent can still halt a
+run by building a directory NAMED `*-sealed` under the workspace and putting a
+sealed file in it. That refusal has to stay -- an area really placed under a mount
+is what the walk exists for -- and it costs the agent a deliberate `-sealed`
+directory instead of one file with a plausible name. It is not closed by the carrier
+mount being `ro`: the route is the workspace mount.
+
 NAMED RESIDUAL -- the payload is identifiable in the mount by its `provenance`.
 Every agent-written item carries `agent/...` (agent.py) and every planted payload
 carries `repo/docs/conventions.md` (attacks.py, build.inject).  `provenance` is
@@ -215,8 +234,13 @@ def docker_argv(task, cmd: list) -> list:
     Separated from the run so a test can read it.  `--network=none` and the `-v`
     list are the two things this benchmark's validity rests on, and both are
     claims about the ARGV -- not about the source text that produces it.
+
+    Both refusals below raise `carrier_store_fs.GroundTruthExposed` rather than
+    `AssertionError`: they mean the answer key is about to go onto a command line,
+    and that must not arrive at a run loop looking like a failed assertion.
     """
     args = ["docker", "run", "--rm", "--network=none"]
+    carrier_root = CARRIER_ROOT.resolve()
     for host, mode in mounts(task):
         # The guard lives in the PRODUCTION path, not only in the gate-1 tests.
         # Every test in test_hidden_test_isolation.py runs against today's
@@ -233,9 +257,19 @@ def docker_argv(task, cmd: list) -> list:
         # actually turns on.  It walks, which costs a directory traversal per
         # container run -- next to `docker run` that is free, and the alternative
         # is a rule that holds until somebody adds a per-workflow sub-root.
-        stray = carrier_store_fs.sealed_area_under(h)
+        #
+        # WHETHER A BARE FILE NAME COUNTS AS EVIDENCE is decided here, because here
+        # is where it is known who can write the tree being walked. Under the
+        # carrier root (`ro`, Task 14) `ground_truth.jsonl` at ANY directory name is
+        # the answer, which is the Task 19 regression the direct name match exists
+        # for. Under the workspace -- rw, because repairing the repo IS the task --
+        # it is not: the agent writes that file itself, and one `open()` then halted
+        # every container run in the benchmark. `is_relative_to` is True for the
+        # root itself, so the carrier root is covered by the same test.
+        stray = carrier_store_fs.sealed_area_under(
+            h, names_are_evidence=h.is_relative_to(carrier_root))
         if stray is not None:
-            raise AssertionError(
+            raise carrier_store_fs.GroundTruthExposed(
                 f"refusing to mount {h}: it holds the sealed area {stray}. That is "
                 f"ground truth -- the per-item `poisoned` labels, the quarantine "
                 f"record and the sealed manifests -- and mounting the directory "
@@ -244,7 +278,7 @@ def docker_argv(task, cmd: list) -> list:
         for secret in forbidden_roots():
             s = secret.resolve()
             if s == h or s.is_relative_to(h) or h.is_relative_to(s):
-                raise AssertionError(
+                raise carrier_store_fs.GroundTruthExposed(
                     f"refusing to mount {h}: it would put {s} inside the "
                     f"container. That directory is an answer key -- the hidden "
                     f"suites or the ground-truth labels -- and an agent that can "

@@ -266,6 +266,73 @@ class CarriersOutsideTheRepo(unittest.TestCase):
         self.assertEqual(len(FSCarrierStore(self.root, repo=self.repo).live("memory")), 1,
                          "the refused write still reached the file")
 
+    def test_the_fixture_repo_takes_its_git_identity_from_the_store_rather_than_restating_it(self):
+        """ONE fixed git identity, in one place.  `tests/fixtures.py` restated
+        `GIT_ENV` verbatim beside `carrier_store_fs.GIT_ENV` -- in a file whose own
+        header argues that private copies of exactly this dict are how a commit sha
+        stops being a pure function of its content, and which already reads
+        `GIT_TIMEOUT` off the module for that reason.  Two copies commit the fixture
+        repo and the store's branch writes under two identities the moment one of
+        them is edited, and the drift shows up as a sha, which nothing reads twice.
+
+        `assertIs`, not `assertEqual`: two dicts that agree today are still two
+        places, and this test exists to refuse the second place.
+
+        Thesis claim (vi): "danh tinh git cua fixture phai LAY TU module, khong duoc
+        chep lai".
+        """
+        from tests import fixtures
+        self.assertIs(fixtures.GIT_ENV, carrier_store_fs.GIT_ENV,
+                      "tests/fixtures.py holds its own copy of the fixed git "
+                      "identity again: editing one of the two moves commit shas in "
+                      "the half nobody looks at")
+
+    def test_an_item_id_already_sealed_by_another_carrier_is_refused_at_the_write(self):
+        """`core.CarrierStore.write`'s collision guard looks inside ONE carrier
+        (`self.items[it.carrier]`), while `_seal_label` writes the label, the digest
+        and the write sequence into dicts keyed on `item_id` ALONE.  Two carriers
+        cannot produce one id TODAY only because `carrier[:3]` differs for the four
+        in `core.CARRIERS` -- a coincidence of four spellings, not a guard -- and
+        `carrier_store_fs`'s own comment claims that adding a fifth carrier "cannot
+        leave this file silently half-updated".
+
+        The fifth carrier is simulated the only way available from outside `core`:
+        an item carrying an id that is already sealed, which is exactly what
+        `Item.__post_init__` produces for a carrier sharing a three-character prefix.
+        Without the refusal the second write OVERWRITES the first item's label,
+        digest and sequence -- the payload's ground truth would then describe a note
+        nobody planted, and the count check would report the WRONG item as the one
+        with no label.
+
+        The sealed side is asserted to be UNTOUCHED afterwards, not merely that
+        something was raised: a guard that raises after writing is no guard.
+
+        Thesis claim (vi): "item_id da niem phong o carrier khac phai bi chan NGAY
+        LUC GHI".
+        """
+        fs = FSCarrierStore(self.root, repo=self.repo)
+        first = fs.write(an_item("memory", t=7))
+        sealed_before = (dict(fs.labels), dict(fs.digests), dict(fs.seqs))
+
+        clash = an_item("queue", t=8)
+        clash.item_id = first.item_id        # what a fifth "mem*" carrier would give
+        self.assertEqual(clash.carrier, "queue",
+                         "the fixture put the clashing item in the same carrier: "
+                         "core.CarrierStore's own guard would refuse it, and this "
+                         "test would pass without the cross-carrier one existing")
+        with self.assertRaises(AssertionError) as caught:
+            fs.write(clash)
+        self.assertIn("already sealed", str(caught.exception),
+                      f"the write was refused, but not as a sealed-id collision: "
+                      f"{str(caught.exception)[:200]}")
+        self.assertEqual((fs.labels, fs.digests, fs.seqs), sealed_before,
+                         "the refused write had already overwritten the first "
+                         "item's sealed record")
+        reopened = FSCarrierStore(self.root, repo=self.repo)
+        self.assertEqual([it.item_id for it in reopened.live("memory")], [first.item_id])
+        self.assertEqual(reopened.live("queue"), [],
+                         "the refused write still reached the carrier file")
+
     def test_a_git_call_that_never_returns_is_killed_and_reported_instead_of_hanging(self):
         """`subprocess.run` with no timeout does not fail on a wedged git, it WAITS.
         A stale `.git/index.lock` -- what a killed container or an interrupted run

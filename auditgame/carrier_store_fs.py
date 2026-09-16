@@ -110,6 +110,13 @@ from core import CARRIERS, Item
 #: Carriers kept as JSONL beside the repo.  `branch` is the complement, and the
 #: complement is computed rather than written out twice, so adding a fifth
 #: carrier to core.CARRIERS cannot leave this file silently half-updated.
+#:
+#: The OTHER half of that promise is `write`'s cross-carrier id guard.  Computing
+#: the complement keeps the FILE LIST complete; it says nothing about ids, and
+#: `item_id` is `carrier[:3]` plus a content hash while the sealed side
+#: (`_seal_label`) is keyed on the id ALONE.  Two carriers sharing a three-character
+#: prefix could therefore produce one id for two items, and `core.CarrierStore`'s
+#: collision guard would not see it -- it looks inside ONE carrier.
 BRANCH = "branch"
 FLAT_CARRIERS = tuple(c for c in CARRIERS if c != BRANCH)
 
@@ -177,9 +184,14 @@ SEALED_MARKER_TEXT = (
 #: Directories the mount walk does not descend into.  The walk runs once per
 #: `docker run` over `WORKSPACE`, which holds a full SWE-bench clone per instance,
 #: and `.git` is most of the file count in each of them.  Nothing here can hold a
-#: sealed area: `sealed_root_for` only ever produces a SIBLING of a carrier root,
-#: and a carrier root inside `.git` would not survive the reset this benchmark is
-#: built on (`git clean -xfd` keeps `.git`, but nothing puts a store there).
+#: sealed area for ONE reason and not two: `sealed_root_for` only ever produces a
+#: SIBLING of a carrier root, and nothing in this benchmark opens a store inside
+#: any of these directories.  "It would not survive the reset" stood here too and
+#: is FALSE for the first of them -- `git clean -xfd` KEEPS `.git`, which is the
+#: whole of decision B-1 and the reason the `branch` carrier lives there, so a
+#: store put in `.git` would survive better than one anywhere else.  A stated
+#: reason wider than the check is the defect family this project keeps finding;
+#: what actually holds is the narrow half.
 WALK_SKIP = frozenset({".git", "__pycache__", ".hg", ".svn", ".tox", ".venv",
                        "node_modules"})
 
@@ -204,6 +216,37 @@ class CarrierTampered(GroundTruthMissing):
     """
 
 
+class _GitFailed(RuntimeError):
+    """`_git` ran a command and git answered with a non-zero status.
+
+    Separate from the TIMEOUT that `_git` also raises, and that separation is the
+    whole point: `_load_branch` turns a failed `cat-file` into `CarrierTampered`,
+    and a wedged `.git/index.lock` must never be re-reported as tampering. A
+    subclass of RuntimeError, so every caller that only ever wanted "git broke"
+    keeps working unchanged.
+    """
+
+
+class GroundTruthExposed(RuntimeError):
+    """A directory arrangement that would put ground truth where it can be read.
+
+    Two sites raise it: `FSCarrierStore._refuse_nesting`, where a carrier root
+    would seal its labels inside a mounted directory, and `harness.docker_argv`,
+    where a mount would carry an answer key into the container.  Both were
+    `AssertionError` -- the class `unittest` raises for every failed assertion, so
+    a refusal that means THE ANSWER KEY IS ON THE ARGV read as a test defect, and
+    it is the class most likely to be swallowed by a broad `except` in the Task 16
+    run loop.  Swallowed, every task scores unsolved: a wrong number rather than a
+    stopped run.  The store's tamper refusals have had a class of their own since
+    Task 19; this is the other half of that.
+
+    NOT a subclass of GroundTruthMissing.  That class names a label the evaluator
+    cannot READ; this one names a label the AGENT can.  The consequences point in
+    opposite directions and a handler written for one must not quietly catch the
+    other.
+    """
+
+
 def sealed_root_for(root) -> pathlib.Path:
     """Where the ground truth for `root` lives.  Outside `root`, by construction."""
     root = pathlib.Path(root)
@@ -214,8 +257,10 @@ def sealed_root_for(root) -> pathlib.Path:
 #: `quarantined.jsonl` are this project's own words; `manifest-*.json` is not, and
 #: it was the whole of the false positive that made the walk refuse an ordinary
 #: `docs/manifest-frontend.json`.  So the two halves are named apart: these two are
-#: evidence on their own, the manifest glob is evidence only inside a directory
-#: already named like a sealed area.
+#: evidence on their own ONLY where the agent cannot write the directory being
+#: asked about (`is_sealed_area(..., names_are_evidence=True)`, which only the
+#: carrier-root mount passes -- it is `ro`), while the manifest glob is evidence
+#: only inside a directory already named like a sealed area, for every caller.
 SEALED_ONLY_NAMES = (LABELS, QUARANTINE)
 
 
@@ -255,9 +300,17 @@ def mkdir_private(path) -> pathlib.Path:
 # The cost is that this file now carries five jobs -- persistence, sealing, tamper
 # detection, a mount predicate and git plumbing -- in ~900 lines.  The clean split
 # is `sealed_names.py` holding the NAMES, imported by both halves; it is not done
-# in this pass because nothing in the round-3 findings made it natural and a move
-# with no behavioural reason is a diff a reviewer cannot check.  Do it the next
-# time either half is opened for its own sake.
+# in this pass because nothing in the round-3 or round-4 findings made it natural
+# and a move with no behavioural reason is a diff a reviewer cannot check.  Do it
+# the next time either half is opened for its own sake.
+#
+# STILL THE RIGHT SEAM after the round-4 fix.  `names_are_evidence` did not move
+# the seam, it named which side of it a fact belongs to: the NAMES are this
+# module's (they would travel to `sealed_names.py`), and "may a bare file name be
+# taken as evidence here" is the CALLER's, because only the caller knows whether
+# the directory it is asking about is one the agent can write.  That fact now
+# travels as an argument instead of being assumed, which is what makes the split
+# above still a pure move of names.
 # --------------------------------------------------------------------------
 
 
@@ -277,37 +330,49 @@ def is_sealed_file(name: str) -> bool:
         name.startswith(MANIFEST_PREFIX) and name.endswith(".json"))
 
 
-def is_sealed_area(path) -> bool:
+def is_sealed_area(path, *, names_are_evidence: bool = False) -> bool:
     """True when `path` IS a sealed area, not when it merely holds a file named
     like one.
 
-    Three ways in, and all three are shapes the SEALING side produces:
+    Two ways in that hold for every caller, and both are shapes the SEALING side
+    produces at a name no repository has a reason to carry:
 
       * it carries `SEALED_MARKER`, which `FSCarrierStore.__init__` writes into
         `self.sealed` -- the primary answer, and the only one for an area that is
         still empty (a store opened but not yet written to);
-      * it holds `ground_truth.jsonl` or `quarantined.jsonl` (SEALED_ONLY_NAMES),
-        at ANY directory name -- these are names no repository carries, so the file
-        alone is the answer;
       * its NAME ends in SEALED_SUFFIX (which is how `sealed_root_for` names every
         one of them) AND it holds a sealed file -- which adds the manifest glob,
         for an area put there by hand without opening a store.
 
-    Only the THIRD is a conjunction, and only because of `manifest-*.json`:
-    `docs/manifest-frontend.json` is an ordinary repository file, and matching it
-    anywhere handed an adversarial agent a way to halt the benchmark with one
-    `open()`.  Requiring the directory name too was the fix -- but applied to all
-    three names it refused STRICTLY LESS than the filename walk it replaced:
-    `ground_truth.jsonl` copied into `<mount>/django/docs/` answered False here
-    while `is_sealed_file` answered True for the same name, and
-    `harness.docker_argv`'s refusal stands for "ground truth is under this mount",
-    which is the wider question.  Keeping the two unambiguous names as a direct
-    file match costs nothing an agent can exploit and restores the claim.
+    `names_are_evidence` adds a THIRD: `ground_truth.jsonl` or `quarantined.jsonl`
+    present at ANY directory name (SEALED_ONLY_NAMES).  OFF by default, because
+    whether a bare file name is evidence depends on WHO CAN WRITE the directory
+    being asked about, and that is the caller's fact, not this function's:
 
-    The residual is unchanged: an agent that deliberately builds
-    `x-sealed/ground_truth.jsonl` to halt the run is doing a DoS it can reach a
-    dozen other ways, not making a real sealed area invisible.  Since Task 14 it
-    cannot even do that through the carrier mount, which is `ro`.
+        those two names used to match for every caller, and `harness.docker_argv`
+        walks the WORKSPACE mount, which is rw because repairing the repo is the
+        task.  One `open("workspace/django/tests/ground_truth.jsonl", "w")`
+        therefore made `docker_argv` raise for that task's mount AND for
+        `mounts(None)`, so every later container run in the benchmark died the same
+        way: the one-`open()` kill switch `manifest-*.json` had already handed over
+        once, with a narrower trigger set and the same consequence.  No `-sealed`
+        directory was needed for it.  And it is worse than a halt if a Task 16 run
+        loop wraps its container runs in a broad `except`: every task then scores
+        unsolved, which is a WRONG NUMBER rather than a stopped run.
+
+    So the caller passes it True only for a directory the agent cannot write -- the
+    carrier root, mounted `ro` since Task 14 -- and there it earns its keep: the
+    labels copied into the carrier root by hand, under any directory name, are
+    still refused, which is the Task 19 regression that match was restored for.
+
+    THE RESIDUAL, as it actually stands.  An agent CAN still halt a run by building
+    `x-sealed/ground_truth.jsonl` (or `x-sealed/manifest-anything.json`) under the
+    WORKSPACE: the `-sealed` name is what makes it a sealed area to the second rule,
+    and that rule has to keep firing, because an area really put under a mount is
+    what the walk exists to catch.  That is a DoS reachable a dozen other ways and
+    it costs a deliberate `-sealed` directory rather than one plausibly-named file.
+    What is NOT true -- and was written here -- is that the carrier mount being `ro`
+    closes it: the route is the WORKSPACE mount, which is rw by design.
     """
     p = pathlib.Path(path)
     if not p.is_dir():
@@ -315,11 +380,15 @@ def is_sealed_area(path) -> bool:
     if (p / SEALED_MARKER).is_file():
         return True
     named_like_one = p.name.endswith(SEALED_SUFFIX)
+    # Nothing left to look for in the common case, which is every ordinary
+    # directory of every SWE-bench clone: the walk skips the iterdir entirely.
+    if not (named_like_one or names_are_evidence):
+        return False
     try:
         for e in p.iterdir():
             if not e.is_file():
                 continue
-            if e.name in SEALED_ONLY_NAMES:
+            if names_are_evidence and e.name in SEALED_ONLY_NAMES:
                 return True
             if named_like_one and is_sealed_file(e.name):
                 return True
@@ -328,8 +397,12 @@ def is_sealed_area(path) -> bool:
     return False
 
 
-def sealed_area_under(path) -> Optional[pathlib.Path]:
+def sealed_area_under(path, *, names_are_evidence: bool = False) -> Optional[pathlib.Path]:
     """The first sealed area at `path` or anywhere beneath it, or None.
+
+    `names_are_evidence` is handed straight to `is_sealed_area` and means what it
+    means there: the caller, not this walk, knows whether the tree being walked is
+    one the agent can write into.  See that docstring for why the default is False.
 
     A WALK, at any depth -- not a check on where a particular store put its sealed
     area.  The sibling rule (`sealed_root_for`) is what keeps the labels out of a
@@ -350,13 +423,13 @@ def sealed_area_under(path) -> Optional[pathlib.Path]:
     if not p.is_dir():
         return None
     # The mount ITSELF: os.walk reports a directory's children, never the top.
-    if is_sealed_area(p):
+    if is_sealed_area(p, names_are_evidence=names_are_evidence):
         return p
     for dirpath, dirnames, _filenames in os.walk(p, followlinks=False):
         dirnames[:] = [d for d in sorted(dirnames) if d not in WALK_SKIP]
         for d in dirnames:
             cand = pathlib.Path(dirpath) / d
-            if is_sealed_area(cand):
+            if is_sealed_area(cand, names_are_evidence=names_are_evidence):
                 return cand
     return None
 
@@ -429,6 +502,31 @@ def line_digest(line: str) -> str:
     return hashlib.blake2b(line.encode("utf-8"), digest_size=16).hexdigest()
 
 
+def _parse_line(text: str, where) -> dict:
+    """`json.loads`, with this module's OWN refusal class on bytes that do not parse.
+
+    Every docstring here promises one family -- `GroundTruthMissing` and its
+    subclass `CarrierTampered` -- and `json.loads` promised something else:
+    `json.JSONDecodeError`, a `ValueError`, reaching a caller written against that
+    family as an unrelated class with a message about a column number.  The case is
+    not hypothetical and the module docstring already names it: a HALF-WRITTEN line
+    left by a killed run, plus the hand-edited store the tamper checks exist for.
+
+    CarrierTampered is the right member of the family rather than a third class.
+    The digest is taken over the exact public line; bytes that no longer parse are
+    not the bytes whose label was sealed, so there is no record here that may be
+    read under that label -- which is what tampering MEANS in this module.
+    """
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as e:
+        raise CarrierTampered(
+            f"a line in {where} is not JSON any more ({e}). A store half-written by "
+            f"a killed run and one edited by hand are the same defect here: these "
+            f"bytes are not the bytes whose label was sealed, so nothing in them "
+            f"can be read back under it.") from e
+
+
 class FSCarrierStore(core.CarrierStore):
     """`core.CarrierStore` with the same six methods, persisted.
 
@@ -478,12 +576,12 @@ class FSCarrierStore(core.CarrierStore):
         here = self.root.resolve()
         for anc in here.parents:
             if (anc / LABELS).exists() or (anc / SEALED_MARKER).exists():
-                raise AssertionError(
+                raise GroundTruthExposed(
                     f"carrier root {here} is inside the SEALED area {anc}: its own "
                     f"labels would sit next to another store's ground truth.")
             if (anc / REPO_POINTER).exists() or any(
                     (anc / f"{c}.jsonl").exists() for c in FLAT_CARRIERS):
-                raise AssertionError(
+                raise GroundTruthExposed(
                     f"carrier root {here} is nested inside the carrier root {anc}: "
                     f"its sealed area {sealed_root_for(here)} would land inside a "
                     f"directory the container is mounted on.")
@@ -542,7 +640,7 @@ class FSCarrierStore(core.CarrierStore):
         if qpath.exists():
             for line in qpath.read_text(encoding="utf-8").splitlines():
                 if line.strip():
-                    self.quarantined.add(json.loads(line)["item_id"])
+                    self.quarantined.add(_parse_line(line, qpath)["item_id"])
 
     def _load_labels(self) -> None:
         """The sealed side, read before any carrier is."""
@@ -551,7 +649,7 @@ class FSCarrierStore(core.CarrierStore):
             return
         for line in path.read_text(encoding="utf-8").splitlines():
             if line.strip():
-                rec = json.loads(line)
+                rec = _parse_line(line, path)
                 for field in (DIGEST_FIELD, SEQ_FIELD):
                     if field not in rec:
                         # A label with no digest binds to an item_id and to nothing
@@ -719,7 +817,7 @@ class FSCarrierStore(core.CarrierStore):
         for line in path.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 self.items[carrier].append(
-                    self._rejoin(json.loads(line), line, carrier))
+                    self._rejoin(_parse_line(line, path), line, carrier))
 
     def _load_branch(self) -> None:
         out = self._git("for-each-ref", "--format=%(refname:short)",
@@ -730,9 +828,29 @@ class FSCarrierStore(core.CarrierStore):
         for ref in sorted(out.split()):
             # `_write_branch` stores `_line(...) + "\n"`, so the blob stripped of
             # that newline is the same string the digest was taken over.
-            line = self._git("cat-file", "-p", f"{ref}:item.json").strip()
+            #
+            # A ref in this namespace carrying no `item.json` is a ref THIS STORE
+            # DID NOT WRITE: `git branch auditgame/999999-anything HEAD`, which is
+            # inside the agent's reach because the branch carrier lives in the
+            # repo's own `.git` (decision B-1) under a mount that is rw. That came
+            # back as a bare RuntimeError naming a git command -- outside the family
+            # every docstring here promises -- for the one carrier a container can
+            # still perturb. It is tampering by this module's definition: a line in
+            # the branch carrier that no sealed label can belong to. A git TIMEOUT
+            # is deliberately NOT caught here (see `_GitFailed`): a wedged repo is a
+            # red gate, not an attack.
+            try:
+                line = self._git("cat-file", "-p", f"{ref}:item.json").strip()
+            except _GitFailed as e:
+                raise CarrierTampered(
+                    f"the ref {ref!r} in {self.repo} sits in the branch carrier's "
+                    f"namespace refs/heads/{BRANCH_NS}/ but carries no `item.json`, "
+                    f"so this store did not write it. A ref added there is counted "
+                    f"as a carrier item by `live()` order and by nothing else -- "
+                    f"there is no sealed label it could be read under.") from e
             self.items[BRANCH].append(
-                self._rejoin(json.loads(line), line, BRANCH))
+                self._rejoin(_parse_line(line, f"{self.repo} ref {ref}"),
+                             line, BRANCH))
 
     # ----------------------------------------------------------------- write
 
@@ -743,6 +861,28 @@ class FSCarrierStore(core.CarrierStore):
                 "this store has no repo attached. Writing it to a JSONL file "
                 "instead would produce a branch carrier that outlives a repo "
                 "reset for a reason that has nothing to do with git.")
+        # ACROSS carriers, which `super().write` cannot see: its guard looks inside
+        # `self.items[it.carrier]`, while `_seal_label` writes into GLOBAL label,
+        # digest and sequence dicts keyed on `item_id`. Two carriers cannot collide
+        # TODAY only because `carrier[:3]` differs for all four of core.CARRIERS --
+        # a coincidence of four spellings, not a guard. A fifth carrier sharing a
+        # three-character prefix would silently overwrite the first item's label,
+        # digest and write sequence, and the count check would then report the
+        # SECOND item as the one with no label. Raised with the same class as the
+        # per-carrier guard, because it is the same defect one carrier wider and a
+        # caller should need one handler for it.
+        #
+        # The same-carrier case is deliberately left to `super().write`, whose
+        # message names it exactly ("two items agree on every field").
+        if it.item_id in self.labels and not any(
+                x.item_id == it.item_id for x in self.items[it.carrier]):
+            raise AssertionError(
+                f"item_id {it.item_id!r} is already sealed under {self.root} by "
+                f"another carrier, and the sealed side is keyed on the id alone: "
+                f"this write would OVERWRITE the first item's label, digest and "
+                f"write sequence. Ids carry `carrier[:3]`, so this can only happen "
+                f"once a carrier sharing a three-character prefix is added to "
+                f"core.CARRIERS -- which is exactly when it must not pass quietly.")
         super().write(it)                      # collision guard, then append
         # SEAL FIRST, publish second.  A crash between the two then leaves a label
         # with no item, which `_refuse_a_record_count_that_moved` reports at the
@@ -891,7 +1031,7 @@ class FSCarrierStore(core.CarrierStore):
                 f"wait forever, and a gate that hangs produces neither a green line "
                 f"nor a red one.") from e
         if r.returncode != 0:
-            raise RuntimeError(
+            raise _GitFailed(
                 f"git {' '.join(args)} in {self.repo} failed ({r.returncode}): "
                 f"{r.stderr.strip()[:400]}")
         return r.stdout

@@ -435,6 +435,137 @@ class GroundTruthIsNotInWhatTheAgentCanRead(unittest.TestCase):
         self.assertIn("order it was written", str(caught.exception),
                       "the store refused, but for a reason other than the order")
 
+    def test_a_ref_added_in_the_branch_namespace_is_refused_as_tampering_not_as_a_git_error(self):
+        """`branch` is the ONE carrier a container can still perturb: it lives in the
+        repo's own `.git` (decision B-1) under a mount that is rw because repairing
+        the repo IS the task.  `git branch auditgame/999999-anything HEAD` puts a ref
+        in the carrier's namespace carrying no `item.json`, and `_load_branch` then
+        failed inside `_git` -- a bare `RuntimeError` reading "git cat-file ...
+        failed", outside the family (`GroundTruthMissing`, `CarrierTampered`) every
+        docstring in this module promises.  A caller written against that family got
+        an unrelated class and git's own error text for the one carrier an attack can
+        reach, and the three other carriers' perturbations all answer correctly.
+
+        The MESSAGE is asserted as well as the class: "git failed" is a refusal for
+        the wrong reason, and this project's recurring defect is a check that is
+        green, or red, for a reason other than the one its name claims.
+
+        Thesis claim (vi): "them mot ref la vao namespace cua carrier branch phai bi
+        TU CHOI nhu gia mao, khong phai bao loi git".
+        """
+        store = self.a_store("branch-added")
+        store.write(an_item("branch", poisoned=True, t=0, topic="t0"))
+        git(store.repo, "branch",
+            f"{carrier_store_fs.BRANCH_NS}/999999-anything", "HEAD")
+        with self.assertRaises(carrier_store_fs.CarrierTampered) as caught:
+            FSCarrierStore(store.root, repo=store.repo)
+        self.assertIn("carries no `item.json`", str(caught.exception),
+                      f"the store refused, but not for the reason this test names: "
+                      f"{str(caught.exception)[:200]}")
+
+    def test_a_branch_carrier_ref_deleted_is_refused_instead_of_leaving_the_count_short(self):
+        """The `branch` half of the deletion check.  Deleting a line from
+        `memory.jsonl` is covered next door; `git branch -D` is the same move on the
+        one carrier that is still reachable, and it was covered nowhere -- the only
+        branch perturbation in this file was a RENAME.
+
+        Thesis claim (vi): "xoa mot ref cua carrier branch phai bi TU CHOI, khong
+        duoc lam hut so dem trong im lang".
+        """
+        store = self.a_store("branch-deleted")
+        store.write(an_item("branch", poisoned=True, t=0, topic="t0"))
+        store.write(an_item("branch", poisoned=False, t=1, topic="t1"))
+        refs = sorted(git(store.repo, "for-each-ref", "--format=%(refname:short)",
+                          f"refs/heads/{carrier_store_fs.BRANCH_NS}").split())
+        self.assertEqual(len(refs), 2, f"the fixture did not write two refs: {refs}")
+
+        git(store.repo, "branch", "-D", refs[0])
+        with self.assertRaises(carrier_store_fs.CarrierTampered) as caught:
+            FSCarrierStore(store.root, repo=store.repo)
+        self.assertIn("label(s) with no record", str(caught.exception),
+                      f"the store refused, but not as a missing record: "
+                      f"{str(caught.exception)[:200]}")
+
+    def test_a_branch_carrier_ref_copied_under_a_second_name_is_refused_instead_of_counting_twice(self):
+        """The `branch` half of the duplication check, and the move that leaves every
+        byte intact: a second ref at the same commit reads back as a second item with
+        the same `item_id`, so `Q_true`/`Q_false` count the payload twice while every
+        digest still matches.
+
+        The copy is asserted to be a COPY first -- both refs name the same commit --
+        so this cannot pass through the digest check instead.
+
+        Thesis claim (vi): "nhan doi mot ref cua carrier branch phai bi TU CHOI thay
+        vi dem payload hai lan".
+        """
+        store = self.a_store("branch-copied")
+        first = store.write(an_item("branch", poisoned=True, t=0, topic="t0"))
+        refs = sorted(git(store.repo, "for-each-ref", "--format=%(refname:short)",
+                          f"refs/heads/{carrier_store_fs.BRANCH_NS}").split())
+        self.assertEqual(len(refs), 1, f"the fixture did not write one ref: {refs}")
+        copy = f"{carrier_store_fs.BRANCH_NS}/000099-{first.item_id}"
+        git(store.repo, "branch", copy, refs[0])
+        self.assertEqual(git(store.repo, "rev-parse", copy).strip(),
+                         git(store.repo, "rev-parse", refs[0]).strip(),
+                         "the fixture did not COPY the ref, it built another commit: "
+                         "the digest check would refuse this instead")
+
+        with self.assertRaises(carrier_store_fs.CarrierTampered) as caught:
+            FSCarrierStore(store.root, repo=store.repo)
+        self.assertIn("beyond their label", str(caught.exception),
+                      f"the store refused, but not as a duplicated record: "
+                      f"{str(caught.exception)[:200]}")
+
+    def test_a_half_written_line_is_refused_as_tampering_rather_than_as_a_json_error(self):
+        """The case the module docstring names -- "a half-written store left by a
+        killed run" -- reaching a caller as the wrong CLASS.
+
+        `json.loads` raises `json.JSONDecodeError`, a `ValueError`, and every
+        docstring here promises `GroundTruthMissing` or `CarrierTampered`.  So the
+        one failure this module says it exists to catch arrived with a message about
+        a column number, in a family nothing documents, and a call site written to
+        stop on tampering did not stop.
+
+        ALL THREE READERS are perturbed, because they are three functions: the public
+        carrier file (`_load_flat`), the sealed labels (`_load_labels`) and the
+        quarantine record -- two of the three being right is how this drifts back.
+
+        Thesis claim (vi): "dong ghi do dang phai bi tu choi nhu gia mao, khong phai
+        nem loi JSON".
+        """
+        store = self.a_store("half-written")
+        it = store.write(an_item("memory", poisoned=True, t=0))
+        store.quarantine(it.item_id)
+        public = store.root / "memory.jsonl"
+        labels = store.sealed / carrier_store_fs.LABELS
+        quarantine = store.sealed / carrier_store_fs.QUARANTINE
+        whole = {p: p.read_text(encoding="utf-8")
+                 for p in (public, labels, quarantine)}
+        # The fixture is a KILLED WRITE, asserted to be one: the line is cut in half,
+        # not replaced, so there is no well-formed record here to read under a label.
+        for p in (public, labels, quarantine):
+            self.assertGreater(len(whole[p]), 4, f"{p.name} was empty to begin with")
+
+        for p in (public, labels, quarantine):
+            try:
+                p.write_text(whole[p][: len(whole[p]) // 2], encoding="utf-8")
+                with self.assertRaises(carrier_store_fs.CarrierTampered) as caught:
+                    FSCarrierStore(store.root, repo=store.repo)
+                self.assertIn("not JSON any more", str(caught.exception),
+                              f"a half-written {p.name} was refused, but not as "
+                              f"unreadable bytes: {str(caught.exception)[:200]}")
+                self.assertNotIsInstance(
+                    caught.exception, ValueError,
+                    f"a half-written {p.name} still reaches the caller as a "
+                    f"ValueError -- the class json.loads raises, which no docstring "
+                    f"in this module promises")
+            finally:
+                p.write_text(whole[p], encoding="utf-8")
+        # and the store is readable again once the bytes are whole
+        self.assertEqual(len(FSCarrierStore(store.root, repo=store.repo).items["memory"]), 1,
+                         "the fixture did not put the store back: the refusals above "
+                         "may have been about something else")
+
     def test_the_order_check_does_not_stand_in_for_the_digest_count_and_carrier_checks(self):
         """FOUR checks, four messages.  A per-carrier chained digest would have
         refused all four of these moves, and every existing test would have stayed
@@ -578,9 +709,12 @@ class GroundTruthIsNotInWhatTheAgentCanRead(unittest.TestCase):
         """
         outer = self.a_store("nested")
         outer.write(an_item("memory", poisoned=False))
-        with self.assertRaises(AssertionError):
+        # GroundTruthExposed, not AssertionError: this refusal means the labels would
+        # land where the agent can read them, and the class `unittest` raises for
+        # every failed assertion is the class a broad `except` swallows first.
+        with self.assertRaises(carrier_store_fs.GroundTruthExposed):
             FSCarrierStore(outer.root / "inner")
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(carrier_store_fs.GroundTruthExposed):
             FSCarrierStore(outer.sealed / "inner")
 
     def test_a_detached_copy_keeps_the_ground_truth_for_scoring(self):
