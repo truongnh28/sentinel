@@ -251,10 +251,30 @@ class MatchedAttack:
 
 REGISTRY: dict = {p.name: p for p in (MatchedAttack(),)}
 
+#: Machine-readable reasons a pipeline is PENDING.  The prose reason beside each
+#: entry is for a human; these are what `usable_with` may reason over.  A dataset
+#: lifts a blocker or it does not -- it must never lift one it knows nothing
+#: about.
+BLOCKER_RETRIEVAL_KIND = "retrieval_kind"   #: needs topic_kind="graded"
+BLOCKER_GATE2_AUC = "gate2_auc"             #: separable on F_match at every epsilon
+
+#: Which blockers a dataset of a given topic_kind LIFTS.  A graded dataset gives
+#: epsilon a surface to act on; it says nothing whatever about whether a payload
+#: is separable on F_match, which is a property of the payload, not of retrieval.
+_LIFTED_BY_TOPIC_KIND = {
+    "exact": frozenset(),
+    "graded": frozenset({BLOCKER_RETRIEVAL_KIND}),
+}
+
 #: Pipelines that CANNOT run against the current dataset.  Record the REASON, do
 #: not drop them silently -- this is rule N3 lifted to the pipeline level: "could
 #: not be built" is nothing like "the defense succeeded", and conflating the two is
 #: how RQ1 gets pumped full of fake zeros.
+#:
+#: Each value is (pipeline, human reason, BLOCKERS).  The third element exists
+#: because `usable_with` used to `update` the WHOLE of this dict as soon as a
+#: dataset declared "graded", which un-gated `legacy` and `verbosity` too -- and
+#: those are pending for gate-2 AUC failures that no retrieval kind can fix.
 PENDING: dict = {
     "legacy": (LegacyAttack(),
                "fails the gate-2 bar: no epsilon reaches AUC_upper <= 0.56 on F_match "
@@ -262,23 +282,54 @@ PENDING: dict = {
                "22-39, zero overlap, so a `size > 50` filter catches every one. It also "
                "declares epsilon_effective=False, so it has no near end to its budget "
                "by construction. Kept for reference -- build.inject still reproduces it "
-               "byte for byte, which is what every recorded number was measured on."),
+               "byte for byte, which is what every recorded number was measured on.",
+               frozenset({BLOCKER_GATE2_AUC})),
     "verbosity": (VerbosityAttack(),
                   "fails the gate-2 bar for the opposite reason: epsilon IS effective "
                   "but runs only one way. At eps=0.1 the payload is already 124 "
                   "characters, three times the largest clean item, and it grows to 211 "
-                  "at eps=1.0. A budget that can only spend is not a budget."),
+                  "at eps=1.0. A budget that can only spend is not a budget.",
+                  frozenset({BLOCKER_GATE2_AUC})),
     "graded": (GradedAttack(),
                "needs a topic_kind='graded' dataset (topic as a token set). The "
                "current dataset matches topic strings exactly, so sim takes only "
                "{0,1} and epsilon has no surface to act on. Blocked on advisor "
-               "question 3."),
+               "question 3.",
+               frozenset({BLOCKER_RETRIEVAL_KIND})),
 }
 
 
+def _scope_admits(pipeline, topic_kind: str) -> bool:
+    """A pipeline that needs graded retrieval is MEANINGLESS on an exact dataset --
+    epsilon has no surface to act on -- so the dataset must refuse it rather than
+    print a number (datasets.py's module docstring)."""
+    return not (pipeline.scope().requires_graded_retrieval and topic_kind != "graded")
+
+
 def usable_with(topic_kind: str) -> dict:
-    """Which pipelines a dataset admits -- the INTERSECTION of scopes, not the union."""
-    ok = dict(REGISTRY)
-    if topic_kind == "graded":
-        ok.update({n: p for n, (p, _) in PENDING.items()})
+    """Which pipelines a dataset admits -- the INTERSECTION of scopes, not the union.
+
+    The old version did `ok.update(PENDING)` whenever topic_kind == "graded",
+    which un-gated EVERY pending pipeline, including `legacy` and `verbosity`:
+    those are pending because no epsilon reaches AUC_upper <= 0.56 on F_match, a
+    property of the PAYLOAD that a token-set topic cannot change. Declaring a
+    dataset graded would therefore have re-admitted two attacks gate 2 had
+    already ruled out -- a scope wider than the claim that justified it.
+
+    A pending pipeline is admitted only when EVERY blocker recorded against it is
+    one this topic_kind lifts, and only if its own declared scope admits the
+    dataset as well. REGISTRY is filtered on that same scope check, so a pipeline
+    requiring graded retrieval cannot run on an exact dataset just by living in
+    the registry.
+    """
+    lifted = _LIFTED_BY_TOPIC_KIND.get(topic_kind)
+    if lifted is None:
+        raise ValueError(
+            f"unknown topic_kind {topic_kind!r}: expected one of "
+            f"{sorted(_LIFTED_BY_TOPIC_KIND)}. Guessing here would silently "
+            f"admit or refuse a whole attacker class.")
+    ok = {n: p for n, p in REGISTRY.items() if _scope_admits(p, topic_kind)}
+    for n, (p, _reason, blockers) in PENDING.items():
+        if blockers <= lifted and _scope_admits(p, topic_kind):
+            ok[n] = p
     return ok

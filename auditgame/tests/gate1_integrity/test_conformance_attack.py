@@ -212,5 +212,81 @@ class AttackPipelineConformance(unittest.TestCase):
                                  f"[{name}] injection changes the SCORE of clean items: {sorted(drift)[:3]}")
 
 
+class WhichAttacksADatasetAdmits(unittest.TestCase):
+    """`attacks.usable_with` is the gate between the dataset port and the attack
+    port, and it had NO caller and NO test -- so its scope was never checked
+    against the claim it makes.
+    """
+
+    def test_a_graded_dataset_unblocks_only_what_was_blocked_on_retrieval_kind(self):
+        """The old version did `ok.update(PENDING)` the moment a dataset declared
+        "graded", which re-admitted EVERY pending pipeline. `legacy` and
+        `verbosity` are pending because no epsilon reaches AUC_upper <= 0.56 on
+        F_match -- a property of the PAYLOAD, which no retrieval kind can change.
+        Declaring a dataset graded would have put two attacks gate 2 already ruled
+        out back into the attacker class, and worst_case takes a MAX over that
+        class, so the harm table would have risen for a reason with no evidence
+        behind it.
+
+        Thesis claim (vi): "cong nao khong khai pham vi thi khong phai cong".
+        """
+        graded = attacks.usable_with("graded")
+        for name, (_p, _reason, blockers) in attacks.PENDING.items():
+            with self.subTest(pending=name, blockers=sorted(blockers)):
+                if blockers <= {attacks.BLOCKER_RETRIEVAL_KIND}:
+                    self.assertIn(name, graded,
+                                  f"[{name}] is blocked only on retrieval kind, so "
+                                  f"a graded dataset must admit it")
+                else:
+                    self.assertNotIn(
+                        name, graded,
+                        f"[{name}] is pending on {sorted(blockers)}, which a "
+                        f"graded dataset does NOT lift, yet usable_with('graded') "
+                        f"admitted it")
+
+    def test_an_exact_dataset_admits_no_attack_that_needs_graded_retrieval(self):
+        """An attack declaring requires_graded_retrieval=True on an exact dataset
+        is the MEANINGLESS combination datasets.py's docstring says must be
+        refused with a reason rather than scored: its payload topic is a strict
+        subset of sigma's, which `==` retrieval never returns, so every epsilon<1
+        cell would report harm 0 for a reason that has nothing to do with the
+        defense.
+
+        Thesis claim (vi): "o ngoai pham vi thi ghi LY DO, khong ghi harm=0".
+        """
+        exact = attacks.usable_with("exact")
+        for name, p in {**attacks.REGISTRY,
+                        **{n: q for n, (q, _r, _b) in attacks.PENDING.items()}}.items():
+            with self.subTest(attack=name):
+                if p.scope().requires_graded_retrieval:
+                    self.assertNotIn(name, exact,
+                                     f"[{name}] needs graded retrieval but an "
+                                     f"exact dataset admitted it")
+        self.assertTrue(exact, "an exact dataset admits no attack at all")
+
+    def test_every_registered_attack_is_admitted_by_the_kind_it_declares_for(self):
+        """usable_with filters REGISTRY on the same scope check it applies to
+        PENDING -- a pipeline does not become admissible merely by being
+        registered.
+
+        Thesis claim (vi): "pham vi phai may kiem duoc, khong phai loi hua".
+        """
+        for kind in ("exact", "graded"):
+            ok = attacks.usable_with(kind)
+            for name, p in attacks.REGISTRY.items():
+                with self.subTest(topic_kind=kind, attack=name):
+                    needs = p.scope().requires_graded_retrieval
+                    self.assertEqual(name in ok, (kind == "graded") or not needs)
+
+    def test_an_unknown_topic_kind_is_refused_rather_than_guessed(self):
+        """Falling through to "not graded" would silently refuse a whole attacker
+        class for a dataset whose declaration was merely misspelt.
+
+        Thesis claim (vi): "khong doan; khong biet thi bao loi".
+        """
+        with self.assertRaises(ValueError):
+            attacks.usable_with("jaccard")
+
+
 if __name__ == "__main__":
     unittest.main()

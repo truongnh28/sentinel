@@ -49,9 +49,11 @@ MAX_INSTANCE_REUSE = 2
 
 class Topic(frozenset):
     """`topics.topic_of_instance` returns a plain `frozenset` of path tokens, and
-    tests/gate1_integrity/test_conformance_ports.py's D2 requires exactly that
-    type once a dataset declares `topic_kind="graded"` -- so Task.topic here MUST
-    stay a real frozenset, not a string.
+    Task.topic here MUST stay a real frozenset, not a string: it is what
+    retrieval.sim / retrieval.payload_topic are written against, and it is the
+    only form from which a graded retrieval can ever be built (scope() explains
+    why the DECLARATION is still "exact" until that retrieval is actually wired
+    in -- a token-set type is not graded retrieval).
 
     But frozenset's own str()/repr() walks its internal hash table, whose layout
     depends on Python's per-process string-hash randomisation (PYTHONHASHSEED).
@@ -107,9 +109,31 @@ class SWEBenchDataset:
                 "non_reused_workflows": len(self._segments(H))}
 
     def scope(self) -> "DatasetScope":
+        # topic_kind="exact", NOT "graded", even though Task.topic here is a token
+        # set. datasets.py defines the two values by the RETRIEVAL they imply:
+        # "graded" means Jaccard retrieval and a continuous sim; "exact" means sim
+        # in {0,1}. The retrieval the runner actually performs is
+        # core.CarrierStore.retrieve, which is `it.topic == topic` -- set equality,
+        # so sim is two-valued and epsilon has no surface to act on.
+        # retrieval.py's Jaccard functions exist but its own module note says they
+        # are "not yet wired into core.CarrierStore. Blocked on advisor question
+        # 3." A token-set TYPE is not graded RETRIEVAL.
+        #
+        # Declaring "graded" while retrieval is equality was not cosmetic. It made
+        # attacks.usable_with admit GradedAttack, whose payload topic is a strict
+        # SUBSET of sigma's; under `==` that item can never be retrieved, so every
+        # epsilon < 1 would have reported harm == 0 -- a fake zero in the exact
+        # cell this framework exists to refuse.
+        #
+        # TO CHANGE THIS BACK, both must hold:
+        #   1. CarrierStore.retrieve goes through retrieval.retrieved(item.topic,
+        #      task.topic, theta) rather than ==, and
+        #   2. theta is FIXED FROM THE MEASURED |topic| distribution (see
+        #      spikes/phan_bo_topic.md), not guessed.
+        # Flipping the string alone re-arms the fake zero.
         from datasets import DatasetScope
         return DatasetScope(repos=frozenset(self._by_repo()),
-                            topic_kind="graded", has_hidden_tests=False,
+                            topic_kind="exact", has_hidden_tests=False,
                             is_mock=False)
 
     def workflows(self, n: int, H: int, seed: int) -> Iterator[Workflow]:

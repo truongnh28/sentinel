@@ -22,7 +22,8 @@ import unittest
 import agents
 import datasets
 import policies as P
-from core import CarrierStore, seed_of
+import retrieval
+from core import CarrierStore, Item, seed_of
 from tests.fixtures import identifiers
 
 
@@ -50,9 +51,50 @@ class DatasetConformance(unittest.TestCase):
                      for w in ds.workflows(4, 6, seed=11)]
                 self.assertEqual(a, b, f"[{name}] workflows differ between two builds at the same seed")
 
+    @staticmethod
+    def _retrieval_probe(query_topic):
+        """Ask the retrieval the RUNNER actually uses what it does with a topic
+        that PARTIALLY overlaps the query.
+
+        Returns (sim_high, sim_low, retrieved_names) for three planted items:
+        `equal` (the same topic), `high` and `low` (strict subsets, so their
+        Jaccard similarity to the query is |A|/|query|, strictly between 0 and 1
+        and different from each other).
+
+        Only usable when the topic is a token set; a string topic has no partial
+        overlap to construct, which is itself the point -- see the caller.
+        """
+        tokens = sorted(query_topic)
+        hi, lo = frozenset(tokens[:2]), frozenset(tokens[:1])
+        store = CarrierStore()
+        planted = {}
+        for label, topic in (("equal", frozenset(query_topic)),
+                             ("high", hi), ("low", lo)):
+            it = Item(carrier="memory", topic=topic, content=f"probe item {label}",
+                      created_at=0, provenance="agent/notes", poisoned=False)
+            planted[store.write(it).item_id] = label
+        got = {planted[i.item_id] for i in store.retrieve(query_topic)}
+        return retrieval.sim(hi, query_topic), retrieval.sim(lo, query_topic), got
+
     def test_D2_topic_kind_is_declared_truthfully(self):
         """`topic_kind` decides which AttackPipeline may be used -- declare it
         wrongly and the framework will happily run a meaningless combination.
+
+        The old version asserted `isinstance(topic, frozenset)` for "graded" and
+        `isinstance(topic, str)` for "exact" -- the TYPE of the topic, not the
+        BEHAVIOUR of retrieval.  datasets.py defines the two values by behaviour:
+        graded is "Jaccard retrieval -> sim continuous", exact is "sim in {0,1}".
+        A dataset can hand out token sets while core.CarrierStore.retrieve still
+        compares them with `==`, and then the declaration is false even though
+        every type check passes.  That is what swebench did: it declared "graded",
+        which un-gated GradedAttack, whose payload topic is a strict SUBSET of
+        sigma's and therefore can NEVER be retrieved under `==` -- every eps < 1
+        would have reported harm == 0.
+
+        So probe the behaviour: plant items whose similarity to the query topic is
+        strictly between 0 and 1 and see whether retrieval separates them.
+        A dataset declaring "graded" must retrieve the closer one; a dataset
+        declaring "exact" must retrieve neither, and only the equal one.
 
         Thesis claim (vi): "cong nao khong khai pham vi thi khong phai cong".
         """
@@ -60,13 +102,59 @@ class DatasetConformance(unittest.TestCase):
             kind = ds.scope().topic_kind
             with self.subTest(dataset=name, topic_kind=kind):
                 self.assertIn(kind, ("exact", "graded"))
-                topic = next(iter(ds.workflows(1, 4, seed=3))).tasks[0].topic
-                if kind == "exact":
-                    self.assertIsInstance(topic, str,
-                                          f"[{name}] declares exact but topic is not a string")
+                tasks = [t for w in ds.workflows(3, 4, seed=3) for t in w.tasks]
+                topic = tasks[0].topic
+                if isinstance(topic, str):
+                    # No partial overlap exists, so retrieval CANNOT be graded.
+                    self.assertEqual(
+                        kind, "exact",
+                        f"[{name}] declares {kind!r} but its topic is a plain "
+                        f"string: sim can only be 0 or 1, so epsilon has no "
+                        f"surface to act on")
+                    continue
+                self.assertIsInstance(
+                    topic, frozenset,
+                    f"[{name}] topic is neither a string nor a token set")
+                # A partial overlap needs >= 3 tokens to build two DISTINCT
+                # strictly-between similarities.  Never skip here: a skip is a
+                # claim with no evidence, and this is the claim that decides
+                # which attacker class may run.
+                probe = next((t.topic for t in tasks if len(t.topic) >= 3), None)
+                self.assertIsNotNone(
+                    probe,
+                    f"[{name}] no task in 3 workflows has a topic with >= 3 "
+                    f"tokens, so the partial-overlap probe cannot be built and "
+                    f"topic_kind cannot be checked BEHAVIOURALLY at all")
+                s_hi, s_lo, got = self._retrieval_probe(probe)
+                # the fixture itself must be a partial overlap, or it proves nothing
+                self.assertTrue(0.0 < s_lo < s_hi < 1.0,
+                                f"probe is not a partial overlap: {s_lo} {s_hi}")
+                self.assertIn("equal", got,
+                              f"[{name}] retrieval missed an item with an "
+                              f"IDENTICAL topic -- this is broken for any kind")
+                if kind == "graded":
+                    self.assertIn(
+                        "high", got,
+                        f"[{name}] declares topic_kind='graded' (Jaccard "
+                        f"retrieval, sim continuous) but the retrieval the runner "
+                        f"uses -- core.CarrierStore.retrieve -- did not return an "
+                        f"item at sim={s_hi}. sim is still {{0,1}}, so epsilon has "
+                        f"no surface and any epsilon<1 attack reports a FAKE "
+                        f"harm=0. Declare 'exact' until retrieval.retrieved() is "
+                        f"wired in with a theta fixed from data.")
+                    self.assertNotIn(
+                        "low", got,
+                        f"[{name}] declares 'graded' but retrieval does not "
+                        f"SEPARATE sim={s_hi} from sim={s_lo}: a threshold that "
+                        f"admits everything is not a graded retrieval either")
                 else:
-                    self.assertIsInstance(topic, frozenset,
-                                          f"[{name}] declares graded but topic is not a token set")
+                    self.assertEqual(
+                        got, {"equal"},
+                        f"[{name}] declares topic_kind='exact' (sim in {{0,1}}) "
+                        f"but retrieval returned partially-matching items "
+                        f"{sorted(got - {'equal'})} at sim {s_hi} / {s_lo}. The "
+                        f"declaration is now understating the retrieval, which "
+                        f"REFUSES attacks that would in fact work.")
 
     def test_D3_workflow_count_matches_the_request(self):
         """Thesis claim (vi): "so workflow dung nhu yeu cau"."""
