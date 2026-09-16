@@ -80,7 +80,16 @@ def _corpora():
                                        random.Random(seed_of("replay-sweep", i)))
                    for i in range(2)]
     if SWEBENCH_FILE.exists():
-        yield "swebench", list(datasets.REGISTRY["swebench"].workflows(2, 8, seed=7))
+        # Built directly with step 4 DISABLED rather than via datasets.REGISTRY.
+        # What this sweep needs from the real path is the TYPE of Task.topic --
+        # a frozenset subclass that has to survive the item-record rebuild, the
+        # topic_counts dict key and the JSON round trip. Whether the workflow
+        # could host the sweep is a different question (SPEC-P1a Part 4 step 4),
+        # it is pinned in test_real_data, and today its answer is "none of them"
+        # -- which would leave this arm silently mock-only.
+        import swebench_dataset
+        yield "swebench", list(
+            swebench_dataset.SWEBenchDataset(sweep_deltas=()).workflows(2, 8, seed=7))
 
 
 def _agent_view(tr):

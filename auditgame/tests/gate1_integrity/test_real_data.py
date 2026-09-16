@@ -223,10 +223,24 @@ class WorkflowGrouping(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        import pathlib
         f = pathlib.Path(__file__).resolve().parents[2] / "data" / "swebench_verified.jsonl"
         if not f.exists():
             raise unittest.SkipTest("no data/ yet -- run swebench_fetch.py")
+
+    @staticmethod
+    def _shape_only():
+        """A dataset with step 4 DISABLED.
+
+        The tests that use it ask about the SHAPE of a workflow -- which repo its
+        tasks come from, how its topic stringifies -- and those hold for every
+        grouped workflow, feasible or not. Step 4 is about whether an ATTACK can
+        be built on one, a different question, pinned by
+        test_step4_drops_every_workflow_on_the_verified_pool below. Running these
+        through the filtered corpus would make them skip (it is empty), and a skip
+        is a claim with no evidence.
+        """
+        import swebench_dataset
+        return swebench_dataset.SWEBenchDataset(sweep_deltas=())
 
     def test_a_workflow_only_groups_instances_from_ONE_repo(self):
         """Chaining instances across repos makes the workflow's "history" fake, and
@@ -234,8 +248,7 @@ class WorkflowGrouping(unittest.TestCase):
 
         Thesis claim (vi): "carrier tich luy chi co nghia khi cung codebase".
         """
-        import swebench_dataset
-        for wf in swebench_dataset.SWEBenchDataset().workflows(5, 8, seed=1):
+        for wf in self._shape_only().workflows(5, 8, seed=1):
             repos = {t.repo for t in wf.tasks}
             self.assertEqual(len(repos), 1, f"{wf.wf_id} mixes repos: {repos}")
 
@@ -255,6 +268,10 @@ class WorkflowGrouping(unittest.TestCase):
         """
         import swebench_dataset
         st = swebench_dataset.SWEBenchDataset().stats(H=8)
+        # `non_reused_workflows` counts the STEP-3 grouping, before step 4.
+        # Question 4 asks how much instance REUSE is needed to reach N=100, which
+        # is a property of the grouping; how many of those can host the sweep is a
+        # different number, pinned separately below.
 
         self.assertEqual(
             st["instances"], 500,
@@ -289,6 +306,64 @@ class WorkflowGrouping(unittest.TestCase):
             "while non_reused_workflows == 58, the formula itself changed "
             "-- stop and find the cause, do not update this number.")
 
+    def test_step4_drops_every_workflow_on_the_verified_pool(self):
+        """SPEC-P1a Part 4 step 4 -- "LOAI workflow khong co cap (i, i+Delta)
+        cung topic vuot theta cho Delta can quet", which the spec itself calls
+        "N3 o muc dataset" -- was never implemented, and the premise it protects
+        is NOT satisfied by the real corpus.
+
+        build.plan_poison never requires iota and sigma to be related; it only
+        forbids sigma's topic in [iota, sigma). build.inject then stamps the
+        payload with sigma's OWN topic, so it is retrieved at sigma whether or
+        not any two real tasks in the workflow have anything to do with each
+        other. Measured: 7 of 560 intra-workflow task pairs share a topic
+        (1.25%), and the agent retrieves prior state on 3.8% of clean tasks
+        against 37.5-45% on the mock. So "two related tasks" was an artifact of
+        the injection, which is exactly the causal reading the created_at sort
+        exists to earn.
+
+        These numbers are a RESULT, not a detail: at H=8 on SWE-bench Verified,
+        ALL 58 grouped workflows fail step 4, and per Delta only 8 / 6 / 2 can
+        host Delta = 1 / 2 / 4 at all. If this test moves, the corpus or the
+        tokenization changed -- STOP and find out which. Do NOT lower theta to
+        make it pass: theta is 1.0 because core.CarrierStore.retrieve compares
+        topics with `==`, and a workflow admitted at a lower theta still cannot
+        host the attack under `==`.
+
+        Thesis claim (vi): "workflow khong dung duoc attack phai RA KHOI mau so".
+        """
+        import swebench_dataset
+        rep = swebench_dataset.SWEBenchDataset().grouping_report(H=8)
+        self.assertEqual(rep["grouped"], 58)
+        self.assertEqual(
+            rep["feasible"], 0,
+            "a workflow now survives step 4 on the Verified pool. Either the "
+            "data changed, tokenization drifted, or theta was weakened. Find "
+            "out which before reporting any swebench number.")
+        self.assertEqual(rep["dropped"], 58)
+        self.assertEqual(rep["per_delta"], {0: 58, 1: 8, 2: 6, 4: 2},
+                         "the per-Delta hosting counts moved")
+
+    def test_a_corpus_that_cannot_host_the_sweep_is_refused_with_a_reason(self):
+        """N3 at dataset level: "could not be built" must never arrive as harm 0.
+        With every workflow dropped by step 4, `workflows()` raises and names the
+        numbers, and datasets.py records swebench in PENDING WITH ITS REASON
+        rather than in REGISTRY -- so experiment.py prints a refusal instead of a
+        grid.
+
+        Thesis claim (vi): "o ngoai pham vi thi ghi LY DO, khong ghi harm=0".
+        """
+        import datasets, swebench_dataset
+        with self.assertRaises(ValueError) as ctx:
+            list(swebench_dataset.SWEBenchDataset().workflows(1, 8, seed=1))
+        msg = str(ctx.exception)
+        self.assertIn("step 4", msg)
+        self.assertIn("58", msg, "the refusal must name how many were dropped")
+        self.assertNotIn("swebench", datasets.REGISTRY,
+                         "an unusable dataset is still registered as usable")
+        self.assertIn("swebench", datasets.PENDING)
+        self.assertIn("step 4", datasets.PENDING["swebench"][1])
+
     def test_workflows_refuses_to_reuse_an_instance_beyond_the_cap(self):
         """bootstrap_paired resamples BY WORKFLOW and assumes independence across
         resamples. Two workflows that share an instance have CORRELATED clean-run
@@ -319,6 +394,11 @@ class WorkflowGrouping(unittest.TestCase):
         ds = swebench_dataset.SWEBenchDataset.__new__(swebench_dataset.SWEBenchDataset)
         ds.pool = "in-memory-stub"
         ds._rows = rows
+        ds._topic_cache = {}
+        # step 4 off: this test is about the REUSE CAP, and a fixture built to
+        # exercise the cap would otherwise be emptied by the filter first.
+        ds.sweep_deltas = ()
+        ds.theta = swebench_dataset.THETA
 
         # H=1 -> each row is its own non-overlapping segment: 2 segments per
         # repo, 4 segments total. cap = MAX_INSTANCE_REUSE * 4 = 8.
@@ -350,8 +430,7 @@ class WorkflowGrouping(unittest.TestCase):
 
         Thesis claim (vi): "topic frozenset khong duoc roi thang vao chuoi hay seed".
         """
-        import swebench_dataset
-        wf = next(iter(swebench_dataset.SWEBenchDataset().workflows(1, 8, seed=1)))
+        wf = next(iter(self._shape_only().workflows(1, 8, seed=1)))
         topic = wf.tasks[0].topic
         self.assertIsInstance(topic, frozenset)
         self.assertEqual(str(topic), "|".join(sorted(topic)))

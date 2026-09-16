@@ -99,63 +99,101 @@ class DatasetConformance(unittest.TestCase):
         Thesis claim (vi): "cong nao khong khai pham vi thi khong phai cong".
         """
         for name, ds in self._each():
-            kind = ds.scope().topic_kind
-            with self.subTest(dataset=name, topic_kind=kind):
-                self.assertIn(kind, ("exact", "graded"))
-                tasks = [t for w in ds.workflows(3, 4, seed=3) for t in w.tasks]
-                topic = tasks[0].topic
-                if isinstance(topic, str):
-                    # No partial overlap exists, so retrieval CANNOT be graded.
-                    self.assertEqual(
-                        kind, "exact",
-                        f"[{name}] declares {kind!r} but its topic is a plain "
-                        f"string: sim can only be 0 or 1, so epsilon has no "
-                        f"surface to act on")
-                    continue
-                self.assertIsInstance(
-                    topic, frozenset,
-                    f"[{name}] topic is neither a string nor a token set")
-                # A partial overlap needs >= 3 tokens to build two DISTINCT
-                # strictly-between similarities.  Never skip here: a skip is a
-                # claim with no evidence, and this is the claim that decides
-                # which attacker class may run.
-                probe = next((t.topic for t in tasks if len(t.topic) >= 3), None)
-                self.assertIsNotNone(
-                    probe,
-                    f"[{name}] no task in 3 workflows has a topic with >= 3 "
-                    f"tokens, so the partial-overlap probe cannot be built and "
-                    f"topic_kind cannot be checked BEHAVIOURALLY at all")
-                s_hi, s_lo, got = self._retrieval_probe(probe)
-                # the fixture itself must be a partial overlap, or it proves nothing
-                self.assertTrue(0.0 < s_lo < s_hi < 1.0,
-                                f"probe is not a partial overlap: {s_lo} {s_hi}")
-                self.assertIn("equal", got,
-                              f"[{name}] retrieval missed an item with an "
-                              f"IDENTICAL topic -- this is broken for any kind")
-                if kind == "graded":
-                    self.assertIn(
-                        "high", got,
-                        f"[{name}] declares topic_kind='graded' (Jaccard "
-                        f"retrieval, sim continuous) but the retrieval the runner "
-                        f"uses -- core.CarrierStore.retrieve -- did not return an "
-                        f"item at sim={s_hi}. sim is still {{0,1}}, so epsilon has "
-                        f"no surface and any epsilon<1 attack reports a FAKE "
-                        f"harm=0. Declare 'exact' until retrieval.retrieved() is "
-                        f"wired in with a theta fixed from data.")
-                    self.assertNotIn(
-                        "low", got,
-                        f"[{name}] declares 'graded' but retrieval does not "
-                        f"SEPARATE sim={s_hi} from sim={s_lo}: a threshold that "
-                        f"admits everything is not a graded retrieval either")
-                else:
-                    self.assertEqual(
-                        got, {"equal"},
-                        f"[{name}] declares topic_kind='exact' (sim in {{0,1}}) "
-                        f"but retrieval returned partially-matching items "
-                        f"{sorted(got - {'equal'})} at sim {s_hi} / {s_lo}. The "
-                        f"declaration is now understating the retrieval, which "
-                        f"REFUSES attacks that would in fact work.")
+            with self.subTest(dataset=name, topic_kind=ds.scope().topic_kind):
+                self._assert_topic_kind_truthful(name, ds)
 
+    def _assert_topic_kind_truthful(self, name, ds):
+        """The body of D2, factored out so D2b can prove it goes RED."""
+        kind = ds.scope().topic_kind
+        self.assertIn(kind, ("exact", "graded"))
+        tasks = [t for w in ds.workflows(3, 4, seed=3) for t in w.tasks]
+        topic = tasks[0].topic
+        if isinstance(topic, str):
+            # No partial overlap exists, so retrieval CANNOT be graded.
+            self.assertEqual(
+                kind, "exact",
+                f"[{name}] declares {kind!r} but its topic is a plain string: "
+                f"sim can only be 0 or 1, so epsilon has no surface to act on")
+            return
+        self.assertIsInstance(
+            topic, frozenset, f"[{name}] topic is neither a string nor a token set")
+        # A partial overlap needs >= 3 tokens to build two DISTINCT
+        # strictly-between similarities.  Never skip here: a skip is a claim with
+        # no evidence, and this is the claim that decides which attacker class
+        # may run.
+        probe = next((t.topic for t in tasks if len(t.topic) >= 3), None)
+        self.assertIsNotNone(
+            probe,
+            f"[{name}] no task in 3 workflows has a topic with >= 3 tokens, so "
+            f"the partial-overlap probe cannot be built and topic_kind cannot be "
+            f"checked BEHAVIOURALLY at all")
+        s_hi, s_lo, got = self._retrieval_probe(probe)
+        # the fixture itself must be a partial overlap, or it proves nothing
+        self.assertTrue(0.0 < s_lo < s_hi < 1.0,
+                        f"probe is not a partial overlap: {s_lo} {s_hi}")
+        self.assertIn("equal", got,
+                      f"[{name}] retrieval missed an item with an IDENTICAL "
+                      f"topic -- this is broken for any kind")
+        if kind == "graded":
+            self.assertIn(
+                "high", got,
+                f"[{name}] declares topic_kind='graded' (Jaccard retrieval, sim "
+                f"continuous) but the retrieval the runner uses -- "
+                f"core.CarrierStore.retrieve -- did not return an item at "
+                f"sim={s_hi}. sim is still {{0,1}}, so epsilon has no surface and "
+                f"any epsilon<1 attack reports a FAKE harm=0. Declare 'exact' "
+                f"until retrieval.retrieved() is wired in with a theta fixed "
+                f"from data.")
+            self.assertNotIn(
+                "low", got,
+                f"[{name}] declares 'graded' but retrieval does not SEPARATE "
+                f"sim={s_hi} from sim={s_lo}: a threshold that admits everything "
+                f"is not a graded retrieval either")
+        else:
+            self.assertEqual(
+                got, {"equal"},
+                f"[{name}] declares topic_kind='exact' (sim in {{0,1}}) but "
+                f"retrieval returned partially-matching items "
+                f"{sorted(got - {'equal'})} at sim {s_hi} / {s_lo}. The "
+                f"declaration is now understating the retrieval, which REFUSES "
+                f"attacks that would in fact work.")
+
+    def test_D2b_the_topic_kind_check_goes_red_on_a_false_graded_declaration(self):
+        """D2 must be able to FAIL for the reason its name claims, and after
+        swebench was corrected to "exact" no dataset in REGISTRY declares
+        "graded" any more -- so D2's graded branch would never execute again and
+        could rot green.  This drives the same check over two stand-in datasets
+        that differ ONLY in the declaration, with identical token-set topics: the
+        one declaring "exact" must pass and the one declaring "graded" must fail,
+        because core.CarrierStore.retrieve is still equality.
+
+        Thesis claim (vi): "phep kiem phai do duoc CAI NO NOI, khong phai kieu du lieu".
+        """
+        from core import Task, Workflow
+
+        class _Stub:
+            def __init__(self, kind):
+                self.name, self._kind = f"stub-{kind}", kind
+
+            def scope(self):
+                return datasets.DatasetScope(
+                    repos=frozenset({"stub/stub"}), topic_kind=self._kind,
+                    has_hidden_tests=False, is_mock=True, instance_pool="stub")
+
+            def workflows(self, n, H, seed):
+                for i in range(n):
+                    yield Workflow(
+                        wf_id=f"stub-{i}", repo="stub/stub",
+                        tasks=[Task(task_id=f"stub-{i}-{t}", repo="stub/stub",
+                                    base_commit="0" * 7,
+                                    topic=frozenset({"pkg", "sub", f"mod{t}"}),
+                                    problem="")
+                               for t in range(H)])
+
+        self._assert_topic_kind_truthful("stub-exact", _Stub("exact"))
+        with self.assertRaises(AssertionError) as ctx:
+            self._assert_topic_kind_truthful("stub-graded", _Stub("graded"))
+        self.assertIn("FAKE harm=0", str(ctx.exception))
     def test_D4_the_results_header_says_what_scored_the_harm_column(self):
         """`has_hidden_tests` was declared on DatasetScope, set twice, and read
         NOWHERE.  Harm is (public tests PASS) AND (hidden test FAILS), so on a

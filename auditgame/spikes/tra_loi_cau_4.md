@@ -77,3 +77,46 @@ thẳng vào `core.seed_of` hay vào chuỗi nội dung (`agent.py`, `build.py`)
 động nhận dạng chuỗi tất định — mà không phải sửa các file đó. Bằng chứng đo
 được: chạy `workflows(10, 8, seed=1)` và in `str(topic)` của từng task ở hai
 tiến trình Python riêng biệt cho kết quả **giống nhau từng byte** (xem trên).
+
+---
+
+## Cập nhật 2026-09-16 — Bước 4 của PHẦN 4 (SPEC-P1a) đã được hiện thực
+
+Con số 58 / 42% ở trên vẫn đúng, nhưng nó trả lời **câu hỏi gom nhóm** (bước 1–3),
+không phải câu hỏi "workflow có dựng được attack không". Bước 4 — *"LOẠI workflow
+không có cặp (i, i+Δ) cùng topic vượt θ cho Δ cần quét"*, mà chính spec gọi là
+**N3 ở mức dataset** — trước đây chưa hiện thực. Nay đã có trong
+`SWEBenchDataset._segments`, và kết quả đo được là một **phát hiện**, không phải
+một chi tiết:
+
+| Pool | H | Workflow sau bước 1–3 | Sống sót bước 4 (Δ ∈ {0,1,2,4}, θ = 1.0) |
+|---|---|---|---|
+| Verified | 8 | 58 | **0** |
+| Full | 8 | 281 | **2** |
+
+Số workflow chịu được **từng** Δ riêng lẻ trên Verified: Δ=1 → 8, Δ=2 → 6, Δ=4 → 2
+(Δ=0 là cắm-và-nổ cùng một task nên luôn được). Không workflow nào chịu được cả ba.
+
+Vì sao: `build.plan_poison` **không** đòi task ι và task σ phải liên quan — nó chỉ
+cấm topic của σ xuất hiện trong [ι, σ). Sau đó `build.inject` đóng dấu payload
+bằng **chính topic của σ**, nên payload được truy xuất ở σ bất kể hai task thật có
+liên quan hay không. Đo được: chỉ **7/560 = 1,25%** cặp task trong cùng workflow
+chia sẻ topic trên dữ liệu thật (mock: 104/560 = 18,57%), và agent truy xuất được
+trạng thái cũ ở **3,8%** task sạch trên dữ liệu thật so với **45,0%** trên mock.
+Nói cách khác: "hai task liên quan" là **sản phẩm của phép tiêm**, đúng thứ mà
+phép sắp theo `created_at` sinh ra để tránh.
+
+Bộ lọc có tác dụng đúng như mong đợi ở từng Δ — với Δ=1 tỉ lệ cặp cùng topic tăng
+1,25% → 7,59% và tỉ lệ truy xuất 3,8% → 20,3% — nhưng tập thoả **toàn bộ** lưới Δ
+là rỗng.
+
+Hệ quả: `datasets.py` ghi `swebench` vào `PENDING` **kèm lý do đo được** thay vì
+`REGISTRY`, và `experiment.py --dataset swebench` in một lời từ chối thay vì một
+bảng harm. Đây là N3 đúng nghĩa: ô ngoài phạm vi ghi **lý do**, không ghi harm = 0.
+
+θ **không** được hạ để giữ số lượng. θ = 1.0 vì `core.CarrierStore.retrieve` so
+topic bằng `==`; workflow được nhận ở θ = 0.5 vẫn không dựng được attack dưới `==`.
+Đo thêm để định hướng: nếu truy xuất trở thành **graded**, số workflow sống sót
+bước 4 trên Verified (Δ ∈ {1,2,4}) là 0 ở θ=1.0, 1 ở θ=0.75, **14 ở θ=0.5**,
+21 ở θ=0.34. Tức là nút thắt thật sự là câu hỏi 3 (truy xuất graded), chứ không
+phải kích thước pool.

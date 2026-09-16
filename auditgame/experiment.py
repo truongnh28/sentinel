@@ -80,7 +80,8 @@ def scope_header(scope) -> list:
     sweep -- a banner nobody checks is a banner that can quietly stop printing.
     """
     lines = [f"scope: topic_kind={scope.topic_kind} "
-             f"has_hidden_tests={scope.has_hidden_tests}"]
+             f"has_hidden_tests={scope.has_hidden_tests} "
+             f"instance_pool={scope.instance_pool}"]
     if not scope.has_hidden_tests:
         lines += [
             "!" * 78,
@@ -118,14 +119,24 @@ def main():
     if a.dataset == "mock":
         wfs = make_corpus(a.n, a.H, seed=2026)
         scope = datasets.REGISTRY["mock"].scope()
+        grouping = None
     else:
         if a.dataset not in datasets.REGISTRY:
             _, reason = datasets.PENDING.get(a.dataset, (None, "not registered"))
             print(f"dataset {a.dataset!r} is not available: {reason}")
             return 1
         ds = datasets.REGISTRY[a.dataset]
-        wfs = list(ds.workflows(a.n, a.H, seed=2026))
+        try:
+            wfs = list(ds.workflows(a.n, a.H, seed=2026))
+        except ValueError as e:
+            # A corpus that cannot host the sweep is refused WITH ITS REASON --
+            # it does not quietly become a grid of zeros (N3 at dataset level,
+            # SPEC-P1a Part 4 step 4).
+            print(f"dataset {a.dataset!r} cannot supply this corpus: {e}")
+            return 1
         scope = ds.scope()
+        report = getattr(ds, "grouping_report", None)
+        grouping = report(H=a.H) if report else None
 
     seeds = tuple(range(1, a.seeds + 1))
     deltas = (0, 1, 2, 4)
@@ -141,6 +152,13 @@ def main():
     print(f"dataset={a.dataset} is_mock={scope.is_mock}")
     for line in scope_header(scope):
         print(line)
+    if grouping is not None:
+        # The step-4 drop belongs beside the feasibility numbers: "N workflows"
+        # means nothing without how many were thrown out to get there.
+        print(f"grouping: {grouping['grouped']} workflows cut from the pool, "
+              f"{grouping['dropped']} dropped by SPEC-P1a Part 4 step 4 "
+              f"(theta={grouping['theta']}, deltas={grouping['sweep_deltas']}), "
+              f"{grouping['feasible']} usable")
     harm_source = harm_scored_by(scope)
     print(f"{a.n} workflows - H={a.H} - B={a.budget} - {a.seeds} seeds - "
           f"injection carriers: {', '.join(carriers)}")
