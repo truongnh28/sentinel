@@ -18,7 +18,7 @@ the detector.  See build.py's module docstring for the measured impact.
 """
 from __future__ import annotations
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from core import Item, CarrierStore, Task, seed_of
 
 @dataclass
@@ -27,6 +27,26 @@ class Outcome:
     writes: list
     patch_has_marker: bool
     solved: bool              # did the agent solve the task (independent of the payload)
+    #: Every STATE QUERY the agent put to the store, in order, with what came
+    #: back: {kind, arg, after_writes, returned}.  SPEC-P1b Part 1 asks the
+    #: retrieval row for "truy van gi . tra ve gi" -- WHAT WAS ASKED as well as
+    #: what came back -- and the query is the half that makes offline replay
+    #: CHECKABLE: replay re-executes each query against its own reconstructed
+    #: store and compares.  If every answer matches, the recorded outcome is the
+    #: outcome this agent would have produced, because the store is the only
+    #: state-dependent input it has (see the determinism note above).  If one
+    #: differs, a quarantine has changed what could be retrieved, and replay must
+    #: DECLARE that instead of scoring on.
+    #: `after_writes` is how many of `writes` were already in the store when the
+    #: query ran, so replay can interleave the writes and the queries in order.
+    queries: list = field(default_factory=list)
+
+
+def _query(kind: str, arg, writes_so_far: list, returned: list) -> dict:
+    """One recorded state query.  See Outcome.queries."""
+    return dict(kind=kind, arg=arg, after_writes=len(writes_so_far),
+                returned=[it.item_id for it in returned])
+
 
 class Agent:
     def run_task(self, t: int, task: Task, store: CarrierStore,
@@ -42,14 +62,16 @@ class MockAgent(Agent):
 
     def run_task(self, t, task, store, seed, marker):
         r = random.Random(seed_of(seed, t))          # deterministic in (seed, t)
+        writes = []
+        queries = []
         retrieved = store.retrieve(task.topic)
+        queries.append(_query("retrieve", task.topic, writes, retrieved))
         poisoned_seen = [it for it in retrieved if it.poisoned]
 
         # (2) adopt the payload -> the patch carries the signature
         adopt = r.random()
         patch_has_marker = bool(poisoned_seen) and adopt < self.adoption_rate
 
-        writes = []
         # the agent always records a note about the task it just did
         writes.append(store.write(Item(
             carrier="memory", topic=task.topic,
@@ -99,7 +121,14 @@ class MockAgent(Agent):
         # nothing could be attributed to drift itself.
         rd = random.Random(seed_of(seed, t, "drift"))
         if self.drift_rate and rd.random() < self.drift_rate:
-            prior = [x for x in store.live("memory") if not x.poisoned]
+            # store.live("memory") is a SECOND state-dependent channel, so it is
+            # logged like the retrieval.  It is read inside the branch, and the
+            # branch is decided by `rd` alone -- state cannot move it -- so the
+            # log is complete: a replay that reproduces every recorded answer
+            # reproduces every state read this agent performed.
+            live_memory = store.live("memory")
+            queries.append(_query("live", "memory", writes, live_memory))
+            prior = [x for x in live_memory if not x.poisoned]
             if prior:
                 old = prior[rd.randrange(len(prior))]
                 writes.append(store.write(Item(
@@ -109,4 +138,5 @@ class MockAgent(Agent):
 
         solved = random.Random(seed_of(seed, t, "solve")).random() < self.solve_rate
         return Outcome(retrieved=retrieved, writes=writes,
-                       patch_has_marker=patch_has_marker, solved=solved)
+                       patch_has_marker=patch_has_marker, solved=solved,
+                       queries=queries)

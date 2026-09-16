@@ -15,7 +15,7 @@ import contextlib
 from dataclasses import dataclass, field
 
 from core import Item, CarrierStore, Task, Workflow, PoisonSpec
-from agent import Outcome
+from agent import Outcome, _query
 import policies as P
 
 # ------------------------------------------------------------ AST helpers ----
@@ -140,6 +140,11 @@ class ScriptedAgent:
 
     Only three things are scripted: whether the task is solved, whether a note is
     written, whether a skill is induced.
+
+    It LOGS its retrieval query (Outcome.queries) for the same reason retrieval is
+    real: replay certifies its validity by re-executing the recorded queries, and
+    an agent that records none leaves replay with nothing to check -- which
+    replay.rescore reports as UNCERTIFIABLE rather than quietly scoring.
     """
     solved_at: tuple = (True, True, True, True, True, True, True, True)
     writes_note: bool = True
@@ -148,11 +153,12 @@ class ScriptedAgent:
 
     def run_task(self, t: int, task: Task, store: CarrierStore,
                  seed: int, marker: str) -> Outcome:
+        writes = []
         retrieved = store.retrieve(task.topic)
+        queries = [_query("retrieve", task.topic, writes, retrieved)]
         poisoned_seen = [it for it in retrieved if it.poisoned]
         patch_has_marker = bool(poisoned_seen) and self.adopts
 
-        writes = []
         if self.writes_note:
             writes.append(store.write(Item(
                 carrier="memory", topic=task.topic,
@@ -167,7 +173,8 @@ class ScriptedAgent:
 
         solved = self.solved_at[t] if t < len(self.solved_at) else True
         return Outcome(retrieved=retrieved, writes=writes,
-                       patch_has_marker=patch_has_marker, solved=solved)
+                       patch_has_marker=patch_has_marker, solved=solved,
+                       queries=queries)
 
 
 # ----------------------------------------------------------------- profile ----
