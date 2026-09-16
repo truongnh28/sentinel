@@ -125,10 +125,23 @@ def inject(store: CarrierStore, wf: Workflow, ps: PoisonSpec) -> Item:
     )
     return store.write(it)
 
-def sealed_manifest(wf: Workflow, ps: PoisonSpec, injected: Item) -> dict:
+def sealed_manifest(wf: Workflow, ps: PoisonSpec, injected: Item, *, auc_match_ci: tuple,
+                    n_c_at_sigma: dict, kappa_measured: dict,
+                    instance_source: str) -> dict:
     """THE SEALED MANIFEST -- the ground truth the evaluator holds and the system
     does NOT.  This, not the payload, is the benchmark's distinctive asset (the
-    payload is borrowed)."""
+    payload is borrowed).
+
+    The four keyword-only fields are MANDATORY and have no defaults, because each
+    answers a question a reviewer will ask and a default would answer it silently:
+
+      auc_match_ci     (auc, lo, hi) on F_match -- evidence the payload is not
+                       trivially distinguishable, so a wrong quarantine has a price
+      n_c_at_sigma     items per carrier at firing time -- lets "hiding in the
+                       crowd" be read off the record instead of argued afterwards
+      kappa_measured   audit costs MEASURED, not assigned (Task 22)
+      instance_source  which pool and commit the instance came from
+    """
     return dict(wf_id=wf.wf_id, repo=wf.repo, H=wf.H,
                 carrier=ps.carrier, iota=ps.iota, sigma=ps.sigma,
                 delta=ps.delta, epsilon=ps.epsilon, marker=ps.marker,
@@ -138,4 +151,6 @@ def sealed_manifest(wf: Workflow, ps: PoisonSpec, injected: Item) -> dict:
                 # the ground truth the evaluator holds; recording a set the
                 # payload does not have would make every epsilon look alike in
                 # exactly the artifact this sealed record exists to expose.
-                topic=injected.topic)
+                topic=injected.topic,
+                auc_match_ci=auc_match_ci, n_c_at_sigma=n_c_at_sigma,
+                kappa_measured=kappa_measured, instance_source=instance_source)
