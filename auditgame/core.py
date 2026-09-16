@@ -322,17 +322,40 @@ def item_from_record(rec: dict) -> Item:
 
 
 def dump_traces(path, traces) -> None:
-    """Write a run's traces to disk.
+    """Write a run's traces to disk, SPLIT ON THE SEAL LINE.
 
     Without this "offline replay" is a figure of speech: RunResult.traces was
     built and dropped at the end of every run_once, so re-scoring could only
     happen inside the very process that had just run the agent -- which saves
     nothing at all.  The saving is: pay for the agent ONCE, write the traces out,
     then score the whole grid from the file in processes that never load an agent.
+
+    TWO FILES, NOT ONE, AND THE SPLIT IS HERE BECAUSE THIS IS THE ONE DOOR.  A
+    TaskTrace carries the evaluator's answer key as well as the run's mechanics:
+    `poisoned` on every item record (core.Item's own field comment calls it
+    "GROUND TRUTH -- audit policies must NOT read this"), the planted payload's
+    full record under `injected`, and a `correct` verdict beside every quarantine.
+    `results/M3-trace.json` was committed with all three, which published for the
+    benchmark's headline artefact exactly what .gitignore refuses to publish for
+    `carriers-sealed/`.  The acceptance line the artefact has to meet -- "the
+    trace carries all nine field groups of SPEC-P1b Part 1" -- is a claim about
+    its SHAPE, and shape survives the split.
+
+        path                   the PUBLIC trace.  Nine field groups, every write
+                               record, every query, every score, every checkpoint.
+                               Committed.
+        sealed_trace.sealed_path(path)   the answer key.  gitignored.
+
+    Splitting anywhere else would be a second door: every writer in this build
+    goes through this function, so putting it here is what makes "the labels are
+    not published" a property of the codebase rather than of one call site that
+    remembered.  `sealed_trace.load` is the reader that puts the halves back
+    together, and it REFUSES when the sealed half is absent instead of returning
+    traces on which nothing is poisoned.
     """
-    import pathlib
-    pathlib.Path(path).write_text(
-        dumps({"format": TRACE_FORMAT, "traces": list(traces)}), encoding="utf-8")
+    import sealed_trace
+    doc = json.loads(dumps({"format": TRACE_FORMAT, "traces": list(traces)}))
+    sealed_trace.write(path, doc, dumps)
 
 
 def load_traces(path) -> list:

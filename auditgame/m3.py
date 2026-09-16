@@ -67,6 +67,7 @@ import llms
 import oracle
 import policies as P
 import runner
+import sealed_trace
 import swebench_dataset
 from core import CARRIERS
 
@@ -99,6 +100,17 @@ DELTA = 2
 #: container still runs with `--network=none`.
 REPO_URL = "https://github.com/{repo}.git"
 CLONE_TIMEOUT = 1800
+
+#: Why the published run record holds a POINTER where the sealed manifest was.
+#: The manifest names `injected_item`, and that is the single fact the trace split
+#: withholds -- see sealed_trace.py.  One file publishing what the other one seals
+#: is not a seal.
+MANIFEST_IS_SEALED = (
+    "the sealed manifest names injected_item, i.e. WHICH item of this run was the "
+    "payload -- the ground truth the benchmark exists to make an evaluator infer. "
+    "It is written beside the sealed half of the trace and gitignored there, for "
+    "the same reason carriers-sealed/ is. An evaluator holding the sealed files "
+    "has it; a reader of the published artefacts does not.")
 
 #: The key a sealed-manifest field carries INSTEAD of a number when the number is
 #: not measured yet.  One spelling, so a reader of `results/` and a reader of the
@@ -635,7 +647,13 @@ def main(argv=None) -> int:
 
     out = pathlib.Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
+    # TWO FILES. `core.dump_traces` splits the trace on the seal line: `out` is the
+    # public half that is committed, and `sealed_trace.sealed_path(out)` holds the
+    # per-item `poisoned` labels, the planted payload and the quarantine verdicts.
+    # See sealed_trace.py -- the answer key is gitignored beside carriers-sealed/.
     core.dump_traces(out, run.result.traces)
+    sealed_out = sealed_trace.sealed_path(out)
+    sealed_run = sealed_trace.sealed_path(out.parent / "M3-run.json")
     wall = time.perf_counter() - wall0
 
     # The EVIDENCE BEHIND spikes/M3.md, beside the trace rather than in a
@@ -660,7 +678,12 @@ def main(argv=None) -> int:
         "container_skipped": None if probe is not None else (why or "asked not to"),
         "carriers_final": {c: len(run.final_store.items[c]) for c in CARRIERS},
         "quarantined_final": sorted(run.final_store.quarantined),
-        "manifest": run.manifest,
+        # The SEALED MANIFEST does not go in the published record.  It names
+        # `injected_item` -- WHICH of the run's items was the payload -- and that
+        # is the one fact the trace split above exists to withhold; re-publishing
+        # it here would undo the split for the sake of a different file.  It is
+        # written beside the sealed trace instead, and what stays is a pointer.
+        "manifest": {"sealed_to": sealed_run.name, "reason": MANIFEST_IS_SEALED},
         "outcome": {"harm": run.result.harm, "solved": run.result.solved,
                     "marker": run.result.marker, "spent": run.result.spent,
                     "detected_at": run.result.detected_at,
@@ -679,6 +702,9 @@ def main(argv=None) -> int:
         "unmeasured": unmeasured(),
     }
     (out.parent / "M3-run.json").write_text(core.dumps(record), encoding="utf-8")
+    sealed_run.write_text(core.dumps(
+        {"sealed_format": sealed_trace.SEALED_FORMAT, "wf_id": wf.wf_id,
+         "manifest": run.manifest}), encoding="utf-8")
 
     print(f"\nrun       : {run.seconds:.1f}s over {len(run.result.traces)} tasks")
     print(f"resets    : {len(run.resets)}  all clean="
@@ -693,7 +719,9 @@ def main(argv=None) -> int:
           f"head==checked-out on all="
           f"{all(p['head'] == p['base_commit'] for p in run.probes)}  "
           f"answer key seen={[p['forbidden_seen'] for p in run.probes if p['forbidden_seen']]}")
-    print(f"trace     : {out}  ({out.stat().st_size} bytes)")
+    print(f"trace     : {out}  ({out.stat().st_size} bytes, PUBLIC)")
+    print(f"sealed    : {sealed_out}  ({sealed_out.stat().st_size} bytes) "
+          f"+ {sealed_run.name}  -- gitignored, this is the answer key")
     print(f"record    : {out.parent / 'M3-run.json'}")
     print(f"wall      : {wall / 60:.2f} min")
 

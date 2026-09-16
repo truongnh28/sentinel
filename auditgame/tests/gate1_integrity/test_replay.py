@@ -433,9 +433,14 @@ core.dump_traces({path!r}, r.traces)
 _SCORER = """
 import sys
 sys.path.insert(0, {root!r})
-import core, detector, replay
+import detector, replay, sealed_trace
 import policies as P
-traces = core.load_traces({path!r})
+# sealed_trace.load, not core.load_traces: dump_traces splits the trace on the
+# seal line and the PUBLIC half carries no `poisoned` labels, which a re-score
+# needs. The reader that puts the two halves back together is the one a scorer
+# uses; it refuses when the sealed half is absent rather than scoring a world in
+# which nothing was planted.
+traces = sealed_trace.load({path!r})
 rr = replay.rescore(traces, detector.Detector.from_setting("strong"),
                     P.make_policy("B1 audit-at-commit", 17.95, 3, "strong"))
 print(rr.valid, rr.harm, rr.spent, rr.t_lost, rr.detected_at, rr.checkpoints)

@@ -22,6 +22,7 @@ for the price of a temp directory.  The real-corpus run is `m3.py`'s own
 `main()`, whose artefacts are `results/M3-trace.json` and `spikes/M3.md`.
 """
 from __future__ import annotations
+import json
 import pathlib
 import shutil
 import tempfile
@@ -287,12 +288,78 @@ class TheNineFieldGroups(unittest.TestCase):
         """`results/M3-trace.json` is the artefact; a group that does not survive
         the round trip is a group the replay engine will never see.
 
+        The PUBLIC half is what is read here, because the public half is what
+        ships: the nine-field-group acceptance line has to hold on the file a
+        reader actually gets, not on the one the evaluator keeps.
+
         Thesis claim (vi): "trace ghi ra dia doc lai van du chin nhom".
         """
         path = self.tmp / "M3-trace.json"
         core.dump_traces(path, self.run.result.traces)
         back = core.load_traces(path)
         self.assertEqual(m3.field_groups(back), m3.field_groups(self.run.result.traces))
+
+    def test_writing_a_trace_puts_the_ground_truth_in_the_sealed_half_and_nowhere_else(self):
+        """The seal line, applied to the artefact.  A trace carries the evaluator's
+        answer key -- `poisoned` on every item record, the planted payload under
+        `injected`, and `correct` beside every quarantine -- and `dump_traces` is
+        the one door every writer goes through, so the split belongs there.
+
+        Checked in BOTH directions: nothing survives in the public half, and
+        nothing was lost, because a split that drops the labels is a split that
+        makes the run unscorable.
+
+        Thesis claim (vi): "nhan ground truth nam trong nua niem phong, khong nam
+        trong file cong bo".
+        """
+        import sealed_trace
+        path = self.tmp / "M3-trace.json"
+        core.dump_traces(path, self.run.result.traces)
+        sealed = sealed_trace.sealed_path(path)
+        self.assertEqual(sealed.name, "M3-sealed.json")
+        self.assertTrue(sealed.is_file(), f"{sealed} was not written")
+
+        public = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            sealed_trace.ground_truth_fields_in(public), [],
+            "the PUBLISHED half of the trace still carries evaluator fields")
+
+        # and the run is still scorable from the two halves together
+        merged = sealed_trace.load(path)
+        self.assertEqual(len(merged), len(self.run.result.traces))
+        planted = [tr for tr in merged if tr.injected]
+        self.assertEqual(len(planted), 1, "the payload is not in the sealed half")
+        self.assertTrue(planted[0].injected["poisoned"])
+        self.assertTrue(
+            all("poisoned" in w for tr in merged for w in tr.writes),
+            "an item record came back from the two halves without its label")
+
+    def test_a_public_trace_alone_refuses_to_be_scored_rather_than_scoring_clean(self):
+        """N3 at the seal line, in its sharpest form.  With the labels stripped,
+        `det.score` draws every item from the clean distribution, no quarantine is
+        ever a true positive and the cell reports a run in which nothing was
+        planted and the defence held -- a full, normal-looking grid of fake zeros.
+
+        Both doors have to refuse: `sealed_trace.load` when the sealed file is not
+        there, and `replay.rescore` when it is handed public traces anyway.
+
+        Thesis claim (vi): "trace cong bo mot minh phai TU CHOI cham diem, khong
+        duoc cham ra 0".
+        """
+        import replay, sealed_trace
+        import policies as P
+        path = self.tmp / "M3-trace.json"
+        core.dump_traces(path, self.run.result.traces)
+        sealed_trace.sealed_path(path).unlink()
+        with self.assertRaises(sealed_trace.SealedLabelsMissing) as ctx:
+            sealed_trace.load(path)
+        self.assertIn("fake zero", str(ctx.exception))
+
+        rr = replay.rescore(core.load_traces(path), a_detector(),
+                            a_policy())
+        self.assertFalse(rr.valid, "a stripped trace was scored instead of refused")
+        self.assertIsNone(rr.harm, "a stripped trace produced a harm number")
+        self.assertIn("poisoned", rr.reason)
 
     def test_the_seconds_in_the_cost_group_are_measured_and_not_a_row_of_zeros(self):
         """SPEC-P1b Part 1's "chi phi" row asks for REAL seconds per audit kind --
@@ -334,26 +401,61 @@ class TheM3ArtefactItself(unittest.TestCase):
                          f"the shipped M3 trace is missing field groups {missing}: "
                          f"{ {g: report[g] for g in missing} }")
 
-    def test_the_shipped_m3_trace_is_a_whole_eight_task_workflow_with_its_payload(self):
-        """Nine groups on a one-task trace would still report complete.  M3 is the
-        EIGHT-task milestone, and the payload has to have been planted and to have
-        reached its sigma, or the checkpoints row is nine groups of nothing.
+    def test_the_committed_m3_trace_carries_no_ground_truth_field(self):
+        """The sibling of the acceptance test above, and the one that stops this
+        recurring at workflow 100.
 
-        Thesis claim (vi): "trace M3 la mot workflow tam task, co payload va co sigma".
+        The committed trace used to carry `injected` with "poisoned": true, a
+        `poisoned` label on all 24 item records, and `quarantines[0].correct` --
+        the ground truth for every item plus whether each quarantine was right.
+        That is precisely what .gitignore refuses to publish for
+        `carriers-sealed/`, in its own words: "publishing it would hand over the
+        labels the benchmark exists to infer". The justification for committing it
+        cited the nine-field-group acceptance line, and that line needs the trace's
+        SHAPE, not its labels -- the test above still passes on the stripped file.
+
+        This is not an agent leak (results/ is outside every mount). It is worse in
+        a different way: M3 sets the pattern for the full study, where this file
+        becomes the complete evaluator ground truth published beside the benchmark.
+
+        Thesis claim (vi): "trace da giao khong duoc mang mot truong ground truth nao".
+        """
+        import sealed_trace
+        self.assertTrue(self.path.exists(), f"{self.path} does not exist")
+        doc = json.loads(self.path.read_text(encoding="utf-8"))
+        leaked = sealed_trace.ground_truth_fields_in(doc)
+        self.assertEqual(
+            leaked, [],
+            f"the COMMITTED M3 trace carries {len(leaked)} evaluator field(s): "
+            f"{leaked[:8]}{' ...' if len(leaked) > 8 else ''}. These belong in "
+            f"{sealed_trace.sealed_path(self.path).name}, which is gitignored "
+            f"beside carriers-sealed/. Rewrite the artefact through "
+            f"core.dump_traces, which splits it.")
+
+    def test_the_shipped_m3_trace_is_a_whole_eight_task_workflow_with_its_sigma(self):
+        """Nine groups on a one-task trace would still report complete.  M3 is the
+        EIGHT-task milestone, and the payload has to have reached its sigma, or the
+        checkpoints row is nine groups of nothing.
+
+        WHAT THIS TEST NO LONGER READS.  It used to assert `injected["poisoned"]`
+        off the committed file; that field is now in the sealed half, which is
+        gitignored, so asserting it here would make the suite depend on an artefact
+        a fresh clone does not have.  The same claim is made on FRESHLY GENERATED
+        data by TheNineFieldGroups, which holds both halves -- so nothing was
+        dropped, it moved to where both halves exist.
+
+        Thesis claim (vi): "trace M3 la mot workflow tam task va co dung mot sigma".
         """
         self.assertTrue(self.path.exists(), f"{self.path} does not exist")
         traces = core.load_traces(self.path)
         self.assertEqual(len(traces), H, "M3 is an eight-task workflow")
         self.assertEqual([tr.t for tr in traces], list(range(H)),
                          "the tasks are not a contiguous 0..H-1 chain")
-        planted = [tr for tr in traces if tr.injected]
-        self.assertEqual(len(planted), 1, "exactly one payload is planted")
-        self.assertTrue(planted[0].injected["poisoned"],
-                        "the planted item is not labelled as the payload")
         sigma = [tr for tr in traces if tr.is_sigma]
         self.assertEqual(len(sigma), 1, "exactly one task is sigma")
         self.assertEqual(sorted(sigma[0].checkpoints), ["P1", "P2", "P3", "P4", "P5"],
                          "the sigma task does not carry the five checkpoints")
+        self.assertTrue(sigma[0].writes, "the sigma task recorded no write")
 
 
 class WhatM3RefusesToInvent(unittest.TestCase):
