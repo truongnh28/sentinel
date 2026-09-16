@@ -310,6 +310,72 @@ class EpsilonHasASurface(unittest.TestCase):
 
 class DormancyHoldsUnderGradedRetrieval(unittest.TestCase):
 
+    def test_plan_poison_reduces_to_the_old_predicate_at_theta_one(self):
+        """The same backward-compatibility condition SPEC-R Part 2.3 imposes on
+        retrieval, imposed on the PLANNER: at theta=1.0 and eps=1.0 the payload
+        is sigma's whole topic and `not retrieved(A, tp[j], 1.0)` is exactly the
+        `tp[j] != tp[sigma]` this function used to ask.  Without it, a change in
+        the planner could not be told apart from a change in the threshold.
+
+        Driven over real topics, and over the plan's OUTPUT rather than the
+        predicate, so it covers the candidate list and the rng draw too.
+
+        Thesis claim (vi): "R khong thay the hanh vi cu, no tong quat hoa".
+        """
+        import swebench_dataset
+        ds = swebench_dataset.SWEBenchDataset(sweep_deltas=())
+        wfs = list(ds.workflows(12, 8, seed=2026))
+        compared = 0
+        for i, wf in enumerate(wfs):
+            tp = [t.topic for t in wf.tasks]
+            for delta in (1, 2, 4):
+                got = build.plan_poison(wf, "memory", delta,
+                                        random.Random(seed_of("compat", i, delta)),
+                                        epsilon=1.0, theta=1.0)
+                # the pre-task implementation, verbatim
+                cands = [s_ for s_ in range(delta, wf.H)
+                         if all(tp[j] != tp[s_] for j in range(s_ - delta, s_))]
+                want = (random.Random(seed_of("compat", i, delta)).choice(cands)
+                        if cands else None)
+                self.assertEqual(got.sigma if got else None, want,
+                                 f"wf {wf.wf_id} d={delta}: at theta=1.0 the "
+                                 f"planner no longer reproduces the `!=` "
+                                 f"predicate it generalises")
+                compared += 1
+        self.assertGreater(compared, 30, f"only {compared} cases compared")
+
+    def test_no_instance_in_either_pool_has_an_empty_topic(self):
+        """The one place graded retrieval does NOT reduce to `==`: sim() returns
+        0.0 for two EMPTY sets by convention (SPEC-R Part 2.2), so two empty
+        topics would fail to match each other where `==` matched them.  That is a
+        real divergence from the exact-matching special case, and the only reason
+        it is not a defect is that it is UNREACHABLE on this data -- which is a
+        property of the corpus, not of the code, so it has to be checked rather
+        than assumed.  If an instance with an empty topic ever appears, this goes
+        red and the convention has to be decided on purpose.
+
+        Thesis claim (vi): "ca rieng theta=1 trung khop chinh xac tren TOAN BO du lieu that".
+        """
+        import json, pathlib, topics as topics_mod
+        import swebench_dataset
+        for pool in ("verified", "full"):
+            path = swebench_dataset.DATA / f"swebench_{pool}.jsonl"
+            if not path.exists():
+                continue
+            with path.open(encoding="utf-8") as fh:
+                empty = [json.loads(l)["instance_id"] for l in fh
+                         if not topics_mod.topic_of_instance(json.loads(l))]
+            with self.subTest(pool=pool):
+                # assertFalse, not assertEqual against []: the failure message
+                # for a list of thousands of ids is a 66 KB unified diff that
+                # buries the sentence explaining what went wrong.
+                self.assertFalse(
+                    empty,
+                    f"{len(empty)} instance(s) in the {pool} pool have an EMPTY "
+                    f"topic, e.g. {empty[:3]}. sim(empty, empty) = 0.0, so "
+                    f"graded retrieval stops matching them where `==` did, and "
+                    f"the theta=1.0 special case is no longer exact.")
+
     def test_the_payload_is_not_retrievable_before_sigma_on_real_topics(self):
         """`plan_poison` guarantees the payload lies dormant for exactly Delta
         tasks.  It used to check `tp[j] != tp[sigma]` -- set INEQUALITY against
