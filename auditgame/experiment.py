@@ -12,7 +12,7 @@ not.
 """
 from __future__ import annotations
 import argparse, json, random, sys
-import build, agent, datasets, detector, metrics, runner
+import build, agent, datasets, detector, metrics, retrieval, runner, scoring
 import policies as P
 
 def gain(row):
@@ -211,13 +211,28 @@ def main():
             ls = metrics.loss(*cells[nm], lambda_Q=(star or 0.0) + 1e-6)
             print(f"  {nm:<28}{l0:>9.3f}{ls:>10.3f}")
 
+        # B8 -- the results table.  config_sha runs through the named function
+        # (not string-concatenated here) so the hash-cell requirement -- pi0 /
+        # the aggregation rule / tau_sel / theta / scope() in ONE cell -- has
+        # something to enforce (test_config_sha_moves_when_theta_moves).
+        cfg_sha = metrics.config_sha(pi0=scoring.PI0, aggregation="mean_lambda",
+                                     tau_sel=det_name, theta=retrieval.THETA,
+                                     scope=scope.topic_kind)
         for d in deltas:
-            lo, hi = runner.bootstrap_paired(grid[d]["B1 audit-at-commit"].per_wf,
-                                             grid[d]["Sentinel"].per_wf)
             b1, sn = grid[d]["B1 audit-at-commit"], grid[d]["Sentinel"]
-            print(f"     D={d}  d-harm = {b1.harm - sn.harm:+.3f}"
-                  f"  CI95 [{lo:+.3f} ; {hi:+.3f}]"
-                  f"   {'excludes 0' if lo > 0 else 'CI COVERS 0'}")
+            cells = {"B1 audit-at-commit": {"harm": b1.harm, "per_wf": b1.per_wf},
+                     "Sentinel": {"harm": sn.harm, "per_wf": sn.per_wf}}
+            print(f"\n  D={d}")
+            # n_survived: GridCell has no workflow-scoped "survived" count
+            # distinct from n_feasible -- worst_case() only appends a workflow
+            # to per_wf (so it counts toward n_feasible) once it ALSO has a
+            # kept clean-phase run, so every feasible workflow has already
+            # survived by construction.  GridCell.kept/.runs are INSTANCE-level
+            # (per (Delta, carrier, seed) attempt, not per workflow) and can
+            # exceed n_feasible, so they do not belong in this slot.
+            for line in metrics.results_table(cells, cfg_sha, sn.n_feasible,
+                                              sn.n_total, sn.n_feasible).splitlines():
+                print(f"     {line}")
 
     print("\n" + "=" * 78)
     print("READING THE TABLE")

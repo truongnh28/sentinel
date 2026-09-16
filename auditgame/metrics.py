@@ -114,6 +114,65 @@ def lambda_q_star(cells: dict, lambda_T: float = LAMBDA_T, hi: float = 5.0):
     return None
 
 
+def _requirements_lock_sha() -> str:
+    """sha256 of the pinned `requirements.lock` -- the ENVIRONMENT half of a
+    results table's evidence.
+
+    Not a parameter of `results_table`: the running environment is not a
+    per-call choice, it is a fact about the machine the table was printed on,
+    read straight from the lock file that pinned it (PLAN.md Task 0, Buoc 0.6:
+    "Header bang ket qua in sha256 cua lock file canh sha256 cau hinh").
+    """
+    import hashlib, pathlib
+    lock = pathlib.Path(__file__).resolve().parent.parent / "requirements.lock"
+    return hashlib.sha256(lock.read_bytes()).hexdigest()
+
+
+def results_table(cells: dict, config_sha: str, n_feasible: int,
+                  n_total: int, n_survived: int) -> str:
+    """A results table that CARRIES ITS OWN EVIDENCE.
+
+    Wraps report_header -- it does not replace it.  `cells` is
+    {policy name -> {"harm": float, "per_wf": list}}.  B1 and Sentinel are both
+    required, since Delta-harm is defined through that pair.
+
+    The CI resamples BY WORKFLOW, not by case: cases from one workflow share a task
+    chain and the same clean-run outcome, so they are not independent and resampling
+    by case gives FALSELY NARROW intervals.
+    """
+    import runner
+    b1, sn = cells["B1 audit-at-commit"], cells["Sentinel"]
+    dh = b1["harm"] - sn["harm"]
+    lo, hi = runner.bootstrap_paired(b1["per_wf"], sn["per_wf"])
+    g = gain(b1["harm"], sn["harm"])
+    gain_text = f"{g:+.1f}%" if g is not None else "-- (denominator < 0.05)"
+    return (report_header(config_sha, n_feasible, n_total, n_survived,
+                          _requirements_lock_sha()) + "\n"
+            + f"d-harm     {dh:+.3f}  CI95 [{lo:+.3f} ; {hi:+.3f}]  gain {gain_text}")
+
+
+def config_sha(*, pi0: float, aggregation: str, tau_sel, theta: float, scope: str) -> str:
+    """sha256 over the FROZEN parameters that must sit in ONE hash cell together
+    (Global Constraints, "Gia phai tra" #2): pi0, the aggregation rule, tau_sel,
+    theta, and the dataset scope.  `experiment.py` calls this to build the
+    config_sha it passes to `results_table` -- see Step 7.5.
+
+    Keyword-only and named per field on purpose: a positional signature lets a
+    caller silently reorder two arguments of the same type (tau_sel and theta are
+    both numbers) and get a DIFFERENT hash for the SAME configuration, which is
+    the one failure mode a freeze exists to rule out.
+
+    theta sat outside every hash for as long as CarrierStore.retrieve used `==`
+    instead of it -- it was not a parameter yet, just an implicit 1.0.  Adding a
+    field here without a test that moves the digest (test_config_sha_moves_when_
+    theta_moves) is exactly the gap that let that go unnoticed.
+    """
+    import hashlib
+    blob = (f"pi0={pi0!r}|aggregation={aggregation!r}|tau_sel={tau_sel!r}|"
+            f"theta={theta!r}|scope={scope!r}")
+    return hashlib.sha256(blob.encode()).hexdigest()
+
+
 def spend_table(spent: dict, budget: float) -> str:
     """Budget CONSUMED per policy, next to the cap.
 
