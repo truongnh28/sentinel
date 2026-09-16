@@ -86,6 +86,12 @@ class RunResult:
     false_quarantine: int     # Q_false: a CLEAN item quarantined.  The mechanism behind lambda_Q
     t_lost: int               # T_lost: a CLEAN patch wrongly blocked by the commit audit
     traces: list = field(default_factory=list)    # one TaskTrace per task -- I9
+    #: The sealed manifest, when `run_once` was given a `seal` plan and a store
+    #: with a sealed area to put it in; None otherwise.  It is the EVALUATOR's
+    #: record and never reaches a Policy -- returned here rather than read back off
+    #: the store so that "this run sealed its manifest" is answerable without
+    #: reopening a directory the caller may already have moved on from.
+    manifest: dict | None = None
 
 
 def expected_harm(p_item: float, topic, topic_counts: dict,
@@ -140,8 +146,38 @@ def _quarantine_record(it, action: str, stage: str) -> dict:
 
 
 def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
-             record_traces=True, orc=None) -> RunResult:
+             record_traces=True, orc=None, store=None, on_task=None,
+             seal=None) -> RunResult:
     """One workflow run under one audit policy.
+
+    THE THREE M3 ARGUMENTS, and why they are here rather than in a second loop.
+
+    `store`, `on_task` and `seal` exist so Task 17 can run this workflow over a
+    REAL filesystem store, with a REAL `git clean -xfd && git checkout --force`
+    between tasks, without copying the body below.  Everything SPEC-P1b Part 1
+    asks a trace to carry is assembled in this one function; a second driver with
+    its own copy of that assembly is two places for nine field groups, and the
+    copy is the one that silently stops recording the row nobody reads until a
+    replay needs it.  All three default to today's behaviour EXACTLY -- an in-RAM
+    `CarrierStore`, no hook, `build.inject` -- so no recorded number moves.
+
+      store     the CarrierStore to run in.  Default: a fresh in-RAM one.
+      on_task   `on_task(t, task, store) -> CarrierStore`, called at the TOP of
+                each task, before this task's `before` snapshot and before the
+                injection.  It returns the store to use from here on, which is
+                what lets M3 reset the repo and REOPEN the store from disk: the
+                reopen is the reading that makes "the carriers survived" an
+                observation rather than an assertion.  The snapshot is taken
+                AFTER the hook on purpose -- `before(t)` must be the state the
+                agent at task t actually faces, so a reopen that lost an item
+                shows up as `before(t)` smaller than `after(t-1)`.
+      seal      the four mandatory evidence fields of `build.sealed_manifest`.
+                When given, the payload is planted with `build.inject_sealed`,
+                which seals the manifest into the store's sealed area in the SAME
+                act.  That function had no production call site and said so in its
+                own docstring; this is it.  It requires a store with
+                `seal_manifest`, i.e. a filesystem store -- an in-RAM store has no
+                sealed area to seal into.
 
     `orc` is THE ORACLE THAT SCORES THE HARM, and it defaults to
     `oracle.default_oracle()` -- the same call `experiment.py` prints the header
@@ -161,7 +197,7 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
     reads, and nothing in the trace path draws from an rng.  Callers that replay
     must leave it at the default.
     """
-    store = CarrierStore()
+    store = CarrierStore() if store is None else store
     # Insert LAZILY at t == iota, NOT before task 0.
     #
     # The old version inserted eagerly, so the payload lived in the store from
@@ -192,11 +228,26 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
     traces = []
     payload_id = None                  # set at iota; drives the P1..P5 checkpoints
 
+    manifest = None
     for t, task in enumerate(wf.tasks):
+        # THE RESET GOES HERE, before anything reads the store.  M3's hook does
+        # `git clean -xfd && git checkout --force <base_commit>` and then reopens
+        # the store from disk; the snapshot below is therefore taken on the
+        # REOPENED store, which is what makes `before(t)` vs `after(t-1)` an
+        # actual reading of what the reset destroyed.  See the docstring.
+        if on_task is not None:
+            store = on_task(t, task, store)
         before = store.snapshot() if record_traces else None
         injected_rec = None
         if do_inject and ps is not None and t == ps.iota:
-            payload = build.inject(store, wf, ps)
+            if seal is None:
+                payload = build.inject(store, wf, ps)
+            else:
+                # ONE ACT, not two -- see build.inject_sealed.  An injection whose
+                # manifest was not sealed is a run whose payload nobody can
+                # identify afterwards, which makes every harm figure from it
+                # unscorable.
+                payload, manifest = build.inject_sealed(store, wf, ps, **seal)
             payload_id = payload.item_id
             if record_traces:
                 injected_rec = item_record(payload)
@@ -384,7 +435,7 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
                      solved=solved_final, marker=marker_final, spent=pol.spent,
                      detected_at=detected_at, quarantined=len(store.quarantined),
                      fired_at=fired_at, true_quarantine=tq, false_quarantine=fq,
-                     t_lost=t_lost, traces=traces)
+                     t_lost=t_lost, traces=traces, manifest=manifest)
 
 
 class _NoAudit(P.Policy):

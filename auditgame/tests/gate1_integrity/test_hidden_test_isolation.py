@@ -891,10 +891,36 @@ class HiddenPathsDoNotTravelInTheCarriers(unittest.TestCase):
         nothing on a fresh clone.  The real carriers are scanned too when a run has
         left something there.
 
+        SINCE TASK 17 THERE IS SUCH A RUN.  `m3.py` leaves the M3 workflow's four
+        carriers in `harness.CARRIER_ROOT`, so on a machine that has run it the
+        first branch below is the REAL scan -- eight tasks of a real corpus, over a
+        real repository, with the payload planted and propagated -- and not a
+        hypothetical.  Two things are then asserted about it that were previously
+        left unsaid, because `last_run_store()` returning SOMETHING is not the same
+        as it returning EVERYTHING:
+
+          * the store it hands back is ATTACHED.  It takes no repo argument and
+            recovers one from `carrier_store_fs.REPO_POINTER`; a root that lost
+            that pointer loads three carriers of four, is scanned, is found clean,
+            and is reported as evidence while `branch` -- a commit per task -- was
+            never read at all.
+          * the scan is NOT VACUOUS.  An empty store passes any leak scan, so a
+            finished run with nothing in a carrier proves nothing about that
+            carrier.
+
         Thesis claim (vi): "co che dai dang quay lai can chinh oracle".
         """
         real = harness.last_run_store()
         if real is not None:
+            self.assertTrue(real.attached,
+                            f"{harness.CARRIER_ROOT} holds a finished run but "
+                            f"forgot which repo carries its `branch` carrier: the "
+                            f"scan below would read three carriers of four and "
+                            f"report a clean bill of health over the one it never "
+                            f"opened")
+            self.assertTrue(any(real.items[c] for c in CARRIERS),
+                            "last_run_store() returned a store with nothing in it: "
+                            "scanning it proves nothing")
             self.assertEqual(harness.hidden_leaks(real), [],
                              "the last real run's carriers reference the hidden tests")
 
