@@ -4,7 +4,7 @@ GATE 1 -- real SWE-bench data.  Spec: ../pipelines/SPEC-P1a-Harness.md Part 2.
 These tests NEVER touch the network: they use one embedded sample row.
 """
 from __future__ import annotations
-import unittest
+import json, pathlib, tempfile, unittest
 
 import topics
 
@@ -109,7 +109,114 @@ class RealData(unittest.TestCase):
         Thesis claim (vi): "theta chot duoc BANG DU LIEU".
         """
         d = topics.distribution([SAMPLE_ROW, SAMPLE_ROW])
-        self.assertEqual((d["n"], d["median"], d["hist"]), (2, 3, {3: 2}))
+        self.assertEqual((d["n"], d["median"], d["hist"]), (2, 3.0, {3: 2}))
+        # The gate reads "median > 3"; int() truncation would turn a true 3.5
+        # into a "3" and trip a STOP the data never called for.
+        self.assertIsInstance(d["median"], float)
+        odd = topics.distribution([SAMPLE_ROW, TWO_FILE_ROW])
+        self.assertEqual(odd["median"], 3.5,
+                         "a median between two middle values must not be truncated")
+
+
+class DownloadIsAllOrNothing(unittest.TestCase):
+    """swebench_fetch writes the file every pinned number is measured from, and a
+    TRUNCATED JSONL still parses -- so a half-download is indistinguishable
+    downstream from a smaller dataset.  Driven entirely by a local stub: no test
+    in this suite may touch the network.
+    """
+
+    def _stub(self, pages):
+        """pages: list of payloads to answer successive _get calls with."""
+        calls = iter(pages)
+
+        def _get(url, tries=4):
+            try:
+                payload = next(calls)
+            except StopIteration:
+                raise AssertionError("fetch asked for more pages than the stub has")
+            if isinstance(payload, Exception):
+                raise payload
+            return payload
+        return _get
+
+    @staticmethod
+    def _page(ids):
+        return {"rows": [{"row": {"instance_id": i}} for i in ids]}
+
+    def test_a_download_that_fails_midway_leaves_the_previous_file_untouched(self):
+        """Opening the output with "w" before the first page truncates the GOOD
+        file at the moment the download starts, so a failure at page 3 of 50
+        replaces a complete corpus with a valid-looking short one -- and nothing
+        downstream can tell the difference.
+
+        Thesis claim (vi): "so lieu do tren corpus DAY DU, khong phai mot phan".
+        """
+        import swebench_fetch
+        with tempfile.TemporaryDirectory() as d:
+            out = pathlib.Path(d) / "swebench_stub.jsonl"
+            out.write_text("PREVIOUS COMPLETE FILE\n", encoding="utf-8")
+            real_get = swebench_fetch._get
+            swebench_fetch._get = self._stub(
+                [self._page(["a", "b"]), RuntimeError("network died at page 2")])
+            try:
+                with self.assertRaises(RuntimeError):
+                    swebench_fetch.fetch("stub/ds", "test", out)
+            finally:
+                swebench_fetch._get = real_get
+            self.assertEqual(out.read_text(encoding="utf-8"),
+                             "PREVIOUS COMPLETE FILE\n",
+                             "a failed download overwrote the previous file")
+            self.assertFalse(list(pathlib.Path(d).glob("*.part")),
+                             "the partial file was left behind")
+
+    def test_an_error_payload_is_raised_not_read_as_the_end_of_the_split(self):
+        """datasets-server answers a rate-limited request with a JSON body that has
+        an "error" key and no "rows".  `.get("rows", [])` read that as "the split
+        ended here" and returned a SHORT count as though it were the whole
+        dataset.  An empty "rows" list is the real terminator; a missing one is a
+        failure.
+
+        Thesis claim (vi): "loi mang phai bao loi, khong duoc thanh het du lieu".
+        """
+        import swebench_fetch
+        with tempfile.TemporaryDirectory() as d:
+            out = pathlib.Path(d) / "swebench_stub.jsonl"
+            real_get = swebench_fetch._get
+            swebench_fetch._get = self._stub(
+                [self._page(["a", "b"]),
+                 {"error": "rate limited, please retry"}])
+            try:
+                with self.assertRaises(RuntimeError) as ctx:
+                    swebench_fetch.fetch("stub/ds", "test", out)
+            finally:
+                swebench_fetch._get = real_get
+            self.assertIn("rows", str(ctx.exception))
+            self.assertFalse(out.exists(),
+                             "an error payload still produced an output file")
+
+    def test_an_empty_rows_page_ends_the_split_and_the_file_is_moved_into_place(self):
+        """The success path of the two tests above: an empty "rows" list IS the
+        end of the split, and only then does the .part file become the real one.
+
+        Thesis claim (vi): "tai xong moi thay the file cu".
+        """
+        import swebench_fetch
+        with tempfile.TemporaryDirectory() as d:
+            out = pathlib.Path(d) / "swebench_stub.jsonl"
+            out.write_text("PREVIOUS COMPLETE FILE\n", encoding="utf-8")
+            real_get = swebench_fetch._get
+            swebench_fetch._get = self._stub(
+                [self._page(["a", "b"]), self._page(["c"]), {"rows": []}])
+            try:
+                n = swebench_fetch.fetch("stub/ds", "test", out)
+            finally:
+                swebench_fetch._get = real_get
+            self.assertEqual(n, 3)
+            self.assertEqual(
+                [json.loads(l)["instance_id"]
+                 for l in out.read_text(encoding="utf-8").splitlines()],
+                ["a", "b", "c"])
+            self.assertFalse(list(pathlib.Path(d).glob("*.part")))
 
 
 class WorkflowGrouping(unittest.TestCase):

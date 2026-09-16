@@ -155,6 +155,11 @@ _STRING_LITERAL = re.compile(r'"(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'')
 #: carry a diacritic, so VIETNAMESE above is structurally blind to exactly
 #: the thing this check is named for; this denylist is the other half.
 #:
+#: Matching is per WORD, not per identifier: `_word_parts` splits each
+#: identifier on "_" first, so `truoc_khi` and `so_thieu` are caught, not only
+#: the bare `thieu`. snake_case is how a Vietnamese phrase normally reaches a
+#: Python identifier, so testing whole identifiers missed the common case.
+#:
 #: KNOWN BLIND SPOT, NOT closed by this list: several unaccented Vietnamese
 #: words are ALSO ordinary English words or common short identifiers -- "can"
 #: (the very word the fixed `runner.py`/`test_real_data.py` bug used, still a
@@ -168,6 +173,24 @@ _STRING_LITERAL = re.compile(r'"(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'')
 #: Vietnamese identifier from this list, and none with a diacritic", not "no
 #: Vietnamese identifiers at all".
 VIETNAMESE_WORDS = {"truoc", "thieu"}
+
+
+def _word_parts(text: str):
+    """Every WORD inside every identifier, lowercased.
+
+    Membership was tested against whole identifiers, so the denylist was blind to
+    the compound spellings Vietnamese identifiers actually take in this repository:
+    `truoc_khi = 1` and `so_thieu = 2` produced no finding while `thieu = 3` did,
+    even though all three are the same defect. snake_case is the normal way a
+    Vietnamese phrase reaches a Python identifier, so that blind spot covered the
+    common case rather than an edge one. Splitting on "_" first closes it, and it
+    cannot widen the scan past the claim: every whole identifier is still one of
+    its own parts.
+    """
+    for tok in re.findall(r'[A-Za-z_]\w*', text):
+        for part in tok.lower().split("_"):
+            if part:
+                yield part
 
 
 def _blank_strings(body: str) -> str:
@@ -221,8 +244,7 @@ def check_vietnamese_identifiers(text: str, findings: list) -> None:
             if check_diacritics and VIETNAMESE.search(clean):
                 findings.append((None, "vi-in-code", line.strip()[:70]))
                 continue
-            if any(tok.lower() in VIETNAMESE_WORDS
-                   for tok in re.findall(r'[A-Za-z_]\w*', clean)):
+            if any(part in VIETNAMESE_WORDS for part in _word_parts(clean)):
                 findings.append((None, "vi-in-code", line.strip()[:70]))
 
     for lang, body in _blocks(text):

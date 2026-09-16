@@ -26,6 +26,14 @@ def distribution(rows) -> dict:
     hist: dict = {}
     for s in sizes:
         hist[s] = hist.get(s, 0) + 1
+    # The median is returned as a FLOAT, not int()-truncated. The decision gate
+    # in PLAN.md is "median > 3 => proceed, median <= 3 => STOP and tokenize
+    # finer", and statistics.median averages the two middle values on an even n,
+    # so a true 3.5 is a PROCEED that int() would report as "3" -- a STOP the
+    # data never called for. Both pools measure 4.0 today, so nothing already
+    # published moves; the truncation is removed because the gate reads this
+    # number, not because the number is currently wrong. Formatting is the
+    # caller's business.
     return {"n": len(sizes),
-            "median": int(statistics.median(sizes)) if sizes else 0,
+            "median": float(statistics.median(sizes)) if sizes else 0.0,
             "hist": dict(sorted(hist.items()))}

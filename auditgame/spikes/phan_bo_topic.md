@@ -17,7 +17,7 @@ print('histogram:',p['hist'])"
 ## Số đo được
 
 ```
-n = 500   trung vị |topic| = 4
+n = 500   trung vị |topic| = 4.0
 histogram: {2: 17, 3: 217, 4: 148, 5: 83, 6: 12, 7: 8, 8: 8, 9: 4, 10: 1, 11: 1, 32: 1}
 ```
 
@@ -46,3 +46,8 @@ này ở task sau.
   chạm rất nhiều file/thư mục khác nhau. Trung vị (4) ổn định hơn trung bình cho
   loại phân bố lệch phải như thế này, đúng lý do `distribution()` báo cáo
   `median` chứ không phải `mean`.
+
+> **Ghi chú (2026-09-16).** `distribution()` nay trả `median` kiểu `float` (in ra
+> `4.0` thay vì `4`); trước đó nó `int()` nên một trung vị thật 3.5 sẽ bị cắt
+> thành `3` và **kích hoạt nhầm** điều kiện dừng "trung vị $\le 3$". Giá trị đo
+> được không đổi (4.0 > 3, vẫn đi tiếp), chỉ cách in đổi.

@@ -218,7 +218,17 @@ def dumps(obj) -> str:
             # reconstructs the topic with `frozenset(the_list)`, or
             # `swebench_dataset.Topic(the_list)` when it needs that subclass.
             return sorted(o)
-        if isinstance(o, (set, tuple)):
+        if isinstance(o, set):
+            # Same reason as the frozenset branch above, and it is NOT covered by
+            # it: `frozenset` is not a subclass of `set`, so neither is a subclass
+            # of the other and each needs its own case.  CarrierStore.quarantined
+            # is a plain `set` of item_ids, so an unsorted list(o) here walks a
+            # hash-backed collection and serialises the SAME run to a DIFFERENT
+            # byte string across processes.
+            return sorted(o)
+        if isinstance(o, tuple):
+            # A tuple's order is MEANINGFUL (derived_from is a propagation trail),
+            # so it is preserved, never sorted.
             return list(o)
         raise TypeError(type(o))
     return json.dumps(obj, default=enc, ensure_ascii=False, indent=2)
