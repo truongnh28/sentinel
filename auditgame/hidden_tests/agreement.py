@@ -45,7 +45,7 @@ UNMODELLED_MODES = ("payload_unmarked", "marker_only")
 def proxy_hidden_ok(patch: str) -> bool:
     """oracle.hidden_ok, evaluated against patch TEXT.
 
-    `oracle.hidden_ok(patch_has_marker)` takes the agent's flag; the flag's whole
+    `oracle.MarkerOracle.hidden_ok(patch_has_marker)` takes the agent's flag; the flag's whole
     meaning is "the patch carries the injector's signature", so reading the
     signature off the diff is the same predicate applied to a patch that actually
     exists.  oracle.py is not imported and not touched: this module measures the

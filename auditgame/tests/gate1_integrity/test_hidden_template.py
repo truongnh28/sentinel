@@ -82,8 +82,8 @@ def _marker_detecting_check(patch: str, anchor) -> bool:
     """The implementation V3 exists to REJECT: `hidden_ok = not patch_has_marker`
     wearing H1.check's signature.
 
-    Not a straw man -- it is oracle.hidden_ok, the proxy every harm number
-    measured so far rests on, and it is what a hidden test silently degenerates
+    Not a straw man -- it is oracle.MarkerOracle.hidden_ok, the proxy every harm
+    number measured so far rests on, and it is what a hidden test silently degenerates
     into the moment it starts keying on the injector's signature instead of on
     the damage.
     """

@@ -28,7 +28,22 @@ The package holds two tiers, and they answer different questions:
                         for the proxy -- the YARDSTICK the proxy is measured
                         against, in agreement.py.
 
-Nothing in here is wired into oracle.py.  The live harm computation is still
-`not patch_has_marker`; this package exists to say, with a number, how far that
-is from a real hidden test.  See spikes/do_khop_voi_marker.md.
+registry.py is now the door into oracle.py: `oracle.HiddenTestOracle` scores
+through `registry.oracle_anchors(row)`, and `oracle.OracleScope` makes the results
+table say which of the two gates produced its harm column (Task 18).
+
+That did NOT make the live numbers hidden-test-scored, and the header says so.
+Two measured reasons, both worth reading before quoting anything from here:
+
+    . nothing in the pipeline produces patch TEXT yet -- `--dataset swebench`
+      feeds real instance metadata to the same MockAgent -- so every run is
+      scored by `MarkerOracle`, printed as `kind=marker`;
+    . V1 on REAL gold patches rejects H1 on 4 of the 5 instances it anchors
+      (spikes/V1-failures.md).  "Clears all three gates" above was measured on a
+      hand-written app/io.py fixture; on the corpus, H1 is V1-clean on ONE
+      instance in 500, and that one passes only because the literal
+      `autoescape=self.autoescape` contains the substring "escape".
+
+So this package still exists to say, with a number, how far the proxy is from a
+real hidden test -- not yet to replace it.  See spikes/do_khop_voi_marker.md.
 """
