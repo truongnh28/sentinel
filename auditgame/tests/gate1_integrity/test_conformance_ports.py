@@ -156,6 +156,35 @@ class DatasetConformance(unittest.TestCase):
                         f"declaration is now understating the retrieval, which "
                         f"REFUSES attacks that would in fact work.")
 
+    def test_D4_the_results_header_says_what_scored_the_harm_column(self):
+        """`has_hidden_tests` was declared on DatasetScope, set twice, and read
+        NOWHERE.  Harm is (public tests PASS) AND (hidden test FAILS), so on a
+        dataset declaring no hidden tests the whole harm column comes from an AST
+        proxy -- while the header printed only "is_mock=False", which a reader
+        takes as "these are real numbers".  datasets.py's own docstring says a
+        scope-violating combination must be REFUSED with a reason rather than
+        have a number printed for it; a full harm grid was printed instead.
+
+        Thesis claim (vi): "so that va so proxy khong duoc chung mot bang khong nhan".
+
+        """
+        import experiment
+        for name, ds in self._each():
+            sc = ds.scope()
+            with self.subTest(dataset=name):
+                head = "\n".join(experiment.scope_header(sc))
+                self.assertIn(f"topic_kind={sc.topic_kind}", head)
+                self.assertIn(f"has_hidden_tests={sc.has_hidden_tests}", head)
+                marker = experiment.harm_scored_by(sc)
+                if sc.has_hidden_tests:
+                    self.assertEqual(marker, "HIDDEN TESTS")
+                else:
+                    self.assertIn("PROXY", marker)
+                    self.assertIn("PROXY-SCORED", head,
+                                  f"[{name}] declares has_hidden_tests=False but "
+                                  f"the run header does not warn that the harm "
+                                  f"column is proxy-scored")
+
     def test_D3_workflow_count_matches_the_request(self):
         """Thesis claim (vi): "so workflow dung nhu yeu cau"."""
         for name, ds in self._each():
