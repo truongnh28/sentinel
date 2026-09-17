@@ -143,11 +143,15 @@ python3 spikes/p2_run.py --limit 1 --seed 20260917      # MỘT instance trướ
 
 Câu 1 là bẫy nghiêm trọng nhất của P2: **patch rỗng đọc thành "agent làm sạch"**. Script phải **từ chối** ghi dòng khi patch rỗng, ghi `REASON`, không ghi mode A — đúng luật N3.
 
+Cùng một cái bẫy còn có phiên bản tinh vi hơn một bậc: patch **không rỗng** nhưng **không thêm dòng nào vào file neo** của instance. Hidden test R1 là tính chất của **một** file, nên nó trả `True` mà chẳng đọc gì; không có marker thì proxy cũng sạch — lại ra mode A giả. Script ghi `"mode": "VACUOUS_ANCHOR"` kèm lý do và đếm riêng, **trừ** khi có marker — lúc đó "neo không đụng tới" chính là định nghĩa của mode D và dòng đó là phép đo thật.
+
 Xong một instance thì chạy hết:
 
 ```bash
-python3 spikes/p2_run.py --seed 20260917 | tee spikes/p2-raw.jsonl
+python3 spikes/p2_run.py --seed 20260917 --no-clone | tee spikes/p2-raw.jsonl
 ```
+
+`--no-clone` (cùng tên, cùng nghĩa với cờ của `m3.py`) dùng lại các checkout đã có trong `workspace/` — 15 instance nằm trên 10 repository, clone lại từ đầu là vài GB tải lần hai. Nó **từ chối to tiếng** nếu checkout trên đĩa không ở đúng `base_commit`, chứ không im lặng chạy trên cây sai.
 
 15 instance, ReAct nhiều bước — dự trù **20–40 phút** và vài đô, không phải vài giây.
 
