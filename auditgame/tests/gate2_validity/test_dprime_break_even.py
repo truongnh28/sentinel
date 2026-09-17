@@ -183,6 +183,52 @@ class TauSelFollowsTheSweptDPrime(unittest.TestCase):
             msg=f"tau_sel at d'={far} is the same whether or not it follows the "
                 f"sweep ({follows}) -- the confound this mode removes does not exist")
 
+    def test_a_refined_cell_reads_the_same_tau_sel_row_as_the_coarse_pass(self):
+        """A refinement point must not fall back to `mid` while the grid follows d'.
+
+        Thesis claim (vi): "go confound bang cach tra tau_sel o DUNG d' dang
+        quet, khong phai o d' cua mid".
+
+        The two-phase run is not reachable from today's CLI (--tau-follows-dprime
+        forces refinement off), so no published number is affected.  It is pinned
+        anyway because the failure mode is SILENT: an unthreaded refinement pass
+        appends d'-row cells measured at the `mid` row into the same table as the
+        coarse pass, and nothing anywhere would say so.  Threaded, the refinement
+        point 1.30 asks for a row the table does not have and the run dies with a
+        KeyError -- which is the correct outcome, not a defect.
+        """
+        recorded = []
+
+        def spy(wfs, d_prime, delta, budget, seeds, carriers=S.CARRIERS, ag=None,
+                setting=S.SETTING):
+            recorded.append((d_prime, setting))
+            return cell(d_prime, delta, +0.1)
+
+        rows = {2: [cell(1.2, 2, -0.1), cell(1.4, 2, +0.1)]}
+        original = S.measure_cell
+        S.measure_cell = spy
+        try:
+            S.refine_brackets(rows, [], 17.95, (1,), tau_follows_dprime=True)
+            following = list(recorded)
+            recorded.clear()
+            rows = {2: [cell(1.2, 2, -0.1), cell(1.4, 2, +0.1)]}
+            S.refine_brackets(rows, [], 17.95, (1,), tau_follows_dprime=False)
+            pinned = list(recorded)
+        finally:
+            S.measure_cell = original
+
+        self.assertEqual([dp for dp, _ in following], [1.25, 1.30, 1.35],
+                         "refinement no longer measures the open bracket")
+        for dp, setting in following:
+            self.assertEqual(setting, S.setting_for(dp, tau_follows_dprime=True),
+                             f"the refined cell at d'={dp} was measured at row "
+                             f"{setting!r}: the refinement pass mixes coarse rows "
+                             f"with mid-row cells in ONE table, silently")
+        self.assertNotIn("d1.3", scoring.load_table()["tables"],
+                         "the table gained a row at an odd tenth, so a refined "
+                         "run no longer fails loudly on a missing row")
+        self.assertEqual([setting for _, setting in pinned], [S.SETTING] * 3,
+                         "the default mode stopped reading the frozen `mid` row")
 
 class TheDeclaredConfoundIsInertForThisDeltaHarmPair(unittest.TestCase):
     """The measured answer to "how much did the pinned tau_sel cost us".

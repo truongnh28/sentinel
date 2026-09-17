@@ -114,12 +114,59 @@ class SweepIsTheSameMeasurement(unittest.TestCase):
         must not have.
         """
         for fn in (S.measure_cell, S.sweep, S.make_corpus, S.make_detector,
-                   S.break_even, S.refinement_points):
+                   S.break_even, S.refinement_points, S.refine_brackets):
             used = identifiers(fn)
             self.assertNotIn("hash", used,
                              f"{fn.__name__} calls hash() -- process-dependent")
             self.assertNotIn("count", used,
                              f"{fn.__name__} uses a counter -- order-dependent")
+
+
+class TheSweepArtefactSaysWhichRunMadeIt(unittest.TestCase):
+    """An archived --json file has to carry the identity of the run that made it."""
+
+    def _cells(self):
+        return {0: [S.SweepCell(d_prime=0.2, delta=0, harm_b1=1.0,
+                                harm_sentinel=0.9, dharm=0.1, ci_lo=0.0, ci_hi=0.2,
+                                n_feasible=40, n_total=40)]}
+
+    def test_the_json_artefact_records_the_mode_and_the_run_that_produced_it(self):
+        """Cells alone cannot say which tau_sel mode measured them.
+
+        Thesis claim (vi): "moi con so deu co mot lenh tai lap di kem".
+
+        The two modes of this sweep produce numbers of the SAME shape -- on the
+        published corpus they are identical cell for cell -- so two archived files
+        are indistinguishable unless the file says which mode, which grid, which
+        seeds and which corpus size it came from.  Without that a sweep JSON is a
+        number with no recipe behind it, which is precisely what gate 1 exists to
+        refuse.
+        """
+        rows = self._cells()
+        common = dict(n=40, H=8, budget=17.95, seeds=(1, 2, 3), deltas=(0,),
+                      grid=S.GRID, refined=False)
+        pinned = S.json_payload(rows, tau_follows_dprime=False, **common)
+        following = S.json_payload(rows, tau_follows_dprime=True, **common)
+
+        for name, doc in (("pinned", pinned), ("following", following)):
+            with self.subTest(mode=name):
+                run = doc["run"]
+                self.assertEqual(run["n_workflows"], 40)
+                self.assertEqual(run["budget"], 17.95)
+                self.assertEqual(list(run["seeds"]), [1, 2, 3])
+                self.assertEqual(list(run["grid"]), list(S.GRID))
+                self.assertEqual(run["corpus_seed"], S.CORPUS_SEED)
+                self.assertEqual(len(doc["cells"]["0"]), 1)
+                self.assertEqual(doc["cells"]["0"][0]["d_prime"], 0.2)
+
+        self.assertFalse(pinned["run"]["tau_follows_dprime"])
+        self.assertTrue(following["run"]["tau_follows_dprime"])
+        self.assertNotEqual(pinned["run"], following["run"],
+                            "the two tau_sel modes write indistinguishable "
+                            "artefacts, so an archived sweep cannot say which one "
+                            "it is")
+        self.assertEqual(pinned["cells"], following["cells"],
+                         "the run block leaked into the cells")
 
 
 if __name__ == "__main__":

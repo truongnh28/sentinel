@@ -14,8 +14,12 @@ Re-running with the same seed must produce EXACTLY this file (I1).  Every parame
 that produced it lives in the JSON's own `provenance` block -- no hidden parameters
 (I5).
 
-    python3 gen_score_table.py            # write score_table.json
     python3 gen_score_table.py --check    # regenerate, compare to the existing file, write nothing
+    python3 gen_score_table.py            # write score_table.json -- REFUSED if it exists
+    python3 gen_score_table.py --force    # overwrite it anyway (deliberate regeneration)
+
+--check comes first on purpose.  It is the non-destructive verification, and a
+regeneration run BEFORE it would leave --check comparing the file against itself.
 
 TWO KINDS OF ROW, TWO KINDS OF INPUT.
 
@@ -183,7 +187,28 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true",
                     help="regenerate and compare to the existing file; write nothing")
+    ap.add_argument("--force", action="store_true",
+                    help="overwrite score_table.json even though it already exists "
+                         "(a full ~23-minute regeneration of a FROZEN artifact)")
     a = ap.parse_args()
+
+    # REFUSE BEFORE BUILDING, not after.  score_table.json is a frozen artifact
+    # with three consumers, and an unguarded write also destroys the verification
+    # meant to catch it: --check rebuilds and compares against the file on disk, so
+    # generate-then-check compares the file against itself and prints MATCH
+    # whatever the generator did.  --check needs no flag (it writes nothing) and
+    # --force keeps the regeneration workflow, on purpose rather than by accident.
+    # A clobbered table is recoverable from git: HEAD carries the CURRENT table
+    # (three declared settings + the 16 d'-keyed rows), and 65ac973 carries the
+    # PRE-EXTENSION table the spike's byte-identity md5s were taken on.
+    #     git show HEAD:reference/score_table.json > reference/score_table.json
+    if not a.check and not a.force and OUT.exists():
+        print(f"REFUSED: {OUT} already exists.\n"
+              f"  --check  rebuilds and compares, writes nothing (~23 min)\n"
+              f"  --force  regenerates and OVERWRITES the frozen artifact (~23 min)\n"
+              f"  recover: git show HEAD:reference/score_table.json > {OUT}",
+              file=sys.stderr)
+        return 2
 
     # Progress on stderr: a full run is ~23 minutes (19 tables x 31 cells x 800k
     # samples) and a silent 23-minute process is indistinguishable from a hung one.
@@ -191,6 +216,12 @@ def main() -> int:
         print(f"  building [{name}] d'={dp:.3f} ...", file=sys.stderr, flush=True)
 
     tables = build(progress)
+    # The Vietnamese strings below are CONTENT OF THE FROZEN ARTIFACT, not source
+    # prose: they are serialised into score_table.json, which --check compares
+    # byte-for-byte after excluding `measured_at` alone.  Translating one of them
+    # changes the file, so an English rewrite here is a 23-minute regeneration plus
+    # a moved artifact -- which is why the project's rule is that frozen Vietnamese
+    # strings stay frozen.  New English prose belongs in comments and docstrings.
     doc = {
         "provenance": {
             "generated_by": "auditgame/reference/gen_score_table.py",

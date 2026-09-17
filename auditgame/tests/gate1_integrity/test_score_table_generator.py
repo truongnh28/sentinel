@@ -22,14 +22,22 @@ seed, a changed M and a changed aggregation rule all land on these cells and all
 show up here.  M is NOT reduced: reducing it would compare against numbers the
 committed file does not contain.
 
+WHAT THE FAST PATH GIVES UP.  Only the n = 0 / n = 1 prefix of each frozen table is
+compared, so an edit deeper in a committed table is invisible here; the complete
+pin is `gen_score_table.py --check`, at ~23 minutes.  Said again at the test.
+
 Naming convention: test names are English and each name is the SENTENCE the test
 protects; the thesis sentence it defends lives in the mandatory
 `Thesis claim (vi):` docstring line.
 """
 from __future__ import annotations
+import contextlib
 import importlib.util
+import io
 import json
 import pathlib
+import sys
+import tempfile
 import unittest
 
 import dprime_sweep as S
@@ -90,6 +98,15 @@ class AddingRowsCannotMoveTheRowsAlreadyThere(unittest.TestCase):
                     f"[{name}] the extended generator no longer reproduces the "
                     f"committed n=0/n=1 rows: the frozen table moved under what "
                     f"was supposed to be an additive change")
+
+    # WHAT THIS DOES NOT COVER, said here so nobody reads it as more than it is.
+    # It pins the n = 0 / n = 1 PREFIX of each legacy table -- the first cells the
+    # stream feeds -- so a shared RNG, a reordered registry, a changed seed, a
+    # changed M and a changed aggregation rule all land on it.  A hand-edit DEEPER
+    # in a frozen table (say at n = 15) passes here untouched.  The COMPLETE pin is
+    # `python3 reference/gen_score_table.py --check`, which rebuilds all 19 tables
+    # and compares every cell -- ~23 minutes, which is why it cannot live in the
+    # suite.  This test is the fast tripwire, not the full check.
 
     def test_the_frozen_settings_keep_their_declared_psi_and_phi_pair(self):
         """weak/mid/strong stay keyed by (psi, phi), not by d'.
@@ -157,6 +174,102 @@ class TheSweepGridHasItsOwnCalibratedRows(unittest.TestCase):
         """
         expected = set(LEGACY) | {GEN.sweep_setting_name(dp) for dp in S.GRID}
         self.assertEqual(set(TABLE["tables"]), expected)
+
+
+class RegeneratingTheFrozenTableIsDeliberate(unittest.TestCase):
+    """A plain `python3 gen_score_table.py` must not silently replace the artifact.
+
+    score_table.json is FROZEN and three consumers read it.  An unguarded write
+    also poisons the verification that is supposed to catch it: --check compares a
+    fresh build against the file on disk, so running the generator first and
+    --check second compares the file against itself and prints MATCH whatever the
+    generator did.  The guard has to refuse BEFORE the build, not after: the build
+    is ~23 minutes and a refusal that arrives afterwards has already burned them.
+    """
+
+    #: 31 rows so main()'s summary print (n = 0..30) has cells to read; the numbers
+    #: are irrelevant here -- what is under test is WHETHER the file is written.
+    STUB_ROWS = [dict(n=n, mean_p=0.1, se_mean_p=0.0,
+                      tau_sel={str(k): 0.1 for k in range(1, 5)},
+                      mean_cubic=0.0, se_cubic=0.0) for n in range(31)]
+
+    def _stubbed(self, out: pathlib.Path):
+        """A generator whose OUT is a temp file and whose build() is counted.
+
+        build() is the 23-minute part, so it is replaced -- and the replacement
+        RECORDS ITS CALLS, which is how "refused before building" is asserted
+        rather than assumed.
+        """
+        mod = _generator()
+        mod.OUT = out
+        builds = []
+
+        def stub_build(progress=None):
+            builds.append(1)
+            return {"mid": dict(psi=0.85, phi=0.12, d_prime=1.0, tau_detector=1.0,
+                                var_lambda=1.0, bound_coefficient_C=1.0,
+                                n_min_bound_useful=1.0, rows=self.STUB_ROWS)}
+
+        mod.build = stub_build
+        return mod, builds
+
+    @staticmethod
+    def _run(mod, argv):
+        """main() with a controlled argv, its output swallowed."""
+        saved = sys.argv
+        sys.argv = ["gen_score_table.py", *argv]
+        try:
+            with contextlib.redirect_stdout(io.StringIO()), \
+                 contextlib.redirect_stderr(io.StringIO()):
+                return mod.main()
+        finally:
+            sys.argv = saved
+
+    def test_a_plain_run_refuses_to_overwrite_an_existing_table(self):
+        """The frozen file survives an accidental `python3 gen_score_table.py`.
+
+        Thesis claim (vi): "KHONG sua tay. Sua script roi sinh lai" -- va cung
+        KHONG sinh lai de len mot artifact dong bang chi vi go nham mot lenh.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "score_table.json"
+            out.write_text("FROZEN", encoding="utf-8")
+            mod, builds = self._stubbed(out)
+            rc = self._run(mod, [])
+            self.assertNotEqual(rc, 0, "an unguarded run reported success")
+            self.assertEqual(out.read_text(encoding="utf-8"), "FROZEN",
+                             "the existing table was overwritten by a plain run")
+            self.assertEqual(builds, [],
+                             "the refusal arrived AFTER the 23-minute build")
+
+    def test_the_explicit_flag_still_regenerates_the_table(self):
+        """The regeneration workflow stays possible -- it just has to be asked for.
+
+        Thesis claim (vi): "sinh lai bang chinh script, khong sua tay".
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "score_table.json"
+            out.write_text("FROZEN", encoding="utf-8")
+            mod, builds = self._stubbed(out)
+            self.assertEqual(self._run(mod, ["--force"]), 0)
+            self.assertEqual(builds, [1])
+            self.assertIn("provenance", json.loads(out.read_text(encoding="utf-8")))
+
+    def test_check_needs_no_flag_and_still_writes_nothing(self):
+        """--check is the non-destructive verification and stays untouched.
+
+        Thesis claim (vi): "--check sinh lai roi SO SANH, khong ghi gi".
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "score_table.json"
+            mod, _ = self._stubbed(out)
+            self.assertEqual(self._run(mod, ["--force"]), 0)
+            written = out.read_bytes()
+            mod, builds = self._stubbed(out)
+            self.assertEqual(self._run(mod, ["--check"]), 0,
+                             "--check no longer matches the file it just wrote")
+            self.assertEqual(out.read_bytes(), written, "--check wrote to the file")
+            self.assertEqual(builds, [1], "--check did not rebuild before comparing")
 
 
 if __name__ == "__main__":

@@ -60,6 +60,14 @@ or B6; for THIS one it is inert, and that is now measured rather than assumed
 (gate 2, TheDeclaredConfoundIsInertForThisDeltaHarmPair, which carries its own
 sensitivity control).
 
+READ THAT RESULT FOR EXACTLY WHAT IT IS.  Because the intervention cannot reach
+either policy of the pair, the new-mode run carries NO information about whether
+the reversal at Delta = 0 is a real mechanism: the two curves had to agree either
+way, and a test that could not have failed is not evidence.  What it establishes
+is an ELIMINATION -- "tau_sel pinned at mid" is struck off the list of candidate
+explanations for the reversal and for the placement of Delta=2's d'* -- and
+nothing more.  The reversal itself is still unexplained.
+
 THE DEFINITION OF d'* -- FIXED BEFORE ANY NUMBER WAS LOOKED AT:
 
     d'* = the SMALLEST d' in the grid such that the CI95 LOWER BOUND of
@@ -109,6 +117,10 @@ GRID = tuple(round(0.2 * i, 2) for i in range(16))
 
 #: Refinement step, used only inside the bracket that already contains d'*.
 REFINE_STEP = 0.05
+
+#: The corpus seed, the same one experiment.py's mock path uses.  Named so the
+#: --json artefact can record WHICH corpus a sweep ran on instead of implying it.
+CORPUS_SEED = 2026
 
 #: The Delta cells.  REPORTED SEPARATELY, NEVER POOLED (project rule): a pooled
 #: number averages the regime where the method helps with the regime where it does
@@ -164,7 +176,7 @@ def make_detector(d_prime: float) -> detector.Detector:
     return detector.Detector(d_prime, TAU_DET)
 
 
-def make_corpus(n: int, H: int, seed: int = 2026) -> list:
+def make_corpus(n: int, H: int, seed: int = CORPUS_SEED) -> list:
     """The same corpus experiment.py's `--dataset mock` path builds.
 
     Copied in shape, not imported, for one reason only: importing experiment would
@@ -294,6 +306,65 @@ def sweep(wfs, grid=GRID, deltas=DELTAS, budget: float = 17.95, seeds=(1, 2, 3),
     return out
 
 
+def refine_brackets(rows: dict, wfs, budget: float, seeds, carriers=CARRIERS,
+                    ag=None, tau_follows_dprime: bool = False) -> dict:
+    """Re-measure each Delta's bracket at step REFINE_STEP, in place.
+
+    The tau_sel row is threaded from the SAME rule the coarse pass used.  It would
+    be very easy not to: measure_cell defaults `setting` to SETTING, so an
+    unthreaded call here silently measures the refined cells at the "mid" row and
+    appends them to a table of d'-row cells, producing ONE curve made of two
+    different thresholds with nothing anywhere to say so.
+
+    Threaded, a refinement point asks for the row calibrated at ITS OWN d' -- which
+    the frozen table does not have, since the names are one decimal wide and the
+    bracket is unknown until the coarse grid is measured -- and the run dies with a
+    KeyError.  That is the correct outcome: a two-phase refined run has to generate
+    its bracket's rows first, and failing loudly is what says so.  Today's CLI
+    forces refinement off under --tau-follows-dprime, so this path is unreachable
+    from the command line; it is threaded anyway because the trap outlives the flag.
+    """
+    for delta, cells in rows.items():
+        for dp in refinement_points(break_even(cells)):
+            cells.append(measure_cell(wfs, dp, delta, budget, seeds, carriers, ag,
+                                      setting_for(dp, tau_follows_dprime)))
+    return rows
+
+
+def json_payload(rows: dict, *, n: int, H: int, budget: float, seeds, deltas,
+                 grid, tau_follows_dprime: bool, refined: bool,
+                 corpus_seed: int = CORPUS_SEED) -> dict:
+    """The --json artefact: the cells, AND the identity of the run that made them.
+
+    The cells alone cannot say which of the two tau_sel modes measured them -- on
+    the published corpus the two modes agree cell for cell, so two archived files
+    are indistinguishable without the run block.  An archived measurement that
+    cannot name its own configuration is a number with no recipe behind it.
+    """
+    return {
+        "run": {
+            "module": "dprime_sweep.py",
+            "n_workflows": n,
+            "H": H,
+            "budget": budget,
+            "seeds": list(seeds),
+            "corpus_seed": corpus_seed,
+            "deltas": list(deltas),
+            "grid": list(grid),
+            "tau_det": TAU_DET,
+            "tau_follows_dprime": bool(tau_follows_dprime),
+            "tau_sel_rows": (f"{setting_for(grid[0], True)!r} .. "
+                             f"{setting_for(grid[-1], True)!r}, one per grid point"
+                             if tau_follows_dprime else
+                             f"{SETTING!r} at every grid point -- declared confound"),
+            "refined": bool(refined),
+            "refine_step": REFINE_STEP if refined else None,
+        },
+        "cells": {str(d): [asdict(c) for c in sorted(rows[d], key=lambda c: c.d_prime)]
+                  for d in deltas},
+    }
+
+
 # ----------------------------------------------------------------- report ----
 
 def table(rows) -> str:
@@ -324,10 +395,12 @@ def main() -> int:
                     help="look tau_sel up in the row calibrated at the SWEPT d' "
                          "(rows d0.0..d3.0) instead of the fixed `mid` row; "
                          "implies --no-refine, see the module docstring")
-    ap.add_argument("--json", metavar="FILE")
+    ap.add_argument("--json", metavar="FILE",
+                    help="write the cells AND a `run` block naming the corpus, the "
+                         "grid, the seeds and which tau_sel mode produced them")
     a = ap.parse_args()
 
-    wfs = make_corpus(a.n, a.H, seed=2026)
+    wfs = make_corpus(a.n, a.H, seed=CORPUS_SEED)
     seeds = tuple(range(1, a.seeds + 1))
     # The table has tau_sel rows at the COARSE grid only, and cannot have more:
     # which bracket gets refined is unknown until the coarse grid is measured.
@@ -361,10 +434,8 @@ def main() -> int:
                  tau_follows_dprime=a.tau_follows_dprime)
 
     if refine:
-        for d in DELTAS:
-            extra = refinement_points(break_even(rows[d]))
-            for dp in extra:
-                rows[d].append(measure_cell(wfs, dp, d, a.budget, seeds))
+        refine_brackets(rows, wfs, a.budget, seeds,
+                        tau_follows_dprime=a.tau_follows_dprime)
 
     summary = {}
     for d in DELTAS:
@@ -389,9 +460,13 @@ def main() -> int:
         print(f"  {name:<7} d'={dp:.3f}   {verdict}")
 
     if a.json:
-        json.dump({str(d): [asdict(c) for c in sorted(rows[d], key=lambda c: c.d_prime)]
-                   for d in DELTAS}, open(a.json, "w"), indent=2)
-        print(f"\n  wrote {a.json}")
+        doc = json_payload(rows, n=a.n, H=a.H, budget=a.budget, seeds=seeds,
+                           deltas=DELTAS, grid=GRID,
+                           tau_follows_dprime=a.tau_follows_dprime, refined=refine)
+        with open(a.json, "w") as fh:
+            json.dump(doc, fh, indent=2)
+        print(f"\n  wrote {a.json}  (run block records the mode: "
+              f"tau_follows_dprime={doc['run']['tau_follows_dprime']})")
     return 0
 
 

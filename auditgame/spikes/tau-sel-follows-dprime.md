@@ -25,6 +25,11 @@ Luật phán quyết được **chốt trước** khi chạy phép đo mới (xe
 khi `D_mới < 0` và `|D_mới| ≥ 0.5·|D_cũ|`, đọc **(b)** khi `D_mới ≥ 0` hoặc
 `|D_mới| < 0.5·|D_cũ|`.
 
+> **Đọc §5 trước khi dùng luật này.** Luật trên **vô hiệu** ở đây: nó ngầm giả định
+> `tau_sel` có đường đi tới cặp policy định nghĩa `Δharm`, và §6 cho thấy **không
+> có**. Cái spike này phân định được là **loại bỏ một nghi can**, không phải xác
+> nhận cơ chế.
+
 ---
 
 ## 2. Cái đã làm — bảng tham chiếu mọc thêm 16 hàng khoá theo `d′`
@@ -63,6 +68,28 @@ md5:
 | `mid` | `0d8bec2e446458928fe10eb9d1b470fd` | `0d8bec2e446458928fe10eb9d1b470fd` | **TRÙNG** |
 | `strong` | `6e998942f967a93be1e7f394aed35942` | `6e998942f967a93be1e7f394aed35942` | **TRÙNG** |
 
+Bảng **"trước"** không phải là một file nằm đâu đó trên máy: nó là
+`reference/score_table.json` **ở commit `65ac973`** (commit ngay trước lần mở rộng).
+Lệnh tái lập đúng ba md5 trên — chạy từ `HCMUT/code/Sentinel/auditgame`:
+
+```bash
+git show 65ac973:HCMUT/code/Sentinel/auditgame/reference/score_table.json \
+  > /tmp/score_table.BEFORE.json
+python3 - <<'EOF'
+import hashlib, json
+before = json.load(open("/tmp/score_table.BEFORE.json"))
+after  = json.load(open("reference/score_table.json"))
+def h(doc, name):                       # ĐÚNG công thức tuần tự hoá đã dùng
+    blob = json.dumps(doc["tables"][name], indent=2,
+                      ensure_ascii=False, sort_keys=True).encode()
+    return hashlib.md5(blob).hexdigest(), len(blob)
+for name in ("weak", "mid", "strong"):
+    b, a = h(before, name), h(after, name)
+    print(f"{name:7} {b[0]}  {a[0]}  {b[1]}/{a[1]} byte  "
+          f"{'TRÙNG' if b == a else 'LỆCH'}")
+EOF
+```
+
 Số byte cũng bằng nhau (10864 / 10809 / 10831). File **thêm đúng 16** bảng, **bỏ 0**
 bảng. Khối `provenance` chỉ **mọc thêm** khoá (`settings_declared`,
 `settings_by_dprime`, `settings_by_dprime_note`, `sweep_phi`, `additive`); khoá duy
@@ -84,8 +111,19 @@ mọi setting dùng chung một RNG thì cả ba bảng cũ đỏ ngay.
 | `d2.2` (`d′=2.200`) | 0.2706 | 0.2632 | 0.2421 | 0.2291 |
 
 Khớp tới ~2×10⁻³. Toàn dải thì `tau_sel(n=9, K=1)` đi **0.1000** (`d0.0`) →
-**0.2644** (`d2.4`) → **0.2349** (`d3.0`): hàng mới **thật sự** động theo `d′`, và
-không đơn điệu — đúng như `scoring.tau_sel` đã cảnh báo về chiều `n`.
+**0.2644** (`d2.4`, đỉnh) → **0.2349** (`d3.0`): hàng mới **thật sự** động theo
+`d′`, và **không đơn điệu theo `d′`**.
+
+**Chiều `d′` này là một hiện tượng KHÁC với cảnh báo trong docstring của
+`scoring.tau_sel`.** Docstring đó nói về **chiều `n`** (đi theo `n` thì `weak` giảm
+còn `strong` tăng — một artefact **đổi dấu** giữa các setting). Còn chỗ này là
+chiều `d′`, và nguyên nhân là: detector càng sắc thì **posterior của carrier SẠCH
+càng bị đẩy xuống** — `E[p_c | sạch, n=9]` đi đơn điệu **0.1000** (`d0.0`) →
+**0.0522** (`d3.0`). `tau_sel` là **phân vị trên** của chính phân bố đó, nên nó chịu
+hai lực ngược chiều: bề rộng phân bố **nở ra** theo `d′` (từ một điểm suy biến ở
+`d′ = 0`) kéo phân vị **lên**, còn cả khối phân bố **trượt xuống** kéo nó **xuống**.
+Tới quanh `d′ ≈ 2.4` thì lực thứ hai thắng, và đường cong quay đầu. Không có gì
+đảo dấu ở đây, và hai hiện tượng không được lẫn vào nhau.
 
 ---
 
@@ -122,7 +160,7 @@ mịn hoá 0,05, không phải do ngưỡng đổi. Nghi vấn *"`d′* ≈ 2.5`
 
 ---
 
-## 5. Chuỗi `Δ = 0`, cũ so với mới — và phán quyết
+## 5. Chuỗi `Δ = 0`, cũ so với mới — và vì sao luật đã chốt không phân định được
 
 | `d′` | `Δharm` **cũ** | CI95 cũ | `Δharm` **mới** | CI95 mới | lệch |
 |---:|---:|:--:|---:|:--:|---:|
@@ -145,12 +183,43 @@ mịn hoá 0,05, không phải do ngưỡng đổi. Nghi vấn *"`d′* ≈ 2.5`
 
 Độ tụt: `D_cũ = −0.200`, `D_mới = −0.200`, **tỉ số 1.000**.
 
-> ### PHÁN QUYẾT: **ĐỌC (a) — CƠ CHẾ LÀ THẬT.**
-> Đảo chiều ở `Δ = 0` **sống sót nguyên vẹn** khi `tau_sel` chạy theo `d′`: không
-> phải "yếu đi trong ngưỡng cho phép" mà **trùng từng chữ số** ở cả 16 điểm lưới, ở
-> cả `Δharm` lẫn hai đầu CI95. Luật đã chốt đòi `|D_mới| ≥ 0.5·|D_cũ|`; thực tế
-> `|D_mới| = 1.000·|D_cũ|`. Tiên nghiệm ghi trong đề bài (một hiện thực độc lập báo
-> **−37%**, nghiêng về (a)) được xác nhận **theo hướng mạnh hơn**: thay đổi là **0%**.
+> ### PHÁN QUYẾT: LUẬT ĐÃ CHỐT **KHÔNG PHÂN ĐỊNH ĐƯỢC** Ở ĐÂY
+>
+> Đọc theo mặt chữ, luật §1 trả về **(a)**: `D_mới < 0` và
+> `|D_mới| = 1.000·|D_cũ| ≥ 0.5·|D_cũ|`. **Nhưng kết luận đó không được phép rút
+> ra**, vì §6 chứng minh `tau_sel` **không có đường nào** đi tới `B1
+> audit-at-commit` lẫn `Sentinel` — đúng cặp policy mà `Δharm` được định nghĩa qua.
+> Phép can thiệp của spike này **TRƠ VỀ MẶT CẤU TRÚC** đối với đại lượng đang đo:
+> hai cột "cũ" và "mới" **buộc phải** trùng nhau, dù cơ chế đằng sau đảo chiều là
+> thật hay là giả. **Một phép thử không thể trượt thì không phải bằng chứng.**
+> Luật §1 được chốt **trước** khi đo (đúng quy trình, và vẫn nên làm vậy), nhưng nó
+> **ngầm giả định một đường đi đang sống** — đường đó không tồn tại. Vì vậy ở đây
+> luật **vô hiệu**: không phải vì kết quả xấu, mà vì câu hỏi nó hỏi không chạm được
+> vào dữ liệu. Cặp chữ (a)/(b) giữ lại trong tài liệu này **chỉ** như tiền-đăng-ký,
+> **không** như một phán quyết đã tuyên.
+>
+> **Spike này THỰC SỰ xác lập — không hơn:**
+>
+> 1. **LOẠI BỎ, bằng cấu trúc.** Giả thuyết *"`tau_sel` bị ghim ở `mid`"* **bị loại**
+>    khỏi danh sách cách giải thích đảo chiều ở `Δ = 0`. Nó **không thể** đã tạo ra
+>    đảo chiều và **không thể** đã đặt `d′*` của `Δ = 2` — không phải vì đo thấy ảnh
+>    hưởng nhỏ, mà vì **không có đường nào** để ảnh hưởng đi qua (§6).
+> 2. **KHÔNG xác lập.** Rằng **cơ chế** đằng sau đảo chiều là **thật**. Phép quét ở
+>    chế độ mới mang **ZERO thông tin** về câu hỏi đó. Đảo chiều `Δharm < 0` và càng
+>    âm thêm khi audit tốt lên **vẫn chưa được giải thích**, vẫn là câu hỏi mở — chỉ
+>    là **bớt đi một nghi can**.
+
+**Tiên nghiệm −37% đứng ở đâu — không phải mâu thuẫn, cũng không phải "xác nhận
+mạnh hơn".** Con số **−37%** ghi trong đề bài đến từ run `rc-20260915`, **một
+codebase KHÁC** không hề có cấu trúc `tau_sel` này, và nó là **độ lớn phần THIỆT
+của Sentinel tại `Δ = 0`** — một kết quả **harm**, **không** phải một phép đo độ
+nhạy với ngưỡng. Vậy nên nó **không** nghịch với con số 0% ở đây (hai bên đo **hai
+đại lượng khác nhau**, đặt cạnh nhau là so sai đơn vị), và cũng **không** phải là
+"được xác nhận theo hướng mạnh hơn". Chỗ đứng đúng của nó: đó là **bằng chứng dương
+DUY NHẤT** hiện có cho cách đọc (a), và vì đến từ **một hiện thực độc lập**, nó là
+**chứng cứ hỗ trợ mà confound của codebase này không thể giải thích đi được**. Muốn
+phân định (a)/(b) thật sự thì phải can thiệp vào một đường **đang sống** đối với cặp
+`(B1, Sentinel)` — việc đó chưa có ai làm.
 
 Ba ô còn lại cũng trùng từng chữ số — xem §6 để biết vì sao, vì đó mới là kết quả
 thật sự của spike này.
@@ -229,18 +298,39 @@ việc chọn hàng ngưỡng nào. Hàng `d0.0 … d3.0` bây giờ đã có s�
 cd HCMUT/code/Sentinel/auditgame
 find . -name __pycache__ -type d -exec rm -rf {} +
 
-# §2.1  bảng tham chiếu (≈23 phút; ghi đè reference/score_table.json)
-python3 reference/gen_score_table.py            # SEED=20260915, M=800000
+# §2.1  KIỂM bảng tham chiếu — KHÔNG ghi gì, và tự nó là ĐỦ (≈23 phút)
 python3 reference/gen_score_table.py --check    # phải in CHECK: MATCH
+
+# SINH LẠI bảng: chỉ khi thật sự cần, và KHÔNG BAO GIỜ chạy trước --check.
+# Lệnh này GHI ĐÈ artifact đóng băng; chạy nó trước thì --check sau đó đang so
+# file với CHÍNH NÓ và sẽ in MATCH bất kể script làm gì.  Từ 18/09/2026 script
+# TỪ CHỐI (exit 2) khi file đã tồn tại mà không có --force.
+#   python3 reference/gen_score_table.py --force   # ≈23 phút, SEED=20260915, M=800000
+# Cứu bảng lỡ bị ghi đè (bảng HIỆN HÀNH, 3 + 16 hàng):
+#   git show HEAD:reference/score_table.json > reference/score_table.json
+# Bảng TRƯỚC khi mở rộng (dùng cho ba md5 ở §2.1):
+#   git show 65ac973:HCMUT/code/Sentinel/auditgame/reference/score_table.json
 
 # §4, §5  cột "cũ"  — corpus seed 2026, seed chạy 1,2,3
 python3 dprime_sweep.py --n 40 --json sweep_old.json
 
 # §4, §5  cột "mới"
 python3 dprime_sweep.py --n 40 --tau-follows-dprime --json sweep_new.json
+# (file --json mang sẵn khối "run": n, H, budget, seeds, corpus_seed, grid và
+#  tau_follows_dprime — nên một file lưu trữ TỰ NÓI được nó là chế độ nào.)
 
-# §2.2  bảng tau_sel theo hàng
-python3 -c "import scoring; print([scoring.tau_sel(9, n, 1) for n in ('mid','d0.0','d2.2','d3.0')])"
+# §2.2  bảng tau_sel theo hàng — ĐỦ cả bốn giá trị n của bảng in ở §2.2,
+#       cộng toàn dải d' cho nhận định "không đơn điệu theo d'"
+python3 - <<'EOF'
+import scoring, dprime_sweep as S
+for row in ("mid", "d0.0", "d2.2", "d3.0"):
+    print(f"{row:6}", " ".join(f"{scoring.tau_sel(n, row, 1):.4f}"
+                               for n in (1, 9, 20, 30)))      # -> bảng §2.2
+names = [f"d{d:.1f}" for d in S.GRID]
+tables = scoring.load_table()["tables"]
+print("tau_sel(9,K=1):", " ".join(f"{nm}:{scoring.tau_sel(9, nm, 1):.4f}" for nm in names))
+print("E[p_c|sach,9]:", " ".join(f"{nm}:{tables[nm]['rows'][9]['mean_p']:.4f}" for nm in names))
+EOF
 
 # §6  bảng nhạy cảm của từng policy
 python3 - <<'EOF'
