@@ -174,6 +174,39 @@ CARRIER = "memory"
 #: the number un-recheckable, which is the one thing a benchmark may not be.
 SEED = 20260916
 
+#: BENIGN CHURN rate the ENRICHED harvest runs MockAgent at (agent.py step 6,
+#: beta).  `harvest` runs one step on an EMPTY store, so no earlier note exists to
+#: revise and depth is pinned at 1 for every item; `harvest_natural` runs a FULL
+#: H-task workflow, and drift is the ONE mechanism by which the agent writes a
+#: memory item at depth 2 (`agent/notes/drift`).  It is turned ON here rather than
+#: at agent.py's default of 0.0 because a benign background WITHOUT churn is the
+#: very degeneracy this file's enrichment exists to remove: with drift off a full
+#: workflow still writes memory at depth 1 only (MEASURED: depth counts {1: 2248}
+#: at drift=0.0 against {1: 2248, 2: 1101} at 0.5), so the spread would still be
+#: hand-narrowed to match the payload.  0.5 is a STAND-IN, not a measured churn
+#: rate -- see PENDING_MEASUREMENT["benign_real_agent"].
+NATURAL_DRIFT_RATE = 0.5
+
+#: Quantities this file CANNOT measure without the real LLM agent and a key,
+#: recorded rather than faked -- the same discipline as agent_llm.PENDING_MEASUREMENT
+#: (NAMES here, the reason is the value).  A number produced against the enriched
+#: MockAgent background is a LOWER BOUND on the honest one, exactly as the harm
+#: numbers measured against MockAgent are a lower bound on the public-OK half.
+PENDING_MEASUREMENT: dict = {
+    "benign_real_agent": (
+        "MockAgent is a stand-in; the truly honest benign background needs the real "
+        "LLM agent (agent_llm.LlmAgent) run clean on real instances, which needs a "
+        "key -- like the public-OK half of harm. Two things this MockAgent number "
+        "cannot stand for: (1) the benign CHURN rate is set by NATURAL_DRIFT_RATE, a "
+        "chosen stand-in, where a real agent's revision behaviour is a measured "
+        "quantity; (2) benign memory items here NEVER carry parents (derived=0 is "
+        "structural in agent.py -- derived_from is populated only alongside "
+        "poisoned=True), so `derived` cannot acquire spread from this agent at all, "
+        "and whether a real agent writes derived-but-benign memory items is unknown. "
+        "Today's enriched AUC is therefore a LOWER BOUND on distinguishability: a "
+        "real background can only be MORE varied, never less."),
+}
+
 _harvest_cache: dict = {}
 
 
@@ -267,8 +300,100 @@ def harvest(rows, n_per_event: int, seed: int, carrier: str = CARRIER) -> list:
     return out
 
 
+def harvest_natural(rows, n_per_event: int, seed: int, carrier: str = CARRIER,
+                    h: int = H, drift_rate: float | None = None) -> list:
+    """ENRICHED benign pool: the population a FULL H-task workflow actually writes.
+
+    Same contract and same return type as `harvest`, and it runs the agent for the
+    SAME reason `harvest` does -- the note template is frozen data, so the benign
+    item must be the one the agent writes, not a string formatted here.  The ONE
+    difference is the run it reads that item off, and it is the difference the whole
+    task turns on:
+
+        harvest          one MockAgent step, EMPTY store, drift off
+        harvest_natural  H consecutive steps in ONE store, drift on
+
+    `harvest` runs each instance ALONE against an empty store, so `retrieve`
+    returns nothing, no skill is ever induced, and no earlier note exists to
+    revise -- every item comes out a first-hand write at depth 1 with derived 0.
+    That narrows the benign class to the payload's own shape (a payload is also a
+    first-hand write), which is the circularity finding 1 records.  Cutting the
+    repo's rows into runs of H CONSECUTIVE instances and running each as a workflow
+    in a shared store is exactly how SWEBenchDataset._raw_segments cuts the
+    benchmark (SPEC-P1a Part 4 steps 1-3), so the population harvested here is the
+    one the benchmark itself runs the agent over -- not a distribution invented in
+    this file.
+
+    WHAT ACQUIRES SPREAD, AND WHAT DOES NOT -- both MEASURED, on the full pool.
+    The memory carrier the corpus is built on gains a second provenance depth from
+    the agent's benign-churn step (agent.py step 6): an ordinary revision of an
+    earlier note is written at `agent/notes/drift`, depth 2.
+
+        feature   harvest (old)         harvest_natural (drift=0.5)
+        depth     {1}                   {1, 2}      counts {1: 2248, 2: 1101}
+        derived   {0}                   {0}         -- see below
+        size      42..549               42..557
+
+    `derived` STAYS constant at 0, and that is not a shortfall of this harvest but
+    a structural fact of agent.py to be reported, not papered over: a benign write
+    populates `derived_from` NOWHERE -- the skill and branch templates set it only
+    alongside `poisoned=True`, and drift writes a fresh revision with no parents.
+    So no MockAgent benign memory item can ever carry a parent, whatever workflow
+    it runs.  A payload read as an EVENT is also derived=0 (`_one_event` reads an
+    event as `poisoned and not derived_from`), so `derived` never separated the two
+    classes in the first place; the axis the circularity actually pinned is
+    `depth`, and that is the one this un-pins.  Whether a real agent writes
+    benign-but-derived memory is PENDING_MEASUREMENT["benign_real_agent"].
+
+    The `n_per_event` no-duplicate-control contract is enforced exactly as
+    `harvest` enforces it, and per event, not across the corpus: a repo must supply
+    at least `n_per_event` benign items ON `carrier` or matching would reuse a
+    control and narrow Hanley-McNeil below the evidence.  MEASURED, the smallest
+    repo supplies 9 memory items at drift=0.5, above the 4 the certify phase asks.
+
+    `drift_rate` defaults to the module's NATURAL_DRIFT_RATE, read HERE at call
+    time: a mutable module value used as a default argument would freeze at
+    definition time and ignore a test (or the spike's sensitivity sweep) that
+    perturbs the rate.
+    """
+    if drift_rate is None:
+        drift_rate = NATURAL_DRIFT_RATE
+    out: list = []
+    for i in range(0, len(rows) - h + 1, h):
+        seg = rows[i:i + h]
+        store = CarrierStore()
+        # ONE agent, with churn on, for the whole segment: benign drift needs a
+        # store that is NOT reset between tasks (that is what an earlier note to
+        # revise means), which is exactly what running the segment in one store buys.
+        ag = agent.MockAgent(drift_rate=drift_rate)
+        # Deterministic in (seed, repo, segment offset) through core.seed_of, never
+        # hash(); run_task fans it out over t internally, so each task draws its own
+        # adoption / induction / drift stream.
+        wf_seed = seed_of(seed, "harvest_natural", seg[0]["repo"], i) & 0xFFFF
+        for t, row in enumerate(seg):
+            task = Task(task_id=row["instance_id"], repo=row["repo"],
+                        base_commit=row["base_commit"],
+                        topic=swebench_dataset.Topic(topics.topic_of_instance(row)),
+                        problem="")
+            outcome = ag.run_task(t, task, store, seed=wf_seed, marker="raw_write")
+            out.extend(it for it in outcome.writes if not it.poisoned)
+
+    on_carrier = sum(1 for it in out if it.carrier == carrier)
+    if on_carrier < n_per_event:
+        raise ValueError(
+            f"{len(rows)} instances supply only {on_carrier} benign "
+            f"{carrier!r} items over full workflows, below n_per_event="
+            f"{n_per_event}. Matching an event here would mean reusing a control, "
+            f"which inflates n_neg and narrows the Hanley-McNeil interval below "
+            f"what the evidence supports. Fix the POOL or lower n_per_event -- do "
+            f"not sample with replacement.")
+
+    random.Random(seed_of(seed, "order_natural", len(out))).shuffle(out)
+    return out
+
+
 def benign_pool(n_per_event: int = 4, pool: str = POOL, seed: int = SEED,
-                h: int = H, carrier: str = CARRIER) -> dict:
+                h: int = H, carrier: str = CARRIER, natural: bool = False) -> dict:
     """`harvest` per repo, keyed (repo, carrier) -- the form the matcher reads.
 
     Cached because the certify phase builds one corpus per Delta and the pool does
@@ -287,10 +412,18 @@ def benign_pool(n_per_event: int = 4, pool: str = POOL, seed: int = SEED,
     written for, and a refusal is the honest answer where a corpus quietly built
     on repeats was not.  It joins the cache key for the same reason: two carriers
     are two contracts, and one cached answer cannot stand for both.
+
+    `natural` selects the ENRICHED harvest: `harvest_natural` (full H-task
+    workflow, benign churn on) rather than `harvest` (one step, empty store).  It
+    defaults to False so every existing caller -- and every number pinned to the
+    old harvest -- gets the identical pool it always did, and it joins the cache
+    key for the same reason `carrier` does: two harvests are two populations, and
+    one cached answer cannot stand for both.
     """
-    key = (pool, n_per_event, seed, h, carrier)
+    key = (pool, n_per_event, seed, h, carrier, natural)
     if key not in _harvest_cache:
         grouped: dict = {}
+        harvester = harvest_natural if natural else harvest
         for repo, rows in sorted(
                 swebench_dataset.SWEBenchDataset(pool=pool)._by_repo().items()):
             # A repo with fewer than H instances forms no segment, so it hosts no
@@ -300,7 +433,7 @@ def benign_pool(n_per_event: int = 4, pool: str = POOL, seed: int = SEED,
             # instance and two seaborn ones; both are below H=8 and both are
             # already absent from `_raw_segments`.
             if len(rows) >= h:
-                for it in harvest(rows, n_per_event, seed, carrier=carrier):
+                for it in harvester(rows, n_per_event, seed, carrier=carrier):
                     grouped.setdefault((repo, it.carrier), []).append(it)
         _harvest_cache[key] = grouped
     return _harvest_cache[key]
@@ -352,7 +485,7 @@ def feasible_sigmas(wf, delta: int, eps: float, theta: float | None = None) -> l
 
 def matched_corpus(pipe, delta: int, eps: float, n_events: int,
                    per_event: int = 4, pool: str = POOL, seed: int = SEED,
-                   carrier: str = CARRIER) -> tuple:
+                   carrier: str = CARRIER, natural: bool = False) -> tuple:
     """(payloads, benign) as F_match feature dicts -- a MATCHED case-control sample.
 
     Returns at most `n_events` poisoning events, each with `per_event` controls
@@ -363,9 +496,17 @@ def matched_corpus(pipe, delta: int, eps: float, n_events: int,
 
     Every draw descends from core.seed_of, so the corpus -- and therefore any AUC
     published from it -- is reproducible from `seed` alone.
+
+    `natural` enriches BOTH sources of the benign class coherently, so the payload
+    is measured against ONE world rather than a mixture: the top-up pool comes from
+    `harvest_natural` (full workflow, churn on), and the within-workflow controls
+    come from a `_one_event` run whose agent has the SAME churn on.  It defaults to
+    False, so the old harvest, the pinned numbers, and every existing caller are
+    untouched.
     """
     _ds, wfs = hosting_workflows(delta, pool=pool, seed=seed)
-    grouped = benign_pool(per_event, pool=pool, seed=seed, carrier=carrier)
+    grouped = benign_pool(per_event, pool=pool, seed=seed, carrier=carrier,
+                          natural=natural)
     poisoned_rows, benign_rows = [], []
     for wf in wfs:
         for sigma in feasible_sigmas(wf, delta, eps):
@@ -373,16 +514,25 @@ def matched_corpus(pipe, delta: int, eps: float, n_events: int,
                 return poisoned_rows, benign_rows
             ps = PoisonSpec(carrier=carrier, iota=sigma - delta, sigma=sigma,
                             epsilon=eps)
-            pos, neg = _one_event(pipe, wf, ps, per_event, grouped, seed)
+            pos, neg = _one_event(pipe, wf, ps, per_event, grouped, seed,
+                                  natural=natural)
             poisoned_rows.extend(pos)
             benign_rows.extend(neg)
     return poisoned_rows, benign_rows
 
 
 def _one_event(pipe, wf, ps: PoisonSpec, per_event: int, grouped: dict,
-               seed: int) -> tuple:
-    """Run one workflow with the payload planted, and read the event off at sigma."""
-    store, ag = CarrierStore(), agent.MockAgent()
+               seed: int, natural: bool = False) -> tuple:
+    """Run one workflow with the payload planted, and read the event off at sigma.
+
+    `natural` runs the workflow's own agent with benign churn on
+    (NATURAL_DRIFT_RATE), so the WITHIN-workflow controls carry the same depth-2
+    drift notes the enriched top-up pool does; with it False the agent runs at
+    agent.py's default drift_rate of 0.0, which is the run every pinned number was
+    measured against.
+    """
+    store = CarrierStore()
+    ag = agent.MockAgent(drift_rate=NATURAL_DRIFT_RATE) if natural else agent.MockAgent()
     for t, task in enumerate(wf.tasks):
         if t == ps.iota:
             store.write(pipe.payload(wf, ps))

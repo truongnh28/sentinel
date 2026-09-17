@@ -339,6 +339,160 @@ class TheSplitIsPartOfTheMeasurement(unittest.TestCase):
             f"declared set collapsed to one seed (bad).")
 
 
+class TheEnrichedBenignBackground(unittest.TestCase):
+    """Finding 1, kept measurable, and the enrichment that answers it.
+
+    The distinguishability bound is only meaningful against a REALISTIC benign
+    background.  `harvest` runs one MockAgent step on an EMPTY store, so every
+    benign item is a first-hand write -- depth 1, derived 0 -- which is the
+    payload's own shape.  Defining benign to look like the payload and then
+    reporting them indistinguishable is circular.  `harvest_natural` runs the FULL
+    H-task workflow the benchmark actually cuts, with benign churn on, so the
+    memory carrier carries the agent's real depth spread instead of a constant.
+    """
+
+    def _memory(self, natural: bool):
+        """Every benign MEMORY item of the pool -- the carrier the corpus is on."""
+        pool = B.benign_pool(natural=natural)
+        return [it for (repo, carrier), items in pool.items()
+                if carrier == B.CARRIER for it in items]
+
+    def test_the_current_harvest_is_uniform_on_depth_and_derived(self):
+        """Finding 1, stated as the test that documents the starting state: the
+        CURRENT `harvest` corpus is CONSTANT on depth AND derived, so three of the
+        four F_match features carry no benign spread and the classifier is really
+        one-variable on `size`.  It PASSES today, on purpose -- it is the before
+        picture, and it goes RED the day `harvest` itself gains spread, which is the
+        one thing this task must NOT do to it.
+
+        Thesis claim (vi): "corpus benign hien tai dong phuc tren depth va derived
+        -- dinh nghia benign khop dung hinh dang payload, la vong tron."
+        """
+        mem = self._memory(natural=False)
+        self.assertTrue(mem, "the old harvest supplied no memory items")
+        self.assertEqual(
+            {it.provenance.count("/") for it in mem}, {1},
+            "the old harvest gained a second provenance depth -- a number pinned "
+            "to its depth=1 uniformity has moved.")
+        self.assertEqual(
+            {len(it.derived_from) for it in mem}, {0},
+            "the old harvest gained a derived item -- a number pinned to it moved.")
+
+    def test_the_enriched_harvest_is_not_uniform_on_depth(self):
+        """The enrichment, measured: the natural corpus carries MORE than one
+        provenance depth on the memory carrier.  RED on the old harvest (depth is
+        the single value {1}); GREEN on the enriched one.  `derived` is asserted
+        SEPARATELY, and NOT as varying: it stays 0 because agent.py populates
+        `derived_from` only alongside poisoned=True, so no benign memory item can
+        carry a parent -- a structural fact reported, not a spread invented.
+
+        Thesis claim (vi): "corpus benign lam giau HET dong phuc tren depth; derived
+        van 0 vi day la su that cau truc cua agent, khong phai do bia phan bo."
+        """
+        mem = self._memory(natural=True)
+        self.assertTrue(mem, "the enriched harvest supplied no memory items")
+        depths = {it.provenance.count("/") for it in mem}
+        self.assertGreater(
+            len(depths), 1,
+            f"the enriched corpus is STILL uniform on depth ({depths}); the "
+            f"benign background did not gain the agent's real spread and the "
+            f"circularity of finding 1 is unbroken.")
+        self.assertEqual(depths, {1, 2}, f"unexpected depth spread {depths}")
+        # derived is structurally constant -- reported, not faked into varying.
+        self.assertEqual(
+            {len(it.derived_from) for it in mem}, {0},
+            "a benign memory item acquired a parent; agent.py only sets "
+            "derived_from alongside poisoned=True, so this cannot come from the "
+            "agent and would mean the distribution was hand-assigned.")
+
+    def test_the_enriched_depth_spread_is_the_agents_own_drift_not_hand_assigned(self):
+        """The spread must come from the agent's DYNAMICS, not from assigning depth
+        by hand.  Every depth-2 memory item must be a real `agent/notes/drift`
+        write -- the benign-churn step of agent.py (step 6) revising an earlier
+        note -- so the second depth is produced by running the agent over a full
+        workflow, exactly as `harvest` produces the first depth by running it for
+        one step.
+
+        Thesis claim (vi): "do trai depth den tu buoc drift cua chinh agent qua mot
+        workflow day du, khong phai tu gan tay."
+        """
+        mem = self._memory(natural=True)
+        deeper = [it for it in mem if it.provenance.count("/") == 2]
+        self.assertTrue(deeper, "no depth-2 memory item -- churn produced no spread")
+        self.assertEqual(
+            {it.provenance for it in deeper}, {"agent/notes/drift"},
+            "a depth-2 memory item has a provenance the agent never writes: the "
+            "spread was assigned rather than harvested from the agent's own run.")
+
+    def test_the_enriched_spread_reaches_the_measured_benign_class_and_keeps_age_matching(self):
+        """The pool is not the measurement; the corpus `matched_corpus` builds is.
+        The enriched depth spread has to survive into the benign class the AUC is
+        actually read off, and it must do so WITHOUT breaking age-matching -- every
+        control still has recency exactly Delta, or the AUC would measure Delta
+        rather than camouflage.
+
+        Thesis claim (vi): "do trai vao tan lop benign duoc DO, va van giu ghep cap
+        theo tuoi (recency = Delta)."
+        """
+        pipe = _matched_pipe()
+        _pos_old, neg_old = _matched_corpus_nat(pipe, 2, 0.0, N_SCREEN, natural=False)
+        _pos_new, neg_new = _matched_corpus_nat(pipe, 2, 0.0, N_SCREEN, natural=True)
+        self.assertEqual({r["depth"] for r in neg_old}, {1},
+                         "old measured benign class was already non-uniform on depth")
+        self.assertEqual(
+            {r["depth"] for r in neg_new}, {1, 2},
+            "the enriched spread did not reach the measured benign class")
+        self.assertEqual(
+            {r["recency"] for r in neg_new}, {2},
+            "an enriched control slipped in at an age the payload cannot have; the "
+            "AUC would be measuring Delta, not surface camouflage.")
+
+    def test_harvest_natural_refuses_rather_than_duplicating_controls(self):
+        """The per-event no-duplicate-control contract is kept: a rows set that
+        cannot supply `n_per_event` benign items on the carrier is REFUSED, not
+        padded by sampling a control twice (which would inflate n_neg and narrow
+        Hanley-McNeil below the evidence).  Same contract `harvest` enforces.
+
+        Thesis claim (vi): "giu hop dong khong-trung-control moi su kien -- tha tu
+        choi con hon nhan ban."
+        """
+        rows = _one_repo_rows()
+        # one H-segment supplies at most a few dozen memory items; 10_000 cannot
+        # be met without reuse, so the contract must refuse.
+        with self.assertRaises(ValueError):
+            B.harvest_natural(rows[:B.H], n_per_event=10_000, seed=B.SEED)
+        # and it does NOT refuse when the supply is enough -- the guard is the
+        # contract, not a blanket ban.
+        ok = B.harvest_natural(rows[:B.H], n_per_event=1, seed=B.SEED)
+        self.assertTrue(ok)
+
+    def test_the_enriched_harvest_is_deterministic_through_seed_of(self):
+        """Every draw goes through core.seed_of, so a rebuilt pool is byte-identical
+        -- hash() or a counter would make the published AUC un-recheckable.
+
+        Thesis claim (vi): "moi rut di qua seed_of; xay lai corpus ra y het."
+        """
+        rows = _one_repo_rows()
+        a = B.harvest_natural(rows, n_per_event=4, seed=B.SEED)
+        b = B.harvest_natural(rows, n_per_event=4, seed=B.SEED)
+        self.assertEqual([it.item_id for it in a], [it.item_id for it in b])
+
+
+def _matched_corpus_nat(pipe, delta, eps, n_events, per_event=4, natural=False):
+    return B.matched_corpus(pipe, delta, eps, n_events, per_event=per_event,
+                            natural=natural)
+
+
+def _one_repo_rows():
+    """The rows of one real repo large enough to form an H-segment, for the
+    contract and determinism tests -- read from the pool so it stays real."""
+    by_repo = B.swebench_dataset.SWEBenchDataset(pool=B.POOL)._by_repo()
+    for _repo, rows in sorted(by_repo.items()):
+        if len(rows) >= B.H:
+            return rows
+    raise AssertionError("no repo supplies an H-segment")
+
+
 def _matched_pipe():
     """The registered pipeline the corpus is built for.  Read from the registry so
     a renamed entry goes red here rather than silently testing nothing."""
