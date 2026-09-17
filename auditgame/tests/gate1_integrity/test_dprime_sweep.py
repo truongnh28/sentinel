@@ -11,9 +11,11 @@ protects; the thesis sentence it defends lives in the mandatory
 from __future__ import annotations
 import unittest
 
+import agent
 import dprime_sweep as S
 import detector
 import experiment
+import runner
 from tests.fixtures import identifiers
 
 
@@ -167,6 +169,100 @@ class TheSweepArtefactSaysWhichRunMadeIt(unittest.TestCase):
                             "it is")
         self.assertEqual(pinned["cells"], following["cells"],
                          "the run block leaked into the cells")
+
+
+class TheFourPolicyCellIsTheSameMeasurementRunnerAlreadyMakes(unittest.TestCase):
+    """The cell now needs PER-WORKFLOW Q_false and T_lost, and runner.GridCell
+    carries those two only as means (`per_wf` is the harm vector alone).  runner.py
+    is frozen, so the sweep keeps its OWN copy of the worst-case loop -- the same
+    move make_corpus already makes against experiment.make_corpus, and pinned the
+    same way: the copy is asserted against the original rather than trusted.
+
+    Without the per-workflow vectors the CI95 of Delta-L could only be the harm CI
+    shifted by a constant, which would give the Q_false and T_lost terms NO
+    sampling variability at all and so report an interval narrower than the
+    evidence -- the exact way a threshold gets overstated."""
+
+    N, H, SEEDS, BUDGET = 6, 4, (1, 2, 3), 17.95
+
+    def test_the_per_workflow_vectors_reproduce_runner_worst_case_exactly(self):
+        """Every scalar of the sweep's own loop equals runner.worst_case's.
+
+        Thesis claim (vi): "phep do nay la CONG THEM -- khong lam xe dich bat ky
+        con so da dong bang nao".
+
+        Not "close to": EQUAL.  A copy of an attacker-max loop that drifts by one
+        seed, one carrier or one tie-break is a second experiment wearing the
+        first one's name.
+        """
+        wfs = S.make_corpus(self.N, self.H, seed=2026)
+        det, ag = S.make_detector(2.0), agent.MockAgent()
+        for name in S.POLICIES:
+            with self.subTest(policy=name):
+                runner.reset_survivor_cache()
+                theirs = runner.worst_case(name, wfs, (1,), S.CARRIERS, det, ag,
+                                           self.BUDGET, self.SEEDS, S.SETTING)
+                runner.reset_survivor_cache()
+                mine = S.policy_curve(name, wfs, (1,), S.CARRIERS, det, ag,
+                                      self.BUDGET, self.SEEDS, S.SETTING)
+                self.assertEqual(mine.per_wf_harm, theirs.per_wf,
+                                 "the sweep's per-workflow harm vector is not "
+                                 "runner.worst_case's")
+                self.assertEqual((mine.harm, mine.q_false, mine.t_lost,
+                                  mine.spent, mine.n_feasible, mine.n_total),
+                                 (theirs.harm, theirs.q_false, theirs.t_lost,
+                                  theirs.spent_mean, theirs.n_feasible,
+                                  theirs.n_total),
+                                 f"{name}: the sweep's copy of the worst-case loop "
+                                 f"drifted from runner.worst_case")
+                for vec in (mine.per_wf_q_false, mine.per_wf_t_lost,
+                            mine.per_wf_spent):
+                    self.assertEqual(len(vec), len(theirs.per_wf),
+                                     "a per-workflow vector has a different length "
+                                     "from the harm vector it must pair with")
+                n = len(theirs.per_wf)
+                self.assertAlmostEqual(sum(mine.per_wf_q_false) / n, theirs.q_false,
+                                       places=12,
+                                       msg="the per-workflow Q_false vector does "
+                                           "not average to the reported mean")
+                self.assertAlmostEqual(sum(mine.per_wf_t_lost) / n, theirs.t_lost,
+                                       places=12)
+                self.assertAlmostEqual(sum(mine.per_wf_spent) / n, theirs.spent_mean,
+                                       places=12)
+
+    def test_adding_b5_and_b6_does_not_move_the_b1_sentinel_pair(self):
+        """The published d-harm cell is unchanged by the two policies added beside it.
+
+        Thesis claim (vi): "duong cong harm da cong bo phai tai lap NGUYEN VEN" --
+        neu them B5/B6 vao cung mot o lam xe dich harm cua B1 hay Sentinel thi co
+        trang thai dung chung giua cac policy, va moi so da dong bang deu dang ngo.
+
+        The survivor cache is keyed without the policy name (runner.survives), so
+        two policies measured in one cell share the clean phase.  That is the
+        state a shared-state defect would travel through, and this pins it.
+        """
+        wfs = S.make_corpus(self.N, self.H, seed=2026)
+        pair = S.measure_cell(wfs, 2.0, 1, self.BUDGET, self.SEEDS,
+                              policies=(S.B1, S.SENTINEL))
+        four = S.measure_cell(wfs, 2.0, 1, self.BUDGET, self.SEEDS)
+        self.assertEqual(sorted(four.curves), sorted(S.POLICIES))
+        self.assertEqual((pair.harm_b1, pair.harm_sentinel, pair.dharm,
+                          pair.ci_lo, pair.ci_hi, pair.n_feasible),
+                         (four.harm_b1, four.harm_sentinel, four.dharm,
+                          four.ci_lo, four.ci_hi, four.n_feasible),
+                         "measuring B5 and B6 in the same cell moved B1/Sentinel")
+
+    def test_the_sweeps_own_worst_case_loop_draws_nothing_process_dependent(self):
+        """The copied loop obeys the same seeding rule as the rest of the core.
+
+        Thesis claim (vi): "moi boc tham qua core.seed_of; hash() va
+        itertools.count bi CAM".
+        """
+        used = identifiers(S.policy_curve)
+        self.assertNotIn("hash", used,
+                         "policy_curve calls hash() -- process-dependent")
+        self.assertNotIn("count", used,
+                         "policy_curve uses a counter -- order-dependent")
 
 
 if __name__ == "__main__":
