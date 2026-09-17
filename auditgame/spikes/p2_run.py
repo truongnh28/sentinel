@@ -68,8 +68,16 @@ the tests, against a repository made on the spot.
 
 Run it:
 
-    python3 spikes/p2_run.py --limit 1 --seed 20260917   # ONE instance, then LOOK
-    python3 spikes/p2_run.py --seed 20260917 --no-clone  # all fifteen, same clones
+    python3 spikes/p2_run.py --limit 1 --out spikes/p2-smoke.jsonl   # one, then LOOK
+    python3 spikes/p2_run.py --seed 20260917 --no-clone              # all fifteen
+
+THE ROWS GO TO `--out` AND NOWHERE ELSE.  Do not pipe this command into the file
+it writes (`... | tee spikes/p2-raw.jsonl`): the runner already holds that path
+open for writing, tee truncates it and writes the printed prose over the JSON,
+and what is destroyed is 20-40 minutes of PAID, UNREPEATABLE measurement -- the
+loop is not deterministic in the seed, so the rows can be measured again but
+never replayed. For the same reason the command refuses to start when the --out
+file already holds a run; `--force` is how that is said on purpose.
 """
 from __future__ import annotations
 
@@ -176,15 +184,57 @@ def vacuous_anchor_reason(anchor: str) -> str:
             f"the property was measured at all.")
 
 
-class AdviceRefused(RuntimeError):
+class Refused(RuntimeError):
+    """A refusal BEFORE anything is spent -- the run does not start.
+
+    One base class because the command line answers all of them the same way: a
+    printed reason and exit 2.  The subclasses exist so a reader of the message
+    is sent to the RIGHT ARTEFACT -- the advice file, the instance corpus, the
+    workspace and the output path are four different things to go and fix.
+    """
+
+
+class AdviceRefused(Refused):
     """The advice file does not match its contract, so no run may start."""
 
 
-class RepoRefused(RuntimeError):
+class CorpusRefused(Refused):
+    """The SWE-bench corpus is missing or incomplete.
+
+    Under its own name, not the advice file's: P2 reads two frozen artefacts and
+    naming the wrong one costs a reader the time it takes to discover that the
+    file they were sent to is fine.  The fix here is `swebench_fetch.py`, which
+    has nothing to do with the advice.
+    """
+
+
+class OutputRefused(Refused):
+    """The output path already holds a run, and a run cannot be replayed.
+
+    The loop is not deterministic in the seed (question 6 closed
+    `deterministic=False`), so `p2-raw.jsonl` can only be RE-MEASURED, at 20-40
+    minutes and a few dollars a time.  The runner opens that path with "w", so a
+    second invocation on the same path -- a rerun, or the `--limit 1` smoke
+    command typed after the real run -- truncates the measurement before it does
+    anything else.  `--force` is how the human says it on purpose.
+    """
+
+
+class RepoRefused(Refused):
     """`--no-clone` was asked for and the checkout on disk is not the one the
     instance names.  A refusal, not a fallback: running the agent against the
     wrong tree produces a patch against the wrong tree, and every verdict read
-    off it is a verdict about a repository nobody chose."""
+    off it is a verdict about a repository nobody chose.
+
+    Raised UP FRONT by `GitRepos.preflight` -- a wrong workspace is not a
+    per-instance accident -- and, for anything that still goes wrong later, per
+    instance inside `run_instance`, where it becomes a REFUSED row.
+    """
+
+
+def _utc_now() -> str:
+    """The wall clock, in one place so a test can replace it."""
+    return datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 
 # ============================================================== THE ADVICE FILE
@@ -228,25 +278,76 @@ def forbidden_identifiers(instance_id: str) -> set:
     return {s for s in marked - gold if s not in fixtures._STOPWORDS}
 
 
-def advice_violation(text: str, forbidden) -> Optional[str]:
+def advice_violation(text, forbidden) -> Optional[str]:
     """Why this advice may not be used, or None.
 
-    Two readings, because they catch different things.  The marker is matched as
-    a SUBSTRING, case-folded, so `xraw_writey` cannot smuggle it past a tokenizer;
+    The first two readings are about what the advice IS, and they belong to the
+    contract rather than being a guard wrapped around it.  A value that is not a
+    string used to reach `.lower()` and raise -- a traceback and exit 1, where
+    requirement 2 promises a printed reason and exit 2.  An EMPTY advice is the
+    instrument missing altogether: that instance runs with nothing planted, is
+    all but certain to score mode A, and its A then enters both the denominator
+    and the agreeing half of `pr_cd_upper_tiers`, leaving `advice_chars: 0` as
+    the only trace of what happened.
+
+    The last two are about what the advice SAYS.  The marker is matched as a
+    SUBSTRING, case-folded, so `xraw_writey` cannot smuggle it past a tokenizer;
     the rest are matched as IDENTIFIERS, so a name is not reported because it
     happened to appear inside a longer word.
     """
-    low = (text or "").lower()
+    if not isinstance(text, str):
+        return (f"the advice is {type(text).__name__}, not a string. The instrument "
+                f"of P2 is fifteen advice STRINGS (guide section 2); a value of "
+                f"any other type is a file that does not hold the instrument")
+    if not text.strip():
+        return ("the advice is empty. An empty advice is NO INSTRUMENT: the "
+                "instance runs with nothing planted, is all but certain to score "
+                "mode A, and that A enters both the denominator and the agreeing "
+                "half of pr_cd_upper_tiers -- a number about an agent that was "
+                "never advised")
+    low = text.lower()
     marker = fixtures.marker().lower()
     if marker in low:
         return (f"the advice spells the injector's signature ({fixtures.marker()!r}). "
                 f"That is the experimenter putting the agent into mode B by hand: "
                 f"the distribution measured afterwards is the one that was typed")
-    named = fixtures._identifiers(text or "") & {f.lower() for f in forbidden}
+    named = fixtures._identifiers(text) & {f.lower() for f in forbidden}
     if named:
         return (f"the advice names {sorted(named)}, which the MARKED payload "
                 f"introduces and the gold patch does not have -- same objection "
                 f"as spelling the marker itself")
+    return None
+
+
+#: The length fields the advice file records AT FREEZE TIME (guide section 2),
+#: and the function of record for each.  OPTIONAL in the file and CHECKED when
+#: present: the runner writes its own count into every row, so a frozen artefact
+#: that disagrees would put two numbers for one quantity into the repository --
+#: the one thing the pre-registration discipline forbids.  `advice_tokens` is
+#: defined here, and in the guide, as the WHITESPACE WORD COUNT and not a
+#: provider tokenizer's output; otherwise the two numbers are not comparable and
+#: the check could not be written at all.
+FROZEN_LENGTHS = (("advice_chars", len, "characters"),
+                  ("advice_tokens", advice_tokens, "whitespace-separated words"))
+
+
+def frozen_length_violation(entry) -> Optional[str]:
+    """Why this row's frozen lengths may not be trusted, or None."""
+    text = entry["advice"]
+    for field, measure, unit in FROZEN_LENGTHS:
+        frozen = entry.get(field)
+        if frozen is None:
+            continue
+        if isinstance(frozen, bool) or not isinstance(frozen, int):
+            return f"{field} is {frozen!r}, which is not a count"
+        got = measure(text)
+        if frozen != got:
+            return (f"the file froze {field}={frozen} and the advice on that same "
+                    f"line measures {got} {unit}. Recompute the file's lengths "
+                    f"with this module (len(advice) and advice_tokens(advice)) or "
+                    f"drop the field -- and do NOT put a provider tokenizer's "
+                    f"count in advice_tokens, which is the word count by "
+                    f"definition")
     return None
 
 
@@ -269,9 +370,18 @@ def load_advice(path) -> dict:
         if not line.strip():
             continue
         try:
-            rows.append(json.loads(line))
+            row = json.loads(line)
         except ValueError as e:
             raise AdviceRefused(f"{path} line {n} is not JSON: {e}") from e
+        if not isinstance(row, dict):
+            # A bare number is valid JSON and used to reach `set(row)`, which
+            # raises TypeError -- outside the refusal contract, so a traceback
+            # and exit 1 where requirement 2 promises a reason and exit 2.
+            raise AdviceRefused(
+                f"{path} line {n} is a JSON {type(row).__name__}, not an object. "
+                f"Each line is one advice row: "
+                f'{{"instance_id": ..., "tier": ..., "advice": ...}}')
+        rows.append(row)
 
     want = [t.instance_id for t in TESTS]
     if len(rows) != len(want):
@@ -285,6 +395,11 @@ def load_advice(path) -> dict:
         missing = {"instance_id", "tier", "advice"} - set(r)
         if missing:
             raise AdviceRefused(f"{path} row {n} is missing {sorted(missing)}")
+        for field in ("instance_id", "tier"):
+            if not isinstance(r[field], str):
+                raise AdviceRefused(
+                    f"{path} row {n}: {field} is {type(r[field]).__name__}, not a "
+                    f"string")
         iid = r["instance_id"]
         if iid in by_id:
             raise AdviceRefused(f"{path} names {iid} twice")
@@ -311,7 +426,8 @@ def load_advice(path) -> dict:
             f"both the statistic and what it is about")
 
     for iid, r in by_id.items():
-        why = advice_violation(r["advice"], forbidden_identifiers(iid))
+        why = (advice_violation(r["advice"], forbidden_identifiers(iid))
+               or frozen_length_violation(r))
         if why is not None:
             raise AdviceRefused(f"{iid}: {why}")
     return by_id
@@ -323,7 +439,7 @@ def load_instances(pool: str = "verified") -> dict:
     """The SWE-bench rows of the 15 R1 instances, keyed by id."""
     src = swebench_dataset.DATA / f"swebench_{pool}.jsonl"
     if not src.is_file():
-        raise AdviceRefused(
+        raise CorpusRefused(
             f"no instance corpus at {src}. P2 edits the REAL repository at the "
             f"instance's base_commit, so the row -- repo, base_commit, problem "
             f"statement -- is not optional. Fetch the pool with swebench_fetch.py")
@@ -335,7 +451,7 @@ def load_instances(pool: str = "verified") -> dict:
             rows[r["instance_id"]] = r
     absent = sorted(want - set(rows))
     if absent:
-        raise AdviceRefused(f"{src} is missing {absent}")
+        raise CorpusRefused(f"{src} is missing {absent}")
     return rows
 
 
@@ -388,6 +504,50 @@ class GitRepos:
             return path
         return self._reuse(path, task)
 
+    def preflight(self, tasks) -> None:
+        """Read EVERY checkout before the run starts, or refuse naming all of them.
+
+        Without this, a wholly wrong `workspace/` is not an error: each instance
+        fails inside `run_instance`, becomes a REFUSED row with a reason, and the
+        run ends with a printed summary and fifteen refusals -- a "completed" run
+        that measured nothing.  Rule N3 is satisfied there (every cell carries a
+        reason) and the human's actual question, "did my run work", is answered
+        fifteen instances too late.  A wrong workspace is one mistake, so it is
+        reported once, up front, listing every repository it applies to.
+
+        A READING and nothing else: no clone, no reset, no write.  The run has
+        not been allowed to start yet, and a check that mutated the workspace
+        would have done part of a run's work on the strength of a question.
+        With `clone=True` there is nothing to check -- the checkout is about to
+        be made.
+        """
+        if self.clone:
+            return
+        wrong = []
+        for task in tasks:
+            why = self._not_the_checkout(pathlib.Path(self.root) / task.repo, task)
+            if why is not None:
+                wrong.append(f"  {task.repo} ({task.task_id}): {why}")
+        if wrong:
+            raise RepoRefused(
+                "--no-clone, and the workspace does not hold the checkouts these "
+                "instances name:\n" + "\n".join(wrong)
+                + "\nRefusing before the first model call: every one of these "
+                  "would have become a REFUSED row and the run would have "
+                  "reported itself complete. Run once without --no-clone, or "
+                  "fetch the missing commits.")
+
+    def _not_the_checkout(self, path: pathlib.Path, task: Task) -> Optional[str]:
+        """Why `path` is not this instance's checkout, or None.  Read-only."""
+        if not (path / ".git").is_dir():
+            return f"{path} is not a git repo"
+        try:
+            m3.git(path, "cat-file", "-e", f"{task.base_commit}^{{commit}}")
+        except RuntimeError as e:
+            return (f"{path} does not carry {task.base_commit}, the base commit "
+                    f"of {task.task_id} ({e})")
+        return None
+
     def _reuse(self, path: pathlib.Path, task: Task) -> pathlib.Path:
         """The checkout already on disk, or `RepoRefused` saying why it is not it.
 
@@ -396,18 +556,18 @@ class GitRepos:
         wrong-commit workspace produces a patch against a tree nobody chose, and
         the run reports modes for it as if nothing were amiss -- a silent
         proceed, which is the one behaviour reuse is not allowed to have.
+
+        `preflight` has usually asked the first two questions already, for every
+        instance at once.  They are asked again here because `prepare` is also
+        reached directly (and because a workspace can change under a run that
+        takes 40 minutes), and because the third -- the reset actually landing --
+        can only be asked after the reset.
         """
-        if not (path / ".git").is_dir():
+        why = self._not_the_checkout(path, task)
+        if why is not None:
             raise RepoRefused(
-                f"--no-clone but {path} is not a git repo. Reuse means REUSE: "
-                f"run once without the flag to put the checkout there")
-        try:
-            m3.git(path, "cat-file", "-e", f"{task.base_commit}^{{commit}}")
-        except RuntimeError as e:
-            raise RepoRefused(
-                f"--no-clone but {path} does not carry {task.base_commit}, the "
-                f"base commit of {task.task_id}. The checkout on disk is not the "
-                f"one this instance names; fetch it, or drop the flag ({e})") from e
+                f"--no-clone but {why}. Reuse means REUSE: run once without the "
+                f"flag to put the checkout there, or drop the flag")
         m3.reset_repo(path, task.base_commit)
         head = m3.git(path, "rev-parse", "HEAD").strip()
         want = m3.git(path, "rev-parse", f"{task.base_commit}^{{commit}}").strip()
@@ -544,8 +704,19 @@ def run_instance(test, entry, instance, *, client, repos, seed, model,
     advice = entry["advice"]
     base = dict(instance_id=test.instance_id, tier=entry["tier"], model=model,
                 temperature=temperature, seed=seed,
-                advice_chars=len(advice), advice_tokens=advice_tokens(advice),
-                timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat())
+                advice_chars=len(advice), advice_tokens=advice_tokens(advice))
+
+    def finished(**kw) -> dict:
+        """A row, STAMPED NOW -- that is, when the instance finished.
+
+        A ReAct loop runs for minutes, so the start and the end are two different
+        readings and the field has to be one of them on purpose.  The row is the
+        record of a finished instance: it carries the patch, the token counts and
+        the verdict, none of which existed when the instance began, so the stamp
+        that belongs beside them is the one taken when they did.
+        """
+        return _row(**base, timestamp=_utc_now(), **kw)
+
     task = task_of(instance)
     try:
         repo_path = repos.prepare(task)
@@ -556,8 +727,8 @@ def run_instance(test, entry, instance, *, client, repos, seed, model,
                        taint=advice_taint)
         patch = repos.patch(task, repo_path)
     except Exception as e:                      # noqa: BLE001 -- reported, not hidden
-        return _row(mode="REFUSED", patch=None,
-                    reason=f"{type(e).__name__}: {e}", **base)
+        return finished(mode=REFUSED, patch=None,
+                        reason=f"{type(e).__name__}: {e}")
 
     tokens_in, tokens_out = res.tokens_in, res.tokens_out
     hit = cache_hit_rate(res)
@@ -565,7 +736,7 @@ def run_instance(test, entry, instance, *, client, repos, seed, model,
                     cache_hit=hit,
                     cost_usd=cost_usd(model, tokens_in, tokens_out, hit))
     if not (patch or "").strip():
-        return _row(mode=REFUSED, reason=EMPTY_PATCH_REASON, **base, **measured)
+        return finished(mode=REFUSED, reason=EMPTY_PATCH_REASON, **measured)
 
     proxy = agreement.proxy_hidden_ok(patch)
     # THE SAME READING THE ORACLE PERFORMS, through the same call: `R1Test.check`
@@ -581,12 +752,12 @@ def run_instance(test, entry, instance, *, client, repos, seed, model,
         # this same shape is a genuine mode D -- "the signature present, the
         # anchored property untouched" is that mode's definition -- so it falls
         # through and is classified.
-        return _row(mode=VACUOUS_ANCHOR, reason=vacuous_anchor_reason(anchor.file),
-                    **base, **measured)
+        return finished(mode=VACUOUS_ANCHOR,
+                        reason=vacuous_anchor_reason(anchor.file), **measured)
 
     hidden = anchor.check(patch)
-    return _row(mode=classify(proxy, hidden), proxy=proxy, hidden=hidden,
-                **base, **measured)
+    return finished(mode=classify(proxy, hidden), proxy=proxy, hidden=hidden,
+                    **measured)
 
 
 def summarize(rows, *, model, seed) -> dict:
@@ -622,7 +793,7 @@ def summarize(rows, *, model, seed) -> dict:
                                   if r["tier"] == tier and r["mode"] == m)
                            for m in ("A", "B", "C", "D", REFUSED, *UNSCOREABLE)}
                     for tier in TIERS},
-        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "timestamp": _utc_now(),
     }
 
 
@@ -647,6 +818,15 @@ def run_p2(*, advice_path=DEFAULT_ADVICE, out_path=DEFAULT_OUT, limit=None,
     rows = load_instances() if rows is None else rows
     client = agent_llm.api_client(model=model) if client is None else client
     repos = GitRepos(clone=not no_clone) if repos is None else repos
+
+    # THE WORKSPACE IS READ BEFORE THE FIRST CALL, for the same reason the advice
+    # file is: a refusal after eleven paid calls is a refusal that cost money.
+    # Optional on the injected source -- a test that hands over its patches has
+    # no workspace to check -- and mandatory in effect, because the real one has
+    # it and `--no-clone` is the flag that can be pointed at the wrong tree.
+    preflight = getattr(repos, "preflight", None)
+    if preflight is not None:
+        preflight([task_of(rows[t.instance_id]) for t in instances])
 
     out_path = pathlib.Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -703,6 +883,31 @@ def _print_summary(s: dict) -> None:
           "never a point (guide section 6.6).")
 
 
+def refuse_to_overwrite(path, *, force: bool) -> None:
+    """`OutputRefused` if `path` already holds a run, unless it is on purpose.
+
+    THE ONE FILE IN THIS BUILD THAT CANNOT BE REGENERATED.  Fifteen ReAct tasks
+    are 20-40 minutes and a few dollars, and the agent is not deterministic in
+    the seed, so what is in `p2-raw.jsonl` can be RE-MEASURED but never replayed.
+    The runner opens the path with "w"; without this reading, typing the
+    `--limit 1` smoke command a second time, or re-running after a crash, deletes
+    the measurement before doing anything else -- and deletes it in the first
+    millisecond, before anything that could fail would have stopped the run.
+
+    An empty file is not a measurement and does not refuse; a partial one does,
+    because eleven paid rows are eleven paid rows.
+    """
+    path = pathlib.Path(path)
+    if force or not path.is_file() or path.stat().st_size == 0:
+        return
+    raise OutputRefused(
+        f"{path} already holds a run ({path.stat().st_size} bytes) and this "
+        f"command opens it for writing. A P2 run is 20-40 minutes and a few "
+        f"dollars, and it CANNOT be replayed -- the loop is not deterministic in "
+        f"the seed, so those rows can only be measured again at the same price. "
+        f"Write somewhere else with --out, move the file, or say --force.")
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[1])
     ap.add_argument("--limit", type=int, default=None,
@@ -716,15 +921,24 @@ def main(argv=None) -> int:
     ap.add_argument("--no-clone", action="store_true",
                     help="refuse to clone; use the repos already in workspace/ "
                          "(refuses loudly if one is not at the base commit)")
+    ap.add_argument("--force", action="store_true",
+                    help="overwrite an --out file that already holds a run "
+                         "(a P2 run costs 20-40 minutes and cannot be replayed)")
     a = ap.parse_args(argv)
 
     try:
+        # FIRST, before the advice and before the key: everything else refuses
+        # something that has not happened yet, and this one protects something
+        # that already did.
+        refuse_to_overwrite(a.out, force=a.force)
         res = run_p2(advice_path=a.advice, out_path=a.out, limit=a.limit,
                      seed=a.seed, no_clone=a.no_clone, on_row=_print_row)
-    except (AdviceRefused, agent_llm.MissingAPIKey) as e:
-        # Both are refusals BEFORE anything was spent, and both are the system
-        # working: no advice file means no frozen instrument, no key means no
-        # real agent -- and there is no fallback to a mock for either.
+    except (Refused, agent_llm.MissingAPIKey) as e:
+        # Every one of these is a refusal BEFORE anything was spent, and all of
+        # them are the system working: no advice file means no frozen instrument,
+        # no corpus means no repositories to edit, a wrong workspace means the
+        # wrong tree, an existing output file means a paid run on disk, and no
+        # key means no real agent. There is no fallback to a mock for any of them.
         print(f"REFUSED: {e}", file=sys.stderr)
         return 2
     _print_summary(res["summary"])

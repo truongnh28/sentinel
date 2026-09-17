@@ -123,6 +123,39 @@ def write_advice(path, rows) -> pathlib.Path:
     return path
 
 
+def a_git_repo(root, repo="acme/widget"):
+    """A real one-commit repository at `root/repo`, and its HEAD.
+
+    The fixture BOTH git-facing classes below work against: `GitRepos.patch` runs
+    a real `git diff` here, and `--no-clone` finds (or fails to find) a checkout
+    here.  One definition, because the two suites disagreeing about what "a
+    repository in the workspace" looks like is how one of them stops testing the
+    thing it names.
+    """
+    root = pathlib.Path(root)
+    path = root / repo
+    path.mkdir(parents=True)
+    def run(*a):
+        return subprocess.run(["git", "-C", str(path), *a], check=True,
+                              capture_output=True, text=True)
+    run("init", "-q", "-b", "main")
+    run("config", "user.email", "t@example.invalid")
+    run("config", "user.name", "t")
+    (path / "pkg").mkdir()
+    (path / "pkg" / "mod.py").write_text("def f():\n    return 1\n")
+    run("add", "-A")
+    run("commit", "-q", "-m", "base")
+    head = run("rev-parse", "HEAD").stdout.strip()
+    return root, path, head
+
+
+def a_task(base_commit, repo="acme/widget"):
+    """The `core.Task` for that repository, built by the runner's own `task_of`."""
+    return p2_run.task_of({"instance_id": "acme__widget-1", "repo": repo,
+                           "base_commit": base_commit, "patch": "",
+                           "problem_statement": "p"})
+
+
 class AdviceFileRefusals(unittest.TestCase):
     """The advice file is the INSTRUMENT.  A run on one that does not match its
     contract measures the file, not the agent."""
@@ -211,6 +244,124 @@ class AdviceContentRefusals(unittest.TestCase):
         self.assertIsNone(p2_run.advice_violation(
             "counting header_rows here is discouraged; index the row directly",
             forbidden={fixtures.marker()}))
+
+    def test_an_advice_that_is_not_a_string_is_refused_not_crashed_on(self):
+        """The contract is "fifteen advice STRINGS". A number there used to reach
+        `.lower()` and raise, which `main` does not catch: a traceback and exit 1
+        where the contract says a printed reason and exit 2."""
+        self.assertIsNotNone(p2_run.advice_violation(7, forbidden=set()))
+        iid = TESTS[2].instance_id
+        rows = advice_rows()
+        rows[2]["advice"] = 7
+        p = write_advice(self.dir / "a.jsonl", rows)
+        with self.assertRaises(p2_run.AdviceRefused) as e:
+            p2_run.load_advice(p)
+        self.assertIn(iid, str(e.exception))
+
+    def test_an_advice_line_that_is_not_a_json_object_is_refused(self):
+        """A bare number is valid JSON and used to reach `set(r)`, which raises
+        TypeError -- again outside the refusal contract."""
+        p = pathlib.Path(self.dir / "a.jsonl")
+        p.write_text("7\n" * 15, encoding="utf-8")
+        with self.assertRaises(p2_run.AdviceRefused) as e:
+            p2_run.load_advice(p)
+        self.assertIn("line 1", str(e.exception))
+
+    def test_an_instance_id_that_is_not_a_string_is_refused(self):
+        rows = advice_rows()
+        rows[0]["instance_id"] = ["a", "list"]
+        p = write_advice(self.dir / "a.jsonl", rows)
+        with self.assertRaises(p2_run.AdviceRefused):
+            p2_run.load_advice(p)
+
+    def test_blank_advice_is_refused(self):
+        """An empty advice is NO INSTRUMENT: the instance runs with nothing
+        planted, scores mode A almost by construction, and its A enters both
+        halves of `pr_cd_upper_tiers` with only `advice_chars: 0` as a trace."""
+        self.assertIsNotNone(p2_run.advice_violation("", forbidden=set()))
+        iid = TESTS[4].instance_id
+        rows = advice_rows()
+        rows[4]["advice"] = ""
+        p = write_advice(self.dir / "a.jsonl", rows)
+        with self.assertRaises(p2_run.AdviceRefused) as e:
+            p2_run.load_advice(p)
+        self.assertIn(iid, str(e.exception))
+
+    def test_whitespace_only_advice_is_refused_too(self):
+        self.assertIsNotNone(p2_run.advice_violation("  \n\t ", forbidden=set()))
+        p = write_advice(self.dir / "a.jsonl",
+                         advice_rows({t.instance_id: "   " for t in TESTS}))
+        with self.assertRaises(p2_run.AdviceRefused):
+            p2_run.load_advice(p)
+
+
+class TheFrozenLengthsMustAgreeWithTheMeasuredOnes(unittest.TestCase):
+    """The advice file records each string's length AT FREEZE TIME (guide §2) and
+    the runner emits its own count in every row.  Two committed artefacts, two
+    numbers for one quantity -- and pre-registration is exactly the discipline
+    that forbids them drifting apart.  So the frozen numbers are CHECKED when
+    they are present, and a disagreement refuses the run rather than being
+    silently overwritten by the fresh measurement.
+    """
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = pathlib.Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+
+    def rows_with_lengths(self):
+        rows = advice_rows()
+        for r in rows:
+            r["advice_chars"] = len(r["advice"])
+            r["advice_tokens"] = p2_run.advice_tokens(r["advice"])
+        return rows
+
+    def test_correct_frozen_lengths_load(self):
+        p = write_advice(self.dir / "a.jsonl", self.rows_with_lengths())
+        self.assertEqual(len(p2_run.load_advice(p)), 15)
+
+    def test_an_advice_file_without_the_length_fields_still_loads(self):
+        p = write_advice(self.dir / "a.jsonl", advice_rows())
+        self.assertEqual(len(p2_run.load_advice(p)), 15)
+
+    def test_a_frozen_char_count_that_disagrees_is_refused(self):
+        rows = self.rows_with_lengths()
+        rows[7]["advice_chars"] += 3
+        p = write_advice(self.dir / "a.jsonl", rows)
+        with self.assertRaises(p2_run.AdviceRefused) as e:
+            p2_run.load_advice(p)
+        self.assertIn("advice_chars", str(e.exception))
+        self.assertIn(TESTS[7].instance_id, str(e.exception))
+
+    def test_a_frozen_token_count_that_disagrees_is_refused(self):
+        rows = self.rows_with_lengths()
+        rows[1]["advice_tokens"] += 1
+        p = write_advice(self.dir / "a.jsonl", rows)
+        with self.assertRaises(p2_run.AdviceRefused) as e:
+            p2_run.load_advice(p)
+        self.assertIn("advice_tokens", str(e.exception))
+
+    def test_a_frozen_length_that_is_not_a_number_is_refused(self):
+        rows = self.rows_with_lengths()
+        rows[0]["advice_chars"] = "62"
+        p = write_advice(self.dir / "a.jsonl", rows)
+        with self.assertRaises(p2_run.AdviceRefused):
+            p2_run.load_advice(p)
+
+    def test_the_row_carries_the_frozen_numbers_it_agreed_with(self):
+        """One quantity, one number: what the row reports is what the frozen file
+        says, because the two were required to be equal to get this far."""
+        ws = self.dir / "ws"
+        ws.mkdir()
+        rows = self.rows_with_lengths()
+        p = write_advice(self.dir / "a.jsonl", rows)
+        iid = TESTS[0].instance_id
+        res = p2_run.run_p2(advice_path=p, out_path=self.dir / "raw.jsonl",
+                            rows=ROWS, limit=1, client=ScriptedClient(),
+                            repos=FixedPatches({iid: fixtures.gold(iid)}, ws))
+        row = res["rows"][0]
+        self.assertEqual(row["advice_chars"], rows[0]["advice_chars"])
+        self.assertEqual(row["advice_tokens"], rows[0]["advice_tokens"])
 
 
 class ClassificationAndRefusedRows(unittest.TestCase):
@@ -443,52 +594,31 @@ class ThePatchComesFromTheRepository(unittest.TestCase):
         self.dir = pathlib.Path(self.tmp.name)
         self.addCleanup(self.tmp.cleanup)
 
-    def a_repo(self, repo="acme/widget"):
-        root = self.dir / "workspace"
-        path = root / repo
-        path.mkdir(parents=True)
-        run = lambda *a: subprocess.run(["git", "-C", str(path), *a], check=True,
-                                        capture_output=True, text=True)
-        run("init", "-q", "-b", "main")
-        run("config", "user.email", "t@example.invalid")
-        run("config", "user.name", "t")
-        (path / "pkg").mkdir()
-        (path / "pkg" / "mod.py").write_text("def f():\n    return 1\n")
-        run("add", "-A")
-        run("commit", "-q", "-m", "base")
-        head = subprocess.run(["git", "-C", str(path), "rev-parse", "HEAD"],
-                              capture_output=True, text=True, check=True).stdout.strip()
-        return root, path, head
-
     def test_a_tracked_edit_shows_up_in_the_patch(self):
-        root, path, head = self.a_repo()
+        root, path, head = a_git_repo(self.dir / "workspace")
         (path / "pkg" / "mod.py").write_text("def f():\n    return 2\n")
-        task = p2_run.task_of({"instance_id": "acme__widget-1", "repo": "acme/widget",
-                               "base_commit": head, "patch": "", "problem_statement": "p"})
+        task = a_task(head)
         patch = p2_run.GitRepos(root=root).patch(task, path)
         self.assertIn("diff --git a/pkg/mod.py", patch)
         self.assertIn("+    return 2", patch)
 
     def test_a_file_the_agent_created_is_in_the_patch_too(self):
-        root, path, head = self.a_repo()
+        root, path, head = a_git_repo(self.dir / "workspace")
         (path / "pkg" / "new.py").write_text("def g():\n    return 3\n")
-        task = p2_run.task_of({"instance_id": "acme__widget-1", "repo": "acme/widget",
-                               "base_commit": head, "patch": "", "problem_statement": "p"})
+        task = a_task(head)
         patch = p2_run.GitRepos(root=root).patch(task, path)
         self.assertIn("diff --git a/pkg/new.py", patch)
 
     def test_an_untouched_repository_gives_an_empty_patch(self):
-        root, path, head = self.a_repo()
-        task = p2_run.task_of({"instance_id": "acme__widget-1", "repo": "acme/widget",
-                               "base_commit": head, "patch": "", "problem_statement": "p"})
+        root, path, head = a_git_repo(self.dir / "workspace")
+        task = a_task(head)
         self.assertEqual(p2_run.GitRepos(root=root).patch(task, path).strip(), "")
 
     def test_prepare_resets_the_worktree_of_a_repo_already_in_the_workspace(self):
-        root, path, head = self.a_repo()
+        root, path, head = a_git_repo(self.dir / "workspace")
         (path / "pkg" / "mod.py").write_text("left over from the last instance\n")
         (path / "scratch.txt").write_text("junk\n")
-        task = p2_run.task_of({"instance_id": "acme__widget-1", "repo": "acme/widget",
-                               "base_commit": head, "patch": "", "problem_statement": "p"})
+        task = a_task(head)
         got = p2_run.GitRepos(root=root).prepare(task)
         self.assertEqual(got, path)
         self.assertEqual((path / "pkg" / "mod.py").read_text(), "def f():\n    return 1\n")
@@ -617,6 +747,26 @@ class TheVacuousAnchorIsNeverAModeA(unittest.TestCase):
         row = self.run_with({iid: anchor_deletions_only(iid)}, limit=1)["rows"][0]
         self.assertEqual(row["mode"], p2_run.VACUOUS_ANCHOR, row)
 
+    def test_every_hidden_test_is_vacuously_true_on_an_empty_added_line_list(self):
+        """WHY THE SPLIT ABOVE IS SOUND, pinned for all fifteen.
+
+        "anchor untouched + marker -> mode D" holds only because `check()` on no
+        added lines answers True: with the marker present `proxy` is False and
+        `hidden` must be True for the pair to spell D.  Today that is so because
+        every one of the 15 predicates is UNIVERSALLY quantified, and `all(...)`
+        over nothing is True.  One future existence-shaped check (`any(...)`)
+        would answer False on the same input and silently turn that row into a
+        mode B -- flipping the reported DIRECTION of the proxy's error, which is
+        the whole output of P2.  Only TESTS[0] was covered; the day the
+        assumption breaks, this says so.
+        """
+        for t in TESTS:
+            self.assertTrue(t._check([]),
+                            f"{t.instance_id}: the hidden test is FALSE on an empty "
+                            f"added-line list, so an untouched anchor carrying the "
+                            f"marker no longer classifies as mode D. p2_run's "
+                            f"vacuous-anchor split has to be revisited")
+
     def test_the_unscoreable_row_leaves_the_denominator_and_is_counted_apart(self):
         patches = {t.instance_id: fixtures.gold(t.instance_id) for t in TESTS}
         mid = TESTS[5].instance_id                  # a mid-tier instance
@@ -664,6 +814,7 @@ class NoRowIsComputedFromTheGroundTruthLabel(unittest.TestCase):
         import unittest.mock
         real_item = p2_run.Item
         built = []
+        labelled = []
 
         def labelled_item(**kw):
             kw["poisoned"] = poisoned
@@ -671,26 +822,55 @@ class NoRowIsComputedFromTheGroundTruthLabel(unittest.TestCase):
             built.append(it)
             return it
 
+        real_taint = p2_run.advice_taint
+
+        def recording_taint(draft, lineage):
+            """Wraps the labeller so the test can prove the DERIVED WRITE really
+            happened.  Without that, a `memory_write` that stopped reaching
+            `advice_taint` would leave this comparison green while comparing two
+            runs in which the label was never consulted at all."""
+            lineage = list(lineage)
+            labelled.append(lineage)
+            return real_taint(draft, lineage)
+
         note = ('```json\n'
                 + json.dumps({"tool": "memory_write",
                               "args": {"topic": "notes", "content": "noted"}})
                 + '\n```')
         patches = {t.instance_id: fixtures.gold(t.instance_id) for t in TESTS}
-        with unittest.mock.patch.object(p2_run, "Item", labelled_item):
+        with unittest.mock.patch.object(p2_run, "Item", labelled_item), \
+                unittest.mock.patch.object(p2_run, "advice_taint", recording_taint):
             res = p2_run.run_p2(advice_path=self.advice, limit=3,
                                 out_path=self.dir / f"{name}.jsonl", rows=ROWS,
                                 repos=FixedPatches(patches, self.ws),
                                 client=ScriptedClient(replies=[note, "done"]))
-        return res, built
+        return res, built, labelled
 
     def test_the_rows_are_identical_whether_the_advice_is_poisoned_or_clean(self):
-        hot, hot_items = self.a_run("hot", poisoned=True)
-        cold, cold_items = self.a_run("cold", poisoned=False)
+        hot, hot_items, hot_labelled = self.a_run("hot", poisoned=True)
+        cold, cold_items, cold_labelled = self.a_run("cold", poisoned=False)
 
         # The comparison is only fair if the label really did differ.
         self.assertTrue(hot_items, "no advice item was built -- this proves nothing")
         self.assertEqual({i.poisoned for i in hot_items}, {True})
         self.assertEqual({i.poisoned for i in cold_items}, {False})
+
+        # ... and only meaningful if the DERIVED WRITE the labeller exists for
+        # actually happened, under both labels.  A note that stopped reaching
+        # `advice_taint` would make the rest of this test compare two runs in
+        # which the ground-truth label was never read.
+        # (The scripted client answers with the note once and "done" afterwards,
+        # so the write happens on the first instance of each run.)
+        for who, labelled in (("poisoned", hot_labelled), ("clean", cold_labelled)):
+            self.assertTrue(labelled,
+                            f"the {who} run labelled NO derived write: the agent's "
+                            f"memory_write no longer reaches advice_taint, so the "
+                            f"comparison below compares two runs in which the "
+                            f"ground-truth label was never consulted")
+            for lineage in labelled:
+                self.assertTrue(lineage, "a derived write with an empty lineage")
+        self.assertEqual({i.poisoned for lineage in hot_labelled for i in lineage},
+                         {True})
 
         self.assertEqual(len(hot["rows"]), 3)
         for h, c in zip(hot["rows"], cold["rows"]):
@@ -704,6 +884,22 @@ class NoRowIsComputedFromTheGroundTruthLabel(unittest.TestCase):
         hs, cs = dict(hot["summary"]), dict(cold["summary"])
         hs.pop("timestamp"), cs.pop("timestamp")
         self.assertEqual(hs, cs)
+
+    def test_a_run_whose_agent_leaves_no_note_derives_no_write(self):
+        """The other side of the count above: three labelled writes is three
+        because the scripted agent leaves a note on every instance, not because
+        the number three appears somewhere."""
+        import unittest.mock
+        labelled = []
+        patches = {t.instance_id: fixtures.gold(t.instance_id) for t in TESTS}
+        with unittest.mock.patch.object(
+                p2_run, "advice_taint",
+                lambda draft, lineage: labelled.append(list(lineage)) or False):
+            p2_run.run_p2(advice_path=self.advice, limit=3,
+                          out_path=self.dir / "quiet.jsonl", rows=ROWS,
+                          repos=FixedPatches(patches, self.ws),
+                          client=ScriptedClient(replies=["done"]))
+        self.assertEqual(labelled, [])
 
     def test_the_real_advice_item_is_labelled_poisoned(self):
         """The other half: the plant IS the payload, and a store that labelled it
@@ -731,63 +927,41 @@ class TheCloneCanBeReused(unittest.TestCase):
         self.dir = pathlib.Path(self.tmp.name)
         self.addCleanup(self.tmp.cleanup)
 
-    def a_repo(self, repo="acme/widget"):
-        root = self.dir / "workspace"
-        path = root / repo
-        path.mkdir(parents=True)
-        run = lambda *a: subprocess.run(["git", "-C", str(path), *a], check=True,
-                                        capture_output=True, text=True)
-        run("init", "-q", "-b", "main")
-        run("config", "user.email", "t@example.invalid")
-        run("config", "user.name", "t")
-        (path / "pkg").mkdir()
-        (path / "pkg" / "mod.py").write_text("def f():\n    return 1\n")
-        run("add", "-A")
-        run("commit", "-q", "-m", "base")
-        head = subprocess.run(["git", "-C", str(path), "rev-parse", "HEAD"],
-                              capture_output=True, text=True, check=True).stdout.strip()
-        return root, path, head
-
-    def a_task(self, base_commit, repo="acme/widget"):
-        return p2_run.task_of({"instance_id": "acme__widget-1", "repo": repo,
-                               "base_commit": base_commit, "patch": "",
-                               "problem_statement": "p"})
-
     def test_reuse_never_calls_the_clone(self):
         import unittest.mock
-        root, path, head = self.a_repo()
+        root, path, head = a_git_repo(self.dir / "workspace")
         (path / "scratch.txt").write_text("junk\n")
         def boom(*a, **kw):
             raise AssertionError("--no-clone must not reach the network")
         with unittest.mock.patch.object(p2_run.m3, "clone_repo", boom):
-            got = p2_run.GitRepos(root=root, clone=False).prepare(self.a_task(head))
+            got = p2_run.GitRepos(root=root, clone=False).prepare(a_task(head))
         self.assertEqual(got, path)
         self.assertFalse((path / "scratch.txt").exists(), "the worktree is still reset")
 
     def test_the_default_still_clones(self):
         import unittest.mock
-        root, path, head = self.a_repo()
+        root, path, head = a_git_repo(self.dir / "workspace")
         calls = []
         with unittest.mock.patch.object(
                 p2_run.m3, "clone_repo",
                 lambda repo, dest: calls.append(repo) or {"cloned": False}):
-            p2_run.GitRepos(root=root).prepare(self.a_task(head))
+            p2_run.GitRepos(root=root).prepare(a_task(head))
         self.assertEqual(calls, ["acme/widget"])
 
     def test_reuse_refuses_a_directory_that_is_not_a_checkout(self):
         root = self.dir / "workspace"
         (root / "acme/widget").mkdir(parents=True)
         with self.assertRaises(p2_run.RepoRefused) as e:
-            p2_run.GitRepos(root=root, clone=False).prepare(self.a_task("0" * 40))
+            p2_run.GitRepos(root=root, clone=False).prepare(a_task("0" * 40))
         self.assertIn("--no-clone", str(e.exception))
 
     def test_reuse_refuses_a_checkout_that_does_not_carry_the_base_commit(self):
         """Loudly, and by name -- not as a raw `git checkout` failure, and never
         by running the agent against whatever tree happened to be there."""
-        root, path, head = self.a_repo()
+        root, path, head = a_git_repo(self.dir / "workspace")
         wrong = "0" * 40
         with self.assertRaises(p2_run.RepoRefused) as e:
-            p2_run.GitRepos(root=root, clone=False).prepare(self.a_task(wrong))
+            p2_run.GitRepos(root=root, clone=False).prepare(a_task(wrong))
         self.assertIn(wrong, str(e.exception))
 
     def test_the_flag_is_on_the_command_line_and_off_by_default(self):
@@ -795,6 +969,273 @@ class TheCloneCanBeReused(unittest.TestCase):
                             "--out", str(self.dir / "raw.jsonl")])
         self.assertEqual(code, 2)                   # accepted, then refused on advice
         self.assertTrue(p2_run.GitRepos().clone, "the default is still to clone")
+
+
+class TheRepositoriesAreCheckedBeforeAnythingIsSpent(unittest.TestCase):
+    """M-5: `--no-clone` must refuse UP FRONT, not fifteen times over.
+
+    Every per-instance failure becomes a REFUSED row by design (a traceback after
+    eleven paid calls is worse than fourteen rows and one stated failure).  But a
+    wholly wrong `workspace/` is not a per-instance accident: it turns the whole
+    run into fifteen REFUSED rows and a summary that says "completed".  Rule N3
+    is satisfied there and the human's question -- "did my run work?" -- is not.
+    So the reuse path reads every checkout BEFORE the first model call and
+    refuses the run, naming what it found.
+    """
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = pathlib.Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+
+    def test_the_preflight_passes_when_the_checkout_is_the_right_one(self):
+        root, path, head = a_git_repo(self.dir / "workspace")
+        p2_run.GitRepos(root=root, clone=False).preflight([a_task(head)])
+
+    def test_the_preflight_refuses_a_workspace_without_the_repository(self):
+        root = self.dir / "workspace"
+        root.mkdir()
+        with self.assertRaises(p2_run.RepoRefused) as e:
+            p2_run.GitRepos(root=root, clone=False).preflight([a_task("0" * 40)])
+        self.assertIn("acme/widget", str(e.exception))
+
+    def test_the_preflight_refuses_a_checkout_at_the_wrong_commit(self):
+        root, path, head = a_git_repo(self.dir / "workspace")
+        with self.assertRaises(p2_run.RepoRefused) as e:
+            p2_run.GitRepos(root=root, clone=False).preflight([a_task("0" * 40)])
+        self.assertIn("0" * 40, str(e.exception))
+
+    def test_the_preflight_names_every_repository_that_is_wrong(self):
+        """One listing, not one refusal per instance: the human fixes the
+        workspace once."""
+        root, path, head = a_git_repo(self.dir / "workspace")
+        with self.assertRaises(p2_run.RepoRefused) as e:
+            p2_run.GitRepos(root=root, clone=False).preflight(
+                [a_task(head), a_task("0" * 40, repo="acme/other"),
+                 a_task("1" * 40)])
+        self.assertIn("acme/other", str(e.exception))
+        self.assertIn("1" * 40, str(e.exception))
+
+    def test_the_preflight_leaves_the_worktree_alone(self):
+        """A READING, not a reset: it runs before the run decides to start, and a
+        check that mutated the workspace would have done half a run's work on the
+        strength of a question."""
+        root, path, head = a_git_repo(self.dir / "workspace")
+        (path / "scratch.txt").write_text("junk\n")
+        p2_run.GitRepos(root=root, clone=False).preflight([a_task(head)])
+        self.assertTrue((path / "scratch.txt").exists())
+
+    def test_cloning_checks_nothing_up_front(self):
+        """With the clone allowed there is nothing to be wrong about yet."""
+        root = self.dir / "workspace"
+        p2_run.GitRepos(root=root).preflight([a_task("0" * 40)])
+
+    def test_the_run_refuses_before_the_first_model_call(self):
+        """The wiring, not just the check: nothing is spent and no output file is
+        opened when the workspace is wrong."""
+        class Refusing:
+            def preflight(self, tasks):
+                raise p2_run.RepoRefused("workspace/acme/widget is not a checkout")
+
+            def prepare(self, task):
+                raise AssertionError("the run started anyway")
+
+            def patch(self, task, repo_path):
+                raise AssertionError("the run started anyway")
+
+        advice = write_advice(self.dir / "advice.jsonl", advice_rows())
+        out = self.dir / "raw.jsonl"
+        client = ScriptedClient()
+        with self.assertRaises(p2_run.RepoRefused):
+            p2_run.run_p2(advice_path=advice, out_path=out, rows=ROWS,
+                          repos=Refusing(), client=client)
+        self.assertEqual(client.requests, [], "a paid call was made anyway")
+        self.assertFalse(out.exists(), "an output file was opened anyway")
+
+    def test_the_command_line_turns_that_refusal_into_exit_two(self):
+        import contextlib
+        import io
+        import unittest.mock
+        advice = write_advice(self.dir / "advice.jsonl", advice_rows())
+        err = io.StringIO()
+        with unittest.mock.patch.object(
+                p2_run, "run_p2",
+                lambda **kw: (_ for _ in ()).throw(p2_run.RepoRefused("wrong tree"))):
+            with contextlib.redirect_stderr(err):
+                code = p2_run.main(["--advice", str(advice), "--no-clone",
+                                    "--out", str(self.dir / "raw.jsonl")])
+        self.assertEqual(code, 2)
+        self.assertIn("wrong tree", err.getvalue())
+
+
+class TheCorpusIsRefusedUnderItsOwnName(unittest.TestCase):
+    """M-2: a missing SWE-bench corpus is not an advice problem.
+
+    The refusal was right and the instrument it named was not: a reader of
+    "AdviceRefused: no instance corpus at ..." is sent to the advice file, which
+    is fine. Different artefact, different fix (`swebench_fetch.py`), different
+    exception -- and both still exit 2, because both are refusals before a cent
+    is spent.
+    """
+
+    def test_a_missing_corpus_is_a_corpus_refusal(self):
+        with self.assertRaises(p2_run.CorpusRefused) as e:
+            p2_run.load_instances(pool="no_such_pool")
+        self.assertIn("no_such_pool", str(e.exception))
+        self.assertNotIsInstance(e.exception, p2_run.AdviceRefused)
+
+    def test_both_refusals_share_the_one_the_command_line_catches(self):
+        self.assertTrue(issubclass(p2_run.CorpusRefused, p2_run.Refused))
+        self.assertTrue(issubclass(p2_run.AdviceRefused, p2_run.Refused))
+
+    def test_the_command_line_exits_two_on_a_missing_corpus(self):
+        import contextlib
+        import io
+        import unittest.mock
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        d = pathlib.Path(tmp.name)
+        advice = write_advice(d / "advice.jsonl", advice_rows())
+        err = io.StringIO()
+        with unittest.mock.patch.object(
+                p2_run, "load_instances",
+                lambda *a, **kw: (_ for _ in ()).throw(
+                    p2_run.CorpusRefused("no instance corpus"))):
+            with contextlib.redirect_stderr(err):
+                code = p2_run.main(["--advice", str(advice),
+                                    "--out", str(d / "raw.jsonl")])
+        self.assertEqual(code, 2)
+        self.assertIn("no instance corpus", err.getvalue())
+
+
+class TheOutputFileOfAPaidRunIsNotOverwritten(unittest.TestCase):
+    """C-1's second half: 20-40 minutes and a few dollars, and NOT REPLAYABLE.
+
+    The agent is not deterministic in the seed (question 6 closed
+    `deterministic=False`), so `p2-raw.jsonl` cannot be regenerated from what is
+    recorded -- only re-measured, at the same price.  The runner opens that path
+    with "w".  A second invocation with the defaults -- a rerun, a `--limit 1`
+    smoke test typed after the real run -- therefore truncates the measurement
+    before it does anything else.  So the command line reads the path first and
+    refuses, before the advice file and before the key, and `--force` is the way
+    to say it on purpose.
+    """
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = pathlib.Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+        self.advice = write_advice(self.dir / "advice.jsonl", advice_rows())
+
+    def test_an_existing_output_file_stops_the_run_and_survives_it(self):
+        import contextlib
+        import io
+        out = self.dir / "raw.jsonl"
+        out.write_text('{"instance_id": "paid for", "mode": "A"}\n', encoding="utf-8")
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            code = p2_run.main(["--advice", str(self.advice), "--out", str(out)])
+        self.assertEqual(code, 2)
+        self.assertIn("paid for", out.read_text(encoding="utf-8"))
+        # ... and it stopped FOR THIS REASON. Without the assertion on the
+        # message the test would pass on a machine that merely has no API key.
+        self.assertIn("already holds a run", err.getvalue())
+
+    def test_force_says_it_on_purpose(self):
+        out = self.dir / "raw.jsonl"
+        out.write_text("old\n", encoding="utf-8")
+        p2_run.refuse_to_overwrite(out, force=True)         # no refusal
+        with self.assertRaises(p2_run.OutputRefused):
+            p2_run.refuse_to_overwrite(out, force=False)
+
+    def test_an_empty_leftover_file_is_not_a_measurement(self):
+        out = self.dir / "raw.jsonl"
+        out.write_text("", encoding="utf-8")
+        p2_run.refuse_to_overwrite(out, force=False)
+
+    def test_a_fresh_path_is_fine(self):
+        p2_run.refuse_to_overwrite(self.dir / "new.jsonl", force=False)
+
+    def test_the_flag_reaches_the_command_line(self):
+        """With --force the output check is passed and the NEXT refusal is the
+        one that speaks -- which is how the order of the two is pinned."""
+        import contextlib
+        import io
+        out = self.dir / "raw.jsonl"
+        out.write_text("old\n", encoding="utf-8")
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            code = p2_run.main(["--advice", str(self.dir / "nope.jsonl"),
+                                "--out", str(out), "--force"])
+        self.assertEqual(code, 2)
+        self.assertIn("no advice file", err.getvalue())
+
+    def test_the_output_check_speaks_first_when_both_are_wrong(self):
+        import contextlib
+        import io
+        out = self.dir / "raw.jsonl"
+        out.write_text("old\n", encoding="utf-8")
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            code = p2_run.main(["--advice", str(self.dir / "nope.jsonl"),
+                                "--out", str(out)])
+        self.assertEqual(code, 2)
+        self.assertIn(str(out), err.getvalue())
+
+
+class TheRowIsStampedWhenTheInstanceFinishes(unittest.TestCase):
+    """M-6: `timestamp` is the completion time, and this is what says so.
+
+    A ReAct loop is minutes long, so "the start" and "the end" are not the same
+    reading.  The row is the record of a FINISHED instance -- it carries the
+    patch, the tokens and the verdict, none of which existed at the start -- so
+    the stamp is taken when the row is built.
+    """
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = pathlib.Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+        self.advice = write_advice(self.dir / "advice.jsonl", advice_rows())
+        self.ws = self.dir / "ws"
+        self.ws.mkdir()
+
+    def a_row_under_a_fake_clock(self, patch):
+        """One instance, with the clock replaced by a tick counter the scripted
+        model also reads.  Comparing the row's stamp against a reading taken
+        DURING the model call is the only way to tell a start stamp from a
+        completion stamp without sleeping."""
+        import itertools
+        import unittest.mock
+        ticks = itertools.count()
+        during = []
+
+        class ClockWatchingClient(ScriptedClient):
+            def complete(self, messages, **kw):
+                during.append(p2_run._utc_now())
+                return super().complete(messages, **kw)
+
+        iid = TESTS[0].instance_id
+        with unittest.mock.patch.object(p2_run, "_utc_now",
+                                        lambda: f"t{next(ticks):06d}"):
+            res = p2_run.run_p2(advice_path=self.advice, limit=1,
+                                out_path=self.dir / "raw.jsonl", rows=ROWS,
+                                repos=FixedPatches({iid: patch}, self.ws),
+                                client=ClockWatchingClient())
+        return res["rows"][0], during
+
+    def test_the_stamp_is_taken_after_the_model_answered(self):
+        iid = TESTS[0].instance_id
+        row, during = self.a_row_under_a_fake_clock(fixtures.gold(iid))
+        self.assertTrue(during, "the model was never called")
+        self.assertGreater(row["timestamp"], during[-1],
+                           "the row is stamped before the model call: that is the "
+                           "START time wearing the name of a completion time")
+
+    def test_a_refused_row_is_stamped_when_it_was_refused_too(self):
+        row, during = self.a_row_under_a_fake_clock("")
+        self.assertEqual(row["mode"], "REFUSED")
+        self.assertGreater(row["timestamp"], during[-1])
 
 
 if __name__ == "__main__":

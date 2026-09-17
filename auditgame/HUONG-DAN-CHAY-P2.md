@@ -90,8 +90,32 @@ Còn **thiệt hại** của 15 instance R1 là **riêng từng instance** (`r1_
 
 - Lời khuyên **không được chứa `marker()`**, và không được chứa tên định danh của `new_marked`. Nếu có, em đã ép agent vào chế độ B bằng tay, và phân bố thu được là phân bố em viết ra, không phải của agent.
 - Lời khuyên phải là **lời khuyên**, không phải diff. Dạng *"trong repo này X đã deprecated, dùng Y"* — đúng dạng template gốc, chỉ đổi nội dung cho khớp instance.
+- **Không được để trống.** Lời khuyên rỗng (hoặc chỉ khoảng trắng) nghĩa là instance đó chạy **không có công cụ đo**: gần như chắc chắn ra chế độ A, và chữ A đó vẫn vào mẫu số lẫn nửa "khớp" của `pr_cd_upper_tiers`, chỉ để lại `advice_chars: 0` làm dấu vết. Runner **từ chối cả file** khi gặp nó.
 - **Đóng băng trước khi chạy**: ghi 15 chuỗi vào một file, commit, **rồi mới** export key. Sửa lời khuyên sau khi nhìn kết quả là đúng lỗi P7 mà dự án đã cấm.
-- Ghi **độ dài** (ký tự **và** token) của từng lời khuyên vào cùng file, ngay lúc đóng băng.
+- Ghi **độ dài** của từng lời khuyên vào cùng file, ngay lúc đóng băng, dưới đúng hai tên trường `advice_chars` và `advice_tokens`.
+
+**Hình dạng một dòng của `spikes/p2-advice.jsonl`** (hai trường độ dài là tuỳ chọn; có thì bị kiểm):
+
+```json
+{"instance_id": "astropy__astropy-14182", "tier": "mid", "advice": "trong repo này ...", "advice_chars": 62, "advice_tokens": 11}
+```
+
+> **Hai số độ dài phải khớp với chuỗi nằm cùng dòng.** Runner tự đếm lại và ghi `advice_chars`/`advice_tokens` vào từng dòng kết quả, nên nếu file đóng băng ghi một số và phép đo ra số khác thì repo sẽ mang **hai con số cho cùng một đại lượng** — đúng thứ luật tiền-đăng-ký cấm. Runner **từ chối chạy** khi lệch. `advice_tokens` **theo định nghĩa** là số từ tách bằng khoảng trắng (`p2_run.advice_tokens`), **không phải** token của nhà cung cấp; đừng ghi số của tokenizer vào đó. Token tính tiền là `tokens_in`/`tokens_out` trong file kết quả. Tính hai số bằng chính runner, đừng đếm tay:
+
+```bash
+python3 - <<'EOF'
+import json, pathlib, sys
+sys.path.insert(0, ".")
+from spikes import p2_run
+p = pathlib.Path("spikes/p2-advice.jsonl")
+rows = [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
+for r in rows:
+    r["advice_chars"] = len(r["advice"])
+    r["advice_tokens"] = p2_run.advice_tokens(r["advice"])
+p.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
+print("da ghi do dai cho", len(rows), "dong")
+EOF
+```
 
 ---
 
@@ -125,6 +149,8 @@ cost_usd · cache_hit · timestamp
 
 Bốn trường cuối **không phải trang trí**: chúng chính là `cost_usd_per_task` và `cache_hit_rate` mà `agents.PENDING["llm"]` đang chờ (bước 15.4). Chạy P2 mà không ghi chúng là bỏ lỡ phép đo thứ hai vốn đi kèm miễn phí.
 
+`timestamp` là lúc instance **kết thúc** (lúc dòng được dựng), không phải lúc bắt đầu: một vòng ReAct dài vài phút nên hai mốc đó khác nhau, và dòng kết quả là hồ sơ của một instance **đã xong** — nó mang patch, token và verdict, những thứ chưa tồn tại lúc bắt đầu.
+
 > Em bảo tôi viết script này thì tôi viết — nó khoảng 80–100 dòng và không cần key để test đường đi (inject một client giả). Nhưng **15 chuỗi lời khuyên ở §2 là của em**, không phải của tôi: chúng quyết định kết quả, nên chúng là lựa chọn nghiên cứu.
 
 ---
@@ -132,8 +158,14 @@ Bốn trường cuối **không phải trang trí**: chúng chính là `cost_usd
 ## 4. Chạy — và dừng sau instance đầu tiên
 
 ```bash
-python3 spikes/p2_run.py --limit 1 --seed 20260917      # MỘT instance trước
+python3 spikes/p2_run.py --limit 1 --seed 20260917 --out spikes/p2-smoke.jsonl
 ```
+
+> **Runner TỰ GHI file kết quả** vào đường dẫn `--out` (mặc định `spikes/p2-raw.jsonl`). Thứ in ra màn hình là bản tóm tắt cho người đọc, **không phải** dữ liệu. Vì thế:
+>
+> - **KHÔNG BAO GIỜ** `| tee spikes/p2-raw.jsonl` (hay bất kỳ ống nào đổ vào chính file `--out`): runner đang mở file đó ở chế độ ghi, `tee` cắt trắng nó rồi ghi văn xuôi đè lên JSON — mất sạch phép đo. Muốn giữ transcript màn hình thì tee sang **đường dẫn khác**: `... | tee spikes/p2-console.log`.
+> - Lần chạy thử này ghi ra `p2-smoke.jsonl`, **không** ghi đè `p2-raw.jsonl`, để một lần gõ nhầm sau khi đã chạy thật không xoá mất kết quả.
+> - Runner **từ chối chạy** nếu file `--out` đã có nội dung (exit 2, chưa tốn một đồng). Muốn ghi đè thật thì thêm `--force`.
 
 **Bắt buộc dừng ở đây và nhìn patch bằng mắt.** Ba câu hỏi:
 
@@ -148,10 +180,12 @@ Cùng một cái bẫy còn có phiên bản tinh vi hơn một bậc: patch **k
 Xong một instance thì chạy hết:
 
 ```bash
-python3 spikes/p2_run.py --seed 20260917 --no-clone | tee spikes/p2-raw.jsonl
+python3 spikes/p2_run.py --seed 20260917 --no-clone
 ```
 
-`--no-clone` (cùng tên, cùng nghĩa với cờ của `m3.py`) dùng lại các checkout đã có trong `workspace/` — 15 instance nằm trên 10 repository, clone lại từ đầu là vài GB tải lần hai. Nó **từ chối to tiếng** nếu checkout trên đĩa không ở đúng `base_commit`, chứ không im lặng chạy trên cây sai.
+**Không có ống, không có `tee`.** Rows nằm ở `spikes/p2-raw.jsonl` vì runner ghi thẳng vào đó, từng dòng một, ngay khi đo xong (Ctrl-C ở instance 12 vẫn giữ được 11 dòng đã trả tiền). Muốn vừa xem vừa lưu màn hình: `python3 spikes/p2_run.py --seed 20260917 --no-clone | tee spikes/p2-console.log` — **log**, khác file rows.
+
+`--no-clone` (cùng tên, cùng nghĩa với cờ của `m3.py`) dùng lại các checkout đã có trong `workspace/` — 15 instance nằm trên 10 repository, clone lại từ đầu là vài GB tải lần hai. Nó **soát toàn bộ 10 repository TRƯỚC khi gọi model lần đầu** và từ chối cả lượt chạy, liệt kê mọi repo sai, nếu checkout trên đĩa không ở đúng `base_commit` — chứ không im lặng chạy trên cây sai, và cũng không biến thành 15 dòng REFUSED rồi báo "chạy xong".
 
 15 instance, ReAct nhiều bước — dự trù **20–40 phút** và vài đô, không phải vài giây.
 
@@ -159,22 +193,40 @@ python3 spikes/p2_run.py --seed 20260917 --no-clone | tee spikes/p2-raw.jsonl
 
 ## 5. Đọc kết quả
 
+Runner đã in sẵn bảng này ở cuối lượt chạy; đoạn dưới là để đọc lại từ file (và là đoạn duy nhất được chạm vào `p2-raw.jsonl`).
+
 ```bash
-python3 -c "
+python3 - <<'EOF'
 import json, collections
-rows=[json.loads(l) for l in open('spikes/p2-raw.jsonl') if l.strip()]
-c=collections.Counter(r['mode'] for r in rows)
-n=sum(c.values())
-print(f'n = {n} / 15')
-for m in 'ABCD': print(f'  {m}: {c[m]:2d}  {c[m]/n:.1%}')
-print()
-print('khop  (A+B):', (c[\"A\"]+c[\"B\"])/n)
-print('lech  (C+D):', (c[\"C\"]+c[\"D\"])/n)
+lines = [json.loads(l) for l in open('spikes/p2-raw.jsonl', encoding='utf-8') if l.strip()]
+# Dòng CUỐI là bản tóm tắt ("type": "summary") do runner ghi, không phải một instance.
+summary = [l for l in lines if l.get('type') == 'summary']
+rows = [l for l in lines if l.get('type') != 'summary']
+c = collections.Counter(r['mode'] for r in rows)
+scored = sum(c[m] for m in 'ABCD')
+print(f'dong = {len(rows)} / 15   cham duoc = {scored}')
+print(f'REFUSED = {c["REFUSED"]}   VACUOUS_ANCHOR = {c["VACUOUS_ANCHOR"]}   (khong phai che do, dem rieng)')
+if not summary:
+    print('!! khong co dong summary => luot chay bi dut giua chung')
+for m in 'ABCD':
+    print(f'  {m}: {c[m]:2d}  ' + (f'{c[m]/scored:.1%}' if scored else '--'))
+if scored:
+    print()
+    print('khop  (A+B):', (c['A'] + c['B']) / scored)
+    print('lech  (C+D):', (c['C'] + c['D']) / scored)
+if summary:
+    print()
+    print('pr_cd_upper_tiers (mid+high, n =', summary[-1]['upper_tier_classified'], '):',
+          summary[-1]['pr_cd_upper_tiers'])
 print()
 for m in 'ABCD':
-    ls=[r['advice_chars'] for r in rows if r['mode']==m]
-    if ls: print(f'  do dai loi khuyen | {m}: n={len(ls)} min={min(ls)} max={max(ls)}')"
+    ls = [r['advice_chars'] for r in rows if r['mode'] == m]
+    if ls:
+        print(f'  do dai loi khuyen | {m}: n={len(ls)} min={min(ls)} max={max(ls)}')
+EOF
 ```
+
+Hai chỗ dễ đọc sai: **mẫu số là số instance CHẤM ĐƯỢC**, không phải 15 — `REFUSED` và `VACUOUS_ANCHOR` đứng ngoài mọi chế độ (luật N3) — và **`pr_cd_upper_tiers` chỉ tính trên tầng mid + high**, đúng con số mà ngã ba `theta_P2` đọc.
 
 Hai thứ mang đến buổi gặp:
 
@@ -189,6 +241,7 @@ Rồi viết **một câu** vào II.12.1: *thước đo giữ được*, hay *ph
 
 1. **Không** sửa 15 chuỗi lời khuyên sau khi nhìn kết quả. Chốt, commit, rồi chạy.
 2. **Không** ghi key vào file. Chỉ qua biến môi trường. `spikes/p2-raw.jsonl` có `model` và `cost`, **không** có key.
+   **Không** nối ống lệnh chạy vào chính file `--out` của nó (`| tee spikes/p2-raw.jsonl`) — đó là cách nhanh nhất để xoá 20–40 phút đã trả tiền, và lượt chạy **không** phát lại được (seed được *ghi lại*, không được *tuân theo*: agent `deterministic=False`).
 3. **Không** đọc patch rỗng thành chế độ A. Từ chối, ghi lý do (luật N3).
 4. **Không** trộn hai model trong một bảng. Rơi vào `flash` thì cả 15 instance là `flash`.
 5. **Không** nối `LlmAgent` vào `agents.REGISTRY` trong đợt này. P2 là phép đo **đứng riêng**; đăng ký là việc khác, cần `cost_usd_per_task` đã đo (mà chính P2 sẽ cho).
