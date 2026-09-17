@@ -1,0 +1,341 @@
+#!/usr/bin/env python3
+"""
+dprime_sweep.py -- Sweep d' CONTINUOUSLY and locate the break-even d'*.
+
+WHY THIS MODULE EXISTS.  The thesis reported three DECLARED operating points
+copied from the manuscript -- weak (0.75, 0.20), mid (0.85, 0.12), strong
+(0.92, 0.06) -- and had no answer to "where does 0.85 come from?".  The answer is
+not a better defence of 0.85.  It is to stop choosing: d' becomes a SWEPT
+PARAMETER, the result is reported across the whole range, and the claim is
+restated as a THRESHOLD --
+
+    "Sentinel reduces harm if and only if the audit reaches d' > d'*."
+
+This needs no new subsystem.  detector.Detector(d_prime, tau_det) already takes an
+arbitrary d'; everything below is measurement, not mechanism.
+
+WHAT IS HELD FIXED, AND WHY THAT PARAMETERISATION.  tau_det is held at the `mid`
+setting's threshold, tau_det = z(1 - 0.12) = 1.17498679206609.  That makes this a
+genuinely ONE-DIMENSIONAL sweep: phi = Phi(-tau_det) = 0.12 does not move, only
+psi = Phi(d' - tau_det) does.  Sweeping (psi, phi) jointly -- which is what the
+three declared settings do -- moves the false-alarm rate and the detection rate at
+the same time, so a difference between two settings cannot be attributed to either
+one.  Here it can: every point on the curve is the SAME false-alarm rate.
+
+WHAT IS NOT HELD FIXED, AND WHERE THAT LEAKS (declared, not discovered later).
+`setting` is also the key into the FROZEN tau_sel table (scoring.tau_sel), the
+carrier-level selection threshold.  That table has rows for weak/mid/strong only,
+and it is calibrated per d': tau_sel is the (1 - alpha_c) quantile of the clean
+posterior, which depends on d'.  This sweep keeps setting="mid" at every d', so
+the policies' carrier-selection threshold stays calibrated at d' = 2.211 while the
+detector runs at the swept d'.  That is the price of "vary d' and nothing else"
+without touching scoring.py; it is a real confound at d' far from 2.211 and it is
+reported as one.  The detector's own d' DOES reach the policies, through
+runner -> scoring.carrier_score(raw, det.d_prime), so the belief model tracks the
+sweep even though the threshold does not.
+
+THE DEFINITION OF d'* -- FIXED BEFORE ANY NUMBER WAS LOOKED AT:
+
+    d'* = the SMALLEST d' in the grid such that the CI95 LOWER BOUND of
+          Delta-harm is > 0 at that d' AND at EVERY LARGER d' in the grid.
+
+The "and at every larger d'" clause is the whole point.  Without it a single noise
+crossing near the bottom of the grid gets reported as a threshold.  This project
+has already been burned once by choosing a summarisation rule after seeing the
+data (finding P7), so the rule is `break_even()` below and it was written first.
+
+If Delta-harm is NOT monotone in d', that is REPORTED (`is_monotone`), not
+smoothed: it is a result about the method.  If a Delta cell never separates from
+zero anywhere in the grid, d'* is None -- "no break-even in this range" is an
+answer, an interpolated number would not be.
+
+N3.  A (d', Delta) cell on which no attack could be built on any workflow carries
+a REASON, not harm = 0.0, and is excluded from the break-even scan -- it is not
+"the defense held".
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import random
+import sys
+from dataclasses import dataclass, asdict
+
+import agent
+import build
+import detector
+import runner
+
+#: The two policies Delta-harm is defined through.  Delta-harm = harm_B1 - harm_Sentinel.
+B1 = "B1 audit-at-commit"
+SENTINEL = "Sentinel"
+
+#: FIXED false-alarm rate for the whole sweep: tau_det from the `mid` setting.
+#: Read off detector.SETTINGS rather than pasted as a literal, so the sweep cannot
+#: drift away from the setting it claims to inherit.
+TAU_DET = detector.operating_point(*detector.SETTINGS["mid"])[1]
+
+#: The frozen tau_sel table this sweep reads (see module docstring).
+SETTING = "mid"
+
+#: Coarse grid: d' in {0.0, 0.2, ..., 3.0} -- 16 points, step 0.2.
+GRID = tuple(round(0.2 * i, 2) for i in range(16))
+
+#: Refinement step, used only inside the bracket that already contains d'*.
+REFINE_STEP = 0.05
+
+#: The Delta cells.  REPORTED SEPARATELY, NEVER POOLED (project rule): a pooled
+#: number averages the regime where the method helps with the regime where it does
+#: not, which is the single thing this grid exists to keep apart.
+DELTAS = (0, 1, 2, 4)
+
+#: D5 -- the attacker class must cover all four carriers.
+CARRIERS = ("memory", "skill", "queue", "branch")
+
+
+@dataclass
+class SweepCell:
+    """One (d', Delta) cell.  N3: harm never travels without its denominator, and a
+    cell that could not be built carries WHY instead of a number."""
+    d_prime: float
+    delta: int
+    harm_b1: float
+    harm_sentinel: float
+    dharm: float
+    ci_lo: float
+    ci_hi: float
+    n_feasible: int
+    n_total: int
+    reason: str | None = None       # not None => excluded from every average
+
+    @property
+    def usable(self) -> bool:
+        return self.reason is None
+
+
+def make_detector(d_prime: float) -> detector.Detector:
+    """The detector at one point of the sweep: swept d', FIXED tau_det.
+
+    Not `Detector.from_operating_point`, which would take a (psi, phi) pair and so
+    move phi as well -- that is the two-dimensional move this sweep exists to
+    replace.
+    """
+    return detector.Detector(d_prime, TAU_DET)
+
+
+def make_corpus(n: int, H: int, seed: int = 2026) -> list:
+    """The same corpus experiment.py's `--dataset mock` path builds.
+
+    Copied in shape, not imported, for one reason only: importing experiment would
+    execute nothing harmful but would couple an additive measurement to the frozen
+    driver.  The seeding is identical -- ONE rng shared across the corpus -- so a
+    sweep point at d' = d'(mid) reproduces experiment.py's `mid` row exactly, and
+    tests/gate1_integrity/test_dprime_sweep.py asserts precisely that.
+    """
+    rng = random.Random(seed)
+    return [build.make_workflow(f"wf-{i:03d}", "django", H, rng) for i in range(n)]
+
+
+def measure_cell(wfs, d_prime: float, delta: int, budget: float, seeds,
+                 carriers=CARRIERS, ag=None) -> SweepCell:
+    """Delta-harm and its CI95 at ONE (d', Delta) cell.
+
+    The CI comes from runner.bootstrap_paired, whose resampling unit is the
+    WORKFLOW -- untouched here.  Cases from one workflow share a task chain and a
+    clean-run outcome, so resampling by case gives falsely narrow intervals; a
+    break-even read off a falsely narrow interval is a fiction.
+    """
+    det = make_detector(d_prime)
+    ag = ag or agent.MockAgent()
+    cells = {}
+    for name in (B1, SENTINEL):
+        runner.reset_survivor_cache()
+        cells[name] = runner.worst_case(name, wfs, (delta,), carriers, det, ag,
+                                        budget, seeds, SETTING)
+    b1, sn = cells[B1], cells[SENTINEL]
+
+    if b1.n_feasible == 0 or sn.n_feasible == 0:
+        # N3: no attack could be built on ANY workflow in this cell.  That is not
+        # harm = 0 and it is not "the defense held" -- it is an absent measurement,
+        # and it says so.
+        return SweepCell(d_prime=d_prime, delta=delta,
+                         harm_b1=float("nan"), harm_sentinel=float("nan"),
+                         dharm=float("nan"), ci_lo=float("nan"), ci_hi=float("nan"),
+                         n_feasible=0, n_total=b1.n_total,
+                         reason=f"no attack could be built at Delta={delta} on any "
+                                f"of the {b1.n_total} workflows")
+    if len(b1.per_wf) != len(sn.per_wf):
+        # bootstrap_paired pairs BY INDEX.  Two different lengths means the two
+        # policies dropped different workflows, and the pairing would be a lie.
+        return SweepCell(d_prime=d_prime, delta=delta,
+                         harm_b1=b1.harm, harm_sentinel=sn.harm,
+                         dharm=float("nan"), ci_lo=float("nan"), ci_hi=float("nan"),
+                         n_feasible=min(b1.n_feasible, sn.n_feasible),
+                         n_total=b1.n_total,
+                         reason=f"B1 kept {b1.n_feasible} workflows and Sentinel "
+                                f"{sn.n_feasible}: the paired CI has no pairing")
+
+    lo, hi = runner.bootstrap_paired(b1.per_wf, sn.per_wf)
+    return SweepCell(d_prime=d_prime, delta=delta,
+                     harm_b1=b1.harm, harm_sentinel=sn.harm,
+                     dharm=b1.harm - sn.harm, ci_lo=lo, ci_hi=hi,
+                     n_feasible=b1.n_feasible, n_total=b1.n_total)
+
+
+def break_even(cells) -> float | None:
+    """d'* -- the DECLARED definition, and the only one this module computes.
+
+        d'* = min { d' : CI95_lo(Delta-harm) > 0 at d' AND at every larger d'
+                         in the grid }
+
+    Implemented as a scan DOWNWARD from the largest d', extending the run while the
+    lower bound stays above zero and stopping at the first point that breaks it.
+    That is the same statement, and it makes the "and stays" clause structural
+    rather than a comment: a lone positive point below a negative one can never be
+    returned, because the scan has already stopped.
+
+    Returns None when no suffix of the grid qualifies -- "there is no break-even in
+    this range" is an answer.  A cell carrying a REASON (N3) breaks the run exactly
+    as a non-positive bound does: an absent measurement cannot support "and stays".
+    """
+    star = None
+    for c in sorted(cells, key=lambda c: c.d_prime, reverse=True):
+        if c.usable and c.ci_lo > 0.0:
+            star = c.d_prime
+        else:
+            break
+    return star
+
+
+def is_monotone(cells) -> bool:
+    """Is Delta-harm non-decreasing in d' across the usable cells of one Delta?
+
+    Reported, never enforced.  A non-monotone curve is a result about the method --
+    more audit quality not always buying more advantage -- and smoothing it would
+    delete the finding.
+    """
+    vals = [c.dharm for c in sorted(cells, key=lambda c: c.d_prime) if c.usable]
+    return all(a <= b + 1e-12 for a, b in zip(vals, vals[1:]))
+
+
+def refinement_points(star: float | None, grid=GRID, step: float = REFINE_STEP) -> tuple:
+    """The d' values to measure inside the bracket that already contains d'*.
+
+    DECLARED BEFORE MEASURING, like the definition itself: if d'* lands on a coarse
+    grid point, the true crossing lies somewhere in (previous point, d'*], so that
+    open interval -- and only it -- is re-measured at `step`.  The d'* rule is then
+    re-applied to the MERGED grid; nothing is interpolated, because an interpolated
+    d'* is a number with fabricated precision.
+
+    Empty when there is no d'*, and empty when d'* is the smallest grid point
+    (nothing below it was measured, so there is no bracket to refine).
+    """
+    ordered = sorted(grid)
+    if star is None or star <= ordered[0]:
+        return ()
+    below = max(g for g in ordered if g < star)
+    n = int(round((star - below) / step))
+    return tuple(round(below + step * i, 4) for i in range(1, n))
+
+
+def sweep(wfs, grid=GRID, deltas=DELTAS, budget: float = 17.95, seeds=(1, 2, 3),
+          carriers=CARRIERS, progress=None) -> dict:
+    """The full d' x Delta measurement.  Returns {delta: [SweepCell, ...]}."""
+    ag = agent.MockAgent()
+    out = {d: [] for d in deltas}
+    for dp in grid:
+        for d in deltas:
+            cell = measure_cell(wfs, dp, d, budget, seeds, carriers, ag)
+            out[d].append(cell)
+            if progress:
+                progress(cell)
+    return out
+
+
+# ----------------------------------------------------------------- report ----
+
+def table(rows) -> str:
+    """One Delta's curve, dense enough to read the shape off the page."""
+    lines = [f"  {'d-prime':>8}{'psi':>8}{'harm B1':>10}{'harm Sen':>10}"
+             f"{'d-harm':>10}{'CI95 lo':>10}{'CI95 hi':>10}{'feas':>9}"]
+    lines.append("  " + "-" * 73)
+    for c in sorted(rows, key=lambda c: c.d_prime):
+        if not c.usable:
+            lines.append(f"  {c.d_prime:>8.2f}{'':>8}  REASON: {c.reason}")
+            continue
+        psi = make_detector(c.d_prime).psi
+        lines.append(f"  {c.d_prime:>8.2f}{psi:>8.3f}{c.harm_b1:>10.3f}"
+                     f"{c.harm_sentinel:>10.3f}{c.dharm:>+10.3f}{c.ci_lo:>+10.3f}"
+                     f"{c.ci_hi:>+10.3f}{c.n_feasible:>5d}/{c.n_total:<3d}")
+    return "\n".join(lines)
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[1])
+    ap.add_argument("--n", type=int, default=40, help="number of workflows")
+    ap.add_argument("--H", type=int, default=8, help="tasks per workflow")
+    ap.add_argument("--budget", type=float, default=17.95)
+    ap.add_argument("--seeds", type=int, default=3)
+    ap.add_argument("--no-refine", action="store_true",
+                    help="skip the step-0.05 refinement inside the bracket")
+    ap.add_argument("--json", metavar="FILE")
+    a = ap.parse_args()
+
+    wfs = make_corpus(a.n, a.H, seed=2026)
+    seeds = tuple(range(1, a.seeds + 1))
+
+    print("=" * 78)
+    print("AuditGame-SE -- d' sweep and break-even d'* (mock agent, no LLM spend)")
+    print("=" * 78)
+    print(f"tau_det  = {TAU_DET!r}  FIXED  =>  phi = Phi(-tau_det) = "
+          f"{make_detector(0.0).phi:.4f} at every point")
+    print(f"tau_sel  = frozen table, setting={SETTING!r} (calibrated at "
+          f"d'={detector.operating_point(*detector.SETTINGS['mid'])[0]:.3f})")
+    print(f"grid     = {GRID[0]} .. {GRID[-1]} step 0.2  ({len(GRID)} points)"
+          + ("" if a.no_refine else f", refined at step {REFINE_STEP} in the bracket"))
+    print(f"deltas   = {DELTAS}   REPORTED PER CELL, NEVER POOLED")
+    print(f"{a.n} workflows - H={a.H} - B={a.budget} - {a.seeds} seeds - "
+          f"carriers: {', '.join(CARRIERS)}")
+    print("d'* = smallest d' whose CI95 lower bound of d-harm is > 0 AND stays > 0")
+    print("      at every larger d' in the grid.  Declared before measuring.")
+    print("=" * 78)
+
+    rows = sweep(wfs, GRID, DELTAS, a.budget, seeds)
+
+    if not a.no_refine:
+        for d in DELTAS:
+            extra = refinement_points(break_even(rows[d]))
+            for dp in extra:
+                rows[d].append(measure_cell(wfs, dp, d, a.budget, seeds))
+
+    summary = {}
+    for d in DELTAS:
+        print(f"\n[Delta = {d}]")
+        print(table(rows[d]))
+        star = break_even(rows[d])
+        mono = is_monotone(rows[d])
+        summary[d] = (star, mono)
+        print(f"  d'* = " + ("none in [0.0, 3.0] -- the CI95 lower bound never "
+                             "stays above 0" if star is None else f"{star:.2f}"))
+        print(f"  d-harm monotone in d': {'YES' if mono else 'NO'}")
+
+    print("\n" + "=" * 78)
+    print("WHERE THE THREE DECLARED SETTINGS LAND")
+    print("=" * 78)
+    for name in ("weak", "mid", "strong"):
+        dp = detector.operating_point(*detector.SETTINGS[name])[0]
+        verdict = " ".join(
+            f"D={d}:" + ("n/a" if summary[d][0] is None
+                         else ("above" if dp >= summary[d][0] else "BELOW"))
+            for d in DELTAS)
+        print(f"  {name:<7} d'={dp:.3f}   {verdict}")
+
+    if a.json:
+        json.dump({str(d): [asdict(c) for c in sorted(rows[d], key=lambda c: c.d_prime)]
+                   for d in DELTAS}, open(a.json, "w"), indent=2)
+        print(f"\n  wrote {a.json}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
