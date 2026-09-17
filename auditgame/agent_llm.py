@@ -244,6 +244,17 @@ PENDING_MEASUREMENT: dict = {
         "been parsed in this build -- there is no key. The first real call is "
         "Task 15 step 15.4; until it happens, 'the client works' is a claim with "
         "no evidence here."),
+    "llm_payloads": (
+        "The LLM-generated attack payload corpus. payloads/generate.py --source=llm "
+        "is the intended generator (payloads.generate.LlmSource); it needs an API "
+        "key and there is none in this environment, so it raises MissingAPIKey "
+        "rather than fabricating a corpus. What IS measured today is the "
+        "template-bank floor (payloads/frozen_payloads.json via TemplateBankSource): "
+        ">=12 hand-authored records that vary sentence, provenance (F_match depth) "
+        "and derived_from. The AUC of the LLM corpus is unknown until a key runs "
+        "generate; the template-bank number is the diversity floor the LLM is "
+        "expected to raise on the SEMANTIC axis F_match cannot see, not on the "
+        "surface axes it can. No fabricated LLM payload is committed."),
 }
 
 
