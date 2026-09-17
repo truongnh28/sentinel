@@ -9,8 +9,11 @@ from __future__ import annotations
 import math
 import unittest
 
+import agent
 import dprime_sweep as S
 import detector
+import runner
+import scoring
 
 
 def cell(d_prime, delta, ci_lo, ci_hi=None, dharm=None, reason=None):
@@ -126,6 +129,114 @@ class OneDimensionalParameterisation(unittest.TestCase):
         self.assertEqual(S.GRID[-1], 3.0)
         self.assertTrue(all(abs((b - a) - 0.2) < 1e-9
                             for a, b in zip(S.GRID, S.GRID[1:])))
+
+
+class TauSelFollowsTheSweptDPrime(unittest.TestCase):
+    """The declared confound of the sweep, and the switch that removes it.
+
+    `setting` is the key into the FROZEN tau_sel table.  Pinning it to "mid" at
+    every swept d' leaves the carrier-selection threshold calibrated at d' = 2.211
+    while the detector runs somewhere else entirely -- a real confound at the two
+    ends of the grid.  With d'-keyed rows in the table there is a second mode in
+    which the threshold follows the sweep."""
+
+    def test_the_default_mode_still_reads_the_frozen_mid_row_at_every_grid_point(self):
+        """Default behaviour is UNCHANGED, so the published curve reproduces.
+
+        Thesis claim (vi): "quet nay giu setting='mid' o moi d'" -- so cu phai tai
+        lap duoc DUNG NHU DA IN; che do moi la mot phep do THEM, khong phai mot
+        phep do thay the.
+        """
+        for dp in S.GRID:
+            with self.subTest(d_prime=dp):
+                self.assertEqual(S.setting_for(dp), S.SETTING)
+        self.assertEqual(S.SETTING, "mid")
+
+    def test_the_following_mode_reads_the_tau_sel_row_calibrated_at_the_swept_d_prime(self):
+        """One name per grid point, and the name resolves to a real table row.
+
+        Thesis claim (vi): "go confound bang cach tra tau_sel o DUNG d' dang
+        quet, khong phai o d' cua mid".
+
+        scoring.tau_sel is a plain dict lookup by setting NAME, so a format drift
+        between the generator's names and the sweep's names is a KeyError in the
+        middle of a 20-minute run.  Both ends are pinned here.
+        """
+        for dp in S.GRID:
+            name = S.setting_for(dp, tau_follows_dprime=True)
+            with self.subTest(d_prime=dp):
+                self.assertEqual(name, f"d{dp:.1f}")
+                self.assertIsInstance(scoring.tau_sel(9, name, 1), float)
+
+    def test_following_the_sweep_actually_moves_the_threshold_away_from_mid(self):
+        """The switch has to CHANGE something, or it removes no confound.
+
+        Thesis claim (vi): "bang tau_sel duoc hieu chinh THEO d'" -- neu nguong o
+        d' = 0.4 bang nguong o d' = 2.211 thi khong co confound nao de go, va ca
+        phep do nay vo nghia.
+        """
+        far = 0.4
+        follows = scoring.tau_sel(9, S.setting_for(far, tau_follows_dprime=True), 1)
+        pinned = scoring.tau_sel(9, S.setting_for(far), 1)
+        self.assertNotAlmostEqual(
+            follows, pinned, places=3,
+            msg=f"tau_sel at d'={far} is the same whether or not it follows the "
+                f"sweep ({follows}) -- the confound this mode removes does not exist")
+
+
+class TheDeclaredConfoundIsInertForThisDeltaHarmPair(unittest.TestCase):
+    """The measured answer to "how much did the pinned tau_sel cost us".
+
+    Policy.tau -- the ONLY caller of scoring.tau_sel -- is consulted by B5
+    risk-score and B6 two-stage and by nobody else.  Neither policy of the pair
+    Delta-harm is defined through (B1 audit-at-commit, Sentinel) ever reads it, so
+    the confound the module docstring declares cannot move the number the module
+    reports.  That is a structural fact and it is pinned here, because it is the
+    reason --tau-follows-dprime reproduces the default curve exactly.
+    """
+
+    #: d' = 1.0 at Delta = 4 on 10 workflows -- a cell where B5 DOES move, so the
+    #: probe is known to be sensitive before it is used to claim insensitivity.
+    N, H, D_PRIME, DELTA, SEEDS, BUDGET = 10, 8, 1.0, 4, (1, 2, 3), 17.95
+
+    def _harm(self, policy: str, setting: str) -> float:
+        wfs = S.make_corpus(self.N, self.H, seed=2026)
+        runner.reset_survivor_cache()
+        return runner.worst_case(policy, wfs, (self.DELTA,), S.CARRIERS,
+                                 S.make_detector(self.D_PRIME), agent.MockAgent(),
+                                 self.BUDGET, self.SEEDS, setting).harm
+
+    def test_a_policy_that_reads_tau_sel_does_move_when_the_row_changes(self):
+        """The control.  Without it the next test proves nothing.
+
+        Thesis claim (vi): "bang tau_sel duoc hieu chinh theo d'" -- neu doi hang
+        tau_sel ma KHONG policy nao nhuc nhich thi phep so sanh hai che do la mot
+        phep do chet, chu khong phai mot ket luan.
+        """
+        pinned = self._harm("B5 risk-score", "mid")
+        following = self._harm("B5 risk-score", "d0.0")
+        self.assertNotEqual(pinned, following,
+                            "B5 risk-score reads tau_sel through Policy.tau and "
+                            "must respond to a different row; this probe cell is "
+                            "no longer sensitive and the next test is vacuous")
+
+    def test_neither_policy_of_the_delta_harm_pair_reads_the_tau_sel_row(self):
+        """B1 and Sentinel are INSENSITIVE to the tau_sel row, so Delta-harm is.
+
+        Thesis claim (vi): "confound tau_sel dong bang o mid ... CO THE gop phan
+        vao chieu di xuong o Delta=0" -- do la mot GIA THUYET, va o day no bi bac
+        bang cau truc: Policy.tau chi duoc B5/B6 goi.
+
+        If this ever goes red, the sweep's declared confound has become LIVE for
+        the pair it reports, and every --tau-follows-dprime number has to be
+        re-read as a different measurement rather than a reproduction.
+        """
+        for policy in (S.B1, S.SENTINEL):
+            with self.subTest(policy=policy):
+                self.assertEqual(self._harm(policy, "mid"),
+                                 self._harm(policy, "d0.0"),
+                                 f"{policy} moved when only the tau_sel row "
+                                 f"changed -- it now reads the frozen table")
 
 
 class ReportOnTheGridDoNotPool(unittest.TestCase):

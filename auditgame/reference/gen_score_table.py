@@ -17,11 +17,42 @@ that produced it lives in the JSON's own `provenance` block -- no hidden paramet
     python3 gen_score_table.py            # write score_table.json
     python3 gen_score_table.py --check    # regenerate, compare to the existing file, write nothing
 
+TWO KINDS OF ROW, TWO KINDS OF INPUT.
+
+  * weak / mid / strong -- keyed by the manuscript's declared (psi, phi) pair.
+    Both the detection rate and the false-alarm rate differ between them.
+
+  * d0.0 .. d3.0 -- keyed by d' ITSELF, one row per point of dprime_sweep.GRID
+    (0.0 .. 3.0, step 0.2).  Name format: "d" followed by d' at ONE decimal,
+    `f"d{d_prime:.1f}"` -- see sweep_setting_name(), and the gate-2 test
+    test_the_following_mode_reads_the_tau_sel_row_calibrated_at_the_swept_d_prime
+    pins the sweep's spelling of the same name against it.
+
+    For these rows the false-alarm rate is FIXED at phi = SWEEP_PHI = 0.12, so
+    tau_detector = z(1 - phi) is one constant and ONLY d' varies down the list.
+    That is not a convenience: it is the same contract dprime_sweep.py states for
+    the curve itself ("every point on the curve is the SAME false-alarm rate").
+    A tau_sel row whose phi drifted with d' would re-introduce the second
+    dimension the sweep exists to remove, and the threshold would then be
+    calibrated against something other than the detector actually running.
+
+    psi is REPORTED for these rows (psi = Phi(d' - tau_det)) but is derived, not
+    an input -- the row is a function of d' alone.
+
+WHY THE ADDITION IS SAFE.  Each setting draws from `random.Random(SEED ^
+hash_name(name))`, a stream keyed by its own NAME, and the rows of one setting
+never touch another setting's stream.  Adding names therefore leaves weak / mid /
+strong BYTE-IDENTICAL.  That is checked, not asserted:
+tests/gate1_integrity/test_score_table_generator.py runs this build() with N_MAX
+cut to 1 and compares each frozen setting's n=0/n=1 rows -- the first cells its
+stream ever feeds -- against the committed file.
+
 FROZEN STRINGS.  The Vietnamese text inside `provenance` (and the empty-carrier
 `note`) is CONTENT OF THE FROZEN ARTIFACT, not source prose.  Translating it
 changes score_table.json and makes --check report a mismatch, so it stays
 byte-identical.  Regenerating is not a cheap way out either: M=800k samples across
-31 values of n and 3 settings is on the order of 1.1 billion Gaussian draws.
+31 values of n and 19 settings is on the order of 7 billion Gaussian draws, about
+23 minutes.
 """
 from __future__ import annotations
 import argparse, json, math, random, statistics, sys, hashlib, datetime, pathlib
@@ -35,6 +66,10 @@ K_MAX = 4                     # max carriers scored within one task
 
 # The manuscript's SS8 (psi, phi) -> (d', tau_detector) per SPEC SS2.1
 SETTINGS = {"weak": (0.75, 0.20), "mid": (0.85, 0.12), "strong": (0.92, 0.06)}
+
+# The d'-keyed rows: dprime_sweep.py's grid, at the sweep's own fixed phi.
+SWEEP_PHI = 0.12                                          # = mid's phi, the sweep's tau_det
+SWEEP_GRID = tuple(round(0.2 * i, 2) for i in range(16))  # 0.0 .. 3.0, step 0.2
 
 HERE = pathlib.Path(__file__).resolve().parent
 OUT = HERE / "score_table.json"
@@ -51,6 +86,17 @@ def d_prime_and_tau(psi: float, phi: float) -> tuple[float, float]:
     tau_sel (carrier level, on the posterior).
     """
     return _z(psi) - _z(phi), _z(1.0 - phi)
+
+
+def sweep_setting_name(d_prime: float) -> str:
+    """Stable name of a d'-keyed row: "d" + d' at one decimal -- d0.0 .. d3.0.
+
+    ONE decimal is enough for dprime_sweep.GRID (step 0.2) and no more than that:
+    a wider format would invite lookups at the sweep's step-0.05 refinement points,
+    for which no row is generated and none could be, since the refinement bracket
+    is only known after the coarse grid has been measured.
+    """
+    return f"d{d_prime:.1f}"
 
 
 def post(lam: float) -> float:
@@ -92,20 +138,40 @@ def measure(d_prime: float, n: int, rng: random.Random) -> dict:
     )
 
 
-def build() -> dict:
+def one_table(name: str, dp: float, tau_det: float, psi: float, phi: float) -> dict:
+    """One setting's 31 rows, drawn from the stream keyed by that setting's NAME.
+
+    The name is the ONLY thing that picks the stream, which is what makes adding
+    settings an additive change: nothing here reads the registry it came from.
+    """
+    V = math.exp(dp * dp) - 1.0
+    C = PI0 * PI0 * (1.0 - PI0) * V              # sandwich-bound coefficient, SPEC SS2.5
+    rng = random.Random(SEED ^ hash_name(name))
+    rows = [measure(dp, n, rng) for n in range(N_MAX + 1)]
+    return dict(
+        psi=psi, phi=phi, d_prime=dp, tau_detector=tau_det,
+        var_lambda=V, bound_coefficient_C=C,
+        n_min_bound_useful=C / PI0,               # below this, -pi0 is the binding side
+        rows=rows,
+    )
+
+
+def build(progress=None) -> dict:
     tables = {}
     for name, (psi, phi) in SETTINGS.items():
         dp, tau_det = d_prime_and_tau(psi, phi)
-        V = math.exp(dp * dp) - 1.0
-        C = PI0 * PI0 * (1.0 - PI0) * V          # sandwich-bound coefficient, SPEC SS2.5
-        rng = random.Random(SEED ^ hash_name(name))
-        rows = [measure(dp, n, rng) for n in range(N_MAX + 1)]
-        tables[name] = dict(
-            psi=psi, phi=phi, d_prime=dp, tau_detector=tau_det,
-            var_lambda=V, bound_coefficient_C=C,
-            n_min_bound_useful=C / PI0,           # below this, -pi0 is the binding side
-            rows=rows,
-        )
+        if progress:
+            progress(name, dp)
+        tables[name] = one_table(name, dp, tau_det, psi, phi)
+
+    # d'-keyed rows: phi FIXED, psi DERIVED, only d' varies.  See module docstring.
+    tau_det = _z(1.0 - SWEEP_PHI)
+    for dp in SWEEP_GRID:
+        name = sweep_setting_name(dp)
+        if progress:
+            progress(name, dp)
+        tables[name] = one_table(name, dp, tau_det,
+                                 statistics.NormalDist().cdf(dp - tau_det), SWEEP_PHI)
     return tables
 
 
@@ -119,7 +185,12 @@ def main() -> int:
                     help="regenerate and compare to the existing file; write nothing")
     a = ap.parse_args()
 
-    tables = build()
+    # Progress on stderr: a full run is ~23 minutes (19 tables x 31 cells x 800k
+    # samples) and a silent 23-minute process is indistinguishable from a hung one.
+    def progress(name, dp):
+        print(f"  building [{name}] d'={dp:.3f} ...", file=sys.stderr, flush=True)
+
+    tables = build(progress)
     doc = {
         "provenance": {
             "generated_by": "auditgame/reference/gen_score_table.py",
@@ -130,6 +201,19 @@ def main() -> int:
             "samples_per_cell": M,
             "pi0": PI0,
             "n_max": N_MAX,
+            "settings_declared": "weak/mid/strong -- khoá bằng cặp (psi, phi) của bản thảo §8",
+            "settings_by_dprime": ("d0.0 .. d3.0 -- khoá bằng CHÍNH d', một hàng cho mỗi điểm của "
+                                   "lưới quét dprime_sweep.GRID (0.0..3.0, bước 0.2). Tên hàng: "
+                                   "f\"d{d_prime:.1f}\"."),
+            "sweep_phi": SWEEP_PHI,
+            "settings_by_dprime_note": ("Các hàng d' GIỮ CỐ ĐỊNH phi = 0.12 (tau_det = z(1-phi)), "
+                                        "psi = Phi(d'-tau_det) là ĐẠI LƯỢNG DẪN XUẤT chứ không phải "
+                                        "đầu vào -- cùng một giao kèo 'mọi điểm cùng một tỉ lệ báo "
+                                        "động giả' mà dprime_sweep.py phát biểu cho đường cong. "
+                                        "Nếu phi trôi theo d' thì tau_sel lại phụ thuộc hai chiều "
+                                        "và confound không gỡ được."),
+            "additive": ("RNG mỗi setting là random.Random(SEED ^ hash_name(TÊN)) nên THÊM setting "
+                         "không làm xê dịch weak/mid/strong: ba bảng cũ BYTE-IDENTICAL."),
             "aggregation": "mean-Lambda: p_c = pi0*mean(Lambda_i) / (pi0*mean(Lambda_i) + 1 - pi0)",
             "alpha_task": ALPHA_TASK,
             "threshold_rule": ("tau_sel(n_c, d', K) = phân vị (1 - alpha_c(K)) của p_c trên carrier sạch, "

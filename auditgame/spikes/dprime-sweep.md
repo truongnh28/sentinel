@@ -47,7 +47,9 @@ chỉnh theo `d′`**. Quét này giữ `setting="mid"` ở mọi `d′`, nên n
 của policy đứng yên ở mức hiệu chỉnh cho `d′ = 2.211` trong khi detector chạy theo
 `d′` quét. Đây là **cái giá** của "chỉ đổi `d′`, không đổi gì khác" mà không được
 sửa `scoring.py`; nó là một **confound thật** ở vùng `d′` xa 2,211 và được ghi ra
-như một confound (§10). `d′` của detector **có** đi vào policy, qua
+như một confound (§10). *(Cập nhật 18/09/2026: confound này đã được **đo** và hoá
+ra **TRƠ** với `Δharm` của cặp `B1`/`Sentinel` — xem §10.1 và
+`spikes/tau-sel-follows-dprime.md`.)* `d′` của detector **có** đi vào policy, qua
 `runner → scoring.carrier_score(raw, det.d_prime)`, nên mô hình niềm tin bám theo
 đường quét dù ngưỡng thì không.
 
@@ -395,13 +397,17 @@ gộp.)*
 
 ## 10. Giới hạn và điều còn nghi
 
-1. **`tau_sel` đóng băng ở `mid`** (§2). Ngưỡng chọn-carrier không được hiệu chỉnh
-   lại theo `d′` quét, vì bảng tham chiếu chỉ có ba hàng và `scoring.py` không được
-   sửa. Ở `d′` xa 2,211 — tức **hai đầu lưới** — policy đang chạy với một ngưỡng
-   lệch hiệu chỉnh. Điều này **có thể** góp phần vào chiều đi xuống ở Δ=0 và vào
-   vị trí `d′*` của Δ=2. Cách gỡ đúng là sinh lại bảng theo `d′`
-   (`reference/gen_score_table.py`) và quét lại — **việc riêng, không thuộc việc
-   này**.
+1. ~~**`tau_sel` đóng băng ở `mid`** (§2)~~ — **ĐÃ GIẢI QUYẾT 18/09/2026, xem
+   `spikes/tau-sel-follows-dprime.md`.** Bảng tham chiếu đã được sinh lại với 16
+   hàng khoá theo `d′` (`d0.0 … d3.0`, cùng `φ = 0.12`) và phép quét đã chạy lại ở
+   chế độ `--tau-follows-dprime`. **Hai đường cong trùng từng chữ số ở cả 64 ô.**
+   Lý do là **cấu trúc**: `scoring.tau_sel` chỉ tới được policy qua `Policy.tau`,
+   mà chỉ `B5 risk-score` và `B6 two-stage` gọi hàm đó — `B1 audit-at-commit` và
+   `Sentinel`, tức đúng cặp định nghĩa `Δharm`, **không đọc bảng**. Vậy confound
+   này **có thật nhưng TRƠ** với con số mà spike này báo cáo: nó **không** góp phần
+   vào chiều đi xuống ở Δ=0, và `d′*` của Δ=2 trên lưới thô là **2.60 ở cả hai chế
+   độ**. Ba bảng `weak/mid/strong` giữ **byte-identical**, nên mọi con số ở §5 vẫn
+   đứng nguyên. Confound vẫn **sống** với mọi kết quả có dính B5/B6.
 2. **`d′* = 2.55` ở Δ=2 sát mép** (§5). Cận dưới tại 2,50 là `−1,4 × 10⁻¹⁸`. Đọc
    là khoảng `[2,50; 2,55]`.
 3. **Mock agent.** Toàn bộ đường cong đo trên `agent.MockAgent` với oracle
