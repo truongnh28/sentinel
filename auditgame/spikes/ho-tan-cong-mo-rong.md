@@ -12,8 +12,10 @@ Ngày: 2026-09-17 (mục (iii) của thầy, ưu tiên 2/5). Nguồn:
 > do, cả hai là khiếm khuyết thật:
 >
 > 1. Corpus báo cáo ở §4 **không** rời mẫu ước lượng của attacker — nó harvest
->    **cả hai** parity, nên 1168 item (72,2 % ước lượng, 34,9 % pool được chấm)
->    là **cùng một item**, cùng `item_id`, cùng `size`. Test "ghim" tính rời nhau
+>    **cả hai** parity, nên 1168 item của **pool top-up** (72,2 % ước lượng,
+>    34,9 % pool) và **766** trong 2540 control **thực sự được chấm** ở Δ=0
+>    (47,3 % ước lượng, 30,2 % control) là **cùng một item**, cùng `item_id`,
+>    cùng `size`. Test "ghim" tính rời nhau
 >    so nửa attacker với một nửa phòng thủ **giả định** mà **không phép đo nào
 >    dùng**, nên nó **không thể đỏ** vì điều nó nêu tên. Đó là **xanh giả**.
 > 2. Các số đối chứng rò rỉ `0,5427 / 0,5873 / 0,5728` ở §6 **không dựng lại
@@ -115,12 +117,37 @@ rời nhau **khi và chỉ khi** tập instance sau lưng chúng rời nhau. Vì
 
 **Nhưng rời mẫu là tính chất của ƯỚC LƯỢNG, không tự động là tính chất của PHÉP
 ĐO.** Ước lượng cắt từ một parity; corpus mặc định **không cắt gì cả**. Đo được,
-`pool="full"`, `carrier="memory"`:
+`pool="full"`, `carrier="memory"`, **trên HAI quần thể khác nhau** — và sự phân
+biệt đó là phần bản trước làm thiếu:
 
-| corpus | item ước lượng | item pool được chấm | **item_id CHUNG** | % của ước lượng | % của pool |
+**(a) POOL TOP-UP** (`benign_pool`) — *nguồn dự phòng*, không phải lớp âm:
+
+| corpus | item ước lượng | item pool top-up | **item_id CHUNG** | % của ước lượng | % của pool |
 |---|---|---|---|---|---|
 | `holdout=None` (phụ) | 1618 | 3349 | **1168** | 72,2 % | 34,9 % |
 | `holdout=0` (**CHÍNH**) | 1618 | 1719 | **0** | 0 % | 0 % |
+
+**(b) LỚP ÂM THỰC SỰ ĐƯỢC CHẤM** — control mà AUC đọc, Δ=0, 900 sự kiện,
+`per_event=4`, `natural=True` (đo qua `matched_corpus(..., control_ids=...)`):
+
+| corpus | item ước lượng | control phân biệt | **item_id CHUNG** | % của ước lượng | % của control |
+|---|---|---|---|---|---|
+| `holdout=None` (phụ) | 1618 | 2540 | **766** | 47,3 % | 30,2 % |
+| `holdout=0` (**CHÍNH**) | 1618 | 1988 | **0** | 0 % | 0 % |
+
+> **CON SỐ CỦA POOL KHÔNG PHẢI LÀ RÒ RỈ — nói thẳng, vì bản trước đã trình bày
+> nó như thế.** `_one_event` lấy control của mỗi sự kiện từ **item sống cùng
+> tuổi của chính workflow chủ nhà TRƯỚC**, và chỉ với tay vào pool top-up khi
+> thiếu. Nên "34,9 % của pool" mô tả **nguồn top-up** và là **CẬN DƯỚI** của rò
+> rỉ corpus: nửa trong-workflow được rút từ workflow của **cả hai** parity, kể cả
+> instance của chính attacker. Ở corpus phụ Δ=0 có 515 trong 2540 control **không**
+> đến từ pool. Bảng (b) mới là rò rỉ; bảng (a) là tính chất của một trong hai
+> nguồn của nó.
+>
+> Số **0** của corpus chính vẫn đúng ở **cả hai** bảng, và từ bản này nó được
+> **ĐO** ở bảng (b) chứ không chỉ suy ra: workflow parity 0 chỉ chứa instance
+> parity 0, nên control trong-workflow không thể là của attacker — nhưng "đúng do
+> cấu tạo" cũng chính là lập luận mà con số 34,9 % đã dựa vào, và ở đó nó sai.
 
 Cách chữa là tham số **`holdout`**, được luồn qua `analysis/benign_corpus.py`
 (`segment_half`, `harvest`, `harvest_natural`, `benign_pool`,
@@ -160,20 +187,36 @@ trọng** (biên gộp rộng hơn biên của một repo, nên payload rút t�
 
 Bản trước khai `carriers=CARRIERS_ALL` (cả bốn). **Không có gì kiểm khai báo
 đó**: bộ K4/K4b/K5 của cổng 1 chỉ duyệt `REGISTRY`, mà pipeline này ở `PENDING`;
-và K4 chỉ gọi `plan()`, không bao giờ gọi `payload()`. Đo thật:
+và K4 chỉ gọi `plan()`, không bao giờ gọi `payload()`.
 
-| carrier | ước lượng attacker harvest được |
-|---|---|
-| `memory` | 11 repo, 1618 exemplar |
-| `branch` | 11 repo, 1096 exemplar |
-| `skill` | 11 repo, 177 exemplar |
-| `queue` | **TỪ CHỐI** — nửa của repo nhỏ nhất cung cấp 0 item `queue`, dưới hợp đồng `n_per_event=1` của `harvest_natural` |
+**MỘT Ô TỒN TẠI KHI CẢ HAI HỢP ĐỒNG ĐỀU QUA, không phải chỉ hợp đồng của
+attacker.** Phía **attacker** cần harvest được ước lượng (`harvest_natural`,
+`n_per_event=1`); phía **phòng thủ** cần rút được control cho ô đó (`benign_pool`,
+`n_per_event=4`). Lần thu hẹp thứ nhất chỉ đọc phía attacker — và đó chính là
+cách `skill` ở lại trong khai báo. Đo thật:
 
-Nên `carriers` được **thu hẹp về `{memory, branch, skill}`**, và `payload()` từ
-chối kèm lý do với mọi carrier ngoài đó — thay vì ném `ValueError` giữa chừng một
-corpus, hoặc chạy vào `randrange()` trên danh sách exemplar rỗng. Khai báo được
-**cưỡng chế** bởi `TheDeclaredScopeIsEnforced`, gọi thẳng `payload()` trên **mọi**
-carrier đã khai và trên **hai đầu** `delta_range`.
+| carrier | ước lượng attacker (`n_per_event=1`) | corpus phòng thủ (`n_per_event=4`) |
+|---|---|---|
+| `memory` | 11 repo, 1618 exemplar | dựng được |
+| `branch` | 11 repo, 1096 exemplar | dựng được |
+| `skill` | 11 repo, 177 exemplar | **TỪ CHỐI** — `matched_corpus(..., carrier="skill", natural=True, holdout=0)` ném *"8 instances supply only 2 benign 'skill' items over full workflows, below n_per_event=4"*; với `holdout=None` là 22 instance / 3 item. Từ chối trên **cả hai** corpus |
+| `queue` | **TỪ CHỐI** — nửa của repo nhỏ nhất cung cấp 0 item `queue`, dưới hợp đồng `n_per_event=1` | không tới được |
+
+`skill` có **payload nhưng không có ô**: item skill cần một bước quy nạp, mà
+harvest ghi ra quá ít (chú thích `CARRIER` của `analysis/benign_corpus.py` đã ghi
+đúng lời từ chối này từ phía corpus). Nên `carriers` được **thu hẹp về
+`{memory, branch}`**, và hai carrier bị bỏ được ghi **lý do** trong
+`DistributionMatchedAttack.CARRIER_REFUSALS` (N3: ô bị từ chối ghi LÝ DO, không
+bao giờ rơi im lặng) — `payload()` in đúng lý do đó ra, thay vì ném `ValueError`
+giữa chừng một corpus, hay chạy vào `randrange()` trên danh sách exemplar rỗng.
+
+Khai báo được **cưỡng chế ở đúng độ cao của nó** bởi `TheDeclaredScopeIsEnforced`:
+nó **dựng CORPUS** trên mọi carrier đã khai (không chỉ gọi `payload()`), vẫn gọi
+`payload()` trên mọi carrier đã khai và trên **hai đầu** `delta_range`, đòi mọi
+carrier của `CARRIERS_ALL` bị bỏ phải có lý do ghi lại, và ghim lời từ chối của
+`skill` trên cả hai corpus. Một khai báo phạm vi chỉ được kiểm ở mức payload là
+**một phép kiểm hẹp hơn lời nó khai** — đúng khiếm khuyết mà lớp test này được
+viết ra để chặn.
 
 ### 3.5 Mock KHÔNG nằm trong phạm vi — và code nói thế trước khi harvest
 
@@ -488,6 +531,25 @@ không phải là một con số báo cáo được.
 (`memory`), 0.6239 / 0.6533 / 0.6566 (`branch`) — vẫn 0/20 ở mọi Δ. Nên khoảng
 cách 0.15–0.18 mà `dist-matched` tạo ra **không** đến từ rò rỉ.
 
+> **NHÃN, vì cùng một cụm từ "nền giàu" gắn với HAI bộ ba khác nhau.** Bộ ba
+> **0.7057 / 0.7618 / 0.7579** ở trên là `MatchedAttack` trên corpus **CHÍNH**
+> (`natural=True`, `holdout=0`), `n_pos` 900 / 386 / 241. Bộ ba
+> **0.7056 / 0.7328 / 0.7318** — xuất hiện ở docstring của
+> `DistributionMatchedAttack` và ở §5b của `spikes/eps-ngan-sach-that.md` — là
+> cùng attacker đó trên corpus **PHỤ** (`holdout=None`), `n_pos` 900 / 826 / 456.
+> Hai bộ chỉ trùng ở Δ=0. `MatchedAttack` **không đọc ước lượng nào**, nên rò rỉ
+> không áp dụng cho nó; thứ đổi giữa hai bộ là **nửa mẫu** corpus được cắt ra.
+> Trích một bộ mà không kèm nhãn là trích sai bộ kia.
+>
+> **Và ba ô `branch` mang một CHỆCH 4 KÝ TỰ chưa đo.** `_AGENT_TEMPLATE_CHARS =
+> 14` là hằng của template **memory**; đếm trên `agent.py`, phần cố định là
+> memory 14, queue 16, skill 20, **branch 10** — nên trên `branch` payload của
+> `MatchedAttack` **DÀI hơn** ghi chú nó bắt chước 4 ký tự. Lập luận "ngắn hơn
+> thì dễ tách hơn, nên AUC là cận TRÊN" chỉ đúng cho hai carrier **ngắn** (queue,
+> skill) và **không** chuyển sang branch: chiều của chệch ở đó chưa được đo. Ba ô
+> 0.6239 / 0.6533 / 0.6566 vì thế **không** là cận trên theo nghĩa các ô `memory`
+> (chệch 0) là cận trên.
+
 ## 7. Đặc trưng nào mang phần dư — và nó ĐỔI theo Δ
 
 Trung hoà từng đặc trưng một (đặt về hằng) trên corpus **CHÍNH** (`memory`,
@@ -592,6 +654,8 @@ seed theo workflow), không phải sửa attacker — và là việc của nhi�
   `2140bbe796ce925a19631a1c7a88f5e0` (bắt trước, xác nhận sau).
 - **Ba cổng xanh, zero skip: 361 / 88 / 9** (Gate 2 tăng 68 → 88 do
   `tests/gate2_validity/test_dist_matched_attack.py` đi từ 13 lên 33 test).
+  Sau bản sửa phạm vi hậu-rà-soát (thu hẹp `CARRIERS` về `{memory, branch}`, đo
+  rò rỉ trên **lớp âm thực sự**): **361 / 94 / 9**, vẫn zero skip.
 - `REGISTRY` **không đổi** — `usable_with("exact")` và `usable_with("graded")`
   đều **không** nhận `dist-matched`.
 - **Mọi mặc định của `analysis/benign_corpus.py` giữ nguyên** (`holdout=None`,

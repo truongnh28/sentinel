@@ -173,6 +173,12 @@ trên 20 split, 80 sự kiện, pool full:
 > được. Nói cách khác: đo lại đúng thống kê sẽ làm cách cài "bám theo tag đã thu
 > hẹp" trông **tệ hơn**, không tốt hơn. Nhưng hai con số **không phải** một phép
 > đo và từ bản này không được trình bày như một.
+>
+> **CẢNH BÁO NÀY GIỜ NẰM CẢ TRONG MÃ.** Bảng trên cũng xuất hiện trong chú thích
+> của `MatchedAttack.payload` (`attacks.py`) — và **đó** mới là nơi người đọc
+> `attacks.py` gặp nó. Chú thích ấy trước chỉ ghi "đo trên full pool", không nói
+> `n = 80`, cũng không nói đây là **trung vị điểm**, nên nó đọc như thể là chính
+> thống kê của tiêu chí. Nguyên văn cảnh báo đã được chép sang chú thích đó.
 
 > **VÀ BIỂU THỨC `size` THỰC RA KHÔNG ĐỔI — nói thẳng ở đây, vì §6(b) có nói còn
 > §4 thì không.** Trước thay đổi: `topic = task.topic` rồi `len(str(topic))`.
@@ -390,12 +396,39 @@ Hai chuyển động, ngược chiều nhau, và cả hai đều đáng kể:
 > đầu ngân sách vẫn không gặp nhau, nhưng vì một lý do **mạnh hơn hẳn** — đầu rẻ
 > cũng đã bị tách rồi.
 
-**Kiểm chéo, không phải một phép đo đứng một mình.** Mục `dist-matched` của
-`attacks.PENDING` đã công bố `MatchedAttack` trên corpus primary
+**SO SÁNH — KHÔNG phải "kiểm chéo", và chữ đó bị RÚT.** Mục `dist-matched` của
+`attacks.PENDING` đã công bố `MatchedAttack` trên corpus **CHÍNH**
 (`natural=True`, có `holdout`): memory **0,7057** / 0,7618 / 0,7579. Ô Δ = 0 ở
-đây đọc **0,7056** — lệch 0,0001 trên cùng `n_pos = 900`. Δ = 2/4 lệch nhiều hơn
-vì `holdout` cắt đôi `n_pos` ở hai Δ đó (386/241 so với 826/456). Hai đường đến
-cùng một chỗ.
+đây — corpus **PHỤ** (`holdout=None`) — đọc **0,7056**, lệch 0,0001 trên cùng
+`n_pos = 900`.
+
+**Hai "đường" đó không độc lập.** Cùng một bộ dựng corpus
+(`benign_corpus.matched_corpus`) trên **hai mẫu CHỒNG NHAU**:
+`hosting_workflows(Δ, holdout=h)` **lọc** đúng danh sách mà
+`hosting_workflows(Δ)` trả về, giữ nguyên thứ tự đã trộn — nên tập workflow của
+corpus chính là một **dãy con** của corpus phụ, không phải một lần rút thứ hai.
+Đo được, pool `full`:
+
+| Δ | workflow chủ nhà (chính) | trong đó cũng thuộc phụ | workflow tiêu thụ | sự kiện `(wf, σ)` CHUNG |
+|---|---|---|---|---|
+| 0 | 144 | 144 / 144 | 113 so với 113 | **476** / 900 và 900 |
+| 2 | 66 | 66 / 66 | 66 trong 141 | **386** / 826 và 386 |
+| 4 | 62 | 62 / 62 | 62 trong 117 | **241** / 456 và 241 |
+
+Tức ở Δ=0 **hơn một nửa** trong 900 sự kiện (476) là **đúng cùng** `(wf, σ)`, cùng
+`wf_id`, cùng hàng payload và cùng lượt rút control trong-workflow; ở Δ=2 và Δ=4
+tập sự kiện của corpus chính là **tập CON thực sự** của corpus phụ — **mọi** sự
+kiện trong 386 và trong 241 đều là sự kiện của 826 và của 456. Phần còn lại đến
+từ **cùng một quần thể qua cùng một đoạn mã**.
+
+- **Sự trùng khớp CHỨNG MINH được:** tính tái lập — hai lời gọi cùng một bộ dựng,
+  ở hai giá trị `holdout`, trên một nửa mẫu dùng chung, khớp tới 0,0001. Nó loại
+  trừ lỗi chép số và lỗi gieo seed ở ô Δ=0.
+- **Nó KHÔNG chứng minh:** rằng 0,7056 lặp lại trên một mẫu **độc lập**. Không có
+  chỗ nào ở đây rút một mẫu như thế. Chính hai "đường" ấy **lệch nhau 0,0290** ở
+  Δ=2 (0,7328 so với 0,7618) và **0,0261** ở Δ=4 (0,7318 so với 0,7579), nơi
+  `holdout` cắt đôi `n_pos` — và đó, chứ không phải sự khớp ở Δ=0, mới là **cỡ**
+  của việc đổi mẫu ở đây.
 
 **Hệ quả với các cổng, nói thẳng.** Cổng 2 hôm nay chứng nhận trên corpus
 `natural=False`, nên **ba cổng vẫn xanh và không số đã ghim nào dịch**. Nhưng
@@ -535,7 +568,10 @@ lý do. Các ε trượt trần ở §5 được ghi **kèm số** (cột `hi`, 
   58 → 68 (`f5e0bd0`, 10 test mới trong
   `tests/gate2_validity/test_matched_epsilon_budget.py`) → 88 (`5bd54f5`,
   13 → 33 test trong `test_dist_matched_attack.py`) → **92** (bản này, 4 test mới
-  của `TheTopicAxisIsOutsideTheMeasuredFeatureSpace`; file epsilon đi 10 → 14).
+  của `TheTopicAxisIsOutsideTheMeasuredFeatureSpace`; file epsilon đi 10 → 14)
+  → **94** (bản sửa phạm vi sau rà soát toàn nhánh: 2 test mới trong
+  `TheDeclaredScopeIsEnforced` — dựng **corpus** trên mọi carrier đã khai, và ghim
+  lời từ chối `skill` trên cả hai corpus).
 - **`REGISTRY` không đổi**: `matched` vẫn là pipeline đăng ký duy nhất, và
   `usable_with("exact")` / `usable_with("graded")` đều vẫn nhận nó.
 - **θ = 0,50 không bị đụng.** Mọi bậc trong §6 được tính tại θ đã đóng băng.

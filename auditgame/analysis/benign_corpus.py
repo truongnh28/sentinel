@@ -518,6 +518,16 @@ def benign_pool(n_per_event: int = 4, pool: str = POOL, seed: int = SEED,
     zero of the holdout corpus are pinned as MEASURED numbers by
     tests/gate2_validity/test_dist_matched_attack.py, so neither can move
     silently.
+
+    WHAT THE POOL'S OVERLAP IS AND IS NOT.  This pool is the TOP-UP source, not
+    the negative class: `_one_event` fills each event's controls from the hosting
+    workflow's OWN live age-matched items first and reaches in here only when
+    short.  So an overlap measured against this dict is a LOWER BOUND on the
+    corpus's -- measured on the default Delta=0 corpus, 34.9% of this pool against
+    30.2% of the controls actually scored, which are different populations with
+    different denominators, not one number quoted twice.  `matched_corpus`'s
+    `control_ids` sink measures the scored class itself, and the test file pins
+    both.
     """
     key = (pool, n_per_event, seed, h, carrier, natural, holdout)
     if key not in _harvest_cache:
@@ -663,7 +673,8 @@ def _refuse_on_estimate_mismatch(pipe, pool: str, h: int,
 def matched_corpus(pipe, delta: int, eps: float, n_events: int,
                    per_event: int = 4, pool: str = POOL, seed: int = SEED,
                    carrier: str = CARRIER, natural: bool = False,
-                   holdout: int | None = None) -> tuple:
+                   holdout: int | None = None,
+                   control_ids: set | None = None) -> tuple:
     """(payloads, benign) as F_match feature dicts -- a MATCHED case-control sample.
 
     Returns at most `n_events` poisoning events, each with `per_event` controls
@@ -698,6 +709,20 @@ def matched_corpus(pipe, delta: int, eps: float, n_events: int,
     N3 exists for: it must be a refusal with a reason, never a number.  The three
     attributes are optional, so a pipeline that reads no estimate (MatchedAttack,
     LegacyAttack) is unaffected.
+
+    `control_ids`, when a set is handed in, is filled with the `item_id` of every
+    benign control this corpus SCORES.  The rows themselves are `Item.surface()`
+    dicts -- size, depth, recency, derived and nothing else -- so once a corpus is
+    built there is no way back to the items it is made of, and the leakage
+    question ("is this control one of the instances the attacker fitted on?") is a
+    question about ITEMS.  It used to be answered against `benign_pool` instead,
+    which is only the TOP-UP source `_one_event` falls back to: each event takes
+    the hosting workflow's own live age-matched items FIRST, so a pool-level
+    overlap is a LOWER BOUND on the corpus's, and on the default corpus it
+    understates it (measured: 34.9% of the pool against 30.2% of the scored
+    controls, 1168 shared items against 766, over two different denominators).
+    The sink is optional and observation-only -- no draw, no seed and no row
+    depends on it, so passing it cannot move a published cell.
     """
     _refuse_on_estimate_mismatch(pipe, pool, h=H, holdout=holdout)
     _ds, wfs = hosting_workflows(delta, pool=pool, seed=seed, holdout=holdout)
@@ -711,14 +736,15 @@ def matched_corpus(pipe, delta: int, eps: float, n_events: int,
             ps = PoisonSpec(carrier=carrier, iota=sigma - delta, sigma=sigma,
                             epsilon=eps)
             pos, neg = _one_event(pipe, wf, ps, per_event, grouped, seed,
-                                  natural=natural)
+                                  natural=natural, control_ids=control_ids)
             poisoned_rows.extend(pos)
             benign_rows.extend(neg)
     return poisoned_rows, benign_rows
 
 
 def _one_event(pipe, wf, ps: PoisonSpec, per_event: int, grouped: dict,
-               seed: int, natural: bool = False) -> tuple:
+               seed: int, natural: bool = False,
+               control_ids: set | None = None) -> tuple:
     """Run one workflow with the payload planted, and read the event off at sigma.
 
     `natural` runs the workflow's own agent with benign churn on
@@ -726,6 +752,13 @@ def _one_event(pipe, wf, ps: PoisonSpec, per_event: int, grouped: dict,
     drift notes the enriched top-up pool does; with it False the agent runs at
     agent.py's default drift_rate of 0.0, which is the run every pinned number was
     measured against.
+
+    `control_ids` is the observation sink `matched_corpus` documents: the
+    `item_id` of every control whose surface is emitted goes into it, and nothing
+    else reads it.  It is filled HERE rather than reconstructed by the caller
+    because THIS is the only place that knows which of the two sources a control
+    came from -- the workflow's own `same_age` items or the `grouped` top-up -- and
+    a leak measured against the top-up source alone is a lower bound, not the leak.
     """
     store = CarrierStore()
     ag = agent.MockAgent(drift_rate=NATURAL_DRIFT_RATE) if natural else agent.MockAgent()
@@ -758,6 +791,9 @@ def _one_event(pipe, wf, ps: PoisonSpec, per_event: int, grouped: dict,
             # `recency` exactly Delta for a harvested item too, without mutating
             # created_at -- which would leave item_id describing a different item
             # from the one it names (item_id is hashed from created_at).
-            neg.extend(c.surface(now=c.created_at + age) for c in controls[:per_event])
+            kept = controls[:per_event]
+            if control_ids is not None:
+                control_ids.update(c.item_id for c in kept)
+            neg.extend(c.surface(now=c.created_at + age) for c in kept)
         return pos, neg
     return [], []

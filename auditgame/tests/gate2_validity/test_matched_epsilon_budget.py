@@ -449,43 +449,81 @@ class TheTopicAxisIsOutsideTheMeasuredFeatureSpace(unittest.TestCase):
 
         The rule has no model, no fit, no threshold and no split: "this item's tag
         is a STRICT subset of some task topic of the workflow it sits in".  On the
-        payload at eps* it is TRUE; on the agent's own note for any task it is
-        FALSE, because that note carries the task's whole topic.
+        payload at eps* it is TRUE.  On the agent's own note it depends ON THE
+        WORKFLOW, not on the note: the note carries its task's WHOLE topic, so the
+        rule fires exactly when that whole topic is itself a strict subset of some
+        OTHER task's topic in the same workflow.
 
         Over the real Delta=0 corpus (900 events, 3600 controls, the corpus SS5
         scores) this rule flags 900 of 900 payloads and 366 of 3600 controls --
         Mann-Whitney AUC 0.9492, against the 0.5414 gate 2 certifies on F_MATCH.
-        The controls it flags are benign notes whose own task topic happens to be
-        a strict subset of another task's in the same workflow, which is why the
-        measured number is 0.949 and NOT the 1.0 the rule looks like it should
+        Those 366 (~10%) ARE the case above: benign notes whose own task topic
+        happens to nest inside another task's in the same workflow, which is why
+        the measured number is 0.949 and NOT the 1.0 the rule looks like it should
         give.  Full table, and the eps=1.0 control where the channel closes, in
         spikes/eps-ngan-sach-that.md SS9 limit 6.
+
+        BOTH CASES ARE ASSERTED, because the assertion used to cover only one and
+        the docstring described both.  The old fixture's two task topics are
+        DISJOINT, so no benign note in it can nest in the other task's topic and
+        the `assertFalse` branch was structurally unable to fail -- while the ~10%
+        it reported two paragraphs later is exactly the case that fixture cannot
+        contain.  A second workflow whose topics DO nest is added, and there the
+        agent's own note is asserted FLAGGED: the rate reported above is now a
+        rate the test covers rather than one it is silent about.
 
         Thesis claim (vi): "co mot quy tac khong tham so tach duoc ke tan cong ma
         gate 2 chung nhan la khong tach duoc".
         """
-        wf = _graded_wf([("db", "django", "models", "query"),
-                         ("astropy", "io", "ascii", "qdp", "core", "ui")],
-                        ["django__django-11039", "astropy__astropy-14365"])
-
-        def strict_subset_of_a_task_topic(topic) -> bool:
+        def flagged_in(wf, topic) -> bool:
             a = retrieval.as_topic(topic)
             return any(a < retrieval.as_topic(t.topic) for t in wf.tasks)
 
-        for sigma, task in enumerate(wf.tasks):
-            with self.subTest(sigma=sigma):
+        # THE TYPICAL CASE: task topics that do not nest, which is where the
+        # channel is widest -- every payload flagged, no benign note flagged.
+        disjoint = _graded_wf([("db", "django", "models", "query"),
+                               ("astropy", "io", "ascii", "qdp", "core", "ui")],
+                              ["django__django-11039", "astropy__astropy-14365"])
+        for sigma, task in enumerate(disjoint.tasks):
+            with self.subTest(case="disjoint", sigma=sigma):
                 self.assertTrue(
-                    strict_subset_of_a_task_topic(_payload_at(wf, sigma, 0.0).topic),
+                    flagged_in(disjoint, _payload_at(disjoint, sigma, 0.0).topic),
                     "at eps* the payload's tag is NOT a strict subset of its "
                     "task's topic, so this rule no longer separates it -- "
                     "re-measure the channel before relaxing the record.")
                 self.assertFalse(
-                    strict_subset_of_a_task_topic(_agent_note(task).topic),
+                    flagged_in(disjoint, _agent_note(task).topic),
                     f"the agent's own note for {task.task_id!r} is flagged by "
-                    f"the rule too. The gap this test records is between a "
-                    f"payload that narrows its tag and a benign note that does "
-                    f"not; if benign notes narrow theirs, the channel is not "
-                    f"what SS9 limit 6 says it is.")
+                    f"the rule in a workflow whose task topics do NOT nest. The "
+                    f"gap this test records is between a payload that narrows "
+                    f"its tag and a benign note that does not; if a note is "
+                    f"flagged here, the channel is not what SS9 limit 6 says.")
+
+        # THE ~10% CASE, which the disjoint fixture cannot reach: task 0's WHOLE
+        # topic is a strict subset of task 1's, so the agent's own note for task 0
+        # IS flagged. This is the false-positive source behind 366 of 3600, and it
+        # is what keeps the measured AUC at 0.9492 instead of 1.0.
+        nested = _graded_wf([("db", "models"),
+                             ("db", "models", "query", "orm")],
+                            ["django__django-11039", "django__django-11133"])
+        with self.subTest(case="nested", sigma=0):
+            self.assertTrue(
+                flagged_in(nested, _agent_note(nested.tasks[0]).topic),
+                "a benign note whose own task topic nests inside another task's "
+                "is NOT flagged, so the ~10% control-side rate the corpus "
+                "measures (366 of 3600) has no mechanism here and the 0.9492 "
+                "below 1.0 is unexplained.")
+            self.assertTrue(
+                flagged_in(nested, _payload_at(nested, 0, 0.0).topic),
+                "the payload is unflagged in the nested workflow, so the rule "
+                "separates in the wrong direction there.")
+        with self.subTest(case="nested", sigma=1):
+            # The WIDER task's note is still unflagged -- nesting flags the
+            # narrower topic only, which is why the rate is ~10% and not ~50%.
+            self.assertFalse(
+                flagged_in(nested, _agent_note(nested.tasks[1]).topic),
+                "the widest task topic of a workflow is flagged, so every "
+                "benign note would be and the rule would separate nothing.")
 
 
 class TheScopeStaysTruthful(unittest.TestCase):

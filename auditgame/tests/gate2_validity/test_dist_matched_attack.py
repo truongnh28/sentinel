@@ -26,15 +26,21 @@ not a sentence in a docstring.
 AND FOR A WHILE IT WAS NEITHER, which is why that class now carries three tests
 instead of one.  The old `test_no_item_the_attacker_fits_on_lives_in_the_
 defenders_half` compared the attacker's half against a HYPOTHETICAL defender half
-that no measurement uses; the corpus the AUC is scored on
-(`benign_pool(..., natural=True)`) harvests BOTH parities, so 1168 of the
-attacker's 1618 estimate items were in it and the test could not go red for the
-condition its own failure message named.  A check narrower than its claim is
-worse than no check.  What replaces it:
+that no measurement uses; the corpus the AUC is scored on harvests BOTH parities,
+so 766 of the attacker's 1618 estimate items are among the controls it scores
+(1168 are in the top-up pool those controls are partly drawn from) and the test
+could not go red for the condition its own failure message named.  A check
+narrower than its claim is worse than no check.  What replaces it:
 
     the DEFAULT corpus's leak, as a measured number that moves loudly
     the HOLDOUT corpus's overlap, asserted at exactly 0
     a refusal when a corpus is cut from the attacker's OWN parity
+
+AND EACH OF THOSE IS ASSERTED AT TWO POPULATIONS, not one.  `benign_pool` is the
+TOP-UP source `_one_event` falls back to, not the negative class: each event takes
+the hosting workflow's own live age-matched items first.  A leak read off the pool
+alone is a lower bound over the wrong denominator, so `matched_corpus`'s
+`control_ids` sink is used to read the scored class itself.
 
 The holdout cell is the PRIMARY reported number (spikes/ho-tan-cong-mo-rong.md
 §4 and §6); the default one is kept beside it, labelled, as the comparison.
@@ -112,11 +118,11 @@ class TheAttackerEstimateIsHeldOut(unittest.TestCase):
         failure message named "the items the discriminator will be scored
         against"; its assertion compares the attacker's half against a
         HYPOTHETICAL defender half that no measurement uses.  The corpus the AUC
-        is actually scored on is built by `benign_pool(..., natural=True)`, which
-        harvests BOTH parities -- so this test could not go red for the condition
-        it named, whatever the leak.  A check narrower than its claim is worse
-        than no check.  The two tests below measure the real thing; this one is
-        kept for what it does establish, which is that `segment_half` partitions.
+        is actually scored on harvests BOTH parities, through both of its control
+        sources -- so this test could not go red for the condition it named,
+        whatever the leak.  A check narrower than its claim is worse than no
+        check.  The two tests below measure the real thing; this one is kept for
+        what it does establish, which is that `segment_half` partitions.
         """
         atk = attacks.estimation_items(parity=attacks.ESTIMATION_PARITY)
         dfn = attacks.estimation_items(parity=1 - attacks.ESTIMATION_PARITY)
@@ -129,26 +135,53 @@ class TheAttackerEstimateIsHeldOut(unittest.TestCase):
             f"{len(a_ids & d_ids)} items appear in BOTH halves: `segment_half` "
             f"has stopped partitioning, so neither corpus below means anything.")
 
-    def _scored_pool_ids(self, holdout):
-        """item_ids of the benign memory items the AUC is ACTUALLY scored against.
+    def _top_up_pool_ids(self, holdout):
+        """item_ids of the benign memory items in the TOP-UP POOL.
 
-        `benign_pool` is the top-up source `benign_corpus._one_event` draws every
-        control from once the workflow's own single age-matched item runs out, so
-        it IS the negative class's population -- not a proxy for it.
+        NOT the negative class, and the earlier name (`_scored_pool_ids`) and
+        docstring said it was: "`benign_pool` ... IS the negative class's
+        population -- not a proxy for it."  That is false.
+        `benign_corpus._one_event` fills each event's controls from the hosting
+        workflow's OWN live age-matched items FIRST and reaches into this pool
+        only when it is short of `per_event`, so this dict is one of TWO sources
+        of a control.  An overlap measured here is therefore a LOWER BOUND on the
+        corpus's overlap, over a different denominator -- which is exactly why
+        `_scored_control_ids` below exists and why both are asserted.
         """
         pool = B.benign_pool(4, carrier="memory", natural=True, holdout=holdout)
         return {it.item_id for (_repo, c), items in pool.items()
                 if c == "memory" for it in items}
 
+    def _scored_control_ids(self, holdout, delta=0, n_events=900):
+        """item_ids of the benign items the AUC is ACTUALLY scored against.
+
+        Built through `matched_corpus`'s `control_ids` sink, so this is the real
+        negative class of the real corpus -- both sources of a control, not just
+        the top-up one -- and it is measured from committed code rather than
+        argued for in a comment.
+        """
+        seen: set = set()
+        B.matched_corpus(_pipe(), delta, 0.0, n_events, carrier="memory",
+                         natural=True, holdout=holdout, control_ids=seen)
+        return seen
+
     def test_the_default_corpus_leak_is_a_recorded_number(self):
-        """THE LEAK, MEASURED -- a quantity that goes red when it changes.
+        """THE LEAK, MEASURED AT BOTH POPULATIONS -- quantities that go red.
 
         This is the test the one above was mistaken for.  It compares the
-        attacker's estimate against the benign pool the AUC is scored on, at the
-        DEFAULT `holdout=None`, which is the corpus §4 of the spike reports.
-        That corpus harvests every segment of every repo, so it contains the
-        attacker's own instances and therefore -- the note being a deterministic
-        function of the instance -- byte-identical ITEMS.
+        attacker's estimate against the DEFAULT `holdout=None` corpus, which is
+        the corpus §4 of the spike reports.  That corpus harvests every segment of
+        every repo, so it contains the attacker's own instances and therefore --
+        the note being a deterministic function of the instance -- byte-identical
+        ITEMS.
+
+        TWO POPULATIONS, TWO NUMBERS, BECAUSE THE FIRST ONE ALONE UNDERSTATES IT.
+        The published `1168 / 3349 = 34.9%` is a property of the TOP-UP POOL; the
+        controls the Delta=0 cell actually scores are 2540 distinct items of which
+        766 are the attacker's (30.2%), the remaining 515 non-pool controls being
+        the workflows' own live items.  The pool figure is a LOWER BOUND on the
+        leak, and quoting it as "the leak" is the scope error this test now pins
+        shut on both sides.
 
         The numbers are asserted rather than the property, because the property
         is FALSE here and pretending otherwise is how the previous version came
@@ -157,15 +190,32 @@ class TheAttackerEstimateIsHeldOut(unittest.TestCase):
         """
         est = attacks.estimation_items(carrier="memory")
         a_ids = {it.item_id for items in est.values() for it in items}
-        p_ids = self._scored_pool_ids(None)
-        shared = a_ids & p_ids
+
+        p_ids = self._top_up_pool_ids(None)
         self.assertEqual(
-            (len(a_ids), len(p_ids), len(shared)), (1618, 3349, 1168),
-            f"the measured leak of the DEFAULT corpus has moved: estimate "
-            f"{len(a_ids)}, scored pool {len(p_ids)}, shared {len(shared)} "
-            f"(was 1618 / 3349 / 1168 = 72.2% of the estimate and 34.9% of the "
-            f"pool). Re-derive spikes/ho-tan-cong-mo-rong.md §4 and §6 before "
-            f"quoting either table.")
+            (len(a_ids), len(p_ids), len(a_ids & p_ids)), (1618, 3349, 1168),
+            f"the measured leak of the DEFAULT corpus's TOP-UP POOL has moved: "
+            f"estimate {len(a_ids)}, pool {len(p_ids)}, shared "
+            f"{len(a_ids & p_ids)} (was 1618 / 3349 / 1168 = 72.2% of the "
+            f"estimate and 34.9% of the pool). Re-derive "
+            f"spikes/ho-tan-cong-mo-rong.md §4 and §6 before quoting either "
+            f"table.")
+
+        c_ids = self._scored_control_ids(None)
+        self.assertEqual(
+            (len(c_ids), len(a_ids & c_ids)), (2540, 766),
+            f"the measured leak of the DEFAULT corpus's SCORED NEGATIVE CLASS "
+            f"has moved: {len(c_ids)} distinct controls at Delta=0, "
+            f"{len(a_ids & c_ids)} of them the attacker's own (was 2540 / 766 = "
+            f"47.3% of the estimate and 30.2% of the controls). This is the leak "
+            f"the secondary cells carry; the pool number above is only its "
+            f"top-up half.")
+        self.assertGreater(
+            len(c_ids - p_ids), 0,
+            "every scored control now comes from the top-up pool, so the "
+            "within-workflow source has gone -- the two figures above have "
+            "stopped being about different populations and the distinction this "
+            "test draws no longer holds.")
 
     def test_the_holdout_corpus_shares_no_item_with_the_attackers_estimate(self):
         """THE PRIMARY CELL'S PRECONDITION: overlap exactly zero, not merely small.
@@ -176,6 +226,13 @@ class TheAttackerEstimateIsHeldOut(unittest.TestCase):
         reportable one: the number it carries is about camouflage and not partly
         about recall.
 
+        ASSERTED AT BOTH POPULATIONS, for the reason the default-corpus test now
+        gives: the zero of the TOP-UP POOL leaves the within-workflow controls
+        unchecked, and while those hold by construction -- a parity-`holdout`
+        workflow can only host parity-`holdout` instances -- "by construction" was
+        also the argument the 34.9% figure rested on, and it was wrong there.  So
+        the scored class is measured too.
+
         Zero is the assertion and it is exact.  Anything above zero here means
         the two cuts have stopped complementing each other -- most likely because
         `h` or the front-aligned offset drifted apart between
@@ -183,14 +240,32 @@ class TheAttackerEstimateIsHeldOut(unittest.TestCase):
         """
         est = attacks.estimation_items(carrier="memory")
         a_ids = {it.item_id for items in est.values() for it in items}
-        p_ids = self._scored_pool_ids(1 - attacks.ESTIMATION_PARITY)
+        p_ids = self._top_up_pool_ids(1 - attacks.ESTIMATION_PARITY)
         self.assertTrue(a_ids and p_ids, "one side is empty -- nothing is proven")
         self.assertEqual(
             a_ids & p_ids, set(),
             f"{len(a_ids & p_ids)} of the attacker's {len(a_ids)} estimate items "
-            f"are in the HOLDOUT corpus of {len(p_ids)}. The holdout is the whole "
-            f"basis on which the primary number is called leakage-free.")
+            f"are in the HOLDOUT corpus's top-up pool of {len(p_ids)}. The "
+            f"holdout is the whole basis on which the primary number is called "
+            f"leakage-free.")
         self.assertEqual((len(a_ids), len(p_ids)), (1618, 1719))
+
+        c_ids = self._scored_control_ids(1 - attacks.ESTIMATION_PARITY)
+        self.assertEqual(
+            a_ids & c_ids, set(),
+            f"{len(a_ids & c_ids)} of the {len(c_ids)} controls the HOLDOUT "
+            f"Delta=0 cell actually scores are items the attacker fitted on. The "
+            f"primary number is then not leakage-free and cannot be reported.")
+        self.assertEqual(
+            len(c_ids), 1988,
+            f"the holdout corpus now scores {len(c_ids)} distinct controls, not "
+            f"1988: the negative class has changed size, so re-derive §6 before "
+            f"quoting it.")
+        self.assertGreater(
+            len(c_ids - p_ids), 0,
+            "every scored control now comes from the top-up pool, so the zero "
+            "above no longer covers the within-workflow source it was extended "
+            "to cover.")
 
     def test_the_corpus_the_attacker_fitted_on_is_refused_outright(self):
         """Cutting the corpus from the attacker's OWN parity is not a control.
@@ -243,11 +318,24 @@ class PayloadFollowsTheBenignShape(unittest.TestCase):
         """The finding this pipeline exists for.
 
         MEASURED on the enriched background: the benign CORPUS ROWS of a
-        N_SHAPE=200 / per_event=4 corpus count depth {1: 519, 2: 281} at Delta=0
-        (491/309 at Delta=2, 512/288 at Delta=4) while EVERY
-        MatchedAttack payload is depth 1, and neutralising `depth` alone drops the
-        held-out AUC from 0.78 to 0.71.  A payload constant on an axis the benign
-        class has spread on is separable for free.
+        N_SHAPE=200 / per_event=4 DEFAULT (holdout=None) corpus count depth
+        {1: 519, 2: 281} at Delta=0 (491/309 at Delta=2, 512/288 at Delta=4) while
+        EVERY MatchedAttack payload is depth 1.  A payload constant on an axis the
+        benign class has spread on is separable for free, and the cost of that is
+        MEASURED rather than quoted: on the 900-event secondary (natural,
+        holdout=None) memory corpus, MatchedAttack's mean CI upper bound over
+        SPLIT_SEEDS is
+
+            Delta   all four   no `depth`   no `size`
+            0       0.7056     0.6128       0.7091
+            2       0.7328     0.6375       0.7305
+            4       0.7318     0.6400       0.7333
+
+        -- so neutralising `depth` costs about 0.09 at every Delta while
+        neutralising `size` moves nothing, which is what "depth is the driving
+        axis and the residual is size" means.  The earlier wording quoted "from
+        0.78 to 0.71", a pair that reproduces at NO Delta, on NO corpus, under NO
+        statistic in this repository; it is withdrawn, not restated.
 
         THOSE ARE CORPUS ROWS, not the harvest pool.  `harvest_natural`'s own
         docstring quotes {1: 2248, 2: 1101} for the same background, and the two
@@ -255,27 +343,44 @@ class PayloadFollowsTheBenignShape(unittest.TestCase):
         `full` pool, the rows here are the `per_event` controls drawn for 200
         events.  Both figures appear in this repository, so both are labelled.
 
-        The tolerance is on the SHAPE (which depths occur, and roughly in what
-        proportion), not on a digit: the payload draws its provenance from a
-        sample DISJOINT from the corpus's, so an exact match would be evidence of
-        leakage rather than of matching.
+        THE TOLERANCE, AND WHICH CORPUS EACH HALF OF ITS JUSTIFICATION IS ABOUT.
+        The check is on the SHAPE (which depths occur, and roughly in what
+        proportion), not on a digit, and it runs over BOTH corpora:
+
+          holdout=1-ESTIMATION_PARITY -- the PRIMARY corpus.  Here the old
+            justification is TRUE: the payload draws its provenance from a sample
+            disjoint from the corpus's (measured 0 shared item_ids, see
+            TheAttackerEstimateIsHeldOut), so an exact match would be evidence of
+            leakage rather than of matching, and a tolerance is the only honest
+            form of the assertion.
+          holdout=None -- the DEFAULT corpus, kept because the depth counts above
+            are quoted from it.  Here that sentence is FALSE and used to be
+            asserted anyway: at the 900-event Delta=0 shape the corpus's controls
+            include 766 of the estimate's 1618 items.  The tolerance on this arm
+            is justified differently -- the payload's depth follows a MIXTURE RATE
+            estimated on a different (overlapping) sample and read out on 200
+            events, so sampling noise alone puts the two shares apart.
 
         Thesis claim (vi): "payload phai trai tren depth giong nen lanh".
         """
         for delta in DELTAS:
-            pos, neg = B.matched_corpus(_pipe(), delta, 0.0, N_SHAPE, natural=True)
-            with self.subTest(delta=delta):
-                self.assertTrue(pos and neg, f"empty corpus at Delta={delta}")
-                self.assertEqual(
-                    {r["depth"] for r in pos}, {r["depth"] for r in neg},
-                    f"at Delta={delta} the payload and the benign class do not "
-                    f"even occupy the same depths.")
-                p1 = sum(1 for r in pos if r["depth"] == 1) / len(pos)
-                b1 = sum(1 for r in neg if r["depth"] == 1) / len(neg)
-                self.assertLess(
-                    abs(p1 - b1), 0.15,
-                    f"at Delta={delta} depth-1 is {p1:.3f} of payloads against "
-                    f"{b1:.3f} of benign items.")
+            for holdout in (1 - attacks.ESTIMATION_PARITY, None):
+                pos, neg = B.matched_corpus(_pipe(), delta, 0.0, N_SHAPE,
+                                            natural=True, holdout=holdout)
+                with self.subTest(delta=delta, holdout=holdout):
+                    self.assertTrue(pos and neg,
+                                    f"empty corpus at Delta={delta}, "
+                                    f"holdout={holdout}")
+                    self.assertEqual(
+                        {r["depth"] for r in pos}, {r["depth"] for r in neg},
+                        f"at Delta={delta} (holdout={holdout}) the payload and "
+                        f"the benign class do not even occupy the same depths.")
+                    p1 = sum(1 for r in pos if r["depth"] == 1) / len(pos)
+                    b1 = sum(1 for r in neg if r["depth"] == 1) / len(neg)
+                    self.assertLess(
+                        abs(p1 - b1), 0.15,
+                        f"at Delta={delta} (holdout={holdout}) depth-1 is "
+                        f"{p1:.3f} of payloads against {b1:.3f} of benign items.")
 
     def test_epsilon_keeps_both_ends(self):
         """K5 with the near end MEASURED rather than asserted.
@@ -420,6 +525,18 @@ class TheDeclaredScopeIsEnforced(unittest.TestCase):
     and could reach a `randrange()` on an empty exemplar list. An attack that
     declares four carriers and crashes on one does not record a refusal with a
     reason, it crashes mid-corpus -- rule N3 one level below the cell.
+
+    AND THE FIRST NARROWING WAS ITSELF TOO WIDE, for the same reason one level up:
+    it was checked at `payload()` only.  `skill` passed that check -- 177
+    exemplars, a payload comes out -- and NO CELL CAN BE BUILT ON IT, because the
+    DEFENDER's side refuses: `benign_pool`'s `n_per_event=4` contract finds 2
+    benign skill items over 8 instances on the holdout corpus (3 over 22 on the
+    default one).  A carrier with a payload and no corpus is a carrier the
+    pipeline cannot be MEASURED on, so it is not in scope.  A scope declaration
+    checked only at the payload level is a check narrower than its claim, which is
+    the same defect this class was written about; the tests below therefore build
+    a CORPUS on every declared carrier, and assert that every carrier of
+    `CARRIERS_ALL` that is NOT declared carries a recorded reason (N3).
     """
 
     #: A real SWE-bench repo with a real token-set topic, so `payload` runs the
@@ -444,16 +561,80 @@ class TheDeclaredScopeIsEnforced(unittest.TestCase):
                 self.assertEqual(it.carrier, carrier)
                 self.assertTrue(it.content)
 
-    def test_an_undeclared_carrier_is_refused_with_a_reason(self):
-        """`queue` is the measured case: the smallest repo's half supplies zero
-        benign queue items, so no estimate exists and no payload can be drawn."""
+    def test_a_corpus_can_be_built_on_every_carrier_the_scope_declares(self):
+        """THE CHECK AT THE ALTITUDE OF THE CLAIM.
+
+        `scope().carriers` is a claim about which CELLS exist, and a cell is a
+        corpus scored by the discriminator, not a payload.  Declaring a carrier
+        `payload()` survives and `matched_corpus()` refuses is how `skill` stayed
+        in the declaration through a narrowing that was supposed to remove exactly
+        that: the estimate harvests 177 skill exemplars at `n_per_event=1` while
+        `benign_pool` refuses at `n_per_event=4`.
+
+        Built on the PRIMARY (holdout) corpus, which is the one the reported
+        numbers come from, and at a small `n_events` because the question is
+        whether the cell EXISTS, not what it reads.
+        """
         pipe = _pipe()
-        self.assertNotIn("queue", pipe.scope().carriers,
-                         "queue is declared again -- measure it before declaring it")
-        with self.assertRaises(ValueError) as cm:
-            pipe.payload(self._wf(), PoisonSpec(carrier="queue", iota=0, sigma=0,
-                                                epsilon=0.0))
-        self.assertIn("cannot target carrier", str(cm.exception))
+        for carrier in sorted(pipe.scope().carriers):
+            with self.subTest(carrier=carrier):
+                pos, neg = B.matched_corpus(
+                    pipe, 0, 0.0, 8, carrier=carrier, natural=True,
+                    holdout=1 - attacks.ESTIMATION_PARITY)
+                self.assertTrue(
+                    pos and neg,
+                    f"carrier {carrier!r} is declared in scope but yields an "
+                    f"empty corpus, so the declaration names a cell that does "
+                    f"not exist.")
+
+    def test_an_undeclared_carrier_is_refused_with_a_reason(self):
+        """N3 at the scope level: every carrier of `CARRIERS_ALL` that the scope
+        drops has to carry a REASON, and `payload()` has to say it.
+
+        `queue` refuses one level earlier than `skill` and the two reasons are
+        different, which is the point of recording them rather than counting
+        them: queue has no ATTACKER estimate at all (the smallest repo's half
+        supplies zero benign queue items), while skill has an estimate and no
+        DEFENDER corpus.
+        """
+        pipe = _pipe()
+        dropped = sorted(set(attacks.CARRIERS_ALL) - set(pipe.scope().carriers))
+        self.assertEqual(
+            dropped, sorted(attacks.DistributionMatchedAttack.CARRIER_REFUSALS),
+            "a carrier left the declared scope without leaving a reason in "
+            "CARRIER_REFUSALS, or a reason names a carrier that is still "
+            "declared. N3: a refused cell records a reason, never a silent drop.")
+        for carrier in dropped:
+            with self.subTest(carrier=carrier):
+                reason = attacks.DistributionMatchedAttack.CARRIER_REFUSALS[carrier]
+                self.assertGreater(len(reason), 60,
+                                   f"the reason recorded for {carrier!r} is not "
+                                   f"one: {reason!r}")
+                with self.assertRaises(ValueError) as cm:
+                    pipe.payload(self._wf(), PoisonSpec(carrier=carrier, iota=0,
+                                                        sigma=0, epsilon=0.0))
+                msg = str(cm.exception)
+                self.assertIn("cannot target carrier", msg)
+                self.assertIn(reason, msg,
+                              f"the refusal for {carrier!r} does not carry its "
+                              f"recorded reason, so the cell is lost without it.")
+
+    def test_the_carrier_that_was_dropped_for_having_no_corpus_really_has_none(self):
+        """The `skill` measurement, pinned so the narrowing is not taken on trust.
+
+        It is the DEFENDER's contract that refuses, on BOTH corpora, which is why
+        `payload()` succeeding on skill proved nothing.  If this ever stops
+        raising, skill has acquired a cell and belongs back in the declaration --
+        measured, not assumed.
+        """
+        pipe = attacks.DistributionMatchedAttack()
+        for holdout in (1 - attacks.ESTIMATION_PARITY, None):
+            with self.subTest(holdout=holdout):
+                with self.assertRaises(ValueError) as cm:
+                    B.matched_corpus(pipe, 0, 0.0, 8, carrier="skill",
+                                     natural=True, holdout=holdout)
+                self.assertIn("n_per_event=4", str(cm.exception))
+                self.assertIn("'skill'", str(cm.exception))
 
     def test_payload_succeeds_at_both_ends_of_the_declared_delta_range(self):
         pipe = _pipe()

@@ -95,12 +95,28 @@ mà `size` được khớp → AUC ≈ 0.5. Trên nền giàu, lớp benign tr�
 payload vẫn kẹt ở depth 1 → **`depth` thành trục phân biệt thật**. Nó chỉ từng khớp
 được một corpus suy biến.
 
-Quy công đặc trưng (Δ=2, nền giàu, trung hoà từng đặc trưng):
+Quy công đặc trưng (nền giàu = corpus PHỤ `natural=True, holdout=None`, carrier
+`memory`, cận trên CI **trung bình** trên `SPLIT_SEEDS` (20), trung hoà từng đặc
+trưng một bằng cách đặt cột đó về hằng 0 ở **cả hai** lớp):
 
-| pipe | tất cả | bỏ `depth` | bỏ `size` | trục dẫn dắt |
-|---|---|---|---|---|
-| MatchedAttack | 0.7328 | **0.6375** | 0.7305 | **`depth`** (bỏ đi rớt nhiều nhất) |
-| FrozenBank | 0.8386 | 0.8414 | **0.6676** | **`size`** |
+| pipe | Δ | tất cả | bỏ `depth` | Δ-lệch | bỏ `size` | Δ-lệch | trục dẫn dắt |
+|---|---|---|---|---|---|---|---|
+| MatchedAttack | 0 | 0.7056 | **0.6128** | −0.0928 | 0.7091 | +0.0035 | **`depth`** |
+| MatchedAttack | 2 | 0.7328 | **0.6375** | −0.0953 | 0.7305 | −0.0023 | **`depth`** |
+| MatchedAttack | 4 | 0.7318 | **0.6400** | −0.0918 | 0.7333 | +0.0015 | **`depth`** |
+| FrozenBank | 2 | 0.8386 | 0.8414 | +0.0028 | **0.6676** | −0.1710 | **`size`** |
+
+`0/20` split vượt trần ở **cả chín** ô của MatchedAttack. `recency` và `derived`
+khớp do cấu tạo ở hai phía nên không trung hoà ở đây.
+
+> **RÚT một con số.** Bản trước, và `attacks.py` cùng
+> `tests/gate2_validity/test_dist_matched_attack.py` chép theo, có câu *"trung hoà
+> `depth` bằng tay đưa nó từ 0,78 xuống 0,71"*. **Không Δ nào, không corpus nào
+> (chính hay phụ), không thống kê nào (cận trên trung bình hay ước lượng điểm)
+> trong kho này cho ra cặp 0,78 → 0,71.** Cặp gần nhất là hàng Δ=2 ở trên
+> (0,7328 → 0,6375). Con số cũ **bị rút**, không được phát biểu lại; ba hàng đo
+> được ở trên thay chỗ nó, mỗi hàng kèm Δ và kèm corpus. Kết luận **định tính**
+> không đổi và vẫn đứng: `depth` là trục dẫn dắt, phần dư là `size`.
 
 Với MatchedAttack, `depth` một mình gần như giải thích hết (bỏ `size` còn 0.7305);
 `size` cũng nhích lên (drift làm ghi chú dài ra, payload khớp bản gốc nên **ngắn
