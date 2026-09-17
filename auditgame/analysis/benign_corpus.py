@@ -210,7 +210,58 @@ PENDING_MEASUREMENT: dict = {
 _harvest_cache: dict = {}
 
 
-def harvest(rows, n_per_event: int, seed: int, carrier: str = CARRIER) -> list:
+def segment_half(rows: list, h: int, parity: int) -> list:
+    """The rows of every OTHER length-`h` segment of one repo, in order.
+
+    THE INSTANCE-LEVEL SPLIT, and it lives HERE -- in the module that cuts the
+    corpus -- rather than in `attacks.py`, which only consumes it.
+    `attacks.segment_half` delegates to this function, so there is exactly ONE
+    implementation of the cut: the attacker's half and the defender's half are
+    two calls to the same code with complementary parities, and they cannot drift
+    apart into two arithmetics that no longer complement each other.
+
+    Why the split has to be over INSTANCES and not over seeds.  The agent's
+    memory note is `"[{topic}] ghi chú từ {task_id}"` -- a deterministic function
+    of the instance -- so harvesting the same instance under two different seeds
+    yields the same content, the same item_id and, most to the point, the same
+    `size`.  Re-seeding changes only the drift coin and the shuffle.  Two samples
+    are disjoint when, and only when, the instances behind them are.
+
+    `h` and the front-aligned cut are not free choices: they have to be the ones
+    the corpus uses, or the halves interleave.  `harvest_natural` walks
+    `range(0, len(rows) - h + 1, h)` and `SWEBenchDataset._raw_segments` walks the
+    identical range, so segment k of a repo is the same k instances on both sides.
+    The `len(rows) % h` rows past the last whole segment belong to NEITHER half,
+    exactly as both of those drop them: a partial segment is not a workflow.
+    """
+    out: list = []
+    for k, i in enumerate(range(0, len(rows) - h + 1, h)):
+        if k % 2 == parity:
+            out.extend(rows[i:i + h])
+    return out
+
+
+def _holdout_segment_keys(ds, h: int, holdout: int) -> set:
+    """{(repo, first instance_id)} of every segment at parity `holdout`.
+
+    The key a Workflow can be matched against.  `SWEBenchDataset.workflows`
+    re-derives its segments internally and shuffles them, so a holdout cannot be
+    applied by handing it a filtered list; it is applied to the workflows it
+    yields.  The enumeration below is byte-for-byte the one `segment_half` and
+    `_raw_segments` walk -- per repo, front-aligned, step `h` -- so segment k here
+    is segment k there, and `holdout` selects exactly the complement of
+    `segment_half(rows, h, 1 - holdout)`.
+    """
+    keys = set()
+    for repo, rows in sorted(ds._by_repo().items()):
+        for k, i in enumerate(range(0, len(rows) - h + 1, h)):
+            if k % 2 == holdout:
+                keys.add((repo, rows[i]["instance_id"]))
+    return keys
+
+
+def harvest(rows, n_per_event: int, seed: int, carrier: str = CARRIER,
+            h: int = H, holdout: int | None = None) -> list:
     """Benign pool: for every REAL instance in `rows`, what the AGENT would write.
 
     `rows` are SWE-bench instance rows (swebench_dataset's own JSON records) FOR
@@ -270,7 +321,14 @@ def harvest(rows, n_per_event: int, seed: int, carrier: str = CARRIER) -> list:
     `seed` fixes the order.  The rows arrive sorted by `created_at`, so an
     unshuffled pool would hand every caller the OLDEST instances of a repo first;
     the shuffle is deterministic in `seed` through core.seed_of, never `hash()`.
+
+    `holdout` restricts `rows` to `segment_half(rows, h, holdout)` -- one parity
+    of the repo's length-`h` segments -- BEFORE anything is harvested.  It
+    defaults to None, i.e. every instance, which is what every pinned number was
+    measured on.  See `benign_pool` for what it is for.
     """
+    if holdout is not None:
+        rows = segment_half(rows, h, holdout)
     out: list = []
     for row in rows:
         task = Task(task_id=row["instance_id"], repo=row["repo"],
@@ -301,7 +359,8 @@ def harvest(rows, n_per_event: int, seed: int, carrier: str = CARRIER) -> list:
 
 
 def harvest_natural(rows, n_per_event: int, seed: int, carrier: str = CARRIER,
-                    h: int = H, drift_rate: float | None = None) -> list:
+                    h: int = H, drift_rate: float | None = None,
+                    holdout: int | None = None) -> list:
     """ENRICHED benign pool: the population a FULL H-task workflow actually writes.
 
     Same contract and same return type as `harvest`, and it runs the agent for the
@@ -334,6 +393,15 @@ def harvest_natural(rows, n_per_event: int, seed: int, carrier: str = CARRIER,
         derived   {0}                   {0}         -- see below
         size      42..549               42..557
 
+    THOSE DEPTH COUNTS ARE THE HARVEST POOL, over the whole `full` pool: every
+    benign memory item this function returns for every repo.  They are NOT the
+    depth counts of the matched corpus's benign ROWS, which are a sample drawn
+    from this pool (`{1: 519, 2: 281}` at N_SHAPE=200 events, per_event=4,
+    Delta=0 -- see
+    tests/gate2_validity/test_dist_matched_attack.py).  The two are different
+    populations with different sizes and both are quoted in this repository, so
+    each is labelled where it appears.
+
     `derived` STAYS constant at 0, and that is not a shortfall of this harvest but
     a structural fact of agent.py to be reported, not papered over: a benign write
     populates `derived_from` NOWHERE -- the skill and branch templates set it only
@@ -355,9 +423,20 @@ def harvest_natural(rows, n_per_event: int, seed: int, carrier: str = CARRIER,
     time: a mutable module value used as a default argument would freeze at
     definition time and ignore a test (or the spike's sensitivity sweep) that
     perturbs the rate.
+
+    `holdout` restricts `rows` to `segment_half(rows, h, holdout)` before any
+    workflow is cut, so the population harvested is exactly ONE PARITY of the
+    repo's segments.  Default None = every instance, which is what every pinned
+    number was measured on.  This is the one knob that makes a LEAKAGE-FREE
+    corpus buildable from committed code: the attacker fits on parity
+    `attacks.ESTIMATION_PARITY` and a corpus built at the complementary parity
+    shares no instance -- and therefore, since the note is a deterministic
+    function of the instance, no ITEM -- with it.
     """
     if drift_rate is None:
         drift_rate = NATURAL_DRIFT_RATE
+    if holdout is not None:
+        rows = segment_half(rows, h, holdout)
     out: list = []
     for i in range(0, len(rows) - h + 1, h):
         seg = rows[i:i + h]
@@ -393,7 +472,8 @@ def harvest_natural(rows, n_per_event: int, seed: int, carrier: str = CARRIER,
 
 
 def benign_pool(n_per_event: int = 4, pool: str = POOL, seed: int = SEED,
-                h: int = H, carrier: str = CARRIER, natural: bool = False) -> dict:
+                h: int = H, carrier: str = CARRIER, natural: bool = False,
+                holdout: int | None = None) -> dict:
     """`harvest` per repo, keyed (repo, carrier) -- the form the matcher reads.
 
     Cached because the certify phase builds one corpus per Delta and the pool does
@@ -419,8 +499,27 @@ def benign_pool(n_per_event: int = 4, pool: str = POOL, seed: int = SEED,
     old harvest -- gets the identical pool it always did, and it joins the cache
     key for the same reason `carrier` does: two harvests are two populations, and
     one cached answer cannot stand for both.
+
+    `holdout` cuts the pool from ONE PARITY of each repo's length-`h` segments
+    (`segment_half`).  It defaults to None -- every instance, today's behaviour,
+    every pinned number untouched -- and it joins the cache key for the same
+    reason `carrier` and `natural` do.
+
+    WHAT IT IS FOR, and why it had to be threaded here rather than patched in
+    locally.  `attacks.DistributionMatchedAttack` fits its (size, provenance)
+    estimate on `segment_half(rows, h, attacks.ESTIMATION_PARITY)`.  With
+    `holdout` None the pool harvested here covers BOTH parities, so the
+    attacker's estimate and the benign class the AUC is scored against share
+    instances -- and because the agent's note is a deterministic function of the
+    instance, they share byte-identical ITEMS, with the same `item_id` and the
+    same `size`.  Passing `holdout = 1 - attacks.ESTIMATION_PARITY` here (and to
+    `hosting_workflows`, which `matched_corpus` does for both at once) drives
+    that overlap to exactly zero.  BOTH the overlap of the default corpus and the
+    zero of the holdout corpus are pinned as MEASURED numbers by
+    tests/gate2_validity/test_dist_matched_attack.py, so neither can move
+    silently.
     """
-    key = (pool, n_per_event, seed, h, carrier, natural)
+    key = (pool, n_per_event, seed, h, carrier, natural, holdout)
     if key not in _harvest_cache:
         grouped: dict = {}
         harvester = harvest_natural if natural else harvest
@@ -432,14 +531,25 @@ def benign_pool(n_per_event: int = 4, pool: str = POOL, seed: int = SEED,
             # over a repo the corpus never reaches.  Verified holds one flask
             # instance and two seaborn ones; both are below H=8 and both are
             # already absent from `_raw_segments`.
-            if len(rows) >= h:
-                for it in harvester(rows, n_per_event, seed, carrier=carrier):
+            #
+            # With a `holdout` the same test is asked of the rows that SURVIVE
+            # the cut, not of the repo: pallets/flask has 11 instances, i.e. ONE
+            # whole segment, so one of the two parities is empty and asking
+            # harvest's n_per_event contract about it would refuse the entire
+            # pool over a repo that contributes nothing to this half.  It leaves
+            # the corpus the same way a sub-H repo does -- silently absent from
+            # `_raw_segments`, hosting no workflow and therefore no event.
+            held = rows if holdout is None else segment_half(rows, h, holdout)
+            if len(held) >= h:
+                for it in harvester(rows, n_per_event, seed, carrier=carrier,
+                                    h=h, holdout=holdout):
                     grouped.setdefault((repo, it.carrier), []).append(it)
         _harvest_cache[key] = grouped
     return _harvest_cache[key]
 
 
-def hosting_workflows(delta: int, pool: str = POOL, h: int = H, seed: int = SEED):
+def hosting_workflows(delta: int, pool: str = POOL, h: int = H, seed: int = SEED,
+                      holdout: int | None = None):
     """Workflows that can host an attack AT THIS Delta.
 
     `sweep_deltas=(delta,)` applies SPEC-P1a Part 4 step 4 PER CELL instead of
@@ -451,11 +561,29 @@ def hosting_workflows(delta: int, pool: str = POOL, h: int = H, seed: int = SEED
     own, and the joint filter would drop workflows that can host the very Delta
     being measured.  Measured on the full pool: 281 / 141 / 117 workflows host
     Delta 0 / 2 / 4 on their own, against 62 that host all four.
+
+    `holdout` keeps only the workflows cut from ONE PARITY of each repo's
+    segments -- the same parity `segment_half` names, so the workflows kept here
+    and the top-up pool `benign_pool(holdout=...)` harvests are the SAME
+    instances.  Default None keeps every workflow, which is what every pinned
+    number was measured on.
+
+    The filter is applied to the workflows `SWEBenchDataset.workflows` YIELDS,
+    not to the segment list handed to it, because that method re-derives and
+    shuffles its own segments; `n = len(segments)` and the `%` reuse mean it
+    enumerates each surviving segment exactly once, so filtering the output drops
+    workflows rather than reordering or duplicating them.  A workflow is matched
+    by (repo, first instance_id), which identifies its segment uniquely: segments
+    are non-overlapping runs of `h` consecutive instances of one repo.
     """
     ds = swebench_dataset.SWEBenchDataset(pool=pool, sweep_deltas=(delta,))
     segments = ds._segments(h)
-    return ds, list(ds.workflows(len(segments), h, seed=seed_of(seed, "wf", delta)
-                                 & 0xFFFFFFFF))
+    wfs = list(ds.workflows(len(segments), h, seed=seed_of(seed, "wf", delta)
+                            & 0xFFFFFFFF))
+    if holdout is not None:
+        keys = _holdout_segment_keys(ds, h, holdout)
+        wfs = [wf for wf in wfs if (wf.repo, wf.tasks[0].task_id) in keys]
+    return ds, wfs
 
 
 def feasible_sigmas(wf, delta: int, eps: float, theta: float | None = None) -> list:
@@ -483,9 +611,59 @@ def feasible_sigmas(wf, delta: int, eps: float, theta: float | None = None) -> l
                    for j in range(s - delta, s))]
 
 
+def _refuse_on_estimate_mismatch(pipe, pool: str, h: int,
+                                 holdout: int | None) -> None:
+    """Refuse a corpus whose population is not the one `pipe` fitted its estimate on.
+
+    Rule N3, one level up from the cells: a pipeline measured against the wrong
+    population must produce a REASON, not a number.  Three declarations are read,
+    all optional (`getattr(..., None)`), so a pipeline that reads no benign
+    estimate at all declares nothing and is never refused:
+
+        estimate_pool    the instance pool the estimate was harvested from
+        estimate_h       the segment length it was cut at
+        estimate_parity  the parity of the segments it was allowed to observe
+
+    The parity check is the one that cannot be recovered after the fact: a corpus
+    built at `holdout == estimate_parity` is cut from EXACTLY the instances the
+    attacker fitted on, which is not a leakage control, it is leakage at 100%.
+    `holdout is None` is not refused -- it is the default, reported corpus, whose
+    partial overlap with the estimate is a measured and published quantity rather
+    than an accident.
+    """
+    want_pool = getattr(pipe, "estimate_pool", None)
+    if want_pool is not None and want_pool != pool:
+        raise ValueError(
+            f"{type(pipe).__name__} fitted its benign estimate on pool "
+            f"{want_pool!r} but the corpus is being cut from {pool!r}. These are "
+            f"different populations ('full' is a strict superset of 'verified' "
+            f"over the same repos), so the payload would be matched to a "
+            f"distribution the AUC is not scored against and the number would be "
+            f"about neither. Construct the pipeline with pool={pool!r}, or "
+            f"measure on {want_pool!r} -- do not pair the two.")
+    want_h = getattr(pipe, "estimate_h", None)
+    if want_h is not None and want_h != h:
+        raise ValueError(
+            f"{type(pipe).__name__} fitted its benign estimate at h={want_h} but "
+            f"the corpus is cut at h={h}. The segment cut is front-aligned at "
+            f"multiples of h, so two different h values interleave the halves and "
+            f"the held-out split stops being a split at all.")
+    want_parity = getattr(pipe, "estimate_parity", None)
+    if (want_parity is not None and holdout is not None
+            and holdout == want_parity):
+        raise ValueError(
+            f"{type(pipe).__name__} fitted its benign estimate on segment parity "
+            f"{want_parity} and this corpus is being cut from the SAME parity "
+            f"(holdout={holdout}). Every benign item the discriminator would be "
+            f"scored against is an item the attacker fitted on -- that is not a "
+            f"leakage control, it is total leakage. The leakage-free corpus is "
+            f"holdout={1 - want_parity}.")
+
+
 def matched_corpus(pipe, delta: int, eps: float, n_events: int,
                    per_event: int = 4, pool: str = POOL, seed: int = SEED,
-                   carrier: str = CARRIER, natural: bool = False) -> tuple:
+                   carrier: str = CARRIER, natural: bool = False,
+                   holdout: int | None = None) -> tuple:
     """(payloads, benign) as F_match feature dicts -- a MATCHED case-control sample.
 
     Returns at most `n_events` poisoning events, each with `per_event` controls
@@ -503,10 +681,28 @@ def matched_corpus(pipe, delta: int, eps: float, n_events: int,
     come from a `_one_event` run whose agent has the SAME churn on.  It defaults to
     False, so the old harvest, the pinned numbers, and every existing caller are
     untouched.
+
+    `holdout` builds the corpus from ONE PARITY of each repo's segments -- BOTH
+    halves of the benign class coherently, the hosting workflows (and therefore
+    the within-workflow controls) and the top-up pool alike.  Default None is
+    every instance, today's behaviour.  Handing it
+    `1 - attacks.ESTIMATION_PARITY` yields the LEAKAGE-FREE corpus: no instance
+    the dist-matched attacker fitted on appears in it, so no item does either.
+
+    THE PIPELINE IS ASKED WHAT IT WAS FITTED ON, and refused if the two disagree.
+    A pipeline that reads an estimate of the benign population has an estimate
+    fitted on SOME pool, at SOME h, from SOME parity, and none of that is visible
+    in the payload it returns.  Measuring a `pool="verified"` corpus against an
+    estimate fitted on `full` -- a strict superset -- would silently pair a
+    payload with the wrong population, which is exactly the class of defect rule
+    N3 exists for: it must be a refusal with a reason, never a number.  The three
+    attributes are optional, so a pipeline that reads no estimate (MatchedAttack,
+    LegacyAttack) is unaffected.
     """
-    _ds, wfs = hosting_workflows(delta, pool=pool, seed=seed)
+    _refuse_on_estimate_mismatch(pipe, pool, h=H, holdout=holdout)
+    _ds, wfs = hosting_workflows(delta, pool=pool, seed=seed, holdout=holdout)
     grouped = benign_pool(per_event, pool=pool, seed=seed, carrier=carrier,
-                          natural=natural)
+                          natural=natural, holdout=holdout)
     poisoned_rows, benign_rows = [], []
     for wf in wfs:
         for sigma in feasible_sigmas(wf, delta, eps):
