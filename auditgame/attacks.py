@@ -277,19 +277,106 @@ class MatchedAttack:
     be tuned away -- and it is why the mock, where sim takes only {0, 1} and
     payload_topic_like is the identity, cannot be asked this question at all.
 
+    ---- AND THAT eps* IS A PROPERTY OF THE BACKGROUND, NOT OF THIS PIPELINE ----
+
+    The table above is `natural=False`: the agent runs at drift_rate 0.0, so EVERY
+    benign item is depth 1 with ZERO variance, and `provenance` stepping to depth
+    2 at eps >= 0.5 is therefore separable BY THE CORPUS, independently of
+    anything here.  The whole right-hand half of that cost column carries no
+    information about the trade-off it appears to show.  Re-measured with exactly
+    one variable moved -- `matched_corpus(..., natural=True)`, same pool, same
+    carrier, same per_event, same n_events, same split set -- MEAN CI upper bound:
+
+        eps      0.0     0.1     0.2     0.3     0.4     0.5     0.7     1.0
+        D=0    0.7056  0.7899  0.8557  0.9029  0.9320  0.9445  0.9698  0.9850
+        D=2    0.7328  0.8067  0.8685  0.9129  0.9391  0.9478  0.9747  0.9900
+        D=4    0.7318  0.8104  0.8717  0.9201  0.9481  0.9577  0.9876  0.9998
+
+    0/20 splits clear 0.56 in ANY of those 24 cells, so on the honest background
+    eps* IS EMPTY, not zero.  Both ends moved, and not symmetrically: eps >= 0.5
+    DROPS off 1.0000 exactly as the depth argument predicts (the benign class now
+    has depth-2 drift notes), but eps = 0 gets WORSE by much more (0.5414 ->
+    0.7056), because the enriched benign class spreads on `size` and `depth`
+    while the payload is still sized to a depth-1, unrevised agent note.
+
+    So "eps* = 0" is a statement about `natural=False`, NOT about MatchedAttack.
+    Cross-checked against a number this module already publishes: the
+    `dist-matched` PENDING entry reports MatchedAttack on the primary
+    (natural, holdout) corpus at memory 0.7057 / 0.7618 / 0.7579, and the Delta=0
+    cell here reads 0.7056 on the same n_pos = 900.  Gate 2 certifies on the
+    `natural=False` corpus, so no gate moves and no pinned number moves -- but the
+    honest sentence is that THIS PIPELINE, the only one in REGISTRY, WOULD NOT
+    CLEAR 0.56 IF GATE 2 CERTIFIED ON THE NATURAL BACKGROUND.  Which background
+    certification should use is a decision nothing in this repository has taken,
+    and it is not taken here.  Full tables: spikes/eps-ngan-sach-that.md SS5b.
+
+    ---- WHAT THE GATE-2 CERTIFICATE DOES NOT COVER ----
+
+    THE SAME CHANGE OPENED A SEPARABILITY CHANNEL OUTSIDE THE MEASURED FEATURE
+    SPACE, and this is the declaration of it.  `discriminator.F_MATCH` is
+    {size, depth, recency, derived}, which is EXACTLY `core.Item.surface()`.
+    `topic` IS NOT IN IT.  Before this change that was harmless: the payload
+    carried `task.topic`, byte-identical to the tag on every benign agent note,
+    so the topic axis held zero signal.  Now, wherever epsilon buys a strict
+    subset -- k = max(1, ceil(eps*m)) < m, which at eps* = 0 is EVERY topic with
+    m >= 2 -- the payload's tag is narrower than any note it hides among.
+
+    Measured on the SS5 corpus itself, against the zero-parameter rule "this
+    item's tag is a strict subset of some task topic of the workflow it sits in"
+    -- no model, no fit, no threshold, no split -- Mann-Whitney AUC:
+
+        eps      0.0               0.3               1.0
+        D=0    0.9492 (900/900)  0.9492 (900/900)  0.5047 (100/900)
+        D=2    0.9508 (826/826)  0.9500 (773/773)  0.4913 ( 39/504)
+        D=4    0.9457 (456/456)  0.9450 (409/409)  0.4579 (  5/202)
+
+    (the fraction is payloads flagged; the control false-positive rate is a flat
+    ~10%, benign notes whose own task topic is a strict subset of another task's
+    in the same workflow, which is why the number is 0.949 and not the 1.0 the
+    rule looks like it should give.)
+
+    So the honest statement of what SS5 certifies is: GATE 2 CERTIFIES
+    NON-DISTINGUISHABILITY OVER FOUR FEATURES AT AUC_upper = 0.5414, AND THIS
+    ATTACKER IS SEPARABLE ON A FIFTH AT AUC 0.9492 -- a 0.41 gap between the
+    measured criterion and an unmeasured one, WIDEST at the exact epsilon the
+    published eps* is read off, and closing only at eps = 1.0, where the payload
+    stops narrowing its tag.
+
+    This is the shape the `frozen-payload` PENDING entry already records -- "a
+    payload that varies depth is separable on an axis the benign class has no
+    spread on" -- arriving through `topic` instead of through `depth`.  It is
+    recorded rather than tuned away for the reason that entry gives: the F_match
+    criterion is what it is, and a channel it cannot see is a LIMIT OF THE
+    CRITERION, not a result about the attacker.  Pinned by
+    tests/gate2_validity/test_matched_epsilon_budget.py::
+    TheTopicAxisIsOutsideTheMeasuredFeatureSpace, and written up as limit 6 of
+    spikes/eps-ngan-sach-that.md SS9.
+
     `requires_graded_retrieval` STAYS FALSE, and the reasoning is not "so the
     mock keeps working".  The flag means MEANINGLESS on an exact dataset
     (`_scope_admits`, datasets.py): a pipeline whose only epsilon surface is
     retrieval reports a fake harm of 0 at every eps < 1 there, which is
-    GradedAttack.  This pipeline keeps a two-ended budget on an exact dataset --
-    `size` really moves and `provenance` really steps -- and on a one-token topic
-    payload_topic_like is the identity, so nothing it reports on the mock is
-    fake; what it loses there is the retrieval surface, which is a property of
-    the DATASET and is already declared by `topic_kind`.  Flipping the flag would
-    empty `usable_with("exact")` -- there is no other registered pipeline -- and
-    put every mock cell out of scope to record a limitation the dataset already
-    records.  The claim is asserted, not argued:
-    tests/gate2_validity/test_matched_epsilon_budget.py::TheScopeStaysTruthful.
+    GradedAttack.  This pipeline still reports REAL numbers on an exact dataset:
+    `size` really moves with epsilon, `provenance` really steps at 0.5, and on a
+    one-token topic payload_topic_like is the IDENTITY, so nothing it reports on
+    the mock is fake.  What it loses there is the retrieval surface, which is a
+    property of the DATASET and is already declared by `topic_kind`.
+
+    AND ON THE MOCK, EPSILON IS STILL A ONE-WAY KNOB.  Earlier drafts of this
+    paragraph said MatchedAttack "keeps a TWO-ENDED budget on an exact dataset",
+    which equivocates on "two ends": `size` up and `provenance` up are two COST
+    ends, not a fail end and a spend end.  With sim = 1.0 at every epsilon there
+    is NO FAILING END on the mock -- which is precisely what VerbosityAttack is
+    disqualified for ("a budget that can only spend is not a budget").  So the
+    honest sentence is the narrow one: THE eps* CALIBRATION REMAINS A TAUTOLOGY
+    ON AN EXACT DATASET; the flag stays False because the flag means something
+    narrower than that -- it means the pipeline would report a FAKE harm of 0
+    there, and this one does not.  Flipping it would empty `usable_with("exact")`
+    -- there is no other registered pipeline -- and put every mock cell out of
+    scope to record a limitation `topic_kind` already records.  What
+    tests/gate2_validity/test_matched_epsilon_budget.py::TheScopeStaysTruthful
+    asserts is exactly the two COST ends and the registry membership, and its
+    tests are now named for that rather than for the wider sentence.
 
     Content strings are Vietnamese ON PURPOSE, and it is not an oversight of the
     English-identifier rule: the payload has to look like the agent's own output,
@@ -309,6 +396,25 @@ class MatchedAttack:
     #: held-out AUC 0.858 at Delta=2 and 0.856 at Delta=4, and NO epsilon in the
     #: screening grid reached the ceiling at all.  14 + len(task_id) is 23 for
     #: every mock task, so no recorded mock number moves.
+    #:
+    #: THE NUMBER IS THE MEMORY TEMPLATE'S, AND `scope()` DECLARES ALL FOUR
+    #: CARRIERS.  Counted off agent.py, the fixed characters are memory 14,
+    #: queue 16, skill 20, branch 10 -- so on skill the payload is 6 characters
+    #: short of the note it claims to imitate, on queue 2 short, and on branch 4
+    #: LONG.  The claim "the length is read off the note being imitated" is
+    #: therefore EXACT for carrier="memory" and APPROXIMATE for the other three,
+    #: and it is scoped here rather than left to read as universal.  Pre-existing
+    #: (the constant predates the carrier opening) and conservative in direction
+    #: on the three that are short -- a payload a few characters short of its
+    #: note is easier to separate, so any AUC it produces is an UPPER bound on
+    #: what a carrier-aware constant would produce -- but it is a real,
+    #: unmeasured offset.  Every AUC in spikes/eps-ngan-sach-that.md is a
+    #: carrier="memory" number, where the offset is zero, and
+    #: TheSizeIsTheAgentNoteItImitates exercises memory only, which is the scope
+    #: of what it proves.  Making it exact for all four means reading the
+    #: template per carrier, which moves the branch numbers the `dist-matched`
+    #: PENDING entry publishes; that is a measurement task, not a comment, and it
+    #: is not done here.
     _AGENT_TEMPLATE_CHARS = 14
     #: len(legacy payload) - len(topic), i.e. how far "blatant" is from "matched".
     _BLATANT_EXTRA = 50
@@ -326,13 +432,23 @@ class MatchedAttack:
         task = wf.tasks[ps.sigma]
         eps = max(0.0, min(1.0, ps.epsilon))
 
-        # THE UPSIDE OF THE BUDGET, which this pipeline did not have.  `topic`
-        # used to be `task.topic` -- sigma's WHOLE topic -- so sim(topic,
-        # task.topic) was 1.0 at every epsilon and the payload was retrieved at
-        # eps=0 exactly as at eps=1.  Epsilon was then pure COST: it bought size
-        # and provenance and nothing else, which makes eps* = 0 a tautology
-        # rather than a calibration ("of course spend nothing, when spending buys
-        # nothing").  `payload_topic_like` is the same function GradedAttack
+        # THE UPSIDE OF THE BUDGET, which this pipeline did not have ON THE AUC
+        # CORPUS.  `topic` used to be `task.topic` -- sigma's WHOLE topic -- so
+        # sim(topic, task.topic) was 1.0 at every epsilon and the payload was
+        # retrieved at eps=0 exactly as at eps=1.  Epsilon was then pure COST: it
+        # bought size and provenance and nothing else, which makes eps* = 0 a
+        # tautology rather than a calibration ("of course spend nothing, when
+        # spending buys nothing").
+        #
+        # SCOPE OF THAT SENTENCE, because the unqualified version overstates it.
+        # It was true of `analysis.benign_corpus.matched_corpus` -- the AUC
+        # corpus -- and of NOTHING ELSE.  The EXPERIMENT path never had the
+        # defect: `runner.run_once` injects through `build.inject`, which has
+        # called `payload_topic_like` since before a2bfa20, so on that path
+        # epsilon always governed retrieval and this line moves no cell of RQ1.
+        # That is also why the end-to-end md5 invariance across this change was
+        # near-trivially guaranteed rather than a meaningful check: the bytes it
+        # hashes were never routed through the expression being fixed.  `payload_topic_like` is the same function GradedAttack
         # already uses and the same one `build.plan_poison` and
         # `benign_corpus.feasible_sigmas` ALREADY ask their dormancy question
         # about -- so before this line those two decided dormancy for a topic the
