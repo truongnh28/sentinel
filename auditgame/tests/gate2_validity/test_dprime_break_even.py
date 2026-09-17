@@ -230,6 +230,7 @@ class TauSelFollowsTheSweptDPrime(unittest.TestCase):
         self.assertEqual([setting for _, setting in pinned], [S.SETTING] * 3,
                          "the default mode stopped reading the frozen `mid` row")
 
+
 class TheDeclaredConfoundIsInertForThisDeltaHarmPair(unittest.TestCase):
     """The measured answer to "how much did the pinned tau_sel cost us".
 

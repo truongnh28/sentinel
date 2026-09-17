@@ -88,6 +88,16 @@ class AddingRowsCannotMoveTheRowsAlreadyThere(unittest.TestCase):
         shared across settings, or the d'-keyed rows moved ahead of the declared
         ones.  Compared against the COMMITTED file, not against a second run of
         the same code, so it survives a wholesale rewrite of the generator.
+
+        WHAT THIS DOES NOT COVER, said here so nobody reads it as more than it
+        is.  It pins the n = 0 / n = 1 PREFIX of each legacy table -- the first
+        cells the stream feeds -- so a shared RNG, a reordered registry, a
+        changed seed, a changed M and a changed aggregation rule all land on it.
+        A hand-edit DEEPER in a frozen table (say at n = 15) passes here
+        untouched.  The COMPLETE pin is `python3 reference/gen_score_table.py
+        --check`, which rebuilds all 19 tables and compares every cell -- ~23
+        minutes, which is why it cannot live in the suite.  This test is the
+        fast tripwire, not the full check.
         """
         truncated = _build_with_n_max(1)
         for name in LEGACY:
@@ -98,15 +108,6 @@ class AddingRowsCannotMoveTheRowsAlreadyThere(unittest.TestCase):
                     f"[{name}] the extended generator no longer reproduces the "
                     f"committed n=0/n=1 rows: the frozen table moved under what "
                     f"was supposed to be an additive change")
-
-    # WHAT THIS DOES NOT COVER, said here so nobody reads it as more than it is.
-    # It pins the n = 0 / n = 1 PREFIX of each legacy table -- the first cells the
-    # stream feeds -- so a shared RNG, a reordered registry, a changed seed, a
-    # changed M and a changed aggregation rule all land on it.  A hand-edit DEEPER
-    # in a frozen table (say at n = 15) passes here untouched.  The COMPLETE pin is
-    # `python3 reference/gen_score_table.py --check`, which rebuilds all 19 tables
-    # and compares every cell -- ~23 minutes, which is why it cannot live in the
-    # suite.  This test is the fast tripwire, not the full check.
 
     def test_the_frozen_settings_keep_their_declared_psi_and_phi_pair(self):
         """weak/mid/strong stay keyed by (psi, phi), not by d'.

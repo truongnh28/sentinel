@@ -19,11 +19,34 @@ trong khi detector chạy theo `d′` quét. Hai hệ quả bị treo lại:
    - **(a) cơ chế thật**: đảo chiều **SỐNG SÓT** khi `tau_sel` chạy theo `d′`;
    - **(b) artefact**: đảo chiều **biến mất hoặc yếu đi đáng kể**.
 
-Luật phán quyết được **chốt trước** khi chạy phép đo mới (xem báo cáo
-`.superpowers/sdd/task-tausel-report.md` §0): gọi
-`D = Δharm(d′=3.0) − Δharm(d′=0.0)` là **độ tụt** dọc lưới ở `Δ = 0`; đọc **(a)**
-khi `D_mới < 0` và `|D_mới| ≥ 0.5·|D_cũ|`, đọc **(b)** khi `D_mới ≥ 0` hoặc
-`|D_mới| < 0.5·|D_cũ|`.
+### 1.1 Tiền-đăng-ký — luật phán quyết, chốt TRƯỚC khi đo, chép nguyên văn vào đây
+
+Luật dưới đây được viết và đóng dấu thời gian **trước** khi phép quét ở chế độ mới
+được chạy: lúc đó phép sinh bảng tham chiếu còn đang chạy và **chưa tồn tại một
+con số nào** của chế độ mới. Dự án đã một lần bị bỏng vì chọn luật tóm tắt *sau*
+khi nhìn thấy dữ liệu (finding **P7**), nên luật được chép **nguyên văn vào chính
+artefact được commit này** — không phải chỉ trỏ đi nơi khác — để nó không thể bị
+dịch chuyển về sau và để người đọc chỉ có repository vẫn kiểm được nó.
+
+> **TIỀN-ĐĂNG-KÝ (chốt trước phép đo).** Trên đúng mặc định đã công bố của module
+> (`--n 40 --H 8 --budget 17.95 --seeds 3`, corpus seed `2026`).
+>
+> Gọi `D_cũ = Δharm_cũ(d′=3.0) − Δharm_cũ(d′=0.0)` và
+> `D_mới = Δharm_mới(d′=3.0) − Δharm_mới(d′=0.0)` là **độ tụt** dọc lưới ở `Δ = 0`
+> (âm = đảo chiều: audit tốt lên làm Sentinel **tệ đi**).
+>
+> * Đọc **(a) SỐNG SÓT** ⟺ ở chế độ mới: (i) `Δharm_mới(d′) < 0` trên **nửa trên**
+>   của lưới, **và** (ii) `D_mới < 0`, **và** (iii) `|D_mới| ≥ 0.5·|D_cũ|`.
+> * Đọc **(b) ARTEFACT / yếu đi đáng kể** ⟺ `D_mới ≥ 0` (độ tụt mất hẳn hoặc đổi
+>   dấu) **hoặc** `|D_mới| < 0.5·|D_cũ|` (mất ít nhất một nửa độ lớn).
+>
+> Mức cắt **50%** là ranh giới giữa *"vẫn là phát hiện cũ, chỉ nhạt đi"* và *"phát
+> hiện đó phần lớn là do ngưỡng bị ghim"*. Nó được phát biểu ở đây để về sau không
+> ai dịch được nó.
+
+*(Bản gốc của khối trên là §0 của nhật ký công việc `task-tausel-report.md`, nằm
+dưới `.superpowers/sdd/` — thư mục đó **gitignored, không đi kèm repository**. Bản
+trong tài liệu này là bản có hiệu lực cho mọi người đọc chỉ có repo.)*
 
 > **Đọc §5 trước khi dùng luật này.** Luật trên **vô hiệu** ở đây: nó ngầm giả định
 > `tau_sel` có đường đi tới cặp policy định nghĩa `Δharm`, và §6 cho thấy **không
@@ -153,10 +176,20 @@ Theo đúng định nghĩa `d′*` đã chốt trong `dprime_sweep.break_even()`
 | **2** | **2.55** (lưới thô **2.60**, mịn hoá kéo xuống 2.55) | **2.60** (không mịn hoá được) | KHÔNG → KHÔNG |
 | **4** | **0.60** | **0.60** | CÓ → CÓ |
 
-**Ô `Δ = 2` không hề dịch.** Trên **cùng một lưới thô**, cả hai chế độ đều cho
-`d′* = 2.60`; chênh lệch 2.55 ↔ 2.60 **hoàn toàn** là do chế độ mới không chạy bước
-mịn hoá 0,05, không phải do ngưỡng đổi. Nghi vấn *"`d′* ≈ 2.5` là artefact của
-`tau_sel` ghim"* — **bác bỏ**.
+**Ô `Δ = 2` không hề dịch — nhưng ĐỪNG đọc sự trùng khớp này như bằng chứng.**
+Trên **cùng một lưới thô**, cả hai chế độ đều cho `d′* = 2.60`, và chênh lệch
+2.55 ↔ 2.60 chỉ là do chế độ mới không chạy được bước mịn hoá 0,05 (§3) — một
+giới hạn **độ phân giải**, không phải một hiệu ứng của ngưỡng. Nhưng hai cột trên
+**BUỘC PHẢI** trùng nhau: §6 chứng minh `tau_sel` **không có đường đi nào** tới
+`B1 audit-at-commit` lẫn `Sentinel` — đúng cặp policy mà `Δharm`, và do đó `d′*`,
+được định nghĩa qua. **Một phép thử không thể trượt thì không phải bằng chứng**,
+nên bảng đo ở trên **tự nó không chứng minh được gì** về confound.
+
+Nghi vấn *"`d′* ≈ 2.5` ở `Δ = 2` là artefact của `tau_sel` ghim"* vẫn **bị bác
+bỏ** — nhưng bác bỏ **BẰNG CẤU TRÚC** (§6: không tồn tại đường cho confound đi
+qua, nên nó **không thể** đã đặt `d′*`), **không** phải bằng việc hai chế độ đo ra
+cùng một số. Ranh giới chính xác của cái spike này xác lập nằm ở hộp phán quyết
+§5; đọc nó trước khi trích ô này.
 
 ---
 
@@ -209,20 +242,32 @@ mịn hoá 0,05, không phải do ngưỡng đổi. Nghi vấn *"`d′* ≈ 2.5`
 >    âm thêm khi audit tốt lên **vẫn chưa được giải thích**, vẫn là câu hỏi mở — chỉ
 >    là **bớt đi một nghi can**.
 
-**Tiên nghiệm −37% đứng ở đâu — không phải mâu thuẫn, cũng không phải "xác nhận
-mạnh hơn".** Con số **−37%** ghi trong đề bài đến từ run `rc-20260915`, **một
-codebase KHÁC** không hề có cấu trúc `tau_sel` này, và nó là **độ lớn phần THIỆT
-của Sentinel tại `Δ = 0`** — một kết quả **harm**, **không** phải một phép đo độ
-nhạy với ngưỡng. Vậy nên nó **không** nghịch với con số 0% ở đây (hai bên đo **hai
-đại lượng khác nhau**, đặt cạnh nhau là so sai đơn vị), và cũng **không** phải là
-"được xác nhận theo hướng mạnh hơn". Chỗ đứng đúng của nó: đó là **bằng chứng dương
-DUY NHẤT** hiện có cho cách đọc (a), và vì đến từ **một hiện thực độc lập**, nó là
-**chứng cứ hỗ trợ mà confound của codebase này không thể giải thích đi được**. Muốn
-phân định (a)/(b) thật sự thì phải can thiệp vào một đường **đang sống** đối với cặp
-`(B1, Sentinel)` — việc đó chưa có ai làm.
-
 Ba ô còn lại cũng trùng từng chữ số — xem §6 để biết vì sao, vì đó mới là kết quả
 thật sự của spike này.
+
+### 5.1 Tiên nghiệm −37% đứng ở đâu — nguồn đầy đủ, vì nó là bằng chứng dương DUY NHẤT
+
+Con số **−37%** **không** phải một phép đo của codebase này. Vì cách đọc (a) hiện
+chỉ còn dựa vào nó, nguồn được ghi đủ ngay tại đây:
+
+| | |
+|---|---|
+| **Run** | `rc-20260915-032257-35131b` (AutoResearchClaw) — 23 stage, 475 file; artefact gốc ở `~/Opensource/AutoResearchClaw/artifacts/rc-20260915-032257-35131b`, **ngoài repo này** |
+| **Bản đối chiếu TRONG repo** | `HCMUT/261-Master-Proposal-Analysis/Doi-chieu-voi-research-run-rc20260915.md` §1.1, bảng *"Ranh giới chế độ nằm ở Δ ≈ 2"*, dòng `research run`, cột `Δ = 0` |
+| **Nó đo cái gì** | **độ lớn phần THIỆT của Sentinel tại `Δ = 0`** — một kết quả **harm**, **KHÔNG** phải phép đo độ nhạy của kết quả với ngưỡng `tau_sel` |
+| **Quan hệ với codebase này** | một **hiện thực độc lập**, khác ngôn ngữ, khác tác giả, khác tham số, và **không hề có cấu trúc `tau_sel`** đang bàn ở đây |
+| **Cùng ô, phiên này đo** | **−17,8%** (cùng bảng, dòng *"phiên này (4 carrier)"*) — **cùng dấu**, khác độ lớn |
+| **Độ tin cậy, phải khai** | chính bản đối chiếu §0 chấm run đó **3/10** và chốt quy tắc dùng: *lưới `stage-13` dùng được để đối chiếu **ĐỊNH HƯỚNG**, mọi vô hướng toàn cục thì không*. `−37%` là một ô của lưới đó ⇒ nó là bằng chứng về **DẤU**, không phải về **độ lớn** |
+
+**Vì vậy:** nó **không** nghịch với con số 0% ở đây (hai bên đo **hai đại lượng
+khác nhau** — một bên là phần thiệt, một bên là độ nhạy với ngưỡng; đặt cạnh nhau
+là so sai đơn vị), và cũng **không** phải là "được xác nhận theo hướng mạnh hơn".
+Chỗ đứng đúng của nó: **bằng chứng dương DUY NHẤT** hiện có cho cách đọc (a) —
+**bằng chứng về dấu, từ một hiện thực độc lập**, nên là chứng cứ hỗ trợ mà confound
+của codebase này **không thể** giải thích đi được. Muốn phân định (a)/(b) thật sự
+thì phải can thiệp vào một đường **đang sống** đối với cặp `(B1, Sentinel)` — việc
+đó chưa có ai làm.
+
 
 ---
 
@@ -345,6 +390,12 @@ for dp in (1.0, 3.0):
                       S.make_detector(dp), ag, 17.95, (1,2,3), setting).harm, 4))
         print(dp, pol, hs)
 EOF
+
+# §5.1  tiên nghiệm −37%: KHÔNG có lệnh nào ở repo này sinh ra nó — đó là số của
+#       một run NGOÀI (`rc-20260915-032257-35131b`).  Tra trong repo:
+#       HCMUT/261-Master-Proposal-Analysis/Doi-chieu-voi-research-run-rc20260915.md
+#       §1.1 — dòng "research run" cột Δ=0 (−37%), dòng "phiên này" (−17,8%),
+#       và §0 cho quy tắc "chỉ dùng lưới stage-13 theo ĐỊNH HƯỚNG".
 
 python3 tests/run_all.py
 ```
