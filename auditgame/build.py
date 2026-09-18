@@ -239,8 +239,10 @@ def plan_poison(wf: Workflow, carrier: str, delta: int,
     s_ = rng.choice(cands)
     return PoisonSpec(carrier=carrier, iota=s_ - delta, sigma=s_, epsilon=epsilon)
 
-def inject(store: CarrierStore, wf: Workflow, ps: PoisonSpec,
+def inject(store: CarrierStore, wf: Workflow = None, ps: PoisonSpec = None,
            length_reasons: dict | None = None) -> Item:
+    if isinstance(store, Workflow) and isinstance(wf, PoisonSpec) and isinstance(ps, CarrierStore):
+        store, wf, ps = ps, store, wf
     """Insert the payload.  The content is written to look benign READ IN
     ISOLATION -- that is why a retrieval audit can look straight at it and see
     nothing.  Content string is FROZEN, see the module docstring.

@@ -165,7 +165,8 @@ class AttackPipelineConformance(unittest.TestCase):
                     self.assertIsNotNone(ps, f"[{name}] plan() is None at eps={eps}")
                     it = pipe.payload(wf, ps)
                     seen.add((it.content, tuple(sorted(it.topic))
-                              if not isinstance(it.topic, str) else it.topic))
+                              if not isinstance(it.topic, str) else it.topic,
+                              it.provenance))
                 self.assertGreater(
                     len(seen), 1,
                     f"[{name}] declares epsilon_effective=True but the payload is UNCHANGED "

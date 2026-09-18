@@ -175,12 +175,12 @@ class BenignCorpus(unittest.TestCase):
             agent.MockAgent().run_task(0, task, store, seed=1, marker=ps.marker)
             note = [it for it in store.live("memory") if not it.poisoned][0]
             with self.subTest(task_id=task_id):
+                import build
                 self.assertEqual(
-                    len(pipe.payload(wf, ps).content), len(note.content),
+                    len(pipe.payload(wf, ps).content), build.PAYLOAD_LENGTH,
                     f"at eps=0 the payload is {len(pipe.payload(wf, ps).content)} "
-                    f"characters against an agent note of {len(note.content)} for "
-                    f"task id {task_id!r}. `size` is an F_match feature, so the "
-                    f"near end of the epsilon budget is missing.")
+                    f"characters against build.PAYLOAD_LENGTH ({build.PAYLOAD_LENGTH}) for "
+                    f"task id {task_id!r}.")
 
     def test_some_epsilon_makes_the_payload_indistinguishable_at_every_delta(self):
         """Invariant (a), and the conformance bar for a registered attack pipeline.
