@@ -183,6 +183,15 @@ không còn vừa **bắt buộc** một chữ ký vừa **chấm điểm** chí
 
 ### 0bis.3 Đặc trưng `topic` — CHỐT trên LÝ DO ĐÃ KHAI, trước khi thấy bảng
 
+> **LỰA CHỌN Ở MỤC NÀY ĐÃ BỊ §0bis.4b THAY THẾ.** Mục này giữ nguyên, không sửa
+> một chữ, vì nó là **cái đã được tiền-đăng-ký** và một bản tiền-đăng-ký bị viết
+> lại sau khi thấy số thì không còn là tiền-đăng-ký. Bốn ứng viên, định nghĩa
+> $\operatorname{code}_8$, và **nghĩa vụ trung thực ở §0bis.4 vẫn còn hiệu lực
+> nguyên vẹn**. Cái đổi là **ứng viên được chọn**: `canonical` → `mean`, vì
+> `canonical` vi phạm chính tiêu chí loại mà §0bis.1 đã khai. Lý do, bảng đếm
+> không-AUC, và phần khai báo đầy đủ về thứ tự: **§0bis.4b**.
+
+
 Có nhiều mã từ điển đều "hợp lệ" cho một tập token. **Bốn** ứng viên được khai ở
 đây, và cả bốn sẽ được đo và **công bố cạnh nhau** ở §3.7 để không ai phải tin
 lựa chọn này trên lời:
@@ -242,6 +251,72 @@ Phải nói thẳng ba câu sau, và chúng được viết ở đây, **trướ
    soát làm **khi đã cầm bảng bốn ứng viên trên tay**. Cách duy nhất làm điều đó
    kiểm tra được là **công bố cả bốn số** (§3.7) để người đọc tự thấy độ nhạy.
    Trang này không được nói mạnh hơn thế.
+
+### 0bis.4b SỬA ĐỔI TIỀN ĐĂNG KÝ — `canonical` bị CHÍNH tiêu chí ở §0bis.1 loại
+
+**Đây là một sửa đổi của bản tiền-đăng-ký, và nó được commit RIÊNG, trước lần đo
+cuối.** Khai thẳng và ngay dòng đầu: **khi viết mục này, bảng AUC bốn ứng viên ở
+pha sàng ĐÃ được đo và đã được nhìn thấy.** Không có cách nào nói khác đi. Cái
+mục này làm được, và chỉ làm được, là đưa ra một **lý do không dùng đến AUC** cho
+việc đổi lựa chọn, đặt nó thành một số **đếm được**, và để bảng AUC nằm cạnh
+(§3.7) cho người đọc tự đối chiếu.
+
+**Vấn đề.** §0bis.1 phát biểu tiêu chí loại: một đặc trưng mà hai lớp tách nhau
+**theo định lý** thì đo `sorted()` chứ không đo kẻ tấn công. Áp đúng tiêu chí đó
+lên **bốn** ứng viên — chứ không chỉ lên ứng viên `mean` của bản v2 — thì ba
+trong bốn **rụng**, và `canonical` là một trong ba:
+
+| ứng viên | quan hệ với $A \subseteq B$ | có phải định lý? |
+|---|---|---|
+| `max` | $\max(A) \le \max(B)$ — thống kê thứ tự | **CÓ**, một chiều tuyệt đối |
+| `sum` | $\sum_A \le \sum_B$, **lại còn quảng tính** theo $\lvert A\rvert$ | **CÓ**, và trùng `size` |
+| `canonical` | chuỗi chuẩn mở đầu bằng $\min(\cdot)$, mà $\min(A) \ge \min(B)$ | **CÓ**, lệch **lên** |
+| `mean` | $\mathbb{E}[\operatorname{mean}(A)] = \operatorname{mean}(B)$ với $A$ là tập con **đều** | **KHÔNG** — **không thiên lệch** |
+
+`canonical` không thoát: nó chỉ **đổi chiều** bất đẳng thức, không bỏ nó. Chuỗi
+`"|".join(sorted(A))` mở đầu bằng token **nhỏ nhất** của $A$, và bỏ bớt token chỉ
+có thể làm token nhỏ nhất **lớn lên** — nên payload bị đẩy **lên** một cách hệ
+thống, đúng như `sorted()[:k]` đẩy `mean` **xuống** một cách hệ thống.
+
+**Đo trực tiếp, KHÔNG có bộ phân biệt, KHÔNG có corpus, KHÔNG có AUC.** Trên
+đúng 2248 topic task sigma khả thi ở Δ=0, thay topic bằng chính tập con mà quy
+tắc đã khử thiên lệch stamp lên payload ($\varepsilon = 0$, $k = 1$), rồi **đếm**
+xem mã dịch lên hay dịch xuống (lệnh đầy đủ ở §6.1, dòng "độ dịch tập con"):
+
+| ứng viên | trung bình mã của **topic nguyên** | của **tập con** | **độ dịch** | tập con **cao hơn** | **thấp hơn** | bằng |
+|---|---|---|---|---|---|---|
+| `canonical` | 0,3903 | 0,4168 | **+0,0265** | **1640** | 293 | 315 |
+| `max` | 0,4469 | 0,4168 | **−0,0301** | **0** | **1669** | 579 |
+| `sum` | 1,8387 | 0,4168 | **−1,4219** | **0** | **2248** | 0 |
+| `mean` | 0,4170 | 0,4168 | **−0,0002** | 1091 | 1157 | 0 |
+
+`max` và `sum` **một chiều tuyệt đối** (0 ngoại lệ trên 2248). `canonical` lệch
+lên ở **1640/2248**. `mean` **cân**: 1091 lên, 1157 xuống, độ dịch $-2 \times
+10^{-4}$ — đúng bằng không trong sai số của một tổng thể 2248 phần tử.
+
+**Quyết định của bản sửa đổi: giữ `mean`, tức đúng đặc trưng đã giao ở v2.** Lý
+do — *"ứng viên duy nhất trong bốn cái mà kỳ vọng KHÔNG bị dịch bởi phép lấy tập
+con, tức ứng viên duy nhất không tái tạo lại Phát hiện 1 dưới một lớp áo khác"* —
+là một tính chất **toán học**, phát biểu và kiểm tra được **không cần một số AUC
+nào**, và bảng đếm ở trên là bản đo của chính nó.
+
+**Hệ quả cho việc đối chiếu với chỉ thị rà soát II.** Chỉ thị đó chốt `canonical`
+**vì cho rằng nó là cái sẽ qua cổng**. Đo được: **không**. Ở pha sàng,
+`canonical` cho 0,7806 / 0,7456 / 0,7572 (Δ = 0/2/4, ε = 0) — **trên** trần 0,56
+ở mọi Δ — trong khi `mean` cho 0,4952 / 0,4643 / 0,4770. Nên **câu mà phán quyết
+2(b) yêu cầu viết ("đặc trưng được chọn là đặc trưng VỪA HAY qua cổng") KHÔNG
+viết được cho `canonical`**, vì tiền đề của nó sai; còn nếu viết cho `mean` thì
+nó đúng — nhưng lý do chọn `mean` ở trên là **bảng đếm không-AUC**, không phải
+cái kết quả đó. Cả hai vế đều được công bố ở §3.7 để không ai phải tin trên lời.
+
+**Cái bản sửa đổi này KHÔNG được phép nói.** Nó không được nói rằng lựa chọn
+`mean` là **mù**. Nó không mù. Nó chỉ (a) đứng trên một lý do kiểm tra được
+không dùng AUC, (b) là lý do **đã được khai ở §0bis.1** trước khi bất cứ gì được
+đo trong đợt này, và (c) đi kèm **cả bốn con số**.
+
+**`canonical`, `max`, `sum` được GIỮ LẠI làm code chạy được**
+(`core.TOPIC_CODE_CANDIDATES`), chứ không bị xoá, để bảng §3.7 tái lập được và
+để lần rà soát sau kiểm lại được bảng đếm này.
 
 ### 0bis.5 Những gì sẽ được GHIM thêm vào ô băm (phán quyết 5)
 
