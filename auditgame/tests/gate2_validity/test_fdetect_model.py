@@ -117,6 +117,19 @@ class MIsV1Alone(unittest.TestCase):
             self.assertEqual(fdetect.m(it, j), 0.21,
                              f"a benign item was pushed off the judge's value: {it.item_id}")
 
+    def test_v1_refuses_when_the_repository_context_is_missing(self):
+        """A judge that cannot see the repository is scoring prose plausibility --
+        level 2 in disguise, which the pre-registration disqualified structurally."""
+        class ContextRequiringJudge:
+            requires_context = True
+            def violation(self, item): return 0.5
+
+        item_without_context = Item(carrier="memory", topic="orm", content="c", created_at=0,
+                                    provenance="agent/notes", poisoned=False)
+        judge = ContextRequiringJudge()
+        with self.assertRaises(fdetect.NotMeasured):
+            fdetect.v1(item_without_context, judge)
+
     def test_v3_is_not_implemented_and_the_reason_is_recorded(self):
         """v3 (lineage) is DROPPED.  A dropped component with no recorded reason
         is indistinguishable from a forgotten one."""
