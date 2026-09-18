@@ -1,16 +1,31 @@
 {
   "generated_by": "analysis/gate2_v2.py::write",
-  "md5": "d7e7124eb3a46dfe64d9f205850504d9",
+  "md5": "45274180520227436a90f03ca1dd21db",
   "record": {
     "ceiling": 0.56,
     "corpus": {
       "carrier": "memory",
       "corpus_seed": 20260916,
       "h": 8,
+      "holdout": null,
+      "natural": false,
+      "per_event": 4,
       "pool": "full"
     },
     "criterion": "mean_ci95_upper_over_split_seeds",
     "date": "2026-09-18",
+    "deltas": [
+      0,
+      2,
+      4
+    ],
+    "epsilon_grid": [
+      0.0,
+      0.2,
+      0.4,
+      0.7,
+      1.0
+    ],
     "event_seed_rule": "seed_of(SEED, 'one_event', wf.wf_id) & 0xFFFF",
     "features": [
       "depth",
@@ -19,7 +34,13 @@
       "size",
       "topic"
     ],
+    "n_events": {
+      "certify": 900,
+      "screen": 80
+    },
     "payload_length_L": 63,
+    "payload_length_rule": "len(content) == payload_length_L exactly when len(payload_tag(topic)) < payload_length_L; otherwise the payload is the tag alone and build.payload_length_reason(topic) states why",
+    "screen_criterion": "median_point_estimate_over_split_seeds <= ceiling at EVERY delta; eps_star = max passing epsilon",
     "split_seeds": [
       1,
       2,
@@ -44,6 +65,7 @@
     ],
     "test_fraction": 0.4,
     "theta": 0.5,
+    "topic_feature": "mean",
     "verdict": "NOT DRAWN -- certification is a separate step",
     "version": 2
   },

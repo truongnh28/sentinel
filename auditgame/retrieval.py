@@ -138,25 +138,73 @@ def retrieved(item_topic: Topic, task_topic: Topic, theta: float) -> bool:
     return sim(item_topic, task_topic) >= theta
 
 
+def subset_priority(target: Topic, token: str) -> int:
+    """The de-biased order `payload_topic` picks its k tokens in.
+
+    A pseudorandom but DETERMINISTIC priority, drawn through `core.seed_of` --
+    blake2b over a string, never `hash()`, never a frozenset's iteration order.
+    Two tokens of the same target never tie in practice, and `payload_topic`
+    tie-breaks on the token itself anyway, so the order is total.
+
+    WHY IT IS KEYED ON `str(target)` AS WELL AS ON THE TOKEN.  A priority that
+    depended on the token alone would be ONE fixed pseudorandom permutation of the
+    whole token universe: still uncorrelated with the alphabet, but the same token
+    would be preferred (or skipped) in every topic it appears in, which is a
+    global signature of its own.  Keying on the target makes the draw independent
+    across topics.  `str(target)` is `Topic.__str__`, the canonical
+    `"|".join(sorted(...))` form, so the key does not move with PYTHONHASHSEED.
+
+    `core` is imported HERE rather than at module scope because `core` imports
+    `retrieval` at module scope; the deferred import resolves at call time, by
+    which point both modules exist.  Duplicating blake2b here instead would give
+    the project two seeding rules, which is the thing `seed_of` exists to prevent.
+    """
+    import core
+    return core.seed_of("payload_topic", str(target), token)
+
+
 def payload_topic(target: Topic, eps: float) -> Topic:
     """Token set the attacker picks for the payload -- a SUBSET of task sigma's.
 
-    |A| = ceil(eps * |B|), taken in SORTED order: deterministic, no sampling.
+    |A| = ceil(eps * |B|), taken in a DETERMINISTIC PSEUDORANDOM order
+    (`subset_priority`): reproducible, no sampling, and -- unlike the sorted order
+    this used to take -- UNCORRELATED WITH THE ALPHABET.
 
-    It must be a subset.  Adding tokens OUTSIDE the target inflates the Jaccard
+    WHY THE SORTED ORDER HAD TO GO, stated here because the change looks cosmetic
+    and is not.  This function used to return `Topic(sorted(target)[:k])`, the k
+    lexicographically SMALLEST tokens, and its own docstring gave the reason as
+    DETERMINISM ("taken in SORTED order: deterministic, no sampling").  Gate 2 v2
+    then added a lexicographic code as an F_match feature (`core.topic_code`).
+    Against a mean-of-token-codes feature the two decisions compose into a
+    THEOREM -- the mean of the k smallest codes never exceeds the mean of all of
+    them -- so the payload scored below the benign note it was cut from BY
+    CONSTRUCTION, and the gate's red cell was measuring `sorted()` rather than any
+    property of the attacker.  Review II ruling 1; the pre-registration is
+    spikes/cong-v2.md SS0bis, committed before the re-measurement.
+
+    The attack model never asked for the alphabet.  It asks for a SUBSET, and only
+    for a subset: adding tokens OUTSIDE the target inflates the Jaccard
     denominator and DROPS sim, so a larger eps would weaken the attack -- exactly
     backwards from "distinguishability budget".  Since A is a subset of B,
-    sim(A, B) = |A| / |B| ~= eps.
+    sim(A, B) = |A| / |B| ~= eps.  Every property the model and the old docstring
+    require survives the change: A is a subset, |A| = k, sim = k/m to the same
+    value at the same eps, the draw is deterministic across processes, and no
+    token from outside the target ever enters.
+
+    The subsets are also NESTED in eps -- the priority order is fixed per target,
+    so a larger k keeps every token a smaller k chose.  That is what keeps sim and
+    |A| monotone in epsilon (tests/gate1_integrity/test_retrieval.py pins both).
 
     Two opposing directions, and that is what makes it a budget:
         small eps -> few tokens -> low sim, may NOT clear theta -> attack fails
-        large eps -> surely retrieved, but a larger `size` feature, so EASIER to
-                     spot on F_match
+        large eps -> surely retrieved, but a wider tag on F_match, so EASIER to
+                     spot
     """
     if not target:
         return Topic()
     k = max(1, math.ceil(eps * len(target)))
-    return Topic(sorted(target)[:k])
+    order = sorted(target, key=lambda t: (subset_priority(target, t), t))
+    return Topic(order[:k])
 
 
 def payload_topic_like(target, eps):

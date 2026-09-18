@@ -110,8 +110,15 @@ class TopicJoinsTheMeasuredFeatureSpace(unittest.TestCase):
         """Being able to tell tokens apart is not enough: the discriminator is a
         LOGISTIC REGRESSION, i.e. monotone in each column, so a nominal
         fingerprint would be noise to it and the gate would be no harder at all.
-        The code is MONOTONE IN LEXICOGRAPHIC ORDER, which is what makes
-        `payload_topic`'s `sorted(target)[:k]` visible to it.
+        The code is MONOTONE IN LEXICOGRAPHIC ORDER of the canonical topic string,
+        so a column the discriminator can fit a weight on.
+
+        NOTE WHAT THIS TEST NO LONGER CLAIMS.  Until review II it was paired with
+        a test asserting that `sorted(target)[:k]` scores BELOW the topic it was
+        cut from -- which was true by theorem, not by measurement, and was the
+        artefact the red cell was reading.  Order is still required, for the
+        reason above; what is gone is the sorted subset rule that turned it into a
+        guaranteed separation.
 
         Thesis claim (vi): "ma token phai co THU TU, khong thi hoi quy tuyen tinh
         khong doc duoc".
@@ -122,27 +129,211 @@ class TopicJoinsTheMeasuredFeatureSpace(unittest.TestCase):
                          f"single-token codes are not lexicographically ordered: "
                          f"{vals}")
 
-    def test_a_strict_subset_taken_from_the_front_scores_below_the_whole_topic(self):
-        """The channel, at the shape the attacker actually produces.
-        `retrieval.payload_topic` keeps `sorted(target)[:k]`, the alphabetically
-        FIRST k tokens, while a benign agent note carries its task's WHOLE topic.
-        Under a lexicographically ordered code the payload therefore sits BELOW
-        the note, and that is the separability v2 puts inside the measured space.
+    def test_the_subset_rule_is_not_the_alphabetical_prefix(self):
+        """THE DE-BIASING, and the test that goes red if `sorted()` comes back.
 
-        Thesis claim (vi): "tag bi cat tu dau bang chu cai nen diem topic thap hon
-        ghi chu lanh -- va gio cong 2 NHIN THAY".
+        `retrieval.payload_topic` used to return `Topic(sorted(target)[:k])` -- the
+        k lexicographically SMALLEST tokens -- for the reason its own docstring
+        gave: DETERMINISM.  Composed with a lexicographic topic code, that made
+        `code(subset) <= code(whole)` a THEOREM rather than a measurement, so the
+        gate's certification cell was reading `sorted()` and not the attacker.
+        Review II ruling 1; pre-registered in spikes/cong-v2.md SS0bis.
+
+        A deterministic pseudorandom k-subset keeps every property the attack
+        model asks for and drops the one it never asked for.  On a topic whose
+        tokens are far apart in the alphabet, the rule must pick something OTHER
+        than the alphabetical prefix at least once across the grid -- otherwise
+        the priority is correlated with the alphabet again.
+
+        Thesis claim (vi): "tap con cua payload KHONG duoc la tien to bang chu
+        cai -- neu khong, cong do chinh `sorted()` chu khong do ke tan cong".
         """
-        whole = retrieval.Topic({"db", "django", "models", "query"})
-        for eps in (0.0, 0.25, 0.5, 0.75):
+        whole = retrieval.Topic({"alpha", "bravo", "delta", "echo", "golf",
+                                 "hotel", "india", "kilo"})
+        differs = False
+        for eps in (0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875):
             part = retrieval.payload_topic(whole, eps)
-            if len(part) == len(whole):
-                continue
-            with self.subTest(eps=eps, k=len(part)):
+            if set(part) != set(sorted(whole)[:len(part)]):
+                differs = True
+        self.assertTrue(
+            differs,
+            "payload_topic returned the alphabetical prefix at EVERY epsilon on "
+            "an 8-token topic. The subset rule is lexicographic again, so a "
+            "lexicographic topic feature separates the classes by theorem and "
+            "the certification cell measures sorted(), not MatchedAttack.")
+
+    def test_the_de_biased_rule_keeps_every_property_the_attack_model_requires(self):
+        """De-biasing must cost NOTHING the model or the old docstring relied on.
+
+        Five properties, all of them asserted rather than argued: the tag is a
+        SUBSET (so the Jaccard denominator is not inflated and a larger epsilon is
+        never weaker), |A| = ceil(eps*m), sim = k/m, the subsets are NESTED in
+        epsilon (which is what keeps sim and |A| monotone), and the draw is
+        reproducible -- `subset_priority` goes through `core.seed_of`, i.e.
+        blake2b over the canonical string, never `hash()`.
+
+        Thesis claim (vi): "khu thien lech ma KHONG mat mot tinh chat nao cua mo
+        hinh tan cong".
+        """
+        import math
+        whole = retrieval.Topic({"db", "django", "models", "query", "sql"})
+        m = len(whole)
+        prev = None
+        for eps in (0.0, 0.2, 0.4, 0.6, 0.8, 1.0):
+            with self.subTest(eps=eps):
+                a = retrieval.payload_topic(whole, eps)
+                k = max(1, math.ceil(eps * m))
+                self.assertTrue(a <= whole, "the tag is not a subset of sigma's topic")
+                self.assertEqual(len(a), k, "|A| != ceil(eps*|B|)")
+                self.assertAlmostEqual(retrieval.sim(a, whole), k / m, places=12)
+                if prev is not None:
+                    self.assertTrue(prev <= a,
+                                    f"subsets are not nested in epsilon: "
+                                    f"{sorted(prev)} -> {sorted(a)}")
+                prev = a
+                self.assertEqual(a, retrieval.payload_topic(whole, eps),
+                                 "the draw is not reproducible within a process")
+
+    def test_the_subset_rule_is_stable_across_PYTHONHASHSEED(self):
+        """The de-biased rule is the one place a `hash()` would be easiest to
+        reach for, and it would make every published AUC un-recheckable: the
+        payload's topic reaches `Item.__post_init__`, which hashes it into
+        `item_id`, which seeds `detector.score`.
+
+        Thesis claim (vi): "quy tac tap con phai on dinh qua PYTHONHASHSEED".
+        """
+        code = ("import sys; sys.path.insert(0, '.')\n"
+                "import retrieval\n"
+                "t = retrieval.Topic({'django', 'db', 'models', 'query', 'sql'})\n"
+                "print([sorted(retrieval.payload_topic(t, e))\n"
+                "       for e in (0.2, 0.4, 0.6, 0.8)])\n")
+        outs = set()
+        for h in ("0", "1", "424242"):
+            r = subprocess.run([sys.executable, "-c", code], capture_output=True,
+                               text=True, cwd=str(pathlib.Path(build.__file__).parent),
+                               env={"PYTHONHASHSEED": h, "PATH": "/usr/bin:/bin"})
+            self.assertEqual(r.returncode, 0, f"run failed at HASHSEED={h}: "
+                                              f"{r.stderr[-400:]}")
+            outs.add(r.stdout)
+        self.assertEqual(len(outs), 1,
+                         f"the subset rule moves with PYTHONHASHSEED: {outs}")
+
+    def test_the_topic_feature_is_the_one_the_frozen_record_NAMES(self):
+        """Four defensible lexicographic codes of a token set span AUC 0.45 to
+        1.00 on this corpus (spikes/cong-v2.md SS3.7), so `features` containing
+        the string "topic" does not pin the feature.  `topic_feature` does, and
+        `core.topic_code` has to BE the candidate it names -- not agree with it by
+        hand.
+
+        Thesis claim (vi): "dac trung topic phai duoc GOI TEN trong ban ghi dong
+        bang, khong phai ngu y".
+        """
+        name = gate2_v2.record()["topic_feature"]
+        self.assertIn(name, core.TOPIC_CODE_CANDIDATES)
+        self.assertEqual(name, core.TOPIC_CODE_CHOICE)
+        for topic in ("orm", retrieval.Topic({"db", "models"}),
+                      retrieval.Topic({"django", "db", "models", "query"}),
+                      retrieval.Topic()):
+            with self.subTest(topic=topic):
+                self.assertEqual(core.topic_code(topic),
+                                 core.TOPIC_CODE_CANDIDATES[name](topic))
+
+    def test_all_four_candidate_features_stay_runnable_and_tell_topics_apart(self):
+        """The sensitivity table in the spike is only checkable if the rejected
+        candidates are still CODE.  Keeping them runnable is what stops
+        "we measured four" from becoming an unverifiable sentence.
+
+        Thesis claim (vi): "ba ung vien bi loai van phai CHAY DUOC de bang do
+        nhay tai lap duoc".
+        """
+        self.assertEqual(set(core.TOPIC_CODE_CANDIDATES),
+                         {"canonical", "mean", "max", "sum"})
+        a = retrieval.Topic({"alpha", "beta"})
+        b = retrieval.Topic({"yankee", "zulu"})
+        for name, fn in sorted(core.TOPIC_CODE_CANDIDATES.items()):
+            with self.subTest(candidate=name):
+                self.assertIsInstance(fn(a), float)
+                self.assertEqual(fn(retrieval.Topic()), 0.0)
+                self.assertNotEqual(fn(a), fn(b),
+                                    f"candidate {name!r} gives two different "
+                                    f"topics the same code")
+                self.assertLess(fn(a), fn(b),
+                                f"candidate {name!r} is not monotone in "
+                                f"lexicographic order, so a logistic regression "
+                                f"cannot read it")
+
+    def test_the_canonical_candidate_really_is_the_string_the_codebase_hashes(self):
+        """The ground review II ruling 2 named, asserted so that it can FAIL.  The
+        claim is not "a canonical string is nice"; it is "this exact string is
+        already this project's identity for a topic" -- `retrieval.Topic.__str__`,
+        which `core.seed_of` stringifies and `Item.__post_init__` hashes into
+        `item_id`, which `detector.score` seeds on.  The claim is TRUE, and it is
+        kept assertable even though the candidate was not the one shipped: a
+        ground that is discarded for a different reason is not a ground that was
+        wrong, and the next reviewer needs to be able to check it.
+
+        Thesis claim (vi): "ly do chon dac trung phai KIEM TRA DUOC trong code,
+        khong phai mot cau van".
+        """
+        t = retrieval.Topic({"query", "db", "models", "django"})
+        self.assertEqual(str(t), "db|django|models|query")
+        self.assertEqual(core.TOPIC_CODE_CANDIDATES["canonical"](t),
+                         core._code8(str(t)))
+        # the same string is what seed_of actually hashes, hence what item_id is
+        self.assertEqual(core.seed_of(t), core.seed_of(str(t)))
+
+    def test_the_SHIPPED_feature_is_the_one_not_displaced_by_taking_a_subset(self):
+        """THE GROUND THE CHOICE ACTUALLY RESTS ON, and the test that goes red if
+        a displaced candidate is shipped again.
+
+        The attack model's one structural difference between the classes is that a
+        payload's tag is a SUBSET of a task topic while a benign note carries the
+        whole one.  So a topic feature that is systematically displaced by
+        subsetting separates the classes BY CONSTRUCTION, and the gate reads its
+        own payload-construction rule instead of the attacker.  That is review II
+        finding 1, and `sorted(target)[:k]` was only one way to arrive at it:
+        `canonical` (the canonical string opens with min(tokens), and
+        min(A) >= min(B)), `max` and `sum` are each displaced too.
+
+        `mean` is the only one of the four that is not: for a uniformly drawn
+        k-subset A of B, E[mean(A)] = mean(B).  Asserted here as a COUNT over real
+        topics rather than as an inequality, because the counts are what the spike
+        publishes and what a reviewer can re-run: the shipped feature must displace
+        UP about as often as it displaces DOWN, while each rejected candidate must
+        be lopsided.
+
+        Thesis claim (vi): "dac trung duoc giao phai la cai KHONG bi phep lay tap
+        con lam lech -- neu khong, Phat hien 1 quay lai duoi mot lop ao khac".
+        """
+        rng = random.Random(20260918)
+        alphabet = [f"{a}{b}{c}" for a in "abcdefgmnoqrstwxyz"
+                    for b in "aeiou" for c in "bcdfglmnprstv"]
+        topics = [retrieval.Topic(rng.sample(alphabet, rng.randint(3, 7)))
+                  for _ in range(400)]
+
+        def displacement(fn):
+            up = down = 0
+            for t in topics:
+                a, b = fn(retrieval.payload_topic(t, 0.0)), fn(t)
+                up += a > b + 1e-15
+                down += a < b - 1e-15
+            return up, down
+
+        up, down = displacement(core.topic_code)
+        self.assertGreater(min(up, down), 0.35 * (up + down),
+                           f"the SHIPPED topic feature is displaced by taking a "
+                           f"subset ({up} up / {down} down of {len(topics)}). The "
+                           f"classes then separate by a theorem and the gate is "
+                           f"measuring payload_topic, not the attacker.")
+        for name in ("canonical", "max", "sum"):
+            with self.subTest(rejected=name):
+                u, d = displacement(core.TOPIC_CODE_CANDIDATES[name])
                 self.assertLess(
-                    _item(part).surface(now=1)["topic"],
-                    _item(whole).surface(now=1)["topic"],
-                    "a front-truncated tag does not score below the whole topic, "
-                    "so the subset channel is invisible to the gate again.")
+                    min(u, d), 0.35 * (u + d),
+                    f"candidate {name!r} is no longer lopsided under subsetting "
+                    f"({u} up / {d} down). It was rejected FOR being lopsided, so "
+                    f"either the subset rule or the candidate has changed and the "
+                    f"choice has to be re-argued rather than inherited.")
 
     def test_the_feature_does_not_depend_on_PYTHONHASHSEED(self):
         """The project's reproducibility rule, applied to the new column.  A
@@ -330,6 +521,85 @@ class ThePayloadIsBuiltAtAFrozenTotalLength(unittest.TestCase):
         self.assertIn("L", reason)
         self.assertIsNone(build.payload_length_reason(retrieval.Topic({"db"})))
 
+    def test_the_LIVE_injection_path_records_that_reason_instead_of_dropping_it(self):
+        """RULE N3, AND THE HOLE IT HAD (review II ruling 3).  Writing a reason
+        that only a test ever calls is not recording it.  `build.inject` never
+        invoked `payload_length_reason`, so 170 of the 2248 feasible sigmas at
+        eps = 1.0 (7.6%, widest tag 506 characters) were built tag-only in
+        SILENCE while the frozen record and the spike asserted size == 63 -- the
+        exact silent value N3 forbids.
+
+        Two things are asserted, and the second is the one that goes red if the
+        wiring is removed: the payload of an over-wide tag really is built
+        tag-only (so the invariant genuinely does not hold for it), and `inject`
+        puts the REASON into the observation sink for exactly those events and for
+        no others.
+
+        The reason must NOT reach `provenance`: `provenance` is a scored feature
+        (`depth`), so a reason written there would inject signal into the thing
+        being measured.  Asserted too.
+
+        Thesis claim (vi): "duong chay THAT phai GHI LY DO, khong phai chi co mot
+        test goi ham do".
+        """
+        wide = retrieval.Topic({f"token{i:03d}" for i in range(12)})
+        narrow = retrieval.Topic({"db"})
+        wf = _token_wf([tuple(narrow), tuple(wide)])
+        reasons = {}
+        store = CarrierStore()
+        thin = build.inject(store, wf,
+                            PoisonSpec(carrier="memory", iota=0, sigma=0,
+                                       epsilon=1.0), length_reasons=reasons)
+        self.assertEqual(len(thin.content), build.PAYLOAD_LENGTH)
+        self.assertEqual(reasons, {},
+                         "a payload that fits L recorded a length reason")
+        fat = build.inject(store, wf,
+                           PoisonSpec(carrier="memory", iota=0, sigma=1,
+                                      epsilon=1.0), length_reasons=reasons)
+        self.assertGreater(len(fat.content), build.PAYLOAD_LENGTH)
+        self.assertEqual(fat.content, build.payload_tag(fat.topic),
+                         "an over-wide tag was truncated instead of built "
+                         "tag-only; the reason would then describe nothing")
+        self.assertIn(fat.item_id, reasons,
+                      "build.inject built a payload it could not build at L and "
+                      "recorded NO reason. That is the silent value N3 forbids.")
+        self.assertIn("L_advice = 0", reasons[fat.item_id])
+        self.assertNotIn("L", fat.provenance)
+        self.assertEqual(fat.provenance, thin.provenance,
+                         "the reason leaked into `provenance`, which is the "
+                         "scored feature `depth`")
+
+    def test_payload_content_asks_payload_length_reason_rather_than_re_deciding(self):
+        """ONE decision site.  The tag-only branch and the reason for it have to be
+        the same expression, or they can disagree -- which is how the reason came
+        to be computed by nothing but a test in the first place.
+
+        Mutating `payload_length_reason` so that it fires on a NARROW topic must
+        therefore change what `payload_content` builds for that topic.  If it does
+        not, `payload_content` is still deciding for itself and the two can drift.
+
+        Thesis claim (vi): "quyet dinh va LY DO cua no phai la MOT bieu thuc".
+        """
+        wide = retrieval.Topic({f"token{i:03d}" for i in range(12)})
+        narrow = retrieval.Topic({"db"})
+        self.assertEqual(build.payload_content(wide, "raw_write"),
+                         build.payload_tag(wide))
+        self.assertEqual(len(build.payload_content(narrow, "raw_write")),
+                         build.PAYLOAD_LENGTH)
+        real = build.payload_length_reason
+        build.payload_length_reason = lambda topic: "mutated: always a reason"
+        try:
+            # With the reason firing everywhere, the tag-only branch must fire
+            # everywhere too. That is what proves the branch READS it.
+            self.assertEqual(build.payload_content(narrow, "raw_write"),
+                             build.payload_tag(narrow),
+                             "payload_content decided the tag-only branch for "
+                             "itself instead of asking payload_length_reason")
+        finally:
+            build.payload_length_reason = real
+        self.assertEqual(len(build.payload_content(narrow, "raw_write")),
+                         build.PAYLOAD_LENGTH)
+
 
 # ======================================================================== 4 ====
 class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
@@ -354,6 +624,36 @@ class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
         self.assertEqual(rec["criterion"], "mean_ci95_upper_over_split_seeds")
         self.assertEqual(rec["event_seed_rule"], B.EVENT_SEED_RULE)
         self.assertEqual(rec["date"], "2026-09-18")
+        # REVIEW II RULING 5 -- the parameters the red cell is ACTUALLY decided
+        # by. The record used to pin the certify criterion and four corpus
+        # fields; the benign background alone moved the cell by 0.0421, and the
+        # SCREEN phase is what ends the test. Two people could satisfy the same
+        # md5 and report different numbers.
+        self.assertEqual(rec["screen_criterion"], gate2_v2.SCREEN_CRITERION)
+        self.assertEqual(tuple(rec["epsilon_grid"]), tuple(gate2_v2.EPSILON_GRID))
+        self.assertEqual(tuple(rec["deltas"]), tuple(gate2_v2.DELTAS))
+        self.assertEqual(rec["n_events"], {"screen": gate2_v2.N_SCREEN,
+                                           "certify": gate2_v2.N_CERTIFY})
+        self.assertEqual(rec["corpus"]["natural"], B.NATURAL)
+        self.assertEqual(rec["corpus"]["per_event"], B.PER_EVENT)
+        self.assertEqual(rec["corpus"]["holdout"], B.HOLDOUT)
+        self.assertEqual(rec["topic_feature"], core.TOPIC_CODE_CHOICE)
+        self.assertEqual(rec["payload_length_rule"], build.PAYLOAD_LENGTH_RULE)
+
+    def test_the_gate_test_reads_the_protocol_off_the_frozen_record(self):
+        """A pinned criterion that the gate does not actually run is decorative.
+        `tests/gate2_validity/test_benign_corpus.py` imports the ceiling, both
+        sample sizes, the epsilon grid and the delta set from `gate2_v2`, so the
+        digest covers what the cell was measured under.
+
+        Thesis claim (vi): "tieu chi duoc GHIM phai dung la tieu chi duoc CHAY".
+        """
+        from tests.gate2_validity import test_benign_corpus as T
+        self.assertEqual(T.AUC_CEILING, gate2_v2.record()["ceiling"])
+        self.assertEqual(T.N_SCREEN, gate2_v2.N_SCREEN)
+        self.assertEqual(T.N_CERTIFY, gate2_v2.N_CERTIFY)
+        self.assertEqual(tuple(T.EPSILONS), tuple(gate2_v2.EPSILON_GRID))
+        self.assertEqual(tuple(T.DELTAS), tuple(gate2_v2.DELTAS))
 
     def test_the_md5_is_the_one_the_definition_was_frozen_at(self):
         """THE PIN.  Any edit to a frozen field moves this digest, and moving it
@@ -390,7 +690,16 @@ class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
                              ("split_seeds", list(range(1, 20))),
                              ("features", sorted(set(rec["features"]) - {"topic"})),
                              ("event_seed_rule", "constant-1"),
-                             ("criterion", "max_ci95_upper_over_split_seeds")):
+                             ("criterion", "max_ci95_upper_over_split_seeds"),
+                             ("screen_criterion", "max_over_split_seeds"),
+                             ("epsilon_grid", [0.0, 0.5, 1.0]),
+                             ("deltas", [0, 2]),
+                             ("n_events", {"screen": 80, "certify": 620}),
+                             ("topic_feature", "canonical"),
+                             ("payload_length_rule", "content is always exactly L"),
+                             ("corpus", dict(rec["corpus"], natural=True)),
+                             ("corpus", dict(rec["corpus"], per_event=8)),
+                             ("corpus", dict(rec["corpus"], holdout=1))):
             with self.subTest(field=field):
                 self.assertNotEqual(
                     base, gate2_v2.md5(dict(rec, **{field: value})),

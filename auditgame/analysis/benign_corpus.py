@@ -17,8 +17,12 @@ clone-and-run.
 EVERY AUC QUOTED IN THIS FILE IS A v1 NUMBER -- four features, {size, depth,
 recency, derived}.  Gate 2 v2 (2026-09-18, analysis/gate2_v2.py, md5
 d7e7124eb3a46dfe64d9f205850504d9) put `topic` into F_match, and on the certify
-corpus the cells below move from 0.5414 / 0.5394 / 0.5411 to 0.8805 / 0.9073 /
-0.9373 at Delta 0 / 2 / 4.  They are NOT restated here as v2 numbers because each
+corpus the cells below move from 0.5414 / 0.5394 / 0.5411 to 0.5190 / 0.5292 /
+0.5870 at Delta 0 / 2 / 4.  (An intermediate restatement of those three as
+0.8805 / 0.9073 / 0.9373 is WITHDRAWN -- it was measured while
+`retrieval.payload_topic` still returned the alphabetical prefix, which composed
+with a lexicographic topic code into a theorem rather than a measurement; review
+II ruling 1, spikes/cong-v2.md SS3.1.)  They are NOT restated here as v2 numbers because each
 one is quoted to support a claim about the CORPUS -- which pool, which carrier,
 which source of controls -- and those claims are unaffected: with the `topic`
 column neutralised the v1 digits reproduce EXACTLY, to four decimals, which is the
@@ -116,6 +120,17 @@ most four dormant sigmas -- so the tightened cell runs half a corpus short of th
 ~900 target and clears the bar anyway, with 0.0189 to spare on the MEAN upper
 bound and 18 of 20 splits clearing on their own.
 
+THE SUPPLY FIGURES ABOVE ARE v1 AND THEY MOVED AT v2.1.  `retrieval.payload_topic`
+no longer takes `sorted(target)[:k]` but a deterministic pseudorandom k-subset
+(review II ruling 1), and the dormancy predicate `feasible_sigmas` asks about the
+topic the payload will actually CARRY -- so a different token means a different
+set of dormant sigmas.  Measured: 826 -> 817 at Delta = 2 and 456 -> 449 at
+Delta = 4, while Delta = 0 (2248) and every eps = 1.0 count are UNCHANGED, which
+is the cross-check: at Delta = 0 there is no window for the predicate to fire in,
+and at eps = 1.0 the subset is the whole topic under either rule.  The supply is a
+MEASURED quantity, not a constant, and the shift is downward -- one more way the
+old rule flattered the corpus.  Full grid: spikes/cong-v2.md SS3.8.
+
 The margin at Delta = 0 is worth reading with the same care.  At the 900-event cap
 the mean upper bound is 0.5414 and 19 of 20 splits clear; lifting the cap to the
 pool's full supply of 2248 events takes it to 0.5366 with 20 of 20.  The cap stays
@@ -184,6 +199,33 @@ CARRIER = "memory"
 #: written down so a published AUC can be reproduced: an unseeded RNG here makes
 #: the number un-recheckable, which is the one thing a benchmark may not be.
 SEED = 20260916
+
+#: THE THREE CORPUS SHAPE PARAMETERS THE FROZEN RECORD USED TO LEAVE LOOSE.
+#: Declared as module constants, and used as the DEFAULTS of `matched_corpus`, so
+#: `analysis.gate2_v2.record()` can read them off the module that owns them
+#: instead of restating them -- and so that two people who satisfy the md5 cannot
+#: report different numbers (review II ruling 5).
+#:
+#: `NATURAL` is the one that matters most: it alone moved the certification cell
+#: 0.8805 -> 0.9226 under the v2 definition as shipped -- a gap wider than the
+#: whole margin some cells clear by.  Both of those digits are withdrawn as
+#: measurements of the attacker (they were taken under the `sorted()[:k]` subset
+#: rule, review II ruling 1), but the POINT stands and is what this constant is
+#: for: the choice of benign background moves the cell by more than the criterion's
+#: own margin, so a record that does not pin it does not pin the population.  A record that pins the pool, the carrier, h and
+#: the seed but NOT which of the two benign backgrounds is read is a record that
+#: does not pin the population at all.
+NATURAL = False
+
+#: Controls matched to each poisoning event.  A CONTRACT (`harvest` refuses a pool
+#: that cannot supply it), so it decides which repos survive into the corpus, not
+#: merely how many rows come out.
+PER_EVENT = 4
+
+#: Segment parity the corpus is cut from.  None = every instance, the default and
+#: reported corpus, whose partial overlap with the dist-matched attacker's
+#: estimate is a MEASURED and published quantity.  See `matched_corpus`.
+HOLDOUT = None
 
 #: BENIGN CHURN rate the ENRICHED harvest runs MockAgent at (agent.py step 6,
 #: beta).  `harvest` runs one step on an EMPTY store, so no earlier note exists to
@@ -712,9 +754,9 @@ def _refuse_on_estimate_mismatch(pipe, pool: str, h: int,
 
 
 def matched_corpus(pipe, delta: int, eps: float, n_events: int,
-                   per_event: int = 4, pool: str = POOL, seed: int = SEED,
-                   carrier: str = CARRIER, natural: bool = False,
-                   holdout: int | None = None,
+                   per_event: int = PER_EVENT, pool: str = POOL,
+                   seed: int = SEED, carrier: str = CARRIER,
+                   natural: bool = NATURAL, holdout: int | None = HOLDOUT,
                    control_ids: set | None = None) -> tuple:
     """(payloads, benign) as F_match feature dicts -- a MATCHED case-control sample.
 

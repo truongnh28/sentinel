@@ -25,12 +25,20 @@ import unittest
 
 from analysis import benign_corpus as B
 from analysis import discriminator as D
+from analysis import gate2_v2 as G2
 
-AUC_CEILING = 0.56        # eval/SPEC-AuditGame-SE.md Part 0, tightened by question 8
-N_SCREEN = 80             # phase 1: cheap epsilon sweep on the point estimate
-N_CERTIFY = 900           # phase 2: the event count question 8 fixed (a CAP, see below)
-DELTAS = (0, 2, 4)
-EPSILONS = (0.0, 0.2, 0.4, 0.7, 1.0)
+#: THE PROTOCOL IS READ OFF THE FROZEN RECORD, not restated here (review II
+#: ruling 5).  Every one of these decides the verdict, and until v2.1 only the
+#: ceiling and the certify-phase criterion were inside the hash cell -- so two
+#: people could satisfy the same md5, run this file, and report different
+#: numbers.  Importing them is what makes "the digest covers the criterion" true
+#: rather than aspirational: change one and `gate2_v2.md5()` moves, and the test
+#: that pins the digest goes red.
+AUC_CEILING = G2.record()["ceiling"]   # SPEC Part 0, tightened by question 8
+N_SCREEN = G2.N_SCREEN    # phase 1: cheap epsilon sweep on the point estimate
+N_CERTIFY = G2.N_CERTIFY  # phase 2: the event count question 8 fixed (a CAP)
+DELTAS = G2.DELTAS
+EPSILONS = G2.EPSILON_GRID
 
 #: The train/test splits both phases are summarised over -- `discriminator.
 #: SPLIT_SEEDS`, read from there rather than restated, so the criterion and the
@@ -207,25 +215,25 @@ class BenignCorpus(unittest.TestCase):
             # small sample (80 events), and on a sample that small the maximum is a
             # reading of the fold.
             #
-            # RE-DERIVED AT GATE 2 v2 (2026-09-18). Under v1 this comment read
-            # "measured, max(auc) at eps=0 reaches 0.6220 at Delta=2, where the
-            # payload is byte-length matched to the agent's note BY CONSTRUCTION",
-            # with medians 0.483 / 0.507 / 0.480 at eps=0. With `topic` inside
-            # F_match the same 80-event screen at eps=0 now measures
+            # RE-DERIVED TWICE. Under v1 this comment read "measured, max(auc) at
+            # eps=0 reaches 0.6220 at Delta=2", with medians 0.483 / 0.507 / 0.480
+            # at eps=0. At gate 2 v2 it was restated as 0.8384 / 0.8499 / 0.9206
+            # -- and THAT restatement is WITHDRAWN: it was measured while
+            # `retrieval.payload_topic` still returned sorted(target)[:k], which
+            # composed with a lexicographic topic code into a theorem, not a
+            # measurement (review II ruling 1). With the subset rule de-biased the
+            # same 80-event screen at eps=0 measures
             #
-            #     Delta   auc_median   auc_max
-            #     0         0.8384      0.9365
-            #     2         0.8499      0.9130
-            #     4         0.9206      0.9599
+            #     Delta   auc_median
+            #     0         0.4952
+            #     2         0.4643
+            #     4         0.4770
             #
-            # -- so the gap between the median and the max has NARROWED (0.10 at
-            # Delta=2, against 0.12 under v1) while both ends moved up by about
-            # 0.35. The argument for the median over the max is unchanged and does
-            # NOT rest on the old digits: an 80-event fold's maximum still
-            # converges to the supremum rather than to a population quantity.
-            # What the old sentence's clause "byte-length matched BY CONSTRUCTION"
-            # named is also unchanged -- `size` is still matched; it is `topic`
-            # that is not. Reproduce: spikes/cong-v2.md SS3.
+            # -- i.e. back under the ceiling, close to the v1 digits and for the
+            # right reason this time. The argument for the median over the max
+            # does NOT rest on any of these digits: an 80-event fold's maximum
+            # still converges to the supremum rather than to a population
+            # quantity. Reproduce: spikes/cong-v2.md SS3.5.
             screen = {}
             for eps in EPSILONS:
                 screen[eps] = {d: D.auc_over_splits(
@@ -336,13 +344,17 @@ class TheSplitIsPartOfTheMeasurement(unittest.TestCase):
         Delta -- some shuffles cleared 0.56 and some did not -- and straddling was
         the evidence that no single shuffle may be quoted as the verdict.
 
-        UNDER v2 there is no straddling at any Delta, and the reason is the
-        OPPOSITE of the one the old failure message offered ("the corpus grew --
-        say so and simplify"): with `topic` inside F_match every split FAILS the
-        ceiling at every Delta (measured: 0/20 clear at Delta 0, 2 and 4, mean
-        upper bounds 0.8805 / 0.9073 / 0.9373). Unanimity that the cell FAILS is
-        not the unanimity that would license simplifying the criterion, and a test
-        that could not tell the two apart would have read the second as the first.
+        UNDER v2 AS SHIPPED there was no straddling at any Delta -- every split
+        failed the ceiling at every Delta (0/20 clear, mean upper bounds 0.8805 /
+        0.9073 / 0.9373). THAT MEASUREMENT IS WITHDRAWN: it was taken while
+        `retrieval.payload_topic` returned sorted(target)[:k] (review II ruling 1).
+
+        UNDER v2.1, with the subset rule de-biased, the splits agree in the OTHER
+        direction at Delta 0 and 2 -- 20 of 20 clear at each, mean upper bounds
+        0.5190 and 0.5292 -- and Delta=4 fails at 0.5870 with 1 of 20. So this
+        corpus now exhibits BOTH kinds of unanimity at once, on different Deltas,
+        which is precisely why the test below reports agreement WITH ITS
+        DIRECTION rather than merely noting that the splits agreed.
 
         So what is asserted now is what still holds and still matters:
 

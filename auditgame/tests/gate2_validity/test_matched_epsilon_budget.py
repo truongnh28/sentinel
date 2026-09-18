@@ -353,8 +353,9 @@ class TheTopicAxisIsInsideNowAndTheRESIDUEIsWhatStaysOutside(unittest.TestCase):
     is a property of the topics, and the topics did not move.  What moved is the
     number it is measured AGAINST:
 
-        gate 2 certifies        v1: 0.5414 over FOUR features
-                                v2: 0.8805 over FIVE
+        gate 2 certifies        v1:   0.5414 over FOUR features
+                                v2:   0.8805 over FIVE -- WITHDRAWN, see below
+                                v2.1: 0.5190 over FIVE, subset rule de-biased
         this rule separates at      0.9492, both versions
         the gap                 v1: 0.4078      v2: 0.0687
 
@@ -448,14 +449,20 @@ class TheTopicAxisIsInsideNowAndTheRESIDUEIsWhatStaysOutside(unittest.TestCase):
         ceiling was the cell where this channel is WIDEST -- the certificate and
         the defect sat on the same row.
 
-        RE-DERIVED AT GATE 2 v2 (2026-09-18): the same corpus and the same eps
-        now measure AUC_upper = 0.8805 at Delta=0 (0.9073 / 0.9373 at Delta 2 / 4)
-        because `topic` is inside F_match, and with the `topic` column neutralised
-        it reproduces the old 0.5414 / 0.5394 / 0.5411 EXACTLY -- which is the
-        cross-check that nothing else in this change moved that corpus.  Whether
-        an attacker can still be built under the v2 definition is the
-        certification question and is NOT answered here.  Reproduce:
-        spikes/cong-v2.md SS3.
+        RE-DERIVED TWICE.  At gate 2 v2 this read "the same corpus and the same
+        eps now measure AUC_upper = 0.8805 at Delta=0 (0.9073 / 0.9373 at Delta
+        2 / 4) because `topic` is inside F_match".  THAT IS WITHDRAWN: it was
+        measured while `retrieval.payload_topic` returned sorted(target)[:k],
+        which composed with a lexicographic topic code into a theorem rather than
+        a measurement (review II ruling 1).  With the subset rule de-biased the
+        same corpus and the same eps measure AUC_upper = 0.5190 at Delta=0,
+        0.5292 at Delta=2 (20 of 20 splits clearing at each) and 0.5870 at
+        Delta=4 -- and the `topic` column, measured alone, sits at chance on every
+        row of the grid.  The channel this class of test exists to keep visible is
+        REAL as a relational rule (below, 0.9492) and is NOT what the `topic`
+        column of F_match reads.  Whether an attacker clears the v2.1 definition
+        is the certification question and is NOT answered here.  Reproduce:
+        spikes/cong-v2.md SS3.1, SS3.5b.
 
         Note the scope of the claim, which is narrower than "every eps < 1":
         the tag is strict exactly when ceil(eps*m) < m.  At eps = 0.7, m = 3 it is
@@ -497,11 +504,16 @@ class TheTopicAxisIsInsideNowAndTheRESIDUEIsWhatStaysOutside(unittest.TestCase):
         Over the real Delta=0 corpus (900 events, 3600 controls, the corpus SS5
         scores) this rule flags 900 of 900 payloads and 366 of 3600 controls --
         Mann-Whitney AUC 0.9492.  RE-MEASURED UNDER v2 and UNCHANGED at all three
-        Deltas (0.9492 / 0.9508 / 0.9457; 900/900, 826/826, 456/456 payloads and
-        366/3600, 325/3304, 198/1824 controls), because the rule reads topics and
-        the topics did not move.  What moved is what it is read against: gate 2
-        certifies 0.8805 over five features at v2, where it certified 0.5414 over
-        four at v1, so the gap this test records narrowed from 0.4078 to 0.0687.
+        Deltas, because the rule reads topics as SETS and de-biasing which tokens
+        a subset keeps does not change that the tag IS a strict subset.  What
+        moved is the corpus SUPPLY it is read over (826 -> 817 at Delta=2,
+        456 -> 449 at Delta=4: the de-biased subset changes which sigmas lie
+        dormant), and what it is read AGAINST.  The v2 claim that the gap narrowed
+        from 0.4078 to 0.0687 is WITHDRAWN -- it rested on the 0.8805 cell, which
+        was the `sorted()` artefact.  Against the de-biased cell the gap is
+        0.9492 - 0.5190 = 0.4302 at Delta=0, i.e. essentially the v1 gap.  THE
+        RESIDUE V2 WAS BUILT TO NARROW WAS NEVER NARROWED, because the thing it
+        was narrowing was not there.
         Those 366 (~10%) ARE the case above: benign notes whose own task topic
         happens to nest inside another task's in the same workflow, which is why
         the measured number is 0.949 and NOT the 1.0 the rule looks like it should

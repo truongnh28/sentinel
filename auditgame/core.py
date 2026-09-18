@@ -15,76 +15,247 @@ import retrieval
 
 CARRIERS = ("memory", "skill", "queue", "branch")
 
-#: How many leading UTF-8 bytes of a token `topic_code` reads.  Eight, because a
-#: float carries 53 bits of mantissa: beyond the first 6-7 bytes the low bits of
-#: the integer are rounded away and two tokens agreeing on that prefix collide
+#: How many leading UTF-8 bytes `topic_code` reads.  Eight, because a float
+#: carries 53 bits of mantissa: beyond the first 6-7 bytes the low bits of the
+#: integer are rounded away and two strings agreeing on that prefix collide
 #: anyway.  Declared rather than inlined so the collision limit below names a
-#: number a reader can check.
+#: number a reader can check -- and so that "read more bytes" is visibly NOT a
+#: fix for the projection's lossiness (see `topic_code`).
 TOPIC_CODE_BYTES = 8
+
+
+def _code8(s: str) -> float:
+    """A string -> its first TOPIC_CODE_BYTES UTF-8 bytes as a base-256 fraction.
+
+    The one byte-reading primitive all four candidate topic features are built
+    from, so they differ ONLY in what they apply it to.  Monotone in the
+    bytewise (i.e. lexicographic-on-UTF-8) order of its argument, which is the
+    property `analysis.discriminator`'s logistic regression needs in order to read
+    the column at all.
+
+    Deterministic across processes: bytes, never `hash()`.
+    """
+    raw = s.encode("utf-8")[:TOPIC_CODE_BYTES]
+    raw = raw + bytes(TOPIC_CODE_BYTES - len(raw))
+    return int.from_bytes(raw, "big") / float(1 << (8 * TOPIC_CODE_BYTES))
+
+
+def _canonical_topic_string(topic) -> str:
+    """The topic's CANONICAL identity string: `"|".join(sorted(tokens))`.
+
+    Built through `retrieval.Topic.__str__` itself rather than re-joined here, so
+    there is exactly ONE definition of "a topic's canonical form" in the project.
+    `as_topic` hands back a bare `frozenset` unchanged when it is given one, and a
+    bare frozenset's str() walks its hash table -- so the tokens are re-wrapped in
+    `Topic` before stringifying, which is what makes this PYTHONHASHSEED-stable
+    for every input shape, not just for the ones that already are Topics.
+    """
+    return str(retrieval.Topic(str(t) for t in retrieval.as_topic(topic)))
+
+
+def _topic_code_canonical(topic) -> float:
+    """code8 of the canonical topic string.  THE CHOSEN FEATURE -- see topic_code."""
+    tokens = retrieval.as_topic(topic)
+    return _code8(_canonical_topic_string(tokens)) if tokens else 0.0
+
+
+def _topic_code_mean(topic) -> float:
+    """Mean of code8 over the tokens.  The feature SHIPPED at gate 2 v2, kept as a
+    named candidate so the sensitivity table in spikes/cong-v2.md SS3.7 can be
+    reproduced rather than taken on trust."""
+    toks = sorted(str(t) for t in retrieval.as_topic(topic))
+    return sum(_code8(t) for t in toks) / len(toks) if toks else 0.0
+
+
+def _topic_code_max(topic) -> float:
+    """Max of code8 over the tokens.  Candidate, not chosen."""
+    toks = [str(t) for t in retrieval.as_topic(topic)]
+    return max((_code8(t) for t in toks), default=0.0)
+
+
+def _topic_code_sum(topic) -> float:
+    """Sum of code8 over the tokens.  Candidate, not chosen -- note it is NOT
+    scale-free: it grows with |T|, so it partly duplicates `size`."""
+    toks = [str(t) for t in retrieval.as_topic(topic)]
+    return sum(_code8(t) for t in toks)
+
+
+#: THE FOUR CANDIDATE TOPIC FEATURES, all defensible lexicographic codes of a
+#: token set, all deterministic, all readable by a monotone-per-column model.
+#: They are kept together and NAMED because review II ruling 2 found they span
+#: AUC 0.45 to 1.00 on the same corpus: an under-specified topic feature is how
+#: the artefact recurs, so the choice has to be a pinned field of the frozen
+#: record and the rivals' numbers have to be publishable beside it.
+TOPIC_CODE_CANDIDATES = {
+    "canonical": _topic_code_canonical,
+    "mean": _topic_code_mean,
+    "max": _topic_code_max,
+    "sum": _topic_code_sum,
+}
+
+#: THE CHOSEN ONE.  A pinned field of `analysis.gate2_v2.record()`, so changing
+#: the topic feature moves the frozen digest instead of moving quietly.
+#:
+#: WHY `mean` AND NOT `canonical`.  Review II ruling 2 named `canonical` -- the
+#: code of `"|".join(sorted(tokens))` -- on the ground that it is the form this
+#: codebase already treats as a topic's identity.  That ground is true and is
+#: still asserted by a test.  It is not sufficient, because `canonical` fails the
+#: criterion ruling 1 established: the classes must not separate by a THEOREM.
+#: The canonical string OPENS with the alphabetically smallest token, and for
+#: A a subset of B, min(A) >= min(B) -- so a subset is displaced UPWARD as
+#: systematically as `sorted(target)[:k]` displaced the mean DOWNWARD.  It flips
+#: the sign of the artefact; it does not remove it.  `max` and `sum` are order
+#: statistics too, and `sum` is extensive in |T| so it also duplicates `size`.
+#:
+#: `mean` is the only one of the four that survives, and the reason needs no AUC:
+#: for a uniformly drawn k-subset A of B, E[mean(A)] = mean(B).  Measured over the
+#: 2248 feasible sigma topics at Delta=0, replacing each topic by the de-biased
+#: subset the attacker stamps displaces the code by
+#:
+#:     canonical  +0.0265   (1640 of 2248 displaced UP,   293 down, 315 equal)
+#:     max        -0.0301   (   0 up, 1669 down, 579 equal -- one-sided)
+#:     sum        -1.4219   (   0 up, 2248 down           -- one-sided)
+#:     mean       -0.0002   (1091 up, 1157 down           -- BALANCED)
+#:
+#: spikes/cong-v2.md SS0bis.4b is the amended pre-registration, its own commit,
+#: and it discloses in its first line that the AUC table had already been seen
+#: when the amendment was written.  SS3.7 publishes all four AUCs.
+TOPIC_CODE_CHOICE = "mean"
 
 
 def topic_code(topic) -> float:
     """WHICH tokens an item's topic carries, as ONE number the discriminator reads.
 
-    THE F_MATCH FEATURE ADDED IN GATE 2 v2.  Until v2, F_match was
-    {size, depth, recency, derived} and `topic` sat OUTSIDE it, which made the
-    gate too loose IN OUR FAVOUR: `retrieval.payload_topic` stamps the payload
-    with `sorted(target)[:k]`, a strict subset of sigma's topic, while every
-    benign agent note carries its task's WHOLE topic -- and a zero-parameter rule
-    over that one difference separated the two classes at Mann-Whitney AUC 0.9492
-    on the v1 corpus while the gate certified 0.5414 over four features.
+    THE F_MATCH FEATURE ADDED IN GATE 2 v2 -- AND READ THE NEXT PARAGRAPH BEFORE
+    QUOTING ANY NUMBER FROM THIS ONE.  Until v2, F_match was
+    {size, depth, recency, derived} and `topic` sat OUTSIDE it, which was argued
+    to make the gate too loose IN OUR FAVOUR: `retrieval.payload_topic` stamps the
+    payload with a strict SUBSET of task sigma's topic, while every benign agent
+    note carries its task's WHOLE topic -- and a zero-parameter rule over that one
+    difference separated the two classes at Mann-Whitney AUC 0.9492 on the v1
+    corpus while the gate certified 0.5414 over four features.
 
-    THE CHOICE.  The code is the MEAN, over the topic's tokens, of the token's
-    first `TOPIC_CODE_BYTES` UTF-8 bytes read as a base-256 fraction in [0, 1).
-    Two properties are being bought, and both are needed:
+    WHAT THE RE-MEASUREMENT FOUND, AND EVERY CLAIM HERE CARRIES ITS PHASE --
+    the two phases disagree and a reader who drops the qualifier will collide them.
 
-      IDENTITY -- the code is a function of WHICH tokens are present, not of how
-        many.  A token COUNT would be a second copy of `size`: on the epsilon
-        model page, five real topics across five epsilons gave 15 distinct `size`
-        values with exactly ONE collision, so `size` already very nearly
-        determines k.  What `size` does NOT carry is which tokens were kept, and
-        that is what this column adds.
+    ON THE SCREEN PHASE (80 events, median point estimate) with the subset rule
+    de-biased (`retrieval.payload_topic`, review II ruling 1), this column reads
+    CHANCE on every row and every Delta: measured range 0.4558 to 0.5973 over all
+    fifteen cells, single-column, carrying NOT ONE failing row.  The rows that do
+    fail there are carried by `size` from eps >= 0.2 and by `depth` from
+    eps >= 0.7, where `depth` separates PERFECTLY at 1.0000; both channels predate
+    v2 and neither was touched by it.
 
-      ORDER -- the code is MONOTONE IN LEXICOGRAPHIC ORDER.  This is not
-        decoration.  `analysis.discriminator` fits a LOGISTIC REGRESSION, which
-        is monotone in each column, so a nominal fingerprint (a blake2b digest,
-        say) would be identity without order and the discriminator could read
-        nothing from it at all -- the gate would gain a feature and no hardness.
-        A lexicographic code makes `sorted(target)[:k]` -- a front-truncated tag
-        -- score BELOW the whole topic it was cut from, which is exactly the
-        channel v2 exists to bring inside the measured space.
+    THAT SCREEN-PHASE RESULT DOES NOT GENERALISE TO THE CERTIFY PHASE.  On the
+    certify corpus (449 events at Delta=4, mean CI95 upper bound) this column DOES
+    carry the one failing cell: neutralising it moves Delta=4 from 0.5870 with 1 of
+    20 splits clearing to 0.5407 with 15 of 20.  Both statements are true.  They
+    differ because of SAMPLE SIZE (80 against 449) and CRITERION (a median point
+    estimate against a mean interval upper bound): a residue of ~0.05 is not
+    resolvable on an 80-event fold.  See spikes/cong-v2.md SS4.1.
 
-    THE LIMITATION, stated because a feature is only as honest as its scope:
+    SO THE FIFTH AXIS WAS ADDED TO CLOSE A CHANNEL MUCH SMALLER THAN THE ONE
+    CLAIMED -- 0.5484 at one Delta on the thinnest corpus, not the 0.88 the v2
+    cell reported.  Whether it stays in F_match is a change to the gate DEFINITION
+    -- a new digest and a review -- and is deliberately not decided here.  The
+    evidence, the case for keeping it (it does see the Delta=4 residue, and it
+    would see an attacker who DID select tokens by an alphabet-correlated rule) and
+    the case against are in spikes/cong-v2.md SS3.5b, SS3.5c and SS4.1.
 
-      1. IT IS LOSSY.  A set is collapsed to one mean, so different token sets
+    THE CHOICE, AND THE GROUND IT RESTS ON.  The code is the MEAN, over the
+    topic's tokens, of the token's first TOPIC_CODE_BYTES UTF-8 bytes read as a
+    base-256 fraction.  The ground is ONE property, and it is a theorem rather
+    than a measurement: for a uniformly drawn k-subset A of a token set B,
+
+        E[ mean_{t in A} code8(t) ] = mean_{t in B} code8(t)
+
+    -- the mean is UNBIASED under subsetting.  Every other summary of the same
+    per-token codes is not, and `TOPIC_CODE_CHOICE` above carries the counts.
+    This matters because the attack model's ONE structural difference between the
+    two classes is that a payload's tag is a SUBSET of a task topic while a benign
+    note carries the whole one.  A topic feature that is displaced by subsetting
+    therefore separates the classes BY CONSTRUCTION, and the gate would be reading
+    its own payload-construction rule instead of the attacker -- which is exactly
+    what `sorted(target)[:k]` plus this column did at v2 as shipped, and what the
+    three rejected candidates do in a new disguise.
+
+    WHAT WAS REJECTED, and it is kept runnable rather than described.
+    `TOPIC_CODE_CANDIDATES` holds all four, so spikes/cong-v2.md SS3.7's
+    sensitivity table can be reproduced instead of taken on trust:
+
+      `canonical` -- code8 of `"|".join(sorted(tokens))`.  Review II ruling 2
+        named THIS one, on the ground (true, and still asserted by a test) that it
+        is the form the codebase already treats as a topic's identity:
+        `retrieval.Topic.__str__` is that string, `seed_of` stringifies its
+        arguments so that string is what it hashes, `Item.__post_init__` hashes
+        `seed_of(...)` into `item_id` and `detector.score` seeds on `item_id`.
+        The ground is real; it is not sufficient.  The canonical string OPENS with
+        the alphabetically smallest token, and min(A) >= min(B) for A a subset of
+        B, so it is displaced UPWARD by subsetting -- the same artefact with its
+        sign flipped.  Measured: 1640 of 2248 topics displaced up.
+      `max` -- an order statistic, max(A) <= max(B), one-sided with ZERO
+        exceptions over 2248 topics.
+      `sum` -- one-sided too, and EXTENSIVE in |T|, so it is also a second copy of
+        `size` (single-column AUC 1.0000 at every Delta).
+
+    SAID PLAINLY, BECAUSE THE ALTERNATIVE IS A COMFORTABLE SILENCE: the chosen
+    feature is also the one under which the certification cell passes, and the
+    choice was NOT made blind -- the four-candidate table had been measured when
+    the pre-registration was amended (spikes/cong-v2.md SS0bis.4b says so in its
+    first line).  What can honestly be claimed is narrower: the disqualifying
+    criterion was declared BEFORE anything was measured (SS0bis.1, commit
+    c85a936), the reason this candidate survives it is checkable with no AUC at
+    all (the displacement counts above), and all four AUCs are published side by
+    side.  A reader who distrusts the choice has the numbers to overturn it.
+
+    TWO PROPERTIES, both still required:
+
+      IDENTITY -- a function of WHICH tokens are present, not of how many.  A
+        token COUNT would be a second copy of `size`: on the epsilon model page,
+        five real topics across five epsilons gave 15 distinct `size` values with
+        exactly ONE collision, so `size` already very nearly determines k.
+
+      ORDER -- monotone in each token's lexicographic order.
+        `analysis.discriminator` fits a LOGISTIC REGRESSION, monotone in each
+        column, so a nominal fingerprint (a blake2b digest, say) would be identity
+        without order and the discriminator could read nothing from it at all --
+        the gate would gain a feature and no hardness.  Order is required; being
+        DISPLACED by subsetting is not the same thing as having order, and the
+        rejected candidates show the difference.
+
+    THE LIMITATIONS, stated because a feature is only as honest as its scope:
+
+      1. IT IS LOSSY.  A set is collapsed to ONE mean, so different token sets
          collide -- any two sets with the same mean code, and any two tokens
-         agreeing on their first `TOPIC_CODE_BYTES` bytes.  The gate therefore
-         certifies non-distinguishability over a PROJECTION of the topic, not
-         over the topic.
-      2. THE ORDER IS LEXICOGRAPHIC, NOT SEMANTIC.  "zlib" and "zope" are near
-         in this column and unrelated in the repository; the feature ranks
-         alphabets, not meanings.
+         agreeing on their first TOPIC_CODE_BYTES bytes.  Reading more bytes does
+         not help: past 6-7 bytes a float's mantissa rounds the low bits away, so
+         the limit is intrinsic to compressing a set of strings into ONE real
+         number.  The gate certifies non-distinguishability over a PROJECTION of
+         the topic, not over the topic.
+      1b. AND UNBIASED IS NOT THE SAME AS BLIND.  The mean being unbiased under
+         subsetting says the payload class is not SHIFTED relative to the benign
+         class; it says nothing about VARIANCE, which a k-subset does inflate.  A
+         logistic regression is monotone per column and cannot read a
+         variance-only difference, which is why the column measures ~0.5 here --
+         but a non-linear discriminator could, and this gate does not certify
+         against one.  That limit is a property of `discriminator`, and it is the
+         honest scope of the cell.
+      2. THE ORDER IS LEXICOGRAPHIC, NOT SEMANTIC.  "zlib" and "zope" are near in
+         this column and unrelated in the repository; the feature ranks alphabets,
+         not meanings.
       3. IT CANNOT EXPRESS A RELATIONAL RULE.  `surface()` sees ONE item and has
-         no workflow around it, so "this tag is a STRICT SUBSET of some task
-         topic of the workflow it sits in" -- the zero-parameter rule measured at
+         no workflow around it, so "this tag is a STRICT SUBSET of some task topic
+         of the workflow it sits in" -- the zero-parameter rule measured at
          0.9492 -- is still NOT in F_match, and cannot be put there without
          changing what a surface feature is.  v2 narrows that gap; it does not
          close it, and tests/gate2_validity/test_matched_epsilon_budget.py keeps
          the residue measurable.
 
-    Deterministic across processes: it reads BYTES of the tokens, never `hash()`
-    and never a frozenset's iteration order (the sum is order-free).  That is the
-    same rule `seed_of` and `retrieval.Topic.__str__` are written to.
+    Deterministic across processes: it reads BYTES, never `hash()` and never a
+    frozenset's iteration order (the tokens are sorted before joining).  That is
+    the same rule `seed_of` and `retrieval.Topic.__str__` are written to.
     """
-    tokens = retrieval.as_topic(topic)
-    if not tokens:
-        return 0.0
-    scale = float(1 << (8 * TOPIC_CODE_BYTES))
-    total = 0.0
-    for tok in sorted(str(t) for t in tokens):
-        raw = tok.encode("utf-8")[:TOPIC_CODE_BYTES]
-        total += int.from_bytes(raw + bytes(TOPIC_CODE_BYTES - len(raw)), "big") / scale
-    return total / len(tokens)
+    return TOPIC_CODE_CANDIDATES[TOPIC_CODE_CHOICE](topic)
 
 
 @dataclass

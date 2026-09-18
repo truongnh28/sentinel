@@ -62,6 +62,18 @@ TOPICS = ["auth", "orm", "migration", "serializer", "cache", "routing"]
 #: VISIBLE edit of this constant and of the frozen digest, not a silent one.
 PAYLOAD_LENGTH = 63
 
+#: THE LENGTH RULE, WITH ITS EXCEPTION, as one string -- a pinned field of
+#: `analysis.gate2_v2.record()`.  The record used to carry `payload_length_L = 63`
+#: alone, which reads as an unqualified "size == 63"; measured, 170 of the 2248
+#: feasible sigmas at eps = 1.0 (7.6%, widest tag 506 characters) cannot meet it,
+#: and a published definition that does not say so is exactly the silent value
+#: rule N3 forbids.  The exception is not a footnote to the record, it is IN the
+#: record, so a reader who checks the digest also reads the exception.
+PAYLOAD_LENGTH_RULE = (
+    "len(content) == payload_length_L exactly when len(payload_tag(topic)) < "
+    "payload_length_L; otherwise the payload is the tag alone and "
+    "build.payload_length_reason(topic) states why")
+
 #: FROZEN DATA, and the ONE deliberate change to the payload's Vietnamese bytes
 #: that the gate-2 v2 task authorises.  Split into INSTRUCTION and JUSTIFICATION,
 #: and built in that order, because at a frozen total length something has to be
@@ -144,9 +156,13 @@ def payload_content(topic, marker: str) -> str:
     part of the leak that is really about WHICH tokens rather than how many.
     """
     tag = payload_tag(topic)
-    budget = payload_advice_chars(topic)
-    if budget <= 0:
+    # ONE decision site.  `payload_length_reason` decides whether L can be met and
+    # SAYS WHY it cannot; re-testing `budget <= 0` here would be a second opinion
+    # about the same thing, and it is how the reason came to be computed by
+    # nothing but a test (review II ruling 3).
+    if payload_length_reason(topic) is not None:
         return tag
+    budget = payload_advice_chars(topic)
     advice = _ADVICE_INSTRUCTION.format(marker=marker)
     if len(advice) < budget:
         just = _ADVICE_JUSTIFICATION
@@ -223,10 +239,28 @@ def plan_poison(wf: Workflow, carrier: str, delta: int,
     s_ = rng.choice(cands)
     return PoisonSpec(carrier=carrier, iota=s_ - delta, sigma=s_, epsilon=epsilon)
 
-def inject(store: CarrierStore, wf: Workflow, ps: PoisonSpec) -> Item:
+def inject(store: CarrierStore, wf: Workflow, ps: PoisonSpec,
+           length_reasons: dict | None = None) -> Item:
     """Insert the payload.  The content is written to look benign READ IN
     ISOLATION -- that is why a retrieval audit can look straight at it and see
-    nothing.  Content string is FROZEN, see the module docstring."""
+    nothing.  Content string is FROZEN, see the module docstring.
+
+    `length_reasons` is an OBSERVATION SINK, the same idiom and the same contract
+    as `analysis.benign_corpus.matched_corpus`'s `control_ids`: when a dict is
+    handed in, every payload this call builds that CANNOT be built at
+    `PAYLOAD_LENGTH` records `item_id -> build.payload_length_reason(topic)` in
+    it.  No draw, no seed and no byte of the payload depends on the sink, so
+    passing it cannot move a published number.
+
+    WHY IT EXISTS (review II ruling 3).  `payload_length_reason` was called by
+    NOTHING but a test, so the events whose tag alone is wider than L -- 170 of
+    2248 feasible sigmas at eps = 1.0, widest tag 506 characters -- were built
+    tag-only in silence while the frozen record and the spike asserted size == 63.
+    Rule N3: a cell that cannot be built as declared records a REASON, never a
+    silent value.  The reason is DELIBERATELY NOT written into `provenance`:
+    `provenance` is a SCORED feature (`depth`), so putting a reason there would
+    inject signal into the very thing being measured.
+    """
     # Topic of the task that WILL FIRE, not the one it is planted at -- and only
     # the FRACTION of it that epsilon buys.  Stamping the payload with sigma's
     # WHOLE topic is what made epsilon a no-op: the payload was then retrieved at
@@ -266,7 +300,16 @@ def inject(store: CarrierStore, wf: Workflow, ps: PoisonSpec) -> Item:
         provenance="repo/docs/conventions.md",   # a plausible-looking origin
         poisoned=True,
     )
-    return store.write(it)
+    written = store.write(it)
+    # Invoked on EVERY injection, not only when a sink is watching: the call is
+    # what makes the tag-only branch of `payload_content` and the reason for it
+    # one decision rather than two, and `payload_content` above has already
+    # consulted it.  The sink is how a caller that quotes `size` invariance can
+    # count the events for which it does not hold.
+    reason = payload_length_reason(topic)
+    if length_reasons is not None and reason is not None:
+        length_reasons[written.item_id] = reason
+    return written
 
 def sealed_manifest(wf: Workflow, ps: PoisonSpec, injected: Item, *, auc_match_ci: tuple,
                     n_c_at_sigma: dict, kappa_measured: dict,
