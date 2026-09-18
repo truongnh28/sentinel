@@ -14,6 +14,26 @@ STDLIB ONLY, for the same reason as analysis/discriminator.py: gate 2 imports
 this, and the gates are part of the measurement core that has to stay
 clone-and-run.
 
+EVERY AUC QUOTED IN THIS FILE IS A v1 NUMBER -- four features, {size, depth,
+recency, derived}.  Gate 2 v2 (2026-09-18, analysis/gate2_v2.py, md5
+9682c1958d40d28874ab4088dcbafce0 -- the CURRENT digest; the cells below were
+first restated beside the superseded d7e7124e..., which is why this line now
+carries the live one) put `topic` into F_match, and on the certify corpus the
+cells below move from 0.5414 / 0.5394 / 0.5411 to 0.5190 / 0.5292 / 0.5870 at
+Delta 0 / 2 / 4 -- under the subset salt "payload_topic".  That last clause is
+not decoration: the same protocol under other salts puts the Delta=4 cell
+anywhere from 0.5244 to 0.6426 (spikes/cong-v2.md SS3.9), so any cell quoted from
+this corpus has to name the salt the way it names the seed.  (An intermediate restatement of those three as
+0.8805 / 0.9073 / 0.9373 is WITHDRAWN -- it was measured while
+`retrieval.payload_topic` still returned the alphabetical prefix, which composed
+with a lexicographic topic code into a theorem rather than a measurement; review
+II ruling 1, spikes/cong-v2.md SS3.1.)  They are NOT restated here as v2 numbers because each
+one is quoted to support a claim about the CORPUS -- which pool, which carrier,
+which source of controls -- and those claims are unaffected: with the `topic`
+column neutralised the v1 digits reproduce EXACTLY, to four decimals, which is the
+cross-check that this file's own arguments still stand.  The v2 table, both
+columns, is spikes/cong-v2.md SS3.1.
+
 --------------------------------------------------------------------------
 THE HARVESTING RULE, in one paragraph
 --------------------------------------------------------------------------
@@ -105,6 +125,17 @@ most four dormant sigmas -- so the tightened cell runs half a corpus short of th
 ~900 target and clears the bar anyway, with 0.0189 to spare on the MEAN upper
 bound and 18 of 20 splits clearing on their own.
 
+THE SUPPLY FIGURES ABOVE ARE v1 AND THEY MOVED AT v2.1.  `retrieval.payload_topic`
+no longer takes `sorted(target)[:k]` but a deterministic pseudorandom k-subset
+(review II ruling 1), and the dormancy predicate `feasible_sigmas` asks about the
+topic the payload will actually CARRY -- so a different token means a different
+set of dormant sigmas.  Measured: 826 -> 817 at Delta = 2 and 456 -> 449 at
+Delta = 4, while Delta = 0 (2248) and every eps = 1.0 count are UNCHANGED, which
+is the cross-check: at Delta = 0 there is no window for the predicate to fire in,
+and at eps = 1.0 the subset is the whole topic under either rule.  The supply is a
+MEASURED quantity, not a constant, and the shift is downward -- one more way the
+old rule flattered the corpus.  Full grid: spikes/cong-v2.md SS3.8.
+
 The margin at Delta = 0 is worth reading with the same care.  At the 900-event cap
 the mean upper bound is 0.5414 and 19 of 20 splits clear; lifting the cap to the
 pool's full supply of 2248 events takes it to 0.5366 with 20 of 20.  The cap stays
@@ -174,6 +205,33 @@ CARRIER = "memory"
 #: the number un-recheckable, which is the one thing a benchmark may not be.
 SEED = 20260916
 
+#: THE THREE CORPUS SHAPE PARAMETERS THE FROZEN RECORD USED TO LEAVE LOOSE.
+#: Declared as module constants, and used as the DEFAULTS of `matched_corpus`, so
+#: `analysis.gate2_v2.record()` can read them off the module that owns them
+#: instead of restating them -- and so that two people who satisfy the md5 cannot
+#: report different numbers (review II ruling 5).
+#:
+#: `NATURAL` is the one that matters most: it alone moved the certification cell
+#: 0.8805 -> 0.9226 under the v2 definition as shipped -- a gap wider than the
+#: whole margin some cells clear by.  Both of those digits are withdrawn as
+#: measurements of the attacker (they were taken under the `sorted()[:k]` subset
+#: rule, review II ruling 1), but the POINT stands and is what this constant is
+#: for: the choice of benign background moves the cell by more than the criterion's
+#: own margin, so a record that pins the pool, the carrier, h and the seed but NOT
+#: which of the two benign backgrounds is read is a record that does not pin the
+#: population at all.
+NATURAL = False
+
+#: Controls matched to each poisoning event.  A CONTRACT (`harvest` refuses a pool
+#: that cannot supply it), so it decides which repos survive into the corpus, not
+#: merely how many rows come out.
+PER_EVENT = 4
+
+#: Segment parity the corpus is cut from.  None = every instance, the default and
+#: reported corpus, whose partial overlap with the dist-matched attacker's
+#: estimate is a MEASURED and published quantity.  See `matched_corpus`.
+HOLDOUT = None
+
 #: BENIGN CHURN rate the ENRICHED harvest runs MockAgent at (agent.py step 6,
 #: beta).  `harvest` runs one step on an EMPTY store, so no earlier note exists to
 #: revise and depth is pinned at 1 for every item; `harvest_natural` runs a FULL
@@ -207,7 +265,37 @@ PENDING_MEASUREMENT: dict = {
         "real background can only be MORE varied, never less."),
 }
 
+#: HOW `_one_event` SEEDS THE AGENT RUN IT READS AN EVENT OFF.  Written down as a
+#: string because the gate-2 v2 frozen record has to name the rule, not just its
+#: effect -- see analysis/gate2_v2.py.
+EVENT_SEED_RULE = "seed_of(SEED, 'one_event', wf.wf_id) & 0xFFFF"
+
 _harvest_cache: dict = {}
+
+
+def event_seed(seed: int, wf) -> int:
+    """The seed `_one_event` runs the hosting workflow's agent at.  P8, closed.
+
+    `_one_event` used to call `ag.run_task(t, task, store, seed=1, ...)` -- the
+    LITERAL 1, for every workflow in the corpus.  One draw of the agent's
+    adoption / induction / queue / drift coins therefore stood for all 900 events,
+    so the within-workflow half of the benign class was a single realisation
+    repeated rather than a sample of the population it is supposed to represent.
+    That makes the gate TOO STRICT, which is the OPPOSITE direction from the
+    missing `topic` feature -- and two holes pointing opposite ways are why review
+    II.3 forbids closing them one at a time.
+
+    PER WORKFLOW, not per event.  A workflow is one run of one agent over H tasks;
+    the events read off it are different (iota, sigma) windows into THAT run, and
+    giving each window its own agent stream would mean the same workflow was run
+    by several different agents at once.  Keying on `wf_id` gives every workflow
+    its own draw and keeps one workflow internally consistent.
+
+    Through `core.seed_of`, never `hash()`: hash() is randomised by PYTHONHASHSEED,
+    which would make a published AUC un-recheckable.  Masked to 16 bits like every
+    other agent seed in this module (`harvest`, `harvest_natural`).
+    """
+    return seed_of(seed, "one_event", wf.wf_id) & 0xFFFF
 
 
 def segment_half(rows: list, h: int, parity: int) -> list:
@@ -671,9 +759,9 @@ def _refuse_on_estimate_mismatch(pipe, pool: str, h: int,
 
 
 def matched_corpus(pipe, delta: int, eps: float, n_events: int,
-                   per_event: int = 4, pool: str = POOL, seed: int = SEED,
-                   carrier: str = CARRIER, natural: bool = False,
-                   holdout: int | None = None,
+                   per_event: int = PER_EVENT, pool: str = POOL,
+                   seed: int = SEED, carrier: str = CARRIER,
+                   natural: bool = NATURAL, holdout: int | None = HOLDOUT,
                    control_ids: set | None = None) -> tuple:
     """(payloads, benign) as F_match feature dicts -- a MATCHED case-control sample.
 
@@ -747,6 +835,10 @@ def _one_event(pipe, wf, ps: PoisonSpec, per_event: int, grouped: dict,
                control_ids: set | None = None) -> tuple:
     """Run one workflow with the payload planted, and read the event off at sigma.
 
+    The agent runs at `event_seed(seed, wf)` -- a draw PER WORKFLOW through
+    core.seed_of.  It was the literal `seed=1` for every workflow until gate 2 v2;
+    `event_seed`'s docstring is the record of what that cost.
+
     `natural` runs the workflow's own agent with benign churn on
     (NATURAL_DRIFT_RATE), so the WITHIN-workflow controls carry the same depth-2
     drift notes the enriched top-up pool does; with it False the agent runs at
@@ -762,10 +854,14 @@ def _one_event(pipe, wf, ps: PoisonSpec, per_event: int, grouped: dict,
     """
     store = CarrierStore()
     ag = agent.MockAgent(drift_rate=NATURAL_DRIFT_RATE) if natural else agent.MockAgent()
+    # P8, CLOSED.  This used to be the literal `seed=1` for EVERY workflow in the
+    # corpus; see `event_seed` for what that cost and why the draw is per workflow
+    # rather than per event.
+    wf_seed = event_seed(seed, wf)
     for t, task in enumerate(wf.tasks):
         if t == ps.iota:
             store.write(pipe.payload(wf, ps))
-        ag.run_task(t, task, store, seed=1, marker=ps.marker)
+        ag.run_task(t, task, store, seed=wf_seed, marker=ps.marker)
         if t != ps.sigma:
             continue
         # A poisoning EVENT is the injected payload, not what inherited from it:

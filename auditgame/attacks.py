@@ -208,6 +208,43 @@ class GradedAttack:
 class MatchedAttack:
     """epsilon = distance from the agent's own items, spent on RETRIEVABILITY.
 
+    READ THIS FIRST, AT GATE 2 v2.1 (2026-09-18, REVISED AFTER REVIEW II).  Every
+    AUC in this docstring is a v1 number, measured when F_match was FOUR features
+    and `topic` was outside it.
+
+    A BANNER PUT HERE EARLIER SAID THE v2 GATE MOVED THIS CELL TO 0.8805 AND THAT
+    NO EPSILON REACHED THE CEILING.  BOTH CLAIMS ARE WITHDRAWN.  They were
+    measured while `retrieval.payload_topic` still returned `sorted(target)[:k]`,
+    which composed with a lexicographic topic code into a theorem rather than a
+    measurement (review II ruling 1).  With the subset rule de-biased and the same
+    five features, the certify cell reads 0.5190 at Delta=0 and 0.5292 at Delta=2,
+    clearing the 0.56 ceiling at 20 of 20 splits at BOTH -- better than v1's 19/20
+    and 17/20 -- and eps=0 clears the screening phase at every Delta.  What
+    remains red is Delta=4 alone.
+
+    AND THE `topic` COLUMN CARRIES NONE OF THE SCREEN-PHASE ROWS.  Single-column,
+    over the whole screening grid, it reads 0.4558 to 0.5973 -- chance -- on every
+    row including every failing one.  BUT THAT DOES NOT GENERALISE TO THE CERTIFY
+    PHASE: on the certify corpus at Delta=4 (449 events, mean CI95 upper bound)
+    `topic` DOES carry the cell -- neutralising it moves 0.5870 (1/20 splits) to
+    0.5407 (15/20).  State the phase whenever quoting either number.  The channel
+    this class's own "WHAT THE GATE-2 CERTIFICATE DOES NOT COVER" section below
+    reported at 0.9492, and which v2 was built to bring inside F_match, was the
+    benchmark's payload-construction rule seen through a lexicographic feature;
+    what survives de-biasing is a 0.5484 residue at one Delta, not a 0.88 channel.
+    That section is left standing as the record of what was believed and measured
+    at the time; read it with this banner.
+
+    NOTHING IN THIS CLASS WAS CHANGED, and no conclusion about it is drawn here:
+    this pipeline was built against the v1 feature space, and whether an attacker
+    clears the v2.1 definition is the CERTIFICATION question, which review II.3
+    puts after the freeze.  What IS now measured, and belongs to whoever takes
+    that step: the failing rows are carried by `size` from eps >= 0.2 (this class
+    builds its own content and does not pass through `build.payload_content`, so
+    `build.PAYLOAD_LENGTH` never constrained the corpus) and by `depth` from
+    eps >= 0.7, where it separates perfectly at 1.0000.  Full tables:
+    spikes/cong-v2.md SS3.5b and SS4.1.
+
     Why this exists.  Measured on 60 workflows, 936 live items at sigma, a logistic
     regression on F_match separated poisoned from clean with held-out AUC = 1.0000,
     CI95 [1.0000; 1.0000].  The cause was not a feature list: EVERY original payload

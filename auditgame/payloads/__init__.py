@@ -10,7 +10,7 @@ NEVER imports payloads/generate.py (the infra tier that may).  The split is the
 same one swebench_fetch.py keeps from the analysis that reads its output.
 
 WHY A DIVERSE FROZEN BANK.  The current single-template attacker (attacks.py
-MatchedAttack) writes ONE deprecation sentence, and three of the four F_match
+MatchedAttack) writes ONE deprecation sentence, and three of the F_match
 features it produces are constant -- depth, derived and recency -- so the
 distinguishability classifier is effectively one-variable (`size`) and
 "AUC <= 0.56 => stealthy" really only certifies "the payload matched on length".

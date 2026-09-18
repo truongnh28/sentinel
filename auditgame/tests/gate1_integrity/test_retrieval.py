@@ -259,26 +259,51 @@ class EpsilonHasASurface(unittest.TestCase):
             "epsilon is still a no-op")
         self.assertNotEqual(lo.item_id, hi.item_id)
 
-    def test_epsilon_buys_retrievability_and_pays_in_size(self):
+    def test_epsilon_buys_retrievability_and_pays_in_advice_characters(self):
         """What makes it a BUDGET rather than a "make it stronger" knob: the two
-        ends pull against each other.  `size` is an F_match feature, so the
-        payload that is certain to be retrieved is also the easiest to spot.
+        ends pull against each other.
 
-        Thesis claim (vi): "epsilon danh doi truy xuat LAY do kho phat hien".
+        WHAT EPSILON PAYS WITH CHANGED AT GATE 2 v2, and this test changed with
+        it rather than being deleted.  Under v1 the topic tokens were interpolated
+        into a template of fixed remainder, so a wider tag meant a longer
+        `content` and the price was `size` -- an F_match feature.  That was the
+        defect, not the design: `size` is a feature the gate ALREADY scored, so
+        the retrieval knob was leaking through a column the certificate was
+        reading, and measured on the epsilon model page five real topics across
+        five epsilons produced 15 distinct sizes with exactly ONE collision, i.e.
+        `size` very nearly determined k.
+
+        Under the three-dimensional model (MO-HINH-EPSILON-BA-CHIEU.md SS3) the
+        content is built to a FROZEN total length, so the tag and the advice share
+        ONE budget: `size` is constant and the price of a wider tag is ADVICE
+        CHARACTERS, i.e. harm (SS4a's shape parameters), not detectability.  The
+        budget still has two ends that pull against each other -- it is just no
+        longer `size` on the far end.
+
+        Thesis claim (vi): "epsilon danh doi truy xuat LAY so ky tu loi khuyen;
+        `size` co dinh o L".
         """
         wf = self._wf()
         target = wf.tasks[3].topic
-        sims, sizes = [], []
+        sims, sizes, advice = [], [], []
         for eps in (0.25, 0.5, 0.75, 1.0):
             it = self._payload(wf, eps)
             sims.append(retrieval.sim(retrieval.as_topic(it.topic), target))
             sizes.append(it.surface(now=3)["size"])
+            advice.append(build.payload_advice_chars(it.topic))
         self.assertEqual(sims, sorted(sims), f"sim must be non-decreasing: {sims}")
-        self.assertEqual(sizes, sorted(sizes), f"size must be non-decreasing: {sizes}")
         self.assertLess(sims[0], sims[-1], f"epsilon cannot change sim: {sims}")
-        self.assertLess(sizes[0], sizes[-1],
-                        f"epsilon buys retrievability for FREE -- size does not "
-                        f"grow with it: {sizes}. There is no budget, only a dial.")
+        self.assertEqual(
+            set(sizes), {build.PAYLOAD_LENGTH},
+            f"the payload's size still moves with epsilon: {sizes}. L is not "
+            f"frozen, so the retrieval knob is leaking through a scored column "
+            f"again -- the exact defect gate 2 v2 closed by construction.")
+        self.assertEqual(advice, sorted(advice, reverse=True),
+                         f"advice budget must be non-increasing in eps: {advice}")
+        self.assertLess(
+            advice[-1], advice[0],
+            f"epsilon buys retrievability for FREE -- it costs no advice "
+            f"characters either: {advice}. There is no budget, only a dial.")
 
     def test_a_small_epsilon_can_miss_the_target_entirely(self):
         """The FAILING end, which is the half a budget needs and the half every
