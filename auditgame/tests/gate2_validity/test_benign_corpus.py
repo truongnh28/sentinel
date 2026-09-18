@@ -40,6 +40,13 @@ N_CERTIFY = G2.N_CERTIFY  # phase 2: the event count question 8 fixed (a CAP)
 DELTAS = G2.DELTAS
 EPSILONS = G2.EPSILON_GRID
 
+#: How many benign items the corpus harvests per event. It was inside the hash
+#: cell but NOT inside this file: `_matched_corpus` took it from a literal `4` in
+#: its own signature, so the frozen field and the number the corpus was actually
+#: built with could part company without a single test going red -- the one field
+#: of `corpus` whose pin did not bite, while `natural` and `holdout` did.
+PER_EVENT = G2.record()["corpus"]["per_event"]
+
 #: The train/test splits both phases are summarised over -- `discriminator.
 #: SPLIT_SEEDS`, read from there rather than restated, so the criterion and the
 #: thing that computes it cannot drift apart.  Both phases used to pass `seed=7`,
@@ -51,7 +58,8 @@ EPSILONS = G2.EPSILON_GRID
 SPLIT_SEEDS = D.SPLIT_SEEDS
 
 
-def _matched_corpus(pipe, delta: int, eps: float, n_events: int, per_event: int = 4):
+def _matched_corpus(pipe, delta: int, eps: float, n_events: int,
+                    per_event: int = PER_EVENT):
     """(payloads, benign) as F_match feature dicts -- a MATCHED case-control sample.
 
     The harvesting rule, why age-matching is forced, and why the pool is `full`
@@ -224,7 +232,7 @@ class BenignCorpus(unittest.TestCase):
             # measurement (review II ruling 1). With the subset rule de-biased the
             # same 80-event screen at eps=0 measures
             #
-            #     Delta   auc_median
+            #     Delta   screen statistic (auc_median)
             #     0         0.4952
             #     2         0.4643
             #     4         0.4770
@@ -236,9 +244,15 @@ class BenignCorpus(unittest.TestCase):
             # quantity. Reproduce: spikes/cong-v2.md SS3.5.
             screen = {}
             for eps in EPSILONS:
-                screen[eps] = {d: D.auc_over_splits(
+                # THE STATISTIC IS READ OFF THE FROZEN RECORD, not spelled
+                # here. `screen_criterion` used to be free text beside a
+                # hard-coded key, so a screen switched to `auc_max` would not
+                # have moved the digest. `G2.screen_statistic` is the one
+                # accessor, and `screen_criterion.statistic` is the frozen field
+                # it reads.
+                screen[eps] = {d: G2.screen_statistic(D.auc_over_splits(
                     *_matched_corpus(pipe, d, eps, N_SCREEN), ceiling=AUC_CEILING,
-                    seeds=SPLIT_SEEDS)["auc_median"] for d in DELTAS}
+                    seeds=SPLIT_SEEDS)) for d in DELTAS}
             passing = [e for e in EPSILONS
                        if all(v <= AUC_CEILING for v in screen[e].values())]
             with self.subTest(pipeline=name, phase="screen"):

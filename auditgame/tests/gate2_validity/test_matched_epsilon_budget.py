@@ -457,12 +457,35 @@ class TheTopicAxisIsInsideNowAndTheRESIDUEIsWhatStaysOutside(unittest.TestCase):
         a measurement (review II ruling 1).  With the subset rule de-biased the
         same corpus and the same eps measure AUC_upper = 0.5190 at Delta=0,
         0.5292 at Delta=2 (20 of 20 splits clearing at each) and 0.5870 at
-        Delta=4 -- and the `topic` column, measured alone, sits at chance on every
-        row of the grid.  The channel this class of test exists to keep visible is
-        REAL as a relational rule (below, 0.9492) and is NOT what the `topic`
-        column of F_match reads.  Whether an attacker clears the v2.1 definition
-        is the certification question and is NOT answered here.  Reproduce:
-        spikes/cong-v2.md SS3.1, SS3.5b.
+        Delta=4.
+
+        THE PHASE QUALIFIER, WHICH THIS FILE WAS MISSING AND core.py AND
+        attacks.py ALREADY CARRY.  "the `topic` column, measured alone, sits at
+        chance on every row of the grid" is true of the SCREEN phase (80 events,
+        median point estimate: 0.4558-0.5973 over all fifteen cells) and FALSE of
+        the CERTIFY cell quoted in the line above it: on the certify corpus at
+        Delta=4, `topic` alone reads 0.5484 with CI upper 0.5960, and neutralising
+        it moves the cell from 1/20 splits clearing to 15/20.  The two phases
+        differ by sample size (80 against 449) and by summary (median point
+        estimate against mean CI upper bound), and a residue of ~0.05 is not
+        resolvable on an 80-event fold.  Both facts are true; the unqualified
+        sentence was not.  STATE THE PHASE BESIDE EVERY `topic` NUMBER.
+
+        AND THE Delta=4 VERDICT IS NOT A PROPERTY OF THE BENCHMARK.  Those three
+        numbers are one draw of the subset rule's salt.  Over a 17-salt family the
+        same protocol on the same corpus seed puts the Delta=4 cell anywhere from
+        0.5244 (19/20 clearing) to 0.6426 (0/20), with 8 of 17 salts clearing and
+        9 failing -- the ceiling sits inside the induced range at Delta 2 and 4 and
+        inside the per-split spread at Delta=0.  So "fails only at Delta=4" is a
+        statement about THIS salt, not about the attacker: the benchmark cannot
+        presently resolve a pass from a fail at this margin.  spikes/cong-v2.md
+        SS3.9.
+
+        The channel this class of test exists to keep visible is REAL as a
+        relational rule (below, 0.9492) and is NOT what the `topic` column of
+        F_match reads.  Whether an attacker clears the v2.1 definition is the
+        certification question and is NOT answered here.  Reproduce:
+        spikes/cong-v2.md SS3.1, SS3.5b, SS3.9.
 
         Note the scope of the claim, which is narrower than "every eps < 1":
         the tag is strict exactly when ceil(eps*m) < m.  At eps = 0.7, m = 3 it is

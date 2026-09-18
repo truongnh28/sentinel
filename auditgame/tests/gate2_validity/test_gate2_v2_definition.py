@@ -200,23 +200,160 @@ class TopicJoinsTheMeasuredFeatureSpace(unittest.TestCase):
         payload's topic reaches `Item.__post_init__`, which hashes it into
         `item_id`, which seeds `detector.score`.
 
-        Thesis claim (vi): "quy tac tap con phai on dinh qua PYTHONHASHSEED".
+        THE PROBE COVERS EVERY SHAPE THE RULE ACCEPTS, not just the one that is
+        stable by construction.  `subset_priority` keys on the target's canonical
+        string, and until this was widened the probe passed only a
+        `retrieval.Topic`, whose `__str__` is canonical already -- so the test
+        certified a property of `Topic`, not of the rule.  `as_topic` hands a bare
+        `frozenset` straight back (`:99-101`) and `payload_topic_like` routes one
+        through at `:235`, and a bare frozenset's `str()` walks its hash table:
+        measured, the same call returned ['django'] / ['query'] / ['query'] under
+        PYTHONHASHSEED 0 / 1 / 2.  No published number moved -- production callers
+        pass `task.topic`, a `Topic` -- but a test quoted for "the subset rule is
+        PYTHONHASHSEED-stable" has to probe the rule's whole domain, or it is
+        narrower than the claim it is quoted for.  `set` and `list` are here for
+        the same reason: `as_topic` accepts them too.
+
+        Thesis claim (vi): "quy tac tap con phai on dinh qua PYTHONHASHSEED, voi
+        MOI dang dau vao no nhan".
+        """
+        shapes = {
+            "Topic": "retrieval.Topic({'django', 'db', 'models', 'query', 'sql'})",
+            "bare frozenset": "frozenset({'django', 'db', 'models', 'query', 'sql'})",
+            "set": "{'django', 'db', 'models', 'query', 'sql'}",
+            "list": "['django', 'db', 'models', 'query', 'sql']",
+        }
+        for shape, literal in shapes.items():
+            code = ("import sys; sys.path.insert(0, '.')\n"
+                    "import retrieval\n"
+                    f"t = {literal}\n"
+                    "print([sorted(retrieval.payload_topic(retrieval.as_topic(t), e))\n"
+                    "       for e in (0.2, 0.4, 0.6, 0.8)])\n"
+                    "print([sorted(retrieval.payload_topic_like(t, e))\n"
+                    "       for e in (0.2, 0.4, 0.6, 0.8)])\n")
+            outs = set()
+            for h in ("0", "1", "2", "424242"):
+                r = subprocess.run([sys.executable, "-c", code], capture_output=True,
+                                   text=True, cwd=str(pathlib.Path(build.__file__).parent),
+                                   env={"PYTHONHASHSEED": h, "PATH": "/usr/bin:/bin"})
+                self.assertEqual(r.returncode, 0, f"run failed at HASHSEED={h}: "
+                                                  f"{r.stderr[-400:]}")
+                outs.add(r.stdout)
+            with self.subTest(shape=shape):
+                self.assertEqual(
+                    len(outs), 1,
+                    f"the subset rule moves with PYTHONHASHSEED when the target is "
+                    f"a {shape}: {outs}. `subset_priority` must key on the "
+                    f"CANONICAL topic string for every shape `as_topic` accepts, "
+                    f"the way core._canonical_topic_string already does.")
+
+    def test_the_frozen_record_PINS_the_subset_rule_that_decides_the_cell(self):
+        """THE PIN THE FIRST FIX FORGOT.  Review II ruling 1 replaced the subset
+        rule; ruling 5 froze the parameters the cell is decided by; and the two
+        did not meet.  `record()` named the topic FEATURE and not the subset RULE
+        that feature is read through -- so the digest was blind to the single
+        decision that moves the certify cells furthest.  Measured, by rebuilding the tree at
+        `0c585b4` and changing the salt literal alone: `gate2_v2.md5()` came back
+        byte-identical at `45274180520227436a90f03ca1dd21db` and the definition
+        suite was unchanged (28 of 29 pass; the 29th errors only because the
+        extracted tree carries no `data/`).  Over a 17-salt family the Delta=4
+        cell runs from 0.5244 (19 of 20 splits clearing) to 0.6426 (0 of 20),
+        against 0.5870 (1 of 20) shipped.  A digest that cannot see that is not
+        freezing the definition, it is freezing a subset of it.
+
+        Two fields, because two things can move independently:
+
+          * `salt` -- the literal `core.seed_of` is keyed on.  It is a FREE
+            PARAMETER: nothing in the attack model prefers one string, and the
+            draw it induces is a different draw for each one.
+          * `fingerprint` -- a digest of the rule's OUTPUT over a fixed probe.
+            A prose `mechanism` string cannot go stale-but-green, because the
+            fingerprint moves when the tokens the rule picks move, whatever the
+            prose says.  That is the same defect this file flags in
+            `screen_criterion`, and it is closed the same way.
+
+        Thesis claim (vi): "quy tac tap con VA hat muoi cua no phai nam trong o
+        bam -- doi mot trong hai la md5 PHAI doi".
+        """
+        rec = gate2_v2.record()
+        self.assertIn("subset_rule", rec,
+                      "the frozen record does not name the subset rule at all")
+        sr = rec["subset_rule"]
+        self.assertEqual(sr["salt"], retrieval.SUBSET_SALT)
+        self.assertEqual(sr["mechanism"], retrieval.SUBSET_RULE)
+        self.assertEqual(sr["fingerprint"], retrieval.subset_rule_fingerprint())
+
+    def test_changing_the_subset_SALT_moves_the_digest(self):
+        """The salt is the parameter this pin exists for, so it gets its own test.
+
+        Not a test about shopping: the salt was fixed in the pre-registration
+        (`c85a936`) before any measurement, and it is the second-WORST of the
+        family at Delta=4.  It is a test about VISIBILITY -- whoever changes it
+        next must move the digest doing so, and therefore say so.
+
+        Thesis claim (vi): "doi hat muoi la doi dinh nghia cong, khong phai doi
+        mot chi tiet cai dat".
+        """
+        before = retrieval.SUBSET_SALT
+        base = gate2_v2.md5()
+        try:
+            retrieval.SUBSET_SALT = before + "#1"
+            self.assertNotEqual(
+                base, gate2_v2.md5(),
+                "changing the subset salt left the frozen digest unchanged. The "
+                "salt decides which tokens the payload carries and moves the "
+                "certify cells by more than the criterion's own margin; a freeze "
+                "that does not react to it is decorative.")
+        finally:
+            retrieval.SUBSET_SALT = before
+        self.assertEqual(gate2_v2.md5(), base, "the salt was not restored")
+
+    def test_changing_the_subset_MECHANISM_moves_the_digest(self):
+        """The salt is not the only way to change which tokens get stamped.
+
+        The fingerprint is taken over the rule's OUTPUT, so putting `sorted()[:k]`
+        back -- the exact regression review II ruling 1 removed -- moves the
+        digest even though the salt, the prose and every other field are
+        untouched.
+
+        Thesis claim (vi): "dua `sorted()` tro lai PHAI lam md5 doi".
+        """
+        base = gate2_v2.md5()
+        before = retrieval.payload_topic
+        try:
+            retrieval.payload_topic = lambda target, eps: retrieval.Topic(
+                sorted(target)[:max(1, __import__("math").ceil(eps * len(target)))]
+            ) if target else retrieval.Topic()
+            self.assertNotEqual(
+                base, gate2_v2.md5(),
+                "restoring the alphabetical-prefix subset rule left the frozen "
+                "digest unchanged: the freeze covers the rule's NAME and not its "
+                "BEHAVIOUR.")
+        finally:
+            retrieval.payload_topic = before
+        self.assertEqual(gate2_v2.md5(), base, "the rule was not restored")
+
+    def test_the_subset_rule_fingerprint_is_itself_PYTHONHASHSEED_stable(self):
+        """A pinned digest that moves between two runs of the same code would make
+        the freeze unfalsifiable -- every checker would get a different answer and
+        none could tell a real edit from a re-run.
+
+        Thesis claim (vi): "van tay quy tac tap con phai tai lap duoc giua cac
+        tien trinh".
         """
         code = ("import sys; sys.path.insert(0, '.')\n"
                 "import retrieval\n"
-                "t = retrieval.Topic({'django', 'db', 'models', 'query', 'sql'})\n"
-                "print([sorted(retrieval.payload_topic(t, e))\n"
-                "       for e in (0.2, 0.4, 0.6, 0.8)])\n")
+                "print(retrieval.subset_rule_fingerprint())\n")
         outs = set()
-        for h in ("0", "1", "424242"):
+        for h in ("0", "1", "2", "424242"):
             r = subprocess.run([sys.executable, "-c", code], capture_output=True,
                                text=True, cwd=str(pathlib.Path(build.__file__).parent),
                                env={"PYTHONHASHSEED": h, "PATH": "/usr/bin:/bin"})
             self.assertEqual(r.returncode, 0, f"run failed at HASHSEED={h}: "
                                               f"{r.stderr[-400:]}")
-            outs.add(r.stdout)
+            outs.add(r.stdout.strip())
         self.assertEqual(len(outs), 1,
-                         f"the subset rule moves with PYTHONHASHSEED: {outs}")
+                         f"the subset-rule fingerprint moves with PYTHONHASHSEED: {outs}")
 
     def test_the_topic_feature_is_the_one_the_frozen_record_NAMES(self):
         """Four defensible lexicographic codes of a token set span AUC 0.45 to
@@ -639,6 +776,14 @@ class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
         self.assertEqual(rec["corpus"]["holdout"], B.HOLDOUT)
         self.assertEqual(rec["topic_feature"], core.TOPIC_CODE_CHOICE)
         self.assertEqual(rec["payload_length_rule"], build.PAYLOAD_LENGTH_RULE)
+        # FIX 2 -- the subset rule and its salt. Measured on the tree at
+        # 0c585b4: with the salt alone changed the digest came back identical and
+        # the definition suite was unchanged, while the Delta=4 certify cell moves
+        # across a 17-salt family from 1/20 to as many as 19/20 splits clearing.
+        self.assertEqual(rec["subset_rule"]["salt"], retrieval.SUBSET_SALT)
+        self.assertEqual(rec["subset_rule"]["mechanism"], retrieval.SUBSET_RULE)
+        self.assertEqual(rec["subset_rule"]["fingerprint"],
+                         retrieval.subset_rule_fingerprint())
 
     def test_the_gate_test_reads_the_protocol_off_the_frozen_record(self):
         """A pinned criterion that the gate does not actually run is decorative.
@@ -654,6 +799,52 @@ class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
         self.assertEqual(T.N_CERTIFY, gate2_v2.N_CERTIFY)
         self.assertEqual(tuple(T.EPSILONS), tuple(gate2_v2.EPSILON_GRID))
         self.assertEqual(tuple(T.DELTAS), tuple(gate2_v2.DELTAS))
+        #: `per_event` was in the hash cell but NOT in the gate test: the test
+        #: took it from a literal default of 4 in `_matched_corpus`'s signature,
+        #: so the record's field and the number the corpus was built with could
+        #: part company silently, which is exactly the failure `natural` and
+        #: `holdout` are covered against.
+        self.assertEqual(T.PER_EVENT, gate2_v2.record()["corpus"]["per_event"])
+
+    def test_the_screen_criterion_NAMES_the_statistic_the_screen_READS(self):
+        """`screen_criterion` was free text.  Nothing bound the sentence to the
+        `auc_median` the screen actually indexes out of `auc_over_splits`, so a
+        screen switched to `auc_max` -- a strictly different and much harsher
+        criterion on an 80-event fold -- would not have moved the digest by one
+        bit.  The only test on the field was a tautology (`rec["screen_criterion"]
+        == SCREEN_CRITERION`).
+
+        It is bound by giving the record a NAMED KEY and one accessor, and making
+        the gate test read the statistic through that accessor instead of
+        spelling it.  Changing the screen then requires editing a frozen field.
+
+        Thesis claim (vi): "tieu chi sang phai GOI TEN dai luong ma no doc, khong
+        phai mo ta bang van xuoi".
+        """
+        import inspect
+        from tests.gate2_validity import test_benign_corpus as T
+        stat = gate2_v2.SCREEN_CRITERION["statistic"]
+        def _row(x):
+            return {f: x for f in D.F_MATCH}
+        probe = D.auc_over_splits([_row(v) for v in (1.0, 2.0, 3.0, 4.0)] * 8,
+                                  [_row(v) for v in (1.5, 2.5, 3.5, 0.5)] * 8,
+                                  ceiling=0.56, seeds=D.SPLIT_SEEDS[:3])
+        self.assertIn(stat, probe,
+                      f"screen_criterion names statistic {stat!r}, which "
+                      f"discriminator.auc_over_splits does not return")
+        self.assertEqual(gate2_v2.screen_statistic(probe), probe[stat],
+                         "gate2_v2.screen_statistic does not read the field")
+        src = inspect.getsource(T)
+        self.assertIn("screen_statistic", src,
+                      "the gate test does not read the screened statistic through "
+                      "gate2_v2.screen_statistic")
+        for literal in (f'["{stat}"]', f"['{stat}']"):
+            self.assertNotIn(
+                literal, src,
+                f"the gate test still indexes {literal} directly. The screened "
+                f"statistic must come from gate2_v2.screen_statistic, or the "
+                f"pinned criterion and the criterion that runs are two objects "
+                f"that happen to agree today.")
 
     def test_the_md5_is_the_one_the_definition_was_frozen_at(self):
         """THE PIN.  Any edit to a frozen field moves this digest, and moving it
@@ -692,6 +883,8 @@ class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
                              ("event_seed_rule", "constant-1"),
                              ("criterion", "max_ci95_upper_over_split_seeds"),
                              ("screen_criterion", "max_over_split_seeds"),
+                             ("screen_criterion",
+                              dict(rec["screen_criterion"], statistic="auc_max")),
                              ("epsilon_grid", [0.0, 0.5, 1.0]),
                              ("deltas", [0, 2]),
                              ("n_events", {"screen": 80, "certify": 620}),
@@ -699,7 +892,14 @@ class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
                              ("payload_length_rule", "content is always exactly L"),
                              ("corpus", dict(rec["corpus"], natural=True)),
                              ("corpus", dict(rec["corpus"], per_event=8)),
-                             ("corpus", dict(rec["corpus"], holdout=1))):
+                             ("corpus", dict(rec["corpus"], holdout=1)),
+                             ("subset_rule",
+                              dict(rec["subset_rule"], salt="some_other_salt")),
+                             ("subset_rule",
+                              dict(rec["subset_rule"], fingerprint="0" * 16)),
+                             ("subset_rule",
+                              dict(rec["subset_rule"],
+                                   mechanism="k smallest tokens of B"))):
             with self.subTest(field=field):
                 self.assertNotEqual(
                     base, gate2_v2.md5(dict(rec, **{field: value})),
@@ -710,10 +910,36 @@ class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
         """Review II.3's order: close, freeze, THEN run the table once.  A frozen
         definition carrying a verdict would be a verdict taken before the freeze.
 
-        Thesis claim (vi): "ban ghi dinh nghia KHONG mang phan quyet nao".
+        THE CHECK IS "NO MEASURED AUC", NOT "NO OCCURRENCE OF THE LETTERS auc".
+        It used to be the second, and that is why `screen_criterion` could only
+        ever be prose: the moment the record NAMES the statistic it reads
+        (`auc_median`, which is the whole point of binding it) the blanket string
+        ban fires on a field that carries no measurement at all.  So the ban is
+        stated as what it means: "auc" may appear only as a STATISTIC NAME, in the
+        two criterion fields, and never next to a digit.  Adding
+        `certify_auc=0.587` to the record still goes red, which is the property
+        this test exists for.
+
+        Thesis claim (vi): "ban ghi dinh nghia KHONG mang phan quyet nao -- ten
+        dai luong thi duoc, GIA TRI do duoc thi khong".
         """
         rec = gate2_v2.record()
-        self.assertNotIn("auc", json.dumps(rec).lower())
+        allowed = {"criterion", "screen_criterion"}
+        for field, value in rec.items():
+            blob = json.dumps(value, ensure_ascii=False).lower()
+            if "auc" not in blob and "auc" not in field.lower():
+                continue
+            with self.subTest(field=field):
+                self.assertIn(field, allowed,
+                              f"{field!r} mentions an AUC. The frozen record "
+                              f"carries the DEFINITION; a measured value in it "
+                              f"would be a verdict taken before the freeze.")
+                self.assertFalse(
+                    any(ch.isdigit() for ch in blob),
+                    f"{field!r} carries an AUC beside a digit: that is a "
+                    f"measurement, not a criterion. {blob}")
+        self.assertEqual(rec["criterion"], "mean_ci95_upper_over_split_seeds")
+        self.assertEqual(rec["screen_criterion"]["statistic"], "auc_median")
         self.assertEqual(rec["verdict"], "NOT DRAWN -- certification is a separate step")
 
 

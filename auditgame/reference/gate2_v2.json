@@ -1,6 +1,6 @@
 {
   "generated_by": "analysis/gate2_v2.py::write",
-  "md5": "45274180520227436a90f03ca1dd21db",
+  "md5": "9682c1958d40d28874ab4088dcbafce0",
   "record": {
     "ceiling": 0.56,
     "corpus": {
@@ -40,7 +40,13 @@
     },
     "payload_length_L": 63,
     "payload_length_rule": "len(content) == payload_length_L exactly when len(payload_tag(topic)) < payload_length_L; otherwise the payload is the tag alone and build.payload_length_reason(topic) states why",
-    "screen_criterion": "median_point_estimate_over_split_seeds <= ceiling at EVERY delta; eps_star = max passing epsilon",
+    "screen_criterion": {
+      "comparison": "<= ceiling",
+      "eps_star": "max passing epsilon",
+      "over": "split_seeds",
+      "scope": "at EVERY delta",
+      "statistic": "auc_median"
+    },
     "split_seeds": [
       1,
       2,
@@ -63,6 +69,11 @@
       19,
       20
     ],
+    "subset_rule": {
+      "fingerprint": "010afe8ce9bb3af0",
+      "mechanism": "k = max(1, ceil(eps * |B|)) tokens of B, ordered by (core.seed_of(SUBSET_SALT, canonical_topic_string(B), token), token); nested in eps",
+      "salt": "payload_topic"
+    },
     "test_fraction": 0.4,
     "theta": 0.5,
     "topic_feature": "mean",

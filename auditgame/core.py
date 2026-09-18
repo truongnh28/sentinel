@@ -49,8 +49,15 @@ def _canonical_topic_string(topic) -> str:
     bare frozenset's str() walks its hash table -- so the tokens are re-wrapped in
     `Topic` before stringifying, which is what makes this PYTHONHASHSEED-stable
     for every input shape, not just for the ones that already are Topics.
+
+    That re-wrap now lives in `retrieval.canonical_topic_string`, beside `Topic`
+    itself, and this function delegates.  It was duplicated here while
+    `retrieval.subset_priority` -- 30 lines away in the other module -- keyed on a
+    bare `str(target)` and was NOT stable for every shape it accepts.  One
+    definition is what stops the two spellings drifting again; the value is
+    byte-identical and no measured number moved.
     """
-    return str(retrieval.Topic(str(t) for t in retrieval.as_topic(topic)))
+    return retrieval.canonical_topic_string(topic)
 
 
 def _topic_code_canonical(topic) -> float:

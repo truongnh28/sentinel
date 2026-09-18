@@ -56,7 +56,7 @@ PATH = str(pathlib.Path(__file__).resolve().parent.parent
 #: visible edit to the criterion rather than a quiet one.  Regenerate with
 #:     python3 -c "from analysis import gate2_v2; gate2_v2.write()"
 #: and the test that pins it will tell you the new digest.
-FROZEN_MD5 = "45274180520227436a90f03ca1dd21db"
+FROZEN_MD5 = "9682c1958d40d28874ab4088dcbafce0"
 
 #: THE CERTIFICATION PROTOCOL, owned HERE because the record is what pins it.
 #: `tests/gate2_validity/test_benign_corpus.py` imports these instead of defining
@@ -73,8 +73,31 @@ N_SCREEN = 80             # phase 1 sample: a RANKING question, deliberately che
 N_CERTIFY = 900           # phase 2 sample: question 8's event count (a CAP)
 EPSILON_GRID = (0.0, 0.2, 0.4, 0.7, 1.0)
 DELTAS = (0, 2, 4)
-SCREEN_CRITERION = ("median_point_estimate_over_split_seeds <= ceiling at EVERY "
-                    "delta; eps_star = max passing epsilon")
+#: WHY THIS IS A NAMED KEY AND NOT A SENTENCE.  It used to be free text, and
+#: nothing bound the sentence to the statistic the screen actually indexes out of
+#: `discriminator.auc_over_splits`.  Switching the screen from `auc_median` to
+#: `auc_max` -- a strictly different and, on an 80-event fold, much harsher
+#: criterion -- would not have moved the frozen digest by one bit, and the only
+#: test on the field compared it to itself.  `statistic` is now the literal KEY the
+#: gate test reads through `screen_statistic()`, so changing the screen means
+#: editing a frozen field.  Same disease, same cure, as `subset_rule.fingerprint`.
+SCREEN_CRITERION = dict(
+    statistic="auc_median",          # the key read off discriminator.auc_over_splits
+    over="split_seeds",              # ... aggregated across THIS set, not one shuffle
+    comparison="<= ceiling",
+    scope="at EVERY delta",
+    eps_star="max passing epsilon",
+)
+
+
+def screen_statistic(split_result: dict) -> float:
+    """The screened statistic, read out of an `auc_over_splits` result BY THE NAME
+    the frozen record pins.
+
+    One accessor, so "the criterion that is pinned" and "the criterion that runs"
+    are the same object rather than two copies that agree today.
+    """
+    return split_result[SCREEN_CRITERION["statistic"]]
 
 
 def record(**overrides) -> dict:
@@ -112,6 +135,24 @@ def record(**overrides) -> dict:
         #: this corpus, so "features includes topic" does not pin the feature: an
         #: under-specified topic feature is how the `sorted()` artefact recurs.
         topic_feature=core.TOPIC_CODE_CHOICE,
+        #: HOW THE PAYLOAD'S TAG IS CHOSEN -- the rule AND the salt it is drawn
+        #: under.  This was the hole the first fix left: review II ruling 1
+        #: REPLACED the subset rule and ruling 5 froze the parameters the cell is
+        #: decided by, and the two did not meet.  Measured: with only the salt
+        #: literal changed, this digest did NOT move, every definition test stayed
+        #: green (28 of 29; the 29th errors only because the extracted tree has
+        #: no data/), and the Delta=4 certify cell moves as far as 1/20 -> 19/20
+        #: splits clearing across a 17-salt family -- verdicts moving in BOTH
+        #: directions at Delta 2 and 4 (spikes/cong-v2.md SS3.9).  The salt is a
+        #: parameter of the measurement, not an implementation detail.
+        #:
+        #: `fingerprint` is what makes the pin BITE.  `mechanism` is prose and
+        #: prose can go stale-but-green; the fingerprint is a digest of WHICH
+        #: TOKENS the rule picks over a fixed probe, so putting `sorted()[:k]`
+        #: back moves the digest even with the prose and the salt untouched.
+        subset_rule=dict(mechanism=retrieval.SUBSET_RULE,
+                         salt=retrieval.SUBSET_SALT,
+                         fingerprint=retrieval.subset_rule_fingerprint()),
         #: The frozen retrieval threshold, already in metrics.config_sha's cell --
         #: repeated here because the corpus's dormancy filter is stated against it.
         theta=retrieval.THETA,
@@ -121,7 +162,7 @@ def record(**overrides) -> dict:
         #: standard error is 0.023).  See discriminator.summarise_splits.
         criterion="mean_ci95_upper_over_split_seeds",
         #: The criterion that runs FIRST and that actually decides the red cell.
-        screen_criterion=SCREEN_CRITERION,
+        screen_criterion=dict(SCREEN_CRITERION),
         #: The grid the screen ranks over.  A criterion stated without its grid is
         #: not reproducible: "no epsilon reaches the ceiling" is a claim about a
         #: SET of epsilons.

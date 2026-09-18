@@ -16,9 +16,14 @@ clone-and-run.
 
 EVERY AUC QUOTED IN THIS FILE IS A v1 NUMBER -- four features, {size, depth,
 recency, derived}.  Gate 2 v2 (2026-09-18, analysis/gate2_v2.py, md5
-d7e7124eb3a46dfe64d9f205850504d9) put `topic` into F_match, and on the certify
-corpus the cells below move from 0.5414 / 0.5394 / 0.5411 to 0.5190 / 0.5292 /
-0.5870 at Delta 0 / 2 / 4.  (An intermediate restatement of those three as
+9682c1958d40d28874ab4088dcbafce0 -- the CURRENT digest; the cells below were
+first restated beside the superseded d7e7124e..., which is why this line now
+carries the live one) put `topic` into F_match, and on the certify corpus the
+cells below move from 0.5414 / 0.5394 / 0.5411 to 0.5190 / 0.5292 / 0.5870 at
+Delta 0 / 2 / 4 -- under the subset salt "payload_topic".  That last clause is
+not decoration: the same protocol under other salts puts the Delta=4 cell
+anywhere from 0.5244 to 0.6426 (spikes/cong-v2.md SS3.9), so any cell quoted from
+this corpus has to name the salt the way it names the seed.  (An intermediate restatement of those three as
 0.8805 / 0.9073 / 0.9373 is WITHDRAWN -- it was measured while
 `retrieval.payload_topic` still returned the alphabetical prefix, which composed
 with a lexicographic topic code into a theorem rather than a measurement; review
@@ -212,9 +217,9 @@ SEED = 20260916
 #: measurements of the attacker (they were taken under the `sorted()[:k]` subset
 #: rule, review II ruling 1), but the POINT stands and is what this constant is
 #: for: the choice of benign background moves the cell by more than the criterion's
-#: own margin, so a record that does not pin it does not pin the population.  A record that pins the pool, the carrier, h and
-#: the seed but NOT which of the two benign backgrounds is read is a record that
-#: does not pin the population at all.
+#: own margin, so a record that pins the pool, the carrier, h and the seed but NOT
+#: which of the two benign backgrounds is read is a record that does not pin the
+#: population at all.
 NATURAL = False
 
 #: Controls matched to each poisoning event.  A CONTRACT (`harvest` refuses a pool

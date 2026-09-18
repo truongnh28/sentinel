@@ -456,16 +456,17 @@ Các trường **mới vào ô băm**:
 | `corpus.per_event` | là **hợp đồng** (`harvest` từ chối pool không cấp đủ) → quyết repo nào sống sót |
 | `corpus.holdout` | chọn **parity segment** → quyết corpus có rò rỉ hay không |
 | `n_events` (`screen` 80, `certify` 900) | hai cỡ mẫu của hai pha |
-| `screen_criterion` | **thứ thực sự quyết ô đỏ**, trước đây không được ghim |
+| `screen_criterion` | **thứ thực sự quyết ô đỏ**, trước đây không được ghim. **Nay nó GỌI TÊN đại lượng** (`statistic = "auc_median"`) thay vì mô tả bằng văn xuôi: trước bản sửa này, đổi pha sàng sang `auc_max` — một tiêu chí khác hẳn và khắc nghiệt hơn nhiều trên 80 sự kiện — **không dịch digest một bit nào**, và test duy nhất trên trường là một phép lặp tautology |
+| `subset_rule` (`mechanism`, `salt`, `fingerprint`) | **THAM SỐ QUYẾT ĐỊNH Ô, mà bản trước để trống hoàn toàn.** Phán quyết 1 **thay** quy tắc tập con, phán quyết 5 đóng băng các tham số quyết định ô, và hai việc **không gặp nhau**. Đo được, bằng cách dựng lại cây ở `0c585b4` và **chỉ** đổi chuỗi muối: md5 trả về **y hệt** `45274180520227436a90f03ca1dd21db`, bộ test định nghĩa **không đổi** (28/29 đạt; cái thứ 29 lỗi chỉ vì cây trích xuất không có `data/`), trong khi ô Δ=4 chạy từ **1/20** tới tận **19/20** trên họ 17 hạt muối. `fingerprint` là digest trên **đầu ra** của quy tắc trên một probe cố định — văn xuôi có thể ôi mà vẫn xanh, đầu ra thì không (§3.9) |
 | `epsilon_grid`, `deltas` | *"không ε nào đạt trần"* là khẳng định về **một TẬP** ε |
 | `topic_feature` | bốn mã từ điển hợp lệ trải AUC 0,45–1,00 → `"topic"` trong `features` **không** ghim được đặc trưng |
 | `payload_length_rule` | ghim $L$ **kèm ngoại lệ** — `payload_length_L = 63` một mình đọc như *"size luôn bằng 63"*, mà 7,6% sự kiện ở ε=1 không thoả |
 
 ```json
-{"ceiling":0.56,"corpus":{"carrier":"memory","corpus_seed":20260916,"h":8,"holdout":null,"natural":false,"per_event":4,"pool":"full"},"criterion":"mean_ci95_upper_over_split_seeds","date":"2026-09-18","deltas":[0,2,4],"epsilon_grid":[0.0,0.2,0.4,0.7,1.0],"event_seed_rule":"seed_of(SEED, 'one_event', wf.wf_id) & 0xFFFF","features":["depth","derived","recency","size","topic"],"n_events":{"certify":900,"screen":80},"payload_length_L":63,"payload_length_rule":"len(content) == payload_length_L exactly when len(payload_tag(topic)) < payload_length_L; otherwise the payload is the tag alone and build.payload_length_reason(topic) states why","screen_criterion":"median_point_estimate_over_split_seeds <= ceiling at EVERY delta; eps_star = max passing epsilon","split_seeds":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],"test_fraction":0.4,"theta":0.5,"topic_feature":"mean","verdict":"NOT DRAWN -- certification is a separate step","version":2}
+{"ceiling":0.56,"corpus":{"carrier":"memory","corpus_seed":20260916,"h":8,"holdout":null,"natural":false,"per_event":4,"pool":"full"},"criterion":"mean_ci95_upper_over_split_seeds","date":"2026-09-18","deltas":[0,2,4],"epsilon_grid":[0.0,0.2,0.4,0.7,1.0],"event_seed_rule":"seed_of(SEED, 'one_event', wf.wf_id) & 0xFFFF","features":["depth","derived","recency","size","topic"],"n_events":{"certify":900,"screen":80},"payload_length_L":63,"payload_length_rule":"len(content) == payload_length_L exactly when len(payload_tag(topic)) < payload_length_L; otherwise the payload is the tag alone and build.payload_length_reason(topic) states why","screen_criterion":{"comparison":"<= ceiling","eps_star":"max passing epsilon","over":"split_seeds","scope":"at EVERY delta","statistic":"auc_median"},"split_seeds":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],"subset_rule":{"fingerprint":"010afe8ce9bb3af0","mechanism":"k = max(1, ceil(eps * |B|)) tokens of B, ordered by (core.seed_of(SUBSET_SALT, canonical_topic_string(B), token), token); nested in eps","salt":"payload_topic"},"test_fraction":0.4,"theta":0.5,"topic_feature":"mean","verdict":"NOT DRAWN -- certification is a separate step","version":2}
 ```
 
-$$\boxed{\texttt{md5} = \texttt{45274180520227436a90f03ca1dd21db}}$$
+$$\boxed{\texttt{md5} = \texttt{9682c1958d40d28874ab4088dcbafce0}}$$
 
 Digest **đã dịch** khỏi `d7e7124eb3a46dfe64d9f205850504d9` của bản v2 — **đúng
 như phải thế**: các trường mới vào ô, và `topic_feature` đổi từ (ngầm) `mean`
@@ -480,16 +481,32 @@ python3 -c "import sys; sys.path.insert(0,'.'); from analysis import gate2_v2; p
 Ghim bởi `tests/gate2_validity/test_gate2_v2_definition.py::TheGateTwoV2DefinitionIsFrozen`,
 gồm một test **nhiễu từng trường một** đòi digest phải dịch cho **17** phép
 nhiễu (kể cả ba phép nhiễu riêng vào `corpus.natural`, `corpus.per_event`,
-`corpus.holdout`) — một ô băm không phản ứng là một ô băm không phủ.
+`corpus.holdout`) — một ô băm không phản ứng là một ô băm không phủ. Bản sửa này
+đưa lên **21**: thêm `subset_rule.salt`, `subset_rule.fingerprint`,
+`subset_rule.mechanism` và `screen_criterion.statistic`.
 
 **Và tiêu chí được GHIM đúng là tiêu chí được CHẠY.**
-`tests/gate2_validity/test_benign_corpus.py` **import** trần, hai cỡ mẫu, lưới ε
-và tập Δ **từ `gate2_v2`** thay vì tự khai lại, và có một test khẳng định hai bên
-bằng nhau. Trước đây chúng là hằng số chép tay trong file test — tức digest phủ
-một tiêu chí, còn cổng chạy một tiêu chí khác.
+`tests/gate2_validity/test_benign_corpus.py` **import** trần, hai cỡ mẫu, lưới ε,
+tập Δ **và `corpus.per_event`** từ `gate2_v2` thay vì tự khai lại, và có một test
+khẳng định hai bên bằng nhau. Trước đây chúng là hằng số chép tay trong file test
+— tức digest phủ một tiêu chí, còn cổng chạy một tiêu chí khác.
 
-**Bản ghi KHÔNG mang phán quyết.** Trường `verdict` nói thẳng điều đó và có một
-test khẳng định trong bản ghi **không có chữ `auc` nào**.
+Hai chỗ **vẫn hở** cho tới bản sửa này, và nay đã bịt:
+
+* **`per_event`** nằm trong ô băm nhưng **không** nằm trong file test: nó đến từ
+  một literal `4` trong chữ ký `_matched_corpus`. `natural` và `holdout` thì cắn,
+  trường này thì không — đúng một trường của `corpus` mà phép ghim không có răng.
+* **đại lượng pha sàng** được đánh chỉ số bằng literal `["auc_median"]` ngay cạnh
+  một `screen_criterion` là văn xuôi. Nay cổng đọc qua `gate2_v2.screen_statistic`,
+  và có một test đòi file test **không** được đánh chỉ số bằng tên đại lượng nữa.
+
+**Bản ghi KHÔNG mang phán quyết.** Trường `verdict` nói thẳng điều đó, và test
+canh việc này nay phát biểu **đúng điều nó muốn nói**: `"auc"` được phép xuất hiện
+**như TÊN một đại lượng**, chỉ trong hai trường tiêu chí, và **không bao giờ cạnh
+một chữ số**. Lệnh cấm cũ là cấm chuỗi ký tự, và chính nó là lý do
+`screen_criterion` chỉ có thể là văn xuôi: đúng lúc bản ghi **gọi tên** đại lượng
+nó đọc thì lệnh cấm nổ. Thêm `certify_auc=0.587` vào bản ghi vẫn **đỏ** — đó là
+tính chất mà test tồn tại vì nó.
 
 ```mermaid
 flowchart LR
@@ -847,13 +864,125 @@ tập con là nguyên topic ở cả hai quy tắc.
 
 ---
 
+### 3.9 BẢNG ĐỘ NHẠY HẠT MUỐI — nghĩa vụ mà bản trước BỎ SÓT
+
+> **ĐÂY KHÔNG PHẢI MỘT CÁO BUỘC CHỌN KẾT QUẢ, và không được đọc như vậy.** Hạt
+> muối `"payload_topic"` nằm trong **mã giả tiền đăng ký** ở §0bis.2, commit
+> `c85a936`, **trước** mọi phép đo, và chưa từng bị đổi. Bảng dưới còn cho thấy
+> nó **không** có hình dạng của một lựa chọn có lợi: ở Δ = 4 nó xếp **thứ 12/17**
+> (5 hạt muối tệ hơn, 11 tốt hơn) và ở Δ = 2 xếp **thứ 10/17**. Cái **sai** không
+> phải là kỷ luật — mà là **công bố**: bản trước in một bảng độ nhạy bốn ứng viên
+> cho **ĐẶC TRƯNG** (§3.7) và **không in cái nào** cho **QUY TẮC TẬP CON**, trong
+> khi những con số dưới đây cho thấy quy tắc tập con **quan trọng hơn**.
+
+**Hạt muối là một THAM SỐ TỰ DO.** `retrieval.subset_priority` rút thứ tự ưu tiên
+qua `core.seed_of(SUBSET_SALT, canonical_topic_string(B), token)`. Mô hình tấn
+công đòi một tập con **độc lập với bảng chữ cái**; **mọi** chuỗi muối cho một tập
+con như thế, và **mỗi** chuỗi cho một tập con **khác**. Không có gì trong mô hình
+ưu tiên chuỗi này hơn chuỗi kia.
+
+**HỌ HẠT MUỐI, khai trước và cơ học** — không có chỗ cho lựa chọn: hạt muối đã
+giao, cộng **đúng** `"payload_topic#1"` … `"payload_topic#16"`, tức **17** hạt.
+Không hạt nào bị bỏ, không hạt nào được thêm sau khi nhìn kết quả.
+
+Kịch bản tái lập (`$SALT` chạy qua 17 giá trị của họ trên):
+
+```python
+# python3 salt_cell.py "payload_topic#7"
+import sys; sys.path.insert(0, ".")
+import retrieval
+retrieval.SUBSET_SALT = sys.argv[1]          # doc LUC GOI, nhu TOPIC_CODE_CHOICE
+import attacks
+from analysis import benign_corpus as B, discriminator as D, gate2_v2 as G2
+pipe = attacks.REGISTRY["matched"]
+for d in G2.DELTAS:
+    pos, neg = B.matched_corpus(pipe, d, 0.0, G2.N_CERTIFY)
+    r = D.auc_over_splits(pos, neg, ceiling=0.56, seeds=D.SPLIT_SEEDS)
+    print(sys.argv[1], d, len(pos), round(r["auc_mean"], 4), round(r["hi_mean"], 4),
+          round(r["hi_min"], 4), round(r["hi_max"], 4), f"{r['clear']}/{r['k']}")
+```
+
+**Pha CHỨNG NHẬN**, ε = 0, corpus seed 20260916, trần 0,56, cận trên CI **trung
+bình** trên 20 split. `[min–max]` là dải cận trên **giữa các split** của chính
+hạt muối đó.
+
+| hạt muối | Δ=0 | Δ=2 | Δ=4 |
+|---|---|---|---|
+| **`payload_topic`** (ĐÃ GIAO) | **0,5190** ✅ 20/20 [0,4734–0,5480] | **0,5292** ✅ 20/20 [0,4899–0,5584] | **0,5870** ❌ 1/20 [0,5383–0,6314] |
+| `payload_topic#1` | 0,5326 ✅ 19/20 | 0,5249 ✅ 18/20 | **0,5565 ✅ 12/20** |
+| `payload_topic#2` | 0,5293 ✅ 20/20 | 0,5113 ✅ 20/20 | 0,6127 ❌ 0/20 |
+| `payload_topic#3` | 0,5382 ✅ 20/20 | **0,5642 ❌ 7/20** | 0,5670 ❌ 7/20 |
+| `payload_topic#4` | 0,5374 ✅ 20/20 | **0,5691 ❌ 5/20** | 0,6426 ❌ 0/20 |
+| `payload_topic#5` | 0,5598 ✅ **8/20** | **0,6023 ❌ 0/20** | 0,6416 ❌ 0/20 |
+| `payload_topic#6` | 0,5415 ✅ 18/20 | 0,5317 ✅ 20/20 | 0,5740 ❌ 3/20 |
+| `payload_topic#7` | 0,5319 ✅ 19/20 | 0,5308 ✅ 19/20 | 0,6012 ❌ 2/20 |
+| `payload_topic#8` | 0,5408 ✅ 18/20 | 0,5214 ✅ 20/20 | **0,5445 ✅ 14/20** |
+| `payload_topic#9` | 0,5333 ✅ 19/20 | **0,5680 ❌ 8/20** | 0,5982 ❌ 1/20 |
+| `payload_topic#10` | 0,5296 ✅ 19/20 | 0,5189 ✅ 20/20 | **0,5432 ✅ 10/20** |
+| `payload_topic#11` | 0,5372 ✅ 19/20 | 0,5249 ✅ 19/20 | **0,5244 ✅ 19/20** |
+| `payload_topic#12` | 0,5354 ✅ 18/20 | 0,5510 ✅ 12/20 | **0,5284 ✅ 19/20** |
+| `payload_topic#13` | 0,5312 ✅ 20/20 | 0,5176 ✅ 20/20 | **0,5355 ✅ 14/20** |
+| `payload_topic#14` | 0,5236 ✅ 20/20 | 0,5186 ✅ 20/20 | 0,5677 ❌ 7/20 |
+| `payload_topic#15` | 0,5195 ✅ 20/20 | 0,5241 ✅ 19/20 | **0,5263 ✅ 19/20** |
+| `payload_topic#16` | 0,5211 ✅ 20/20 | 0,5290 ✅ 19/20 | **0,5555 ✅ 10/20** |
+| **dải trên 17 hạt muối** | **0,5190 – 0,5598** | **0,5113 – 0,6023** | **0,5244 – 0,6426** |
+| **số hạt muối HỎNG ô** | 0/17 | **4/17** | **9/17** |
+| **thứ hạng hạt muối ĐÃ GIAO** | **1/17** (thuận lợi nhất) | 10/17 | 12/17 |
+
+`n_pos` cũng dịch theo hạt muối — 900 / 812–822 / 442–452 ở Δ 0 / 2 / 4 — vì quy
+tắc tập con đóng dấu token khác nên vị từ **nằm im** của `feasible_sigmas` bật ở
+một tập sigma khác (§3.8). Dịch chuyển đó **nhỏ** (±1,1% ở Δ=4) và **không** giải
+thích được dải AUC ở trên.
+
+**PHA SÀNG**, ε = 0, trung vị điểm trên 20 split, cũng dịch: **0,4264 – 0,6345**
+qua ba Δ, với **3/17** hạt muối vượt trần ở ít nhất một Δ — tức hạt muối có thể
+đổi cả `eps*`, chứ không chỉ đổi ô chứng nhận đọc tại `eps*`.
+
+#### Đọc bảng này: BA điều, và điều thứ ba là điều quan trọng
+
+1. **Phán quyết từng ô di chuyển theo CẢ HAI chiều.** Ở Δ = 4, ô **xanh** dưới 8
+   hạt muối và **đỏ** dưới 9. Ở Δ = 2 — ô mà bản trước công bố là **đạt 20/20** —
+   nó **hỏng** dưới 4 hạt muối, một trong số đó (`#5`, 0,6023, **0/20**) hỏng
+   dứt khoát. Ở Δ = 0 mọi hạt muối đều đạt **trên tiêu chí trung bình**, nhưng số
+   split tự đạt chạy từ **8/20** đến **20/20**, và trần 0,56 nằm **bên trong**
+   dải cận trên giữa các split ở **9/17** hạt muối.
+
+2. **Phán quyết TOÀN CỔNG là một đồng xu.** Một hạt muối cho cổng xanh khi cả ba
+   Δ đạt: **8/17 xanh, 9/17 đỏ**. Câu *"đạt ở Δ=0 và Δ=2, chỉ hỏng ở Δ=4"* mô tả
+   **một lần rút**, không mô tả benchmark.
+
+3. **Trần 0,56 nằm TRONG dải nhiễu của chính phép dựng.** Ở Δ = 2 dải là
+   0,5113–0,6023 và ở Δ = 4 là 0,5244–0,6426; trần nằm trong cả hai. Ở Δ = 0 dải
+   trung bình (0,5190–0,5598) **nằm sát dưới** trần — biên hẹp nhất chỉ 0,0002 —
+   và dải **giữa các split** phủ trần. **Ở mức lề này, benchmark không phân biệt
+   được ĐẠT với HỎNG**, và điều đó **đúng với bất kỳ ai chọn hạt muối**, kể cả
+   một người chọn nó trước khi đo, như đã làm ở đây.
+
+#### Hệ quả — được GHIM, không chỉ được kể
+
+`retrieval.SUBSET_SALT` và `retrieval.SUBSET_RULE` nay là **trường đóng băng** của
+`analysis.gate2_v2.record()`, cùng với `subset_rule.fingerprint` — một digest trên
+**đầu ra** của quy tắc trên một probe cố định. Vì sao cần cả vân tay: trước bản
+sửa này, **đổi riêng hạt muối** để lại md5 **y nguyên**
+(`45274180520227436a90f03ca1dd21db`, dựng lại từ `0c585b4` và kiểm chứng), bộ
+test định nghĩa **không đổi**, và ô Δ=4 chạy từ **1/20** tới **19/20** trên họ
+17 hạt muối. Đó đúng là khiếm khuyết mà **phán quyết 5**
+tồn tại để bịt, bị **phán quyết 1** mở lại. Nay đổi hạt muối, hoặc đưa
+`sorted()[:k]` trở lại, đều **dịch md5**.
+
 ## 4. Cổng
 
-| cổng | v1 | v2 đã giao | **v2.1 khử thiên lệch** |
-|---|---|---|---|
-| 1 — toàn vẹn | 447/447 | 447/447 | **447/447** |
-| 2 — hiệu lực | 129/129 | 148/149 — MỘT ĐỎ | **156/158 — HAI ĐỎ** |
-| 3 — lực | 15/15 | 15/15 | **15/15** |
+| cổng | v1 | v2 đã giao | v2.1 khử thiên lệch | **v2.2 ghim hạt muối** |
+|---|---|---|---|---|
+| 1 — toàn vẹn | 447/447 | 447/447 | 447/447 | **447/447** |
+| 2 — hiệu lực | 129/129 | 148/149 — MỘT ĐỎ | 156/158 — HAI ĐỎ | **161/163 — HAI ĐỎ** |
+| 3 — lực | 15/15 | 15/15 | 15/15 | **15/15** |
+
+Cổng 2 lên 158 → **163** (năm test mới: ghim quy tắc tập con, ghim hạt muối, ghim
+cơ chế, vân tay ổn định qua `PYTHONHASHSEED`, và ràng `screen_criterion` vào đại
+lượng nó đọc). **Hai ô đỏ là ĐÚNG HAI ô cũ**, thân assertion **không bị đụng**,
+và cả ba cell chứng nhận đọc **y hệt** 0,5190 / 0,5292 / 0,5870 với cùng số split
+— tức bản sửa này **không dịch một con số đã công bố nào**.
 
 Zero skip ở cả ba.
 
@@ -861,8 +990,12 @@ Zero skip ở cả ba.
 > vậy, nên nói thẳng ngay đây: **một ô ĐỎ VÌ HỎNG, một ô ĐỎ VÌ ĐẠT QUÁ ĐẬM.**
 > Câu trạng thái trung thực trong một dòng:
 >
-> **cổng 2 ở 156/158 — một ô KHÔNG ĐẠT, và một ô ĐẠT dứt khoát tới mức một cái
+> **cổng 2 ở 161/163 — một ô KHÔNG ĐẠT, và một ô ĐẠT dứt khoát tới mức một cái
 > bẫy đã được đặt sẵn phải lên tiếng.**
+>
+> **Và từ §3.9 trở đi, một điều nữa phải nói cùng câu đó:** cả hai màu đều là
+> **một lần rút của hạt muối**. Dưới 8/17 hạt muối ô số 1 xanh; dưới 4/17 hạt
+> muối thì Δ=2 hỏng và bẫy ở ô số 2 **không nổ**.
 
 | # | test | đỏ vì | chiều | § |
 |---|---|---|---|---|
@@ -880,6 +1013,42 @@ trí). Đây là lần đầu tiên corpus rơi vào nhánh *nhất trí ĐẠT*
 lần đầu tiên **có người phải nghĩ về nó**.
 
 ### 4.1 Ô ĐỎ — phát biểu lại theo đúng bằng chứng (phán quyết 6)
+
+> ## ⚠️ PHÁT BIỂU LẠI KẾT LUẬN CHÍNH — ĐỌC TRƯỚC MỌI CON SỐ Ở §4.1
+>
+> Bản trước công bố: *"đạt ở Δ=0 và Δ=2, chỉ hỏng ở Δ=4, và Δ=4 do `topic`
+> gánh"*. **Câu đó mô tả MỘT LẦN RÚT của hạt muối quy tắc tập con, không mô tả
+> benchmark** (§3.9): trên họ 17 hạt muối cơ học, ô Δ=4 **xanh dưới 8 hạt muối và
+> đỏ dưới 9**, ô Δ=2 **hỏng dưới 4**, và phán quyết **toàn cổng** chia **8 xanh /
+> 9 đỏ**. Mọi con số trong §4.1 dưới đây **vẫn đúng** — và đúng **cho hạt muối
+> `"payload_topic"`**, không đúng như một tính chất của benchmark.
+>
+> **KHẲNG ĐỊNH THAY THẾ, và nó MẠNH HƠN chứ không phải rút lui:**
+>
+> > **Một**: bỏ `sorted()` đi thì kênh `topic` **sụp từ 0,88 về mức ngẫu nhiên** —
+> > 0,88 là một **định lý** đọc nhầm thành một phép đo, và điều này **không** phụ
+> > thuộc vào hạt muối nào cả (§3.1, §0bis.4b).
+> >
+> > **Hai**: các ô chứng nhận sau khi khử thiên lệch nằm trong khoảng
+> > **0,51–0,64**, và **trần 0,56 nằm BÊN TRONG dải nhiễu của chính phép dựng** ở
+> > mọi Δ — trong dải giữa các hạt muối ở Δ=2 và Δ=4, và trong dải giữa các split
+> > ở Δ=0.
+> >
+> > ⇒ **Ở mức lề này, benchmark KHÔNG PHÂN GIẢI ĐƯỢC "ĐẠT" với "HỎNG".**
+>
+> Đây là một **kết quả về dụng cụ đo**, không phải một lời từ chối trả lời: nó
+> nói rằng một ô chứng nhận công bố ở mức lề ~0,03 quanh trần **không mang thông
+> tin về kẻ tấn công**, dù nó xanh hay đỏ. Nó **đúng với bất kỳ ai chọn hạt
+> muối**, kể cả người chọn trước khi đo — nên nó không thể được sửa bằng cách
+> chọn hạt muối cẩn thận hơn. Nó chỉ sửa được bằng **nâng $n$**, **hạ lề**, hoặc
+> **lấy trung bình phán quyết trên một họ hạt muối đã khai trước** — và cả ba đều
+> là **sửa định nghĩa cổng**, tức việc của bước chứng nhận, không phải của trang
+> này (§7).
+>
+> **Hệ quả cho §5.4 của báo cáo và cho bảng ablation dưới đây:** câu *"`topic`
+> gánh Δ=4"* là **MỘT HIỆN THỰC HOÁ**, không phải một tính chất của benchmark.
+> Ablation dưới đây đo đúng cái nó nói nó đo, dưới hạt muối đã giao.
+
 
 **Câu của bản trước:** *"`MatchedAttack` hỏng ở MỌI epsilon dưới cổng mới"*, kèm
 dự báo *"ở ε cao kênh `topic` đóng lại"*.
@@ -919,27 +1088,46 @@ control), mỗi cột đo **một mình** và đo **khi bị trung hoà**:
 | `derived` | **0,5000** / 0,5471 | 0,5870 | 1/20 |
 | *(tất cả)* | — / **0,5870** | — | 1/20 |
 
-**CÂU TRẢ LỜI, phát biểu chính xác:**
+**CÂU TRẢ LỜI, phát biểu chính xác** (và **dưới hạt muối `"payload_topic"`** —
+xem khung ở đầu §4.1 và §3.9):
 
-> **Ô Δ = 4 do `topic` gánh.** Trung hoà `topic` đưa ô từ **0,5870 (1/20)** xuống
+> **Ở lần rút này, ô Δ = 4 do `topic` gánh.** Trung hoà `topic` đưa ô từ **0,5870 (1/20)** xuống
 > **0,5407 (15/20)** — **dưới** trần. Không cột nào khác làm được điều đó:
 > `depth`, `recency`, `derived` đọc **đúng 0,5000** khi đứng một mình ở ε = 0
 > (không mang tín hiệu nào), và trung hoà `size` làm ô **xấu đi** (0,5870 →
 > 0,5960).
 
-**Và nó KHÔNG hỏng vì thiếu lực một mình — tính ra được:**
+**Nguồn cung thiếu LÀM NẶNG THÊM nhưng KHÔNG tự nó giải thích — một phép đối
+chứng XẤP XỈ, không phải một phép tính đóng:**
 
 * nửa bề rộng khoảng ở Δ = 4 là $0{,}5870 - 0{,}5394 = 0{,}0476$ (449 sự kiện);
   ở Δ = 0 là $0{,}5190 - 0{,}4860 = 0{,}0330$ (900 sự kiện).
 * **Giả sử** Δ = 4 có độ chính xác của Δ = 0: $0{,}5394 + 0{,}0330 = 0{,}5724$ —
-  **vẫn trên trần**. Nên **lực không giải thích hết**.
+  **vẫn trên trần**.
 * **Giả sử ngược lại**, Δ = 4 có điểm ước lượng của Δ = 0 nhưng giữ bề rộng của
   chính nó: $0{,}4860 + 0{,}0476 = 0{,}5336$ — **đạt**.
 
-⇒ Cái làm ô đỏ là **ĐIỂM ƯỚC LƯỢNG 0,5394**, không phải khoảng tin cậy; và điểm
-ước lượng đó do **`topic`** mang (`topic` một mình: 0,5484; bỏ `topic` đi thì
-điểm về ≈ 0,493). Nguồn cung thiếu (449 so với mục tiêu ~900) **làm nặng thêm**
-nhưng **không** là nguyên nhân đủ.
+> **HAI ĐÍNH CHÍNH, cả hai đều làm khẳng định ở đây YẾU ĐI.**
+>
+> **(1) Câu *"ô hỏng vì ĐIỂM ƯỚC LƯỢNG, không phải vì khoảng tin cậy"* — bản
+> trước viết ở đây — là SAI.** Điểm ước lượng ở Δ = 4 là **0,5394**, **DƯỚI**
+> trần 0,56. Tiêu chí chứng nhận đọc **cận trên CI trung bình**, và chính cận
+> trên (0,5870) là thứ vượt trần. Nói cách khác ô này **được quyết bởi khoảng**,
+> và khoảng thì phụ thuộc cả vào $n$ lẫn vào giá trị AUC. Khẳng định còn đứng
+> được là khẳng định **yếu hơn**: nguồn cung thiếu **làm nặng thêm** nhưng
+> **không tự nó giải thích** ô đỏ — vì ngay cả ở độ chính xác của Δ = 0, điểm
+> 0,5394 cộng bề rộng 0,0330 vẫn trên trần.
+>
+> **(2) Đây KHÔNG phải *"số học chứ không phải phán đoán"*** — bản trước gọi nó
+> như vậy. Bề rộng khoảng Hanley–McNeil phụ thuộc vào **giá trị AUC**, không chỉ
+> vào $n$; ghép bề rộng của một ô sang điểm ước lượng của ô kia là một **phép
+> xấp xỉ**, không phải một đồng nhất thức. Nó đủ để nói *"lực không giải thích
+> hết"* theo nghĩa định tính, và **không** đủ để định lượng phần còn lại.
+
+⇒ Phần dư mà `topic` mang: `topic` một mình đọc 0,5484 (cận trên 0,5960); bỏ
+`topic` đi thì điểm về ≈ 0,493 và ô về 0,5407 (15/20). **Nhưng xem §3.9 trước
+khi đọc bất kỳ con số nào ở trên như một tính chất của benchmark** — cả ba ô
+chứng nhận là **một lần rút** của hạt muối quy tắc tập con.
 
 **Tái lập phép tách lực này** (mọi số vào là `auc_mean` và `hi_mean` của chính
 lệnh ablation ở dưới — không có hằng số nào được nhập tay):
@@ -1017,6 +1205,27 @@ làm nó **ngay sau khi vừa nhìn thấy con số** là đúng thứ kỷ lu�
 §0bis tồn tại để chặn. Nới test cho xanh thì còn tệ hơn: đó là **vá benchmark cho
 qua cổng của chính nó**.
 
+#### XUẤT XỨ CỦA CHÍNH Ô ĐỎ NÀY — công bố, như mọi thứ khác ở trang này
+
+Để nó đỏ là **đúng**, và thân assertion **không bị diff này đụng tới**. Nhưng ba
+sự thật về **vì sao** nó đỏ phải được nói ra, vì không nói thì trang này giấu
+đúng loại thông tin nó đòi hỏi ở chỗ khác:
+
+1. **Dạng v1 của test này khẳng định `straddling`** — rằng có split đạt và có
+   split không. Trên số liệu hôm nay Δ=4 **đúng là straddling** (1/20), nên
+   **assertion của v1 sẽ XANH**.
+2. **Màu đỏ đến từ dạng `unanimous_clear`**, được đưa vào ở commit `2627d90` —
+   **chính commit mà phép đo động cơ của nó (0,8805 / 0,9073 / 0,9373) nay đã bị
+   RÚT như một artefact** (§3.1). Tức: cái bẫy được đặt lại vì một con số không
+   còn đứng, và rồi nó nổ vì một lý do khác hẳn.
+3. **Và cái nhất trí làm nó nổ cũng là một lần rút.** "Δ=0 và Δ=2 đạt 20/20" đúng
+   dưới hạt muối đã giao; dưới `#5` thì Δ=2 là **0/20** và dưới `#12` thì Δ=2 là
+   **12/20** (§3.9). Bẫy nổ hay không nổ **phụ thuộc hạt muối**.
+
+Ba điều đó **không** làm nó đáng được vá cho xanh — chúng làm cho việc *"đơn giản
+hoá tiêu chí đa-split"* trở thành một quyết định phải lấy trên **họ hạt muối**,
+không phải trên một lần rút.
+
 **Quyết định được NÊU RA, không được rút ở đây:** với corpus v2.1, tiêu chí
 20-split có còn mua gì ở Δ=0 và Δ=2 không? Bằng chứng để trả lời đã có sẵn trong
 chính thông điệp đỏ — `hi_max > hi_min` vẫn đúng ở mọi Δ (split **vẫn** làm cận
@@ -1029,10 +1238,12 @@ khác nhau, và ai đơn giản hoá tiêu chí phải phân biệt được ch�
 
 Nói thẳng, vì trang này chứa những con số trông rất giống một phán quyết:
 
-- **0,5190 / 0,5292 / 0,5870 KHÔNG phải một phán quyết chứng nhận.** Nó là trạng
-  thái của corpus chứng nhận **dưới định nghĩa v2.1 vừa đóng băng**, đo bằng
-  `MatchedAttack` — một attacker được dựng cho **v1**. Việc hai trong ba ô **đạt
-  trần với 20/20 split** là một **phép đo**, không phải một giấy chứng nhận.
+- **0,5190 / 0,5292 / 0,5870 KHÔNG phải một phán quyết chứng nhận** — và nay còn
+  ít hơn thế. Nó là trạng thái của corpus chứng nhận **dưới định nghĩa v2.1 vừa
+  đóng băng VÀ dưới hạt muối `"payload_topic"`**, đo bằng `MatchedAttack` — một
+  attacker được dựng cho **v1**. Trên họ 17 hạt muối, phán quyết toàn cổng chia
+  **8 xanh / 9 đỏ** (§3.9), nên ba con số này là **một lần rút**, không phải một
+  phép đo về kẻ tấn công.
 - **`eps*` KHÔNG được công bố lại như một kết quả.** Nó được in vì pha sàng nay
   **đi qua** và test phải chọn một ε để chứng nhận.
 - **Không attacker nào bị chuyển khỏi `REGISTRY`, không mục `PENDING` nào được
@@ -1040,7 +1251,7 @@ Nói thẳng, vì trang này chứa những con số trông rất giống một 
   của `MatchedAttack` được **phát biểu lại**, vì banner cũ nói hai điều mà phép đo
   bây giờ bác.
 - **Bảng chứng nhận chạy MỘT lần, SAU khi định nghĩa đóng băng** — và nó đã đóng
-  băng ở §2, với ngày và md5 `45274180520227436a90f03ca1dd21db`.
+  băng ở §2, với ngày và md5 `9682c1958d40d28874ab4088dcbafce0`.
 
 ### 5.1 Những khẳng định của bản trước bị RÚT
 
@@ -1051,10 +1262,21 @@ Nói thẳng, vì trang này chứa những con số trông rất giống một 
 | *"ở ε cao kênh `topic` đóng lại"* | **RÚT** — `topic` **chưa bao giờ mở**; ε cao hỏng vì `depth` (§3.5b) |
 | *"khoảng cách cổng ↔ quy tắc quan hệ thu từ 0,4078 xuống 0,0687"* | **RÚT** — dựa trên ô 0,8805; khoảng cách thật là **0,4302** (§3.4) |
 | $L = 63$ *"viết và commit trước khi nhìn AUC"* | **RÚT** ordering claim (§0); phép dẫn **giữ** |
+| *"đạt ở Δ=0 và Δ=2, chỉ hỏng ở Δ=4"* | **PHÁT BIỂU LẠI** — một lần rút của hạt muối; 8/17 hạt muối cho cổng xanh, 9/17 đỏ (§3.9, §4.1) |
+| *"`topic` gánh Δ=4"* (§5.4 báo cáo) | **THU HẸP PHẠM VI** — đúng cho hạt muối đã giao, **không** là tính chất của benchmark |
+| *"ô hỏng vì ĐIỂM ƯỚC LƯỢNG, không phải khoảng tin cậy"* | **RÚT** — điểm ước lượng 0,5394 **dưới** trần; ô do **khoảng** quyết (§4.1) |
+| *"phép đối chứng nửa bề rộng là số học chứ không phải phán đoán"* | **RÚT** — bề rộng Hanley–McNeil phụ thuộc **giá trị AUC**, không chỉ $n$: đó là **xấp xỉ** (§4.1) |
 
 ---
 
 ## 6. Bất biến & phạm vi
+
+> **MỘT QUY ƯỚC TRÍCH DẪN MỚI, bắt buộc từ bản sửa này.** Mọi ô AUC đọc từ corpus
+> chứng nhận phải mang **ba** thứ, không phải hai: **lệnh**, **seed corpus**, và
+> **hạt muối quy tắc tập con**. §3.9 cho thấy hạt muối dịch phán quyết ô nhiều
+> hơn cả việc chọn nền lành (0,0421) — thứ đã được coi là phải ghim. Một ô trích
+> dẫn không kèm hạt muối là một ô không tái lập được.
+
 
 - **Không sửa**: `oracle.py`, `runner.py`, `scoring.py`, `metrics.py`,
   `detector.py`. `attacks.py`, `agent.py`, `policies.py` không đổi **một biểu
@@ -1101,6 +1323,8 @@ Nói thẳng, vì trang này chứa những con số trông rất giống một 
 | §4.1 (ablation corpus chứng nhận) | §3.7 khối lệnh, thêm vòng cô lập/trung hoà từng cột |
 | §4.1 **phép tách LỰC vs ĐIỂM ƯỚC LƯỢNG** | §4.1, khối lệnh ngay dưới bảng ablation |
 | §4.1 `topic` gánh Δ=4 (0,5870 → 0,5407) | §4.1, cùng khối lệnh ablation, đọc dòng `topic` |
+| **§3.9 (ĐỘ NHẠY HẠT MUỐI, 17 hạt × 3 Δ, cả hai pha)** | §3.9, khối lệnh trong mục; chạy một tiến trình cho mỗi hạt muối |
+| vân tay quy tắc tập con | `python3 -c "import sys; sys.path.insert(0,'.'); import retrieval; print(retrieval.subset_rule_fingerprint())"` |
 | md5 cổng 2 v2.1 | §2, lệnh `gate2_v2.md5()` |
 | ba cổng | `python3 tests/run_all.py` |
 
