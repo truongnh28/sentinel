@@ -15,6 +15,77 @@ import retrieval
 
 CARRIERS = ("memory", "skill", "queue", "branch")
 
+#: How many leading UTF-8 bytes of a token `topic_code` reads.  Eight, because a
+#: float carries 53 bits of mantissa: beyond the first 6-7 bytes the low bits of
+#: the integer are rounded away and two tokens agreeing on that prefix collide
+#: anyway.  Declared rather than inlined so the collision limit below names a
+#: number a reader can check.
+TOPIC_CODE_BYTES = 8
+
+
+def topic_code(topic) -> float:
+    """WHICH tokens an item's topic carries, as ONE number the discriminator reads.
+
+    THE F_MATCH FEATURE ADDED IN GATE 2 v2.  Until v2, F_match was
+    {size, depth, recency, derived} and `topic` sat OUTSIDE it, which made the
+    gate too loose IN OUR FAVOUR: `retrieval.payload_topic` stamps the payload
+    with `sorted(target)[:k]`, a strict subset of sigma's topic, while every
+    benign agent note carries its task's WHOLE topic -- and a zero-parameter rule
+    over that one difference separated the two classes at Mann-Whitney AUC 0.9492
+    on the v1 corpus while the gate certified 0.5414 over four features.
+
+    THE CHOICE.  The code is the MEAN, over the topic's tokens, of the token's
+    first `TOPIC_CODE_BYTES` UTF-8 bytes read as a base-256 fraction in [0, 1).
+    Two properties are being bought, and both are needed:
+
+      IDENTITY -- the code is a function of WHICH tokens are present, not of how
+        many.  A token COUNT would be a second copy of `size`: on the epsilon
+        model page, five real topics across five epsilons gave 15 distinct `size`
+        values with exactly ONE collision, so `size` already very nearly
+        determines k.  What `size` does NOT carry is which tokens were kept, and
+        that is what this column adds.
+
+      ORDER -- the code is MONOTONE IN LEXICOGRAPHIC ORDER.  This is not
+        decoration.  `analysis.discriminator` fits a LOGISTIC REGRESSION, which
+        is monotone in each column, so a nominal fingerprint (a blake2b digest,
+        say) would be identity without order and the discriminator could read
+        nothing from it at all -- the gate would gain a feature and no hardness.
+        A lexicographic code makes `sorted(target)[:k]` -- a front-truncated tag
+        -- score BELOW the whole topic it was cut from, which is exactly the
+        channel v2 exists to bring inside the measured space.
+
+    THE LIMITATION, stated because a feature is only as honest as its scope:
+
+      1. IT IS LOSSY.  A set is collapsed to one mean, so different token sets
+         collide -- any two sets with the same mean code, and any two tokens
+         agreeing on their first `TOPIC_CODE_BYTES` bytes.  The gate therefore
+         certifies non-distinguishability over a PROJECTION of the topic, not
+         over the topic.
+      2. THE ORDER IS LEXICOGRAPHIC, NOT SEMANTIC.  "zlib" and "zope" are near
+         in this column and unrelated in the repository; the feature ranks
+         alphabets, not meanings.
+      3. IT CANNOT EXPRESS A RELATIONAL RULE.  `surface()` sees ONE item and has
+         no workflow around it, so "this tag is a STRICT SUBSET of some task
+         topic of the workflow it sits in" -- the zero-parameter rule measured at
+         0.9492 -- is still NOT in F_match, and cannot be put there without
+         changing what a surface feature is.  v2 narrows that gap; it does not
+         close it, and tests/gate2_validity/test_matched_epsilon_budget.py keeps
+         the residue measurable.
+
+    Deterministic across processes: it reads BYTES of the tokens, never `hash()`
+    and never a frozenset's iteration order (the sum is order-free).  That is the
+    same rule `seed_of` and `retrieval.Topic.__str__` are written to.
+    """
+    tokens = retrieval.as_topic(topic)
+    if not tokens:
+        return 0.0
+    scale = float(1 << (8 * TOPIC_CODE_BYTES))
+    total = 0.0
+    for tok in sorted(str(t) for t in tokens):
+        raw = tok.encode("utf-8")[:TOPIC_CODE_BYTES]
+        total += int.from_bytes(raw + bytes(TOPIC_CODE_BYTES - len(raw)), "big") / scale
+    return total / len(tokens)
+
 
 @dataclass
 class Item:
@@ -43,11 +114,19 @@ class Item:
 
     # ---- SURFACE features: all the detector is ever allowed to look at ----
     def surface(self, now: int) -> dict:
+        """F_match.  `analysis.discriminator.F_MATCH` is asserted equal to the KEYS
+        of this dict, so the feature space the gate scores and the feature space
+        the attacker has to match are one object, not two that agree by hand.
+
+        `topic` JOINED THE SET IN v2 and it is the only non-integer column; see
+        `topic_code` for what the number is and what it cannot express.
+        """
         return dict(
             size=len(self.content),
             depth=self.provenance.count("/"),
             recency=now - self.created_at,
             derived=len(self.derived_from),
+            topic=topic_code(self.topic),
         )
 
 

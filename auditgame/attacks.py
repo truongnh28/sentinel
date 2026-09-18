@@ -208,6 +208,22 @@ class GradedAttack:
 class MatchedAttack:
     """epsilon = distance from the agent's own items, spent on RETRIEVABILITY.
 
+    READ THIS FIRST, AT GATE 2 v2 (2026-09-18).  Every AUC in this docstring is a
+    v1 number, measured when F_match was FOUR features and `topic` was outside it.
+    v2 put `topic` in (core.topic_code) and the certify cell moves 0.5414 ->
+    0.8805 at Delta=0; no epsilon in the screening grid reaches the 0.56 ceiling
+    any more.  The "WHAT THE GATE-2 CERTIFICATE DOES NOT COVER" section below --
+    which measured this very channel at 0.9492 and recorded it as a limit of the
+    CRITERION -- is what v2 acted on, and the residue it leaves is now 0.0687
+    rather than 0.4078.
+
+    NOTHING IN THIS CLASS WAS CHANGED, and no conclusion about it is drawn here:
+    this pipeline was built against the v1 feature space, and whether an attacker
+    can clear the v2 definition is the CERTIFICATION question, which review II.3
+    puts after the freeze, not before it.  Numbers, and the four things that were
+    considered and rejected as ways to make the cell green, are in
+    spikes/cong-v2.md SS4.1.
+
     Why this exists.  Measured on 60 workflows, 936 live items at sigma, a logistic
     regression on F_match separated poisoned from clean with held-out AUC = 1.0000,
     CI95 [1.0000; 1.0000].  The cause was not a feature list: EVERY original payload

@@ -335,28 +335,45 @@ class TheMockCannotMove(unittest.TestCase):
 
 
 
-class TheTopicAxisIsOutsideTheMeasuredFeatureSpace(unittest.TestCase):
-    """THE LIMIT OF THE GATE-2 CERTIFICATE, pinned so it cannot be forgotten.
+class TheTopicAxisIsInsideNowAndTheRESIDUEIsWhatStaysOutside(unittest.TestCase):
+    """THE LIMIT OF THE GATE-2 CERTIFICATE, REWRITTEN AT v2 -- not deleted.
 
-    `discriminator.F_MATCH` is {size, depth, recency, derived} -- exactly
-    `core.Item.surface()`.  `topic` IS NOT IN IT.  Before the payload carried
-    `payload_topic_like`, that did not matter: the payload's topic was
-    `task.topic`, identical to the tag on every benign agent note, so the topic
-    axis carried zero signal.  Giving epsilon its retrieval upside back opened
-    that axis, and it opened it OUTSIDE the feature space gate 2 scores.
+    Under v1 this class was called `TheTopicAxisIsOutsideTheMeasuredFeatureSpace`
+    and its anchor test asserted `topic` was NOT in `discriminator.F_MATCH`, with
+    the standing instruction that "if `topic` ever joins F_MATCH, the limitation
+    these tests record stops being a limitation and this class has to be
+    REWRITTEN, not deleted".  Gate 2 v2 put it in (`core.topic_code`), so this is
+    that rewrite.
 
-    So these tests do not assert that the attacker is stealthy.  They assert the
-    OPPOSITE, and they assert it about a property no published AUC can see:
+    WHAT CHANGED, in the two numbers it is a gap between.  The channel this class
+    measures is the zero-parameter rule "this item's tag is a STRICT SUBSET of
+    some task topic of the workflow it sits in".  Re-measured on the v2 corpus it
+    is UNCHANGED -- 900/900 payloads and 366/3600 controls flagged at Delta=0,
+    Mann-Whitney AUC 0.9492 (0.9508 at Delta=2, 0.9457 at Delta=4) -- because it
+    is a property of the topics, and the topics did not move.  What moved is the
+    number it is measured AGAINST:
 
-        gate 2 certifies non-distinguishability over FOUR features
-        and this attacker is separable on a FIFTH.
+        gate 2 certifies        v1: 0.5414 over FOUR features
+                                v2: 0.8805 over FIVE
+        this rule separates at      0.9492, both versions
+        the gap                 v1: 0.4078      v2: 0.0687
 
-    This is the same shape as the `frozen-payload` PENDING entry -- "a payload
-    that varies depth is separable on an axis the benign class has no spread on"
-    -- arriving through `topic` instead of through `depth`, and it gets the same
-    treatment: recorded as a number, not as a hope.  A property kept only in prose
-    drifts; this is the machine holding the claim.  Measured cost of the channel
-    is in spikes/eps-ngan-sach-that.md SS9 limit 6.
+    So v2 did what it was for: most of the channel is now INSIDE the measured
+    space.  The class is kept because the gap did not close, and the part that
+    remains is structural rather than an oversight.
+
+    WHY A RESIDUE IS UNAVOIDABLE, and this is the sentence the class now exists
+    for.  `Item.surface()` sees ONE ITEM.  The rule above is RELATIONAL -- it asks
+    about the workflow the item sits in -- so it cannot be written as a surface
+    feature at all without changing what a surface feature is.  `core.topic_code`
+    captures WHICH tokens an item carries, which is what lets the discriminator
+    see the front-truncated tag; it cannot capture WHOSE topic that tag is a
+    subset of.  That is a LIMIT OF THE CRITERION, not a result about the attacker,
+    and it gets the same treatment it always did: recorded as a number, not as a
+    hope.
+
+    NO VERDICT ABOUT ANY ATTACKER IS DRAWN HERE.  Measured cost of the channel is
+    in spikes/eps-ngan-sach-that.md SS9 limit 6 and spikes/cong-v2.md SS3.
     """
 
     #: The topics these tests read the property on.  A 4-token topic (the
@@ -366,27 +383,40 @@ class TheTopicAxisIsOutsideTheMeasuredFeatureSpace(unittest.TestCase):
     TOPICS = (("db", "django", "models", "query"),
               ("astropy", "io", "ascii", "qdp", "core", "ui"))
 
-    def test_topic_is_not_one_of_the_features_gate_two_scores(self):
-        """The anchor.  Everything below is only interesting BECAUSE of this: if
-        `topic` ever joins F_MATCH, the limitation these tests record stops being
-        a limitation and this class has to be rewritten, not deleted.
+    def test_topic_is_a_feature_gate_two_scores_but_only_as_a_per_item_number(self):
+        """The anchor, at v2.  Everything below is only interesting BECAUSE of the
+        second half: `topic` is now INSIDE the scored space, so the channel these
+        tests measure is largely inside it too -- and what remains outside is the
+        RELATIONAL part, which a per-item surface cannot express.
 
-        Thesis claim (vi): "gate 2 chung nhan tren BON dac trung, khong phai nam".
+        If `topic` is ever removed from F_MATCH again, this goes red and the whole
+        class reverts to the v1 statement; if `surface()` ever gains workflow
+        context, the residue these tests record stops being structural and they
+        have to be re-measured rather than deleted.
+
+        Thesis claim (vi): "gate 2 v2 cham tren NAM dac trung; phan con lai nam
+        ngoai vi no la quan he, khong phai vi bi bo quen".
         """
         from analysis import discriminator
         from core import Item
-        self.assertNotIn("topic", discriminator.F_MATCH,
-                         "`topic` has joined F_MATCH. The MatchedAttack "
-                         "limitation recorded here is about a channel OUTSIDE "
-                         "the scored feature space; if the space has grown, "
-                         "re-measure it rather than deleting the record.")
+        self.assertIn("topic", discriminator.F_MATCH,
+                      "`topic` has left F_MATCH again: gate 2 is back to the v1 "
+                      "four-feature space and the 0.4078 gap this class used to "
+                      "record is back with it.")
         surface = Item(carrier="memory", topic="orm", content="x",
                        created_at=0, provenance="agent/notes",
                        poisoned=False).surface(0)
         self.assertEqual(set(surface), set(discriminator.F_MATCH),
                          "Item.surface() and F_MATCH have drifted apart, so "
-                         "'the four features gate 2 scores' no longer names one "
-                         "thing.")
+                         "'the features gate 2 scores' no longer names one thing.")
+        # The residue, structurally: a surface feature is computed from ONE item,
+        # so no argument about the surrounding workflow can reach it.
+        import inspect
+        self.assertEqual(
+            sorted(inspect.signature(Item.surface).parameters), ["now", "self"],
+            "Item.surface() has gained an argument. If that argument carries the "
+            "workflow, the relational rule below is no longer outside the "
+            "measured space and this class must be re-measured, not kept.")
 
     def test_the_payload_never_claims_a_token_the_task_does_not_have(self):
         """The half that is true at EVERY epsilon: the tag is a SUBSET, never a
@@ -410,12 +440,22 @@ class TheTopicAxisIsOutsideTheMeasuredFeatureSpace(unittest.TestCase):
     def test_at_eps_star_the_payload_tag_is_a_STRICT_subset_of_the_task_topic(self):
         """THE CHANNEL, at the epsilon the published result is read off.
 
-        `eps* = 0.0` is where spikes/eps-ngan-sach-that.md SS5 reports
-        AUC_upper = 0.5414 and declares the attacker non-distinguishable.  At that
-        same epsilon the payload's tag is k = max(1, ceil(0 * m)) = 1 token of an
-        m-token topic, while every benign agent note carries its task's WHOLE
-        topic.  So the cell that clears the ceiling is the cell where this channel
-        is WIDEST -- the certificate and the defect sit on the same row.
+        `eps* = 0.0` is where spikes/eps-ngan-sach-that.md SS5 reported
+        AUC_upper = 0.5414 under the v1 gate and declared the attacker
+        non-distinguishable.  At that same epsilon the payload's tag is
+        k = max(1, ceil(0 * m)) = 1 token of an m-token topic, while every benign
+        agent note carries its task's WHOLE topic.  So the cell that cleared the
+        ceiling was the cell where this channel is WIDEST -- the certificate and
+        the defect sat on the same row.
+
+        RE-DERIVED AT GATE 2 v2 (2026-09-18): the same corpus and the same eps
+        now measure AUC_upper = 0.8805 at Delta=0 (0.9073 / 0.9373 at Delta 2 / 4)
+        because `topic` is inside F_match, and with the `topic` column neutralised
+        it reproduces the old 0.5414 / 0.5394 / 0.5411 EXACTLY -- which is the
+        cross-check that nothing else in this change moved that corpus.  Whether
+        an attacker can still be built under the v2 definition is the
+        certification question and is NOT answered here.  Reproduce:
+        spikes/cong-v2.md SS3.
 
         Note the scope of the claim, which is narrower than "every eps < 1":
         the tag is strict exactly when ceil(eps*m) < m.  At eps = 0.7, m = 3 it is
@@ -456,7 +496,12 @@ class TheTopicAxisIsOutsideTheMeasuredFeatureSpace(unittest.TestCase):
 
         Over the real Delta=0 corpus (900 events, 3600 controls, the corpus SS5
         scores) this rule flags 900 of 900 payloads and 366 of 3600 controls --
-        Mann-Whitney AUC 0.9492, against the 0.5414 gate 2 certifies on F_MATCH.
+        Mann-Whitney AUC 0.9492.  RE-MEASURED UNDER v2 and UNCHANGED at all three
+        Deltas (0.9492 / 0.9508 / 0.9457; 900/900, 826/826, 456/456 payloads and
+        366/3600, 325/3304, 198/1824 controls), because the rule reads topics and
+        the topics did not move.  What moved is what it is read against: gate 2
+        certifies 0.8805 over five features at v2, where it certified 0.5414 over
+        four at v1, so the gap this test records narrowed from 0.4078 to 0.0687.
         Those 366 (~10%) ARE the case above: benign notes whose own task topic
         happens to nest inside another task's in the same workflow, which is why
         the measured number is 0.949 and NOT the 1.0 the rule looks like it should

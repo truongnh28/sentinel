@@ -205,11 +205,27 @@ class BenignCorpus(unittest.TestCase):
             # The MEDIAN point estimate over the declared split set, not seed 7's
             # and not the maximum. Phase 1 is a RANKING question on a deliberately
             # small sample (80 events), and on a sample that small the maximum is a
-            # reading of the fold: measured, max(auc) at eps=0 reaches 0.6220 at
-            # Delta=2, where the payload is byte-length matched to the agent's note
-            # BY CONSTRUCTION. The median ranks the epsilons exactly as seed 7 did
-            # -- 0.483 / 0.507 / 0.480 at eps=0 against 0.703 / 0.714 / 0.748 at
-            # eps=0.2 -- without any one shuffle deciding it.
+            # reading of the fold.
+            #
+            # RE-DERIVED AT GATE 2 v2 (2026-09-18). Under v1 this comment read
+            # "measured, max(auc) at eps=0 reaches 0.6220 at Delta=2, where the
+            # payload is byte-length matched to the agent's note BY CONSTRUCTION",
+            # with medians 0.483 / 0.507 / 0.480 at eps=0. With `topic` inside
+            # F_match the same 80-event screen at eps=0 now measures
+            #
+            #     Delta   auc_median   auc_max
+            #     0         0.8384      0.9365
+            #     2         0.8499      0.9130
+            #     4         0.9206      0.9599
+            #
+            # -- so the gap between the median and the max has NARROWED (0.10 at
+            # Delta=2, against 0.12 under v1) while both ends moved up by about
+            # 0.35. The argument for the median over the max is unchanged and does
+            # NOT rest on the old digits: an 80-event fold's maximum still
+            # converges to the supremum rather than to a population quantity.
+            # What the old sentence's clause "byte-length matched BY CONSTRUCTION"
+            # named is also unchanged -- `size` is still matched; it is `topic`
+            # that is not. Reproduce: spikes/cong-v2.md SS3.
             screen = {}
             for eps in EPSILONS:
                 screen[eps] = {d: D.auc_over_splits(
@@ -310,33 +326,60 @@ class TheSplitIsPartOfTheMeasurement(unittest.TestCase):
             "the summary over the declared set equals the summary at seed 7 "
             "alone, so the declared set is decorative.")
 
-    def test_one_split_cannot_decide_a_delta_that_the_declared_set_splits_on(self):
-        """The finding, kept measurable.  On the certify corpus the per-split upper
-        bounds STRADDLE the ceiling at at least one Delta -- some shuffles clear
-        0.56 and some do not -- which is exactly why no single shuffle may be
-        quoted as the verdict.
+    def test_one_split_cannot_decide_a_delta_of_the_certify_corpus(self):
+        """The finding, kept measurable, and RESTATED AT GATE 2 v2 rather than
+        carried over -- because the thing it used to assert stopped being true of
+        this corpus, and asserting it anyway is how a test comes to certify its
+        own obsolescence.
 
-        If a future corpus is strong enough that every split clears at every Delta,
-        this goes red and the message says so: the criterion could then be
-        simplified, and that is a decision to take deliberately rather than by a
-        test quietly staying green.
+        UNDER v1 the per-split upper bounds STRADDLED the ceiling at at least one
+        Delta -- some shuffles cleared 0.56 and some did not -- and straddling was
+        the evidence that no single shuffle may be quoted as the verdict.
 
-        Thesis claim (vi): "co Delta ma cac split khong dong y, nen mot split khong
-        duoc quyet".
+        UNDER v2 there is no straddling at any Delta, and the reason is the
+        OPPOSITE of the one the old failure message offered ("the corpus grew --
+        say so and simplify"): with `topic` inside F_match every split FAILS the
+        ceiling at every Delta (measured: 0/20 clear at Delta 0, 2 and 4, mean
+        upper bounds 0.8805 / 0.9073 / 0.9373). Unanimity that the cell FAILS is
+        not the unanimity that would license simplifying the criterion, and a test
+        that could not tell the two apart would have read the second as the first.
+
+        So what is asserted now is what still holds and still matters:
+
+          (a) the shuffle MOVES the bound -- hi_max > hi_min at every Delta, so
+              the declared set is not decorative and one seed is still not the
+              measurement;
+          (b) the splits' agreement, WHEN they agree, is recorded WITH ITS
+              DIRECTION. Unanimous failure is reported as failure; unanimous
+              clearing goes red here and says the criterion may now be simplified,
+              which is a decision to take deliberately.
+
+        NO VERDICT ABOUT THE ATTACKER IS DRAWN HERE. That the cells fail is
+        recorded as the state of the corpus under the v2 definition; certifying is
+        a separate step (see tests/gate2_validity/test_gate2_v2_definition.py).
+
+        Thesis claim (vi): "mot split khong duoc quyet -- va khi ca 20 split dong y
+        thi phai noi ro chung dong y VE PHIA NAO".
         """
-        straddling = {}
+        seen = {}
         for d in DELTAS:
             pos, neg = _matched_corpus(_matched_pipe(), d, 0.0, N_CERTIFY)
             r = D.auc_over_splits(pos, neg, ceiling=AUC_CEILING, seeds=SPLIT_SEEDS)
-            if 0 < r["clear"] < r["k"]:
-                straddling[d] = (round(r["hi_min"], 4), round(r["hi_mean"], 4),
-                                 round(r["hi_max"], 4), r["failing_seeds"])
-        self.assertTrue(
-            straddling,
-            f"no Delta has splits disagreeing about the {AUC_CEILING} ceiling, so "
-            f"the multi-split criterion is buying nothing on this corpus. Either "
-            f"the corpus grew (good -- say so and simplify deliberately) or the "
-            f"declared set collapsed to one seed (bad).")
+            seen[d] = r
+            with self.subTest(delta=d):
+                self.assertGreater(
+                    r["hi_max"], r["hi_min"],
+                    f"at Delta={d} every split returns the same upper bound "
+                    f"({r['hi_min']:.4f}), so the declared split set is buying "
+                    f"nothing and the criterion has collapsed to one seed.")
+        unanimous_clear = [d for d, r in seen.items() if r["clear"] == r["k"]]
+        self.assertFalse(
+            unanimous_clear,
+            f"every split clears {AUC_CEILING} at Delta {unanimous_clear} "
+            f"(bounds: { {d: round(seen[d]['hi_mean'], 4) for d in unanimous_clear} }). "
+            f"The corpus is now strong enough that the multi-split criterion buys "
+            f"nothing THERE -- say so and simplify deliberately rather than "
+            f"letting a test stay green on a claim it no longer makes.")
 
 
 class TheEnrichedBenignBackground(unittest.TestCase):
@@ -360,7 +403,7 @@ class TheEnrichedBenignBackground(unittest.TestCase):
     def test_the_current_harvest_is_uniform_on_depth_and_derived(self):
         """Finding 1, stated as the test that documents the starting state: the
         CURRENT `harvest` corpus is CONSTANT on depth AND derived, so three of the
-        four F_match features carry no benign spread and the classifier is really
+        F_match features carry no benign spread and the classifier is really
         one-variable on `size`.  It PASSES today, on purpose -- it is the before
         picture, and it goes RED the day `harvest` itself gains spread, which is the
         one thing this task must NOT do to it.

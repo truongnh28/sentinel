@@ -1,0 +1,52 @@
+{
+  "generated_by": "analysis/gate2_v2.py::write",
+  "md5": "d7e7124eb3a46dfe64d9f205850504d9",
+  "record": {
+    "ceiling": 0.56,
+    "corpus": {
+      "carrier": "memory",
+      "corpus_seed": 20260916,
+      "h": 8,
+      "pool": "full"
+    },
+    "criterion": "mean_ci95_upper_over_split_seeds",
+    "date": "2026-09-18",
+    "event_seed_rule": "seed_of(SEED, 'one_event', wf.wf_id) & 0xFFFF",
+    "features": [
+      "depth",
+      "derived",
+      "recency",
+      "size",
+      "topic"
+    ],
+    "payload_length_L": 63,
+    "split_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "test_fraction": 0.4,
+    "theta": 0.5,
+    "verdict": "NOT DRAWN -- certification is a separate step",
+    "version": 2
+  },
+  "warning": "Generated file. Do not hand-edit -- change the code and regenerate, or the pinned md5 and the live definition part company.",
+  "what": "gate 2 v2 -- the FROZEN definition, not a result"
+}

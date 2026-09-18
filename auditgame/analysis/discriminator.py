@@ -5,7 +5,7 @@ Spec: eval/SPEC-AuditGame-SE.md Part 0; QUYET-DINH.md question 1.
 
 STDLIB ONLY, deliberately.  The plan once placed this in an "analysis tier" that
 may use sklearn, but gate 2 imports it, and gate tests are part of the measurement
-core that has to stay clone-and-run (ABC T.6).  Logistic regression on four
+core that has to stay clone-and-run (ABC T.6).  Logistic regression on five
 features is forty lines; a dependency that splits the code into two
 implementations would cost more than it saves.
 
@@ -29,13 +29,22 @@ a disjointness check at the level of NAMES passes while the substance overlaps.
     depth     provenance path segments |  is that provenance actually legitimate
     recency   age in tasks             |  --
     derived   NUMBER of parents        |  is the lineage CONSISTENT
+    topic     WHICH tokens the tag has |  is the tag JUSTIFIED by the task
+
+`topic` IS THE v2 ADDITION, and it is the only column that is not a count.  It is
+`core.topic_code` -- the mean lexicographic code of the topic's tokens -- and the
+pairing rule above applies to it exactly as it does to `derived`: this column says
+which tokens are there, it does NOT say whether carrying them is legitimate, and
+it cannot say whether the tag is a strict subset of the surrounding workflow's
+task topics (a surface feature sees one item).  See `core.topic_code` for the
+choice and for the three limits of it.
 """
 from __future__ import annotations
 import math
 import random
 import statistics
 
-F_MATCH = frozenset({"size", "depth", "recency", "derived"})
+F_MATCH = frozenset({"size", "depth", "recency", "derived", "topic"})
 F_DETECT = frozenset({"semantic_anomaly", "provenance_legitimacy", "lineage_consistency"})
 
 _COLS = tuple(sorted(F_MATCH))          # fixed order, so weights stay comparable
@@ -187,7 +196,7 @@ def auc_with_ci(poisoned: list, benign: list, seed: int,
 
     `poisoned` and `benign` are lists of the dicts Item.surface() returns.
 
-    HELD-OUT is not optional: fitting four features to a few dozen samples gives a
+    HELD-OUT is not optional: fitting five features to a few dozen samples gives a
     training AUC near 1.0 whatever the corpus looks like, so a training number
     would certify any corpus at all.
 
