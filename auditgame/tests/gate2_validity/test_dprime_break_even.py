@@ -632,6 +632,14 @@ class ATieForTheBestLossIsReportedAsATieAndNotAsAWin(unittest.TestCase):
     def test_a_tie_at_zero_is_a_place_lambda_q_star_cannot_see_the_flip(self):
         """lambda-bar is an UPPER reading wherever L(0) ties.
 
+        READ THIS TEST FOR WHAT IT IS: a CHARACTERIZATION of frozen `metrics.py`,
+        not a regression pin on this module.  Everything it asserts is decided
+        inside `metrics.lambda_q_star`, which this batch may not modify, so no
+        change to `dprime_sweep.py` can turn it red.  It is here to keep the
+        limitation VISIBLE in the suite -- it would go red only if metrics.py were
+        one day unfrozen and taught to see the root at 0, which is exactly the day
+        the surrounding caveats must be rewritten.
+
         Thesis claim (vi): "lambda_q_star la trong so NHO NHAT > 0 lam doi thu
         hang" -- no bo qua diem cat tai DUNG 0, nen o mot o hoa tai 0, thu hang da
         doi ngay tren 0 ma lambda_q_star van bao mot so lon hon.  Dieu do phai duoc
@@ -650,6 +658,410 @@ class ATieForTheBestLossIsReportedAsATieAndNotAsAWin(unittest.TestCase):
         self.assertNotIn(S.SENTINEL, S.l_winners(c, 1e-9),
                          "Sentinel is still a winner just above zero, so there is "
                          "no overshoot to report here")
+
+
+class TheClaimFormRestsOnThePairwiseCrossingNotOnLambdaQStar(unittest.TestCase):
+    """The pre-registered claim is "Sentinel beats X for all lambda_Q < lambda-bar",
+    which is a statement about ONE pair.  `metrics.lambda_q_star` is not that
+    quantity: it is the smallest weight at which the argmin over ALL FOUR policies
+    changes hands, and it cannot see a crossing at exactly 0 (frozen, see
+    ATieForTheBestLossIsReportedAsATieAndNotAsAWin).  The pairwise crossing is a
+    DIFFERENT number under a DIFFERENT name, and the three outcomes of the pairwise
+    comparison have to stay apart: a crossing, ahead everywhere, and behind from
+    the moment the weight leaves zero."""
+
+    def _cell(self, b1, sentinel, b5, b6):
+        return cell(2.0, 0, +0.10, curves=four(b1=b1, sentinel=sentinel, b5=b5,
+                                               b6=b6))
+
+    def test_a_tie_at_zero_that_loses_above_zero_is_behind_and_not_a_crossing(self):
+        """Tie-at-0 then lose is BEHIND, not "Sentinel leads up to 0".
+
+        Thesis claim (vi): "thua tu 0" phai bao gom ca o HOA tai 0 roi thua voi moi
+        lambda_Q > 0 -- goi no la mot diem cat bang 0 se bien mot o thua thanh mot
+        o co dai lambda_Q de phat bieu.
+        """
+        c = self._cell(b1=curve(1.20, 0.00, 0.40, 16.40),
+                       sentinel=curve(0.99, 1.12, 0.00, 7.13),
+                       b5=curve(0.99, 0.00, 0.00, 0.00),
+                       b6=curve(0.99, 1.03, 0.00, 3.20))
+        kind, value = S.pairwise_crossing(c, S.B5)
+        self.assertEqual(kind, S.BEHIND_FROM_ZERO,
+                         "a cell where Sentinel ties at 0 and loses at every "
+                         "positive weight was not reported as behind")
+        self.assertIsNone(value)
+
+    def test_a_policy_ahead_at_zero_that_quarantines_less_is_ahead_at_every_weight(self):
+        """No crossing exists when the opponent is worse on BOTH terms.
+
+        Thesis claim (vi): "hon o moi lambda_Q" la mot ket cuc RIENG, khong duoc
+        gop vao "khong co diem cat" cung voi "thua tu 0".
+        """
+        c = self._cell(b1=curve(1.20, 0.00, 0.40, 16.40),
+                       sentinel=curve(0.99, 1.12, 0.00, 7.13),
+                       b5=curve(0.99, 0.00, 0.00, 0.00),
+                       b6=curve(1.20, 1.50, 0.00, 3.20))
+        kind, value = S.pairwise_crossing(c, S.B6)
+        self.assertEqual(kind, S.AHEAD_EVERYWHERE)
+        self.assertIsNone(value)
+
+    def test_the_crossing_is_the_weight_where_the_two_loss_lines_meet(self):
+        """The number reported IS a root of L_other - L_Sentinel, not an estimate.
+
+        Thesis claim (vi): "lambda cat theo CAP: L cua policy kia bang L cua
+        Sentinel tai dung trong so do".
+        """
+        c = self._cell(b1=curve(1.20, 0.00, 0.40, 16.40),
+                       sentinel=curve(0.99, 1.12, 0.00, 7.13),
+                       b5=curve(0.99, 0.00, 0.00, 0.00),
+                       b6=curve(0.99, 1.03, 0.00, 3.20))
+        kind, x = S.pairwise_crossing(c, S.B1)
+        self.assertEqual(kind, S.CROSSES)
+        self.assertAlmostEqual(x, (0.21 + 0.5 * 0.40) / 1.12, places=12)
+        self.assertAlmostEqual(c.curves[S.B1].loss(x),
+                               c.curves[S.SENTINEL].loss(x), places=12,
+                               msg="the reported crossing is not a weight at which "
+                                   "the two L lines are equal")
+
+    def test_the_pairwise_crossing_is_named_apart_from_lambda_bar(self):
+        """Two quantities, two names (RULING 1, 18/09/2026).
+
+        Thesis claim (vi): "lambda-bar = lambda_q_star" la mot dai luong tren BON
+        policy; diem cat theo cap la mot dai luong khac. Dung mot ky hieu cho ca
+        hai la cach mot bao cao noi hai dieu khac nhau bang cung mot chu.
+        """
+        c = self._cell(b1=curve(1.20, 0.00, 0.40, 16.40),
+                       sentinel=curve(0.99, 1.12, 0.00, 7.13),
+                       b5=curve(0.99, 0.00, 0.00, 0.00),
+                       b6=curve(0.99, 1.03, 0.00, 3.20))
+        self.assertNotEqual(S.LAMBDA_BAR_NAME, S.LAMBDA_CROSS_NAME,
+                            "the four-policy quantity and the pairwise quantity "
+                            "are printed under the same name")
+        lb = S.lambda_bar(c)
+        self.assertIsNotNone(lb)
+        self.assertEqual(S.pairwise_crossing(c, S.B5)[0], S.BEHIND_FROM_ZERO,
+                         "this fixture no longer has a pair with NO range to "
+                         "state, so it cannot show the two quantities disagreeing")
+        self.assertAlmostEqual(lb, S.pairwise_crossing(c, S.B1)[1], places=12,
+                               msg="lambda-bar here is not read off the "
+                                   "Sentinel-B1 pair, so this fixture no longer "
+                                   "shows lambda-bar answering about a DIFFERENT "
+                                   "pair from the one the claim is about")
+        out = S.pairwise_table([c])
+        self.assertIn("lambda-bar", out)
+        self.assertIn("lambda-cross", out,
+                      "the printed table does not name the pairwise quantity, so a "
+                      "reader cannot tell the two columns apart")
+
+    def test_a_cell_with_no_curves_says_so_instead_of_returning_a_crossing(self):
+        """N3 travels into the pairwise column too.
+
+        Thesis claim (vi): "o khong do duoc mang LY DO, khong mang mot con so".
+        """
+        kind, value = S.pairwise_crossing(cell(2.0, 0, +0.10), S.B1)
+        self.assertEqual(kind, S.NO_MEASUREMENT)
+        self.assertIsNone(value)
+        self.assertIn("REASON", S.pairwise_table([cell(2.0, 0, +0.10,
+                                                      reason="no attack")]))
+
+
+class TheSurvivingClaimIsLoadBearingOnTheUnsweptLambdaT(unittest.TestCase):
+    """The one claim that survives -- Sentinel beats B1 -- is bought by the T_lost
+    term, and T_lost enters L weighted by lambda_T = 0.50, a constant this project
+    has never swept.  A claim that depends on an unswept constant has to be
+    reported WITH that dependence, so the sensitivity is computed rather than
+    asserted to be small."""
+
+    def _rows(self):
+        #: Cell A: Sentinel is ahead of B1 on harm, so it stays ahead at lambda_T=0.
+        #: Cell B: Sentinel is WORSE than B1 on harm (0.992 vs 0.983, the measured
+        #: Delta=0 shape) and is ahead only through B1's T_lost.
+        a = cell(2.0, 1, +0.10, curves=four(
+            b1=curve(1.20, 0.00, 0.40, 16.40),
+            sentinel=curve(0.99, 1.12, 0.00, 7.13),
+            b5=curve(0.99, 0.00, 0.00, 0.00),
+            b6=curve(0.99, 1.03, 0.00, 3.20)))
+        b = cell(2.2, 1, +0.10, curves=four(
+            b1=curve(0.983, 0.00, 0.40, 16.40),
+            sentinel=curve(0.992, 1.12, 0.00, 7.13),
+            b5=curve(0.992, 0.00, 0.00, 0.00),
+            b6=curve(0.992, 1.03, 0.00, 3.20)))
+        return {1: [a, b]}
+
+    def test_the_count_of_cells_sentinel_leads_moves_with_lambda_t(self):
+        """Turning lambda_T off has to be able to REMOVE cells from the claim.
+
+        Thesis claim (vi): "Sentinel hon B1 vi so hang T_lost, khong phai vi harm"
+        -- neu dung vay thi o lambda_T = 0 so o Sentinel dan phai TUT, va bao cao
+        phai in con so do chu khong noi rang no nho.
+        """
+        rows = self._rows()
+        at_default = S.lambda_t_sensitivity(rows, S.B1, (metrics.LAMBDA_T,))[0]
+        at_zero = S.lambda_t_sensitivity(rows, S.B1, (0.0,))[0]
+        self.assertEqual(at_default["ahead_at_zero"], 2)
+        self.assertEqual(at_default["n"], 2)
+        self.assertEqual(at_zero["ahead_at_zero"], 1,
+                         "the cell Sentinel leads only through B1's T_lost did not "
+                         "drop out when lambda_T was set to 0")
+        self.assertLess(at_zero["ahead_at_zero"], at_default["ahead_at_zero"])
+
+    def test_the_sensitivity_grid_contains_the_unswept_default_and_zero(self):
+        """The default is IN the table, beside 0, or the table cannot be read.
+
+        Thesis claim (vi): "bao cao ca hai phien ban" -- mot bang do nhay khong
+        chua chinh gia tri dang dung thi khong noi duoc dieu gi ve no.
+        """
+        self.assertIn(0.0, S.LAMBDA_T_GRID)
+        self.assertIn(metrics.LAMBDA_T, S.LAMBDA_T_GRID)
+        out = S.lambda_t_table(self._rows(), S.B1)
+        self.assertIn("lambda_T", out)
+        self.assertIn(f"{metrics.LAMBDA_T:.2f}", out)
+        self.assertIn("0.00", out)
+
+    def test_the_median_crossing_is_reported_from_the_cells_that_cross(self):
+        """A median over "behind" cells would be a median over numbers that do not
+        exist.
+
+        Thesis claim (vi): "ba ket cuc giu TACH BACH" -- trung vi chi duoc lay tren
+        cac o THAT SU co diem cat.
+        """
+        rows = self._rows()
+        s = S.pairwise_summary([c for cs in rows.values() for c in cs], S.B1)
+        self.assertEqual(len(s["crossings"]), 2)
+        self.assertAlmostEqual(s["median"], sum(sorted(s["crossings"])) / 2,
+                               places=12)
+        s0 = S.pairwise_summary([c for cs in rows.values() for c in cs], S.B1,
+                                lambda_T=0.0)
+        self.assertEqual(s0["behind_from_zero"], 1)
+        self.assertEqual(len(s0["crossings"]), 1,
+                         "a cell that is behind at lambda_T = 0 still contributed "
+                         "a crossing to the median")
+
+
+class EveryPolicyTheRankingIsTakenOverNeedsItsOwnFeasibilityGuard(unittest.TestCase):
+    """The L ranking is over FOUR policies, so a cell where any ONE of them kept no
+    feasible workflow has a NaN in the ranking.  Guarding only the pair Delta-harm
+    is defined through leaves that cell printing a bare `--` in the argmin column
+    with nothing anywhere to say why."""
+
+    N, H, SEEDS, BUDGET = 4, 4, (1, 2, 3), 17.95
+
+    def test_a_cell_where_a_ranked_policy_has_no_feasible_workflow_carries_a_reason(self):
+        """N3 over the whole ranking, not over the pair only.
+
+        Thesis claim (vi): "o bi tu choi ghi LY DO, khong bao gio mot gia tri im
+        lang hay mot dau `--` tran" -- va thu hang duoi L duoc lay tren bon policy,
+        nen bon policy deu phai co mau so.
+        """
+        wfs = S.make_corpus(self.N, self.H, seed=2026)
+        real = S.policy_curve
+
+        def empty_for_b5(name, *a, **kw):
+            got = real(name, *a, **kw)
+            if name != S.B5:
+                return got
+            return S.PolicyCurve(harm=float("nan"), q_false=float("nan"),
+                                 t_lost=float("nan"), spent=float("nan"),
+                                 n_feasible=0, n_total=got.n_total,
+                                 per_wf_harm=[], per_wf_q_false=[],
+                                 per_wf_t_lost=[], per_wf_spent=[])
+
+        S.policy_curve = empty_for_b5
+        try:
+            c = S.measure_cell(wfs, 2.0, 1, self.BUDGET, self.SEEDS)
+        finally:
+            S.policy_curve = real
+        self.assertIsNotNone(c.reason,
+                             "a cell where B5 kept no feasible workflow was "
+                             "reported as usable, so its L ranking is over a NaN")
+        self.assertIn(S.B5, c.reason,
+                      "the reason does not name the policy that has no denominator")
+        self.assertIn("REASON", S.policy_table([c]),
+                      "the four-policy table printed the cell without its reason")
+
+
+class ThePublishedHarmBreakEvenIsPinnedToItsOwnInterval(unittest.TestCase):
+    """d'* under harm = none / none / 2.55 / 0.60 is the number every other
+    document in this project quotes, and until now nothing in the suite could go
+    red if it moved: the non-mutation test works on synthetic cells and the
+    B1/Sentinel equality pin works on a 6-workflow cell.
+
+    READ THIS PIN FOR EXACTLY WHAT IT COVERS.  It freezes the CI95 lower-bound
+    series the published run measured, and asserts that `break_even` -- the
+    summarisation rule -- still maps that series onto the published numbers.  It
+    catches a change to the RULE (a >= for a >, a scan that forgets "and stays", a
+    refinement point dropped from the merged grid).  It CANNOT catch a change to
+    the measurement that produced the series: reproducing that needs the full
+    40-workflow run, which is minutes, and minutes do not belong in the gates.
+    That half of the gap stays open and is declared in the report.
+
+    Reproduction of the series (command + seed):
+        python3 dprime_sweep.py --n 40 --json /tmp/sweep-L-pinned.json
+        corpus seed 2026, run seeds (1,2,3), B = 17.95, H = 8, tau_sel row "mid",
+        refinement on -- (d', ci_lo) read off ["cells"][Delta], 18/09/2026.
+    """
+
+    #: The PUBLISHED series: (d', CI95 lower bound of Delta-harm) per Delta, in
+    #: grid order, refinement points included.  Delta = 2 and Delta = 4 carry the
+    #: two cells that decide the answer -- d' = 2.50 sits at exactly 0.0 (so 2.55
+    #: is the smallest point of the holding run) and d' = 0.55 likewise for 0.60.
+    PUBLISHED_CI_LO = {
+        0: [
+              (0.0, -0.025), (0.2, -0.04166666666666667), (0.4,
+              -0.06666666666666668), (0.6, -0.07916666666666668), (0.8,
+              -0.08750000000000001), (1.0, -0.10833333333333335), (1.2,
+              -0.13333333333333336), (1.4, -0.13333333333333336), (1.6,
+              -0.14166666666666666), (1.8, -0.15833333333333335), (2.0,
+              -0.16666666666666669), (2.2, -0.19166666666666668), (2.4,
+              -0.29166666666666663), (2.6, -0.3), (2.8, -0.3), (3.0, -0.3)],
+        1: [
+              (0.0, 0.0), (0.2, 0.0), (0.4, -0.025), (0.6, -0.1), (0.8,
+              -0.07916666666666668), (1.0, -0.1125), (1.2,
+              -0.16666666666666669), (1.4, -0.1625), (1.6, -0.1875), (1.8,
+              -0.2), (2.0, -0.1875), (2.2, -0.18333333333333335), (2.4,
+              -0.19583333333333336), (2.6, -0.2041666666666667), (2.8,
+              -0.2), (3.0, -0.20416666666666666)],
+        2: [
+              (0.0, -0.025), (0.2, -0.05), (0.4, -0.05), (0.6, -0.0625),
+              (0.8, -0.07083333333333333), (1.0, -0.0625), (1.2,
+              -0.07916666666666666), (1.4, -0.07083333333333333), (1.6,
+              -0.07083333333333333), (1.8, -0.07083333333333333), (2.0,
+              -0.049999999999999996), (2.2, -0.05), (2.4,
+              -0.008333333333333333), (2.45, -0.016666666666666663), (2.5,
+              -1.3877787807814458e-18), (2.55, 0.01666666666666667), (2.6,
+              0.01666666666666667), (2.8, 0.04166666666666667), (3.0,
+              0.06666666666666668)],
+        4: [
+              (0.0, 0.0), (0.2, 0.0), (0.4, 0.0), (0.45, 0.0), (0.5, 0.0),
+              (0.55, 0.0), (0.6, 0.004504504504504504), (0.8,
+              0.018018018018018018), (1.0, 0.018018018018018018), (1.2,
+              0.03153153153153153), (1.4, 0.04504504504504504), (1.6,
+              0.05405405405405406), (1.8, 0.10360360360360361), (2.0,
+              0.10360360360360361), (2.2, 0.16666666666666666), (2.4,
+              0.1936936936936937), (2.6, 0.21621621621621623), (2.8,
+              0.28378378378378377), (3.0, 0.32432432432432434)]
+    }
+
+    #: spikes/dprime-sweep.md SS5, quoted in three other documents.
+    PUBLISHED_D_STAR = {0: None, 1: None, 2: 2.55, 4: 0.60}
+
+    def _cells(self, delta):
+        return [cell(dp, delta, lo) for dp, lo in self.PUBLISHED_CI_LO[delta]]
+
+    def test_the_rule_still_maps_the_published_series_onto_the_published_d_star(self):
+        """The frozen rule on the frozen series gives the frozen answer.
+
+        Thesis claim (vi): "d'* duoi harm van la none / none / 2.55 / 0.60" -- con
+        so nay duoc trich o ba tai lieu khac, va cho toi truoc test nay khong co gi
+        trong bo cong co the do len neu no xe dich.
+        """
+        for delta, want in self.PUBLISHED_D_STAR.items():
+            with self.subTest(delta=delta):
+                got = S.break_even(self._cells(delta))
+                self.assertEqual(got, want,
+                                 f"Delta={delta}: the published harm break-even "
+                                 f"moved from {want} to {got} under the same "
+                                 f"interval series")
+
+    def test_the_two_cells_that_decide_the_answer_are_in_the_series(self):
+        """The pin is only a pin if the series contains the decisive points.
+
+        Thesis claim (vi): "d'* la d' NHO NHAT ma tu do tro len can duoi > 0 VA GIU
+        DUOC" -- diem quyet dinh la diem NGAY DUOI d'*, noi can duoi chua > 0.  Mot
+        chuoi khong chua diem do se cho cung mot cau tra loi vi mot ly do khac.
+        """
+        for delta, below in ((2, 2.50), (4, 0.55)):
+            with self.subTest(delta=delta):
+                lo = dict(self.PUBLISHED_CI_LO[delta])[below]
+                self.assertLessEqual(lo, 0.0,
+                                     f"Delta={delta}: d' = {below} no longer sits "
+                                     f"at or below zero, so it is not what stops "
+                                     f"the run")
+                self.assertGreater(
+                    dict(self.PUBLISHED_CI_LO[delta])[self.PUBLISHED_D_STAR[delta]],
+                    0.0, f"Delta={delta}: the published d'* is not a point whose "
+                         f"bound is above zero")
+
+
+class TheAttackerMaximisesHarmAndThatIsADirectionNotJustABound(unittest.TestCase):
+    """Concern 1 of this batch says the attacker maximises HARM while the defender
+    is scored with L, so "every L number here is a lower bound on loss".  True per
+    policy -- and on its own it says NOTHING about a ranking, which is what every
+    reportable claim of this batch is.  A per-policy lower bound can move a ranking
+    in either direction or not at all, so the direction is MEASURED at declared
+    cells instead of argued: `policy_curve` can run the same attacker-max loop with
+    L as the objective, and the two are compared."""
+
+    N, H, SEEDS, BUDGET = 6, 4, (1, 2, 3), 17.95
+
+    def _curves(self, lambda_Q, lambda_T=metrics.LAMBDA_T):
+        wfs = S.make_corpus(self.N, self.H, seed=2026)
+        det, ag = S.make_detector(2.0), agent.MockAgent()
+        out = {}
+        for name in S.POLICIES:
+            runner.reset_survivor_cache()
+            out[name] = S.policy_curve(name, wfs, (1,), S.CARRIERS, det, ag,
+                                       self.BUDGET, self.SEEDS, S.SETTING,
+                                       objective_lambda_Q=lambda_Q,
+                                       objective_lambda_T=lambda_T)
+        return out
+
+    def test_the_loss_objective_at_zero_weights_is_the_harm_objective_exactly(self):
+        """L(0, 0) IS harm, so the switch must be a no-op there.
+
+        Thesis claim (vi): "ke tan cong toi da hoa harm, dung nhu runner.worst_case
+        dinh nghia" -- mot tuy chon muc tieu moi khong duoc phep lam xe dich phep do
+        cu o cho hai muc tieu la MOT.  Neu no xe dich, cai thay doi la vong lap chu
+        khong phai muc tieu.
+        """
+        harm = self._curves(None)
+        same = self._curves(0.0, 0.0)
+        for name in S.POLICIES:
+            with self.subTest(policy=name):
+                a, b = harm[name], same[name]
+                self.assertEqual((a.harm, a.q_false, a.t_lost, a.spent,
+                                  a.n_feasible, a.per_wf_harm),
+                                 (b.harm, b.q_false, b.t_lost, b.spent,
+                                  b.n_feasible, b.per_wf_harm),
+                                 "maximising L at lambda_Q = lambda_T = 0 chose a "
+                                 "different attack from maximising harm, so the "
+                                 "objective switch changed more than the objective")
+
+    def test_an_l_maximising_attacker_never_lowers_the_loss_it_is_maximising(self):
+        """The bound has a DIRECTION per policy: L can only go up.
+
+        Thesis claim (vi): "neu ke tan cong biet lai theo Q_false, moi con so L o
+        day la CAN DUOI cua ton that" -- phat bieu do chi dung neu phep do duoi muc
+        tieu L khong bao gio cho ra L NHO HON, va do la dieu phai do chu khong phai
+        gia dinh.
+        """
+        lq = metrics.LAMBDA_Q
+        harm = self._curves(None)
+        steered = self._curves(lq)
+        moves = {}
+        for name in S.POLICIES:
+            with self.subTest(policy=name):
+                a = harm[name].loss(lq)
+                b = steered[name].loss(lq)
+                moves[name] = b - a
+                self.assertGreaterEqual(
+                    b, a - 1e-12,
+                    f"{name}: the L-maximising attacker found a LOWER L than the "
+                    f"harm-maximising one, which a maximum cannot do")
+        self.assertTrue(any(v > 1e-9 for v in moves.values()),
+                        "no policy's L moved at all, so this probe cannot say "
+                        "anything about the direction of the bound: the attacker "
+                        "class cannot steer Q_false on this fixture")
+
+    def test_the_probe_cells_are_declared_and_not_chosen_after_the_fact(self):
+        """The cells the reported direction is read at are named in the module.
+
+        Thesis claim (vi): "moi con so deu co lenh + seed tai lap" -- va mot probe
+        chon o SAU khi nhin ket qua thi khong do duoc gi ca.
+        """
+        for dp, delta in S.L_ATTACKER_PROBE_CELLS:
+            self.assertIn(dp, S.GRID, f"probe d' = {dp} is not on the grid")
+            self.assertIn(delta, S.DELTAS, f"probe Delta = {delta} is not reported")
 
 
 if __name__ == "__main__":

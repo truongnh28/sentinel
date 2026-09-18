@@ -185,6 +185,35 @@ class TheFourPolicyCellIsTheSameMeasurementRunnerAlreadyMakes(unittest.TestCase)
 
     N, H, SEEDS, BUDGET = 6, 4, (1, 2, 3), 17.95
 
+    #: (n, H, d', Delta, tau_sel row, policies) the equality is checked at.  The
+    #: first is the DEFAULT mode's `mid` row -- the only point the original test
+    #: ran on.
+    #: The next two are `d0.0` and `d3.0`, rows the HEADLINE mode
+    #: (--tau-follows-dprime) actually runs on, at the two ends of the grid, since
+    #: every table this batch reports is read from those rows and none of them was
+    #: pinned.
+    #:
+    #: The LAST one is the probe that gives the row itself teeth: 10 workflows at
+    #: H = 8, d' = 1.0, Delta = 4 is the cell gate 2's
+    #: TheDeclaredConfoundIsInertForThisDeltaHarmPair has already MEASURED B5
+    #: moving between the `mid` row and the `d0.0` row.  On the small corpus the
+    #: other probes run on, B5 and B6 come out identical under either row -- so a
+    #: copy that silently passed `mid` everywhere would reproduce
+    #: runner.worst_case there and this test would not notice.  Verified by
+    #: mutation: replacing `setting` with SETTING inside policy_curve leaves the
+    #: first three probes green and turns this one red.
+    #: The last field is WHICH policies that probe runs on: the heavy one runs on
+    #: the two that read tau_sel at all (Policy.tau's only callers), because it is
+    #: there to pin the ROW, and a 10x8 corpus on four policies would cost the
+    #: gate half a minute to re-assert what the cheap probes already cover.
+    PROBES = ((6, 4, 2.0, 1, S.SETTING, S.POLICIES),
+              (6, 4, 0.0, 1, S.setting_for(0.0, tau_follows_dprime=True),
+               S.POLICIES),
+              (6, 4, 3.0, 1, S.setting_for(3.0, tau_follows_dprime=True),
+               S.POLICIES),
+              (10, 8, 1.0, 4, S.setting_for(0.0, tau_follows_dprime=True),
+               (S.B5, S.B6)))
+
     def test_the_per_workflow_vectors_reproduce_runner_worst_case_exactly(self):
         """Every scalar of the sweep's own loop equals runner.worst_case's.
 
@@ -195,40 +224,45 @@ class TheFourPolicyCellIsTheSameMeasurementRunnerAlreadyMakes(unittest.TestCase)
         seed, one carrier or one tie-break is a second experiment wearing the
         first one's name.
         """
-        wfs = S.make_corpus(self.N, self.H, seed=2026)
-        det, ag = S.make_detector(2.0), agent.MockAgent()
-        for name in S.POLICIES:
-            with self.subTest(policy=name):
-                runner.reset_survivor_cache()
-                theirs = runner.worst_case(name, wfs, (1,), S.CARRIERS, det, ag,
-                                           self.BUDGET, self.SEEDS, S.SETTING)
-                runner.reset_survivor_cache()
-                mine = S.policy_curve(name, wfs, (1,), S.CARRIERS, det, ag,
-                                      self.BUDGET, self.SEEDS, S.SETTING)
-                self.assertEqual(mine.per_wf_harm, theirs.per_wf,
-                                 "the sweep's per-workflow harm vector is not "
-                                 "runner.worst_case's")
-                self.assertEqual((mine.harm, mine.q_false, mine.t_lost,
-                                  mine.spent, mine.n_feasible, mine.n_total),
-                                 (theirs.harm, theirs.q_false, theirs.t_lost,
-                                  theirs.spent_mean, theirs.n_feasible,
-                                  theirs.n_total),
-                                 f"{name}: the sweep's copy of the worst-case loop "
-                                 f"drifted from runner.worst_case")
-                for vec in (mine.per_wf_q_false, mine.per_wf_t_lost,
-                            mine.per_wf_spent):
-                    self.assertEqual(len(vec), len(theirs.per_wf),
-                                     "a per-workflow vector has a different length "
-                                     "from the harm vector it must pair with")
-                n = len(theirs.per_wf)
-                self.assertAlmostEqual(sum(mine.per_wf_q_false) / n, theirs.q_false,
-                                       places=12,
-                                       msg="the per-workflow Q_false vector does "
-                                           "not average to the reported mean")
-                self.assertAlmostEqual(sum(mine.per_wf_t_lost) / n, theirs.t_lost,
-                                       places=12)
-                self.assertAlmostEqual(sum(mine.per_wf_spent) / n, theirs.spent_mean,
-                                       places=12)
+        ag = agent.MockAgent()
+        for n_wf, H, d_prime, delta, setting, on in self.PROBES:
+            wfs = S.make_corpus(n_wf, H, seed=2026)
+            det = S.make_detector(d_prime)
+            for name in on:
+                with self.subTest(policy=name, n=n_wf, d_prime=d_prime,
+                                  delta=delta, setting=setting):
+                    runner.reset_survivor_cache()
+                    theirs = runner.worst_case(name, wfs, (delta,), S.CARRIERS,
+                                               det, ag, self.BUDGET, self.SEEDS,
+                                               setting)
+                    runner.reset_survivor_cache()
+                    mine = S.policy_curve(name, wfs, (delta,), S.CARRIERS, det, ag,
+                                          self.BUDGET, self.SEEDS, setting)
+                    self.assertEqual(mine.per_wf_harm, theirs.per_wf,
+                                     "the sweep's per-workflow harm vector is not "
+                                     "runner.worst_case's")
+                    self.assertEqual((mine.harm, mine.q_false, mine.t_lost,
+                                      mine.spent, mine.n_feasible, mine.n_total),
+                                     (theirs.harm, theirs.q_false, theirs.t_lost,
+                                      theirs.spent_mean, theirs.n_feasible,
+                                      theirs.n_total),
+                                     f"{name}: the sweep's copy of the worst-case"
+                                     f" loop drifted from runner.worst_case")
+                    for vec in (mine.per_wf_q_false, mine.per_wf_t_lost,
+                                mine.per_wf_spent):
+                        self.assertEqual(len(vec), len(theirs.per_wf),
+                                         "a per-workflow vector has a different "
+                                         "length from the harm vector it pairs "
+                                         "with")
+                    n = len(theirs.per_wf)
+                    self.assertAlmostEqual(sum(mine.per_wf_q_false) / n,
+                                           theirs.q_false, places=12,
+                                           msg="the per-workflow Q_false vector does "
+                                               "not average to the reported mean")
+                    self.assertAlmostEqual(sum(mine.per_wf_t_lost) / n, theirs.t_lost,
+                                           places=12)
+                    self.assertAlmostEqual(sum(mine.per_wf_spent) / n,
+                                           theirs.spent_mean, places=12)
 
     def test_adding_b5_and_b6_does_not_move_the_b1_sentinel_pair(self):
         """The published d-harm cell is unchanged by the two policies added beside it.

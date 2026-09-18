@@ -109,11 +109,44 @@ still reported, as the reproduction of the published configuration.  The cost of
 the headline mode is resolution: it forces refinement off (see above), so d'* under
 L is read at the coarse grid's 0.2.
 
+WHAT THE CLAIM FORM ACTUALLY NEEDS, AND THE AMENDMENT THAT SAYS SO (18/09/2026).
+tien-dang-ky v2 SS9 pre-registered the boundary of the claim as lambda-bar =
+metrics.lambda_q_star.  Measuring exposed two reasons that function cannot express
+the pre-registered sentence -- "Sentinel beats X for all lambda_Q < boundary" is
+about ONE PAIR, while lambda_q_star is about the argmin over ALL FOUR policies; and
+it accepts roots in (1e-9, 5] only, so on the 25 of 64 cells where L(0) TIES it
+skips the flip that happens immediately above 0 and returns a larger number read
+off a different pair.  So the boundary is now measured PAIRWISE and reported under
+its own name, lambda-cross (`pairwise_crossing`), with lambda-bar reported beside
+it unchanged.  Two names because they are two numbers: over the same 64 cells
+lambda-bar runs [0.0042 ; 1.4217] and the Sentinel-B1 lambda-cross runs
+[0.0462 ; 0.5932].  Reporting the second under the first's symbol would have been a
+silent change of definition.
+
+AND TWO CONVENTIONS AT ZERO, WHICH DISAGREE ON 25 CELLS (AT_ZERO, ABOVE_ZERO).  At
+exactly 0 a tie is a tie; in the limit from above it has already broken.  Each
+count printed below says which convention it is in, because a table and its own
+summary once disagreed for exactly this reason.
+
+THE SURVIVING CLAIM RESTS ON AN UNSWEPT CONSTANT, AND THE RUN SAYS SO.  Sentinel
+beats B1 through the T_lost term alone, and T_lost enters L weighted by
+metrics.LAMBDA_T = 0.50, which this project has never swept.  `lambda_t_table`
+re-scores the SAME cells at lambda_T in {0, 0.25, 0.50} -- 64/64 cells at 0.50,
+22/64 at 0 -- and that table is printed by every run.  The B5 and B6 verdicts do
+not move with it: all three score-reading policies have T_lost = 0.000 everywhere.
+
 THE ATTACKER'S OBJECTIVE IS STILL HARM.  `policy_curve` takes the max over the
 attacker class of mean HARM, exactly as runner.worst_case defines it, and reads the
 penalty terms off the configuration that choice lands on.  A worst case under L
 would be a different attacker and a different measurement; it is not what any
 frozen number here is, so it is not what is computed.
+
+What IS computed, because "every L here is a lower bound" says nothing about a
+RANKING on its own: `--l-attacker-probe` re-runs the same attacker class with L as
+its objective at three DECLARED cells and prints how far each policy's L moves.
+Measured: every policy's L rises, no probe cell changes a ranking, and the
+direction of the DIFFERENCE is not uniform (it deepens Sentinel's deficit against
+B5 at Delta = 0 and narrows it at Delta = 4).  That is a probe, not a worst case.
 
 THE DEFINITION OF d'* -- FIXED BEFORE ANY NUMBER WAS LOOKED AT:
 
@@ -139,6 +172,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import statistics
 import sys
 from dataclasses import dataclass, asdict, field
 
@@ -181,6 +215,17 @@ SPEND_REFERENCE_D_PRIME = 2.2
 LQ_ZERO = "lambda_Q=0"
 LQ_BAR = "lambda_Q=lambda-bar (per cell)"
 LQ_DEFAULT = f"lambda_Q={metrics.LAMBDA_Q}"
+
+#: TWO CONVENTIONS, TWO LABELS -- and they do not agree, so they may not share a
+#: name.  AT_ZERO is the weight EXACTLY 0, where three policies can hold the same
+#: L and a tie is reported as a tie.  ABOVE_ZERO is the limit from above, where a
+#: tie at 0 has already broken in favour of whoever quarantines less: on this
+#: corpus the two readings differ on 25 of 64 cells (at 0: B5 11 sole / Sentinel
+#: 28 sole / 25 tied; at 0+: B5 33 / Sentinel 28 / B6 3).  Writing "lambda_Q -> 0"
+#: over a column computed at 0.0 is what made a table and its own summary
+#: disagree, so the arrow now means the limit and nothing else.
+AT_ZERO = "lambda_Q = 0"
+ABOVE_ZERO = "lambda_Q -> 0+"
 
 #: FIXED false-alarm rate for the whole sweep: tau_det from the `mid` setting.
 #: Read off detector.SETTINGS rather than pasted as a literal, so the sweep cannot
@@ -316,7 +361,9 @@ def make_corpus(n: int, H: int, seed: int = CORPUS_SEED) -> list:
 
 
 def policy_curve(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
-                 setting: str, update_rule: str = "ratio") -> PolicyCurve:
+                 setting: str, update_rule: str = "ratio",
+                 objective_lambda_Q: float | None = None,
+                 objective_lambda_T: float = metrics.LAMBDA_T) -> PolicyCurve:
     """runner.worst_case, KEEPING the per-workflow Q_false / T_lost / spent vectors.
 
     THIS IS A COPY OF A FROZEN LOOP, AND IT IS DECLARED AS ONE.  runner.py may not
@@ -328,16 +375,27 @@ def policy_curve(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
     scalar of this function EQUALS runner.worst_case's on the same arguments, for
     all four policies.  If the two ever drift, that test is the thing that says so.
 
-    The attacker's objective is UNCHANGED and stays harm: `best` is the max over
-    the attacker class of MEAN HARM, exactly as runner.worst_case defines it, and
-    the penalty terms are read off the configuration that choice lands on.  A
-    worst case under L would be a different attacker and a different measurement;
-    it is not what any frozen number here is, so it is not what this computes.
+    The attacker's objective is UNCHANGED BY DEFAULT and stays harm: `best` is the
+    max over the attacker class of MEAN HARM, exactly as runner.worst_case defines
+    it, and the penalty terms are read off the configuration that choice lands on.
+    Every number this module reports is measured that way.
+
+    `objective_lambda_Q` is NOT that measurement and does not replace it.  It is
+    the PROBE behind the batch's own first concern -- "the attacker maximises harm
+    while the defender is scored with L, so every L number is a lower bound on
+    loss".  That sentence is true per policy and says nothing about a RANKING,
+    which is what every reportable claim here is; a bound that moves all four
+    policies by the same amount moves no ranking at all.  Passing a weight makes
+    the attacker maximise L = harm + lambda_Q Q_false + lambda_T T_lost over the
+    SAME attacker class, so the direction can be measured at declared cells
+    (L_ATTACKER_PROBE_CELLS, --l-attacker-probe) instead of argued.  None keeps the
+    frozen loop, and L(0, 0) is harm, so the probe at zero weights reproduces it
+    exactly (pinned by gate 2).
     """
     per_wf, qf, tl, sp = [], [], [], []
     for wf in wfs:
         best = None                                  # None = no feasible attack yet
-        bq = bt = bs = 0.0
+        bh = bq = bt = bs = 0.0
         for d in deltas:
             for k in carriers:
                 rng = random.Random(seed_of(wf.wf_id, d, k))
@@ -354,13 +412,18 @@ def policy_curve(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
                     ts.append(r.t_lost); ss.append(r.spent)
                 if hs:
                     m = sum(hs) / len(hs)
-                    if best is None or m > best:
-                        best = m
-                        bq = sum(qs) / len(qs)
-                        bt = sum(ts) / len(ts)
+                    q = sum(qs) / len(qs)
+                    t = sum(ts) / len(ts)
+                    obj = m if objective_lambda_Q is None else metrics.loss(
+                        m, q, t, objective_lambda_Q, objective_lambda_T)
+                    if best is None or obj > best:
+                        best = obj
+                        bh = m
+                        bq = q
+                        bt = t
                         bs = sum(ss) / len(ss)
         if best is not None:        # N3: drop from the DENOMINATOR, never turn into 0.0
-            per_wf.append(best); qf.append(bq); tl.append(bt); sp.append(bs)
+            per_wf.append(bh); qf.append(bq); tl.append(bt); sp.append(bs)
 
     n = len(per_wf)
 
@@ -371,6 +434,60 @@ def policy_curve(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
                        spent=mean(sp), n_feasible=n, n_total=len(wfs),
                        per_wf_harm=per_wf, per_wf_q_false=qf,
                        per_wf_t_lost=tl, per_wf_spent=sp)
+
+
+#: The (d', Delta) cells the attacker-objective probe is read at -- DECLARED here,
+#: not picked after seeing which one gives the answer the text wants.  One cell at
+#: the reference d' in the regime where the policies separate (Delta = 2), one in
+#: the saturated regime the L ranking is dominated by Q_false in (Delta = 0), and
+#: one at low d' and the largest Delta.
+L_ATTACKER_PROBE_CELLS = ((2.2, 2), (2.2, 0), (0.6, 4))
+
+
+def l_attacker_probe(wfs, budget: float, seeds, cells=L_ATTACKER_PROBE_CELLS,
+                     lambda_Q: float = metrics.LAMBDA_Q,
+                     lambda_T: float = metrics.LAMBDA_T,
+                     tau_follows_dprime: bool = True,
+                     carriers=CARRIERS, policies=POLICIES) -> str:
+    """How much does the ranking move when the ATTACKER is scored with L too?
+
+    The batch's first concern, measured rather than asserted.  Each declared cell
+    is measured twice -- once with the frozen harm-maximising attacker, once with
+    an L-maximising one over the same attacker class -- and the table prints the
+    MOVE in each policy's L.  What matters for this project's claims is not that
+    each L rises (it must: a maximum cannot fall) but whether the rises DIFFER
+    between policies, because only a difference moves a ranking.
+    """
+    ag = agent.MockAgent()
+    out = [f"  ATTACKER OBJECTIVE PROBE -- harm-max vs L-max over the SAME attacker",
+           f"  class, at declared cells.  lambda_Q = {lambda_Q}, lambda_T = "
+           f"{lambda_T}; tau_follows_dprime={tau_follows_dprime}.",
+           f"  Read the MOVE row: a rise shared by all four policies moves no "
+           f"ranking."]
+    for d_prime, delta in cells:
+        det = make_detector(d_prime)
+        setting = setting_for(d_prime, tau_follows_dprime)
+        out.append(f"\n  [d' = {d_prime}  Delta = {delta}  tau_sel row {setting!r}]")
+        out.append(f"  {'policy':<24}{'objective':<10}{'harm':>8}{'Q_fal':>8}"
+                   f"{'T_lost':>8}{'L':>10}{'feas':>9}")
+        for name in policies:
+            got = {}
+            for label, lq in (("harm", None), (f"L@{lambda_Q}", lambda_Q)):
+                runner.reset_survivor_cache()
+                c = policy_curve(name, wfs, (delta,), carriers, det, ag, budget,
+                                 seeds, setting, objective_lambda_Q=lq,
+                                 objective_lambda_T=lambda_T)
+                got[label] = c
+                out.append(f"  {name:<24}{label:<10}{_fmt(c.harm, 8)}"
+                           f"{_fmt(c.q_false, 8)}{_fmt(c.t_lost, 8)}"
+                           f"{_fmt(c.loss(lambda_Q, lambda_T), 10, 4)}"
+                           f"{c.n_feasible:>6d}/{c.n_total:<3d}")
+            a, b = got["harm"], got[f"L@{lambda_Q}"]
+            out.append(f"  {'':<24}{'MOVE':<10}{b.harm - a.harm:>+8.3f}"
+                       f"{b.q_false - a.q_false:>+8.3f}"
+                       f"{b.t_lost - a.t_lost:>+8.3f}"
+                       f"{b.loss(lambda_Q, lambda_T) - a.loss(lambda_Q, lambda_T):>+10.4f}")
+    return "\n".join(out)
 
 
 def measure_cell(wfs, d_prime: float, delta: int, budget: float, seeds,
@@ -396,16 +513,28 @@ def measure_cell(wfs, d_prime: float, delta: int, budget: float, seeds,
                                    budget, seeds, setting)
     b1, sn = cells[B1], cells[SENTINEL]
 
-    if b1.n_feasible == 0 or sn.n_feasible == 0:
+    empty = [n for n in policies if cells[n].n_feasible == 0]
+    if empty:
         # N3: no attack could be built on ANY workflow in this cell.  That is not
         # harm = 0 and it is not "the defense held" -- it is an absent measurement,
         # and it says so.
+        #
+        # Checked over EVERY policy, not over the pair alone.  Delta-harm needs B1
+        # and Sentinel, but the L RANKING is taken over all four: a policy with no
+        # feasible workflow has harm = NaN, so its L is NaN, `l_winners` finds no
+        # minimum and the argmin column prints a bare `--` -- an absent measurement
+        # with no reason attached, which is the one thing N3 forbids.
         return SweepCell(d_prime=d_prime, delta=delta,
                          harm_b1=float("nan"), harm_sentinel=float("nan"),
                          dharm=float("nan"), ci_lo=float("nan"), ci_hi=float("nan"),
                          n_feasible=0, n_total=b1.n_total,
                          reason=f"no attack could be built at Delta={delta} on any "
-                                f"of the {b1.n_total} workflows",
+                                f"of the {b1.n_total} workflows for "
+                                + ", ".join(empty)
+                                + ("" if len(empty) == len(policies) else
+                                   f"; the L ranking is taken over {len(policies)} "
+                                   f"policies and cannot be read with one of them "
+                                   f"absent"),
                          curves=cells)
     if len(b1.per_wf_harm) != len(sn.per_wf_harm):
         # bootstrap_paired pairs BY INDEX.  Two different lengths means the two
@@ -526,9 +655,11 @@ def l_winners(cell: SweepCell, lambda_Q: float,
     A list, not a name, because `min()` breaks a tie by INSERTION ORDER and the
     curves are inserted in POLICIES order with Sentinel second.  On the published
     corpus a quarter of the grid ties at lambda_Q = 0 -- at Delta = 0 Sentinel, B5
-    and B6 all sit at harm 0.992 with T_lost 0.000 -- and a bare min() hands every
-    one of those cells to Sentinel, overstating the headline by nearly 2x.  A tie
-    is a tie and it is reported as one.
+    and B6 all sit at harm 0.992 with T_lost 0.000 -- and a bare min() hands 24 of
+    those 25 cells to Sentinel, overstating the headline by nearly 2x.  (The 25th,
+    Delta = 4 at d' = 0.2, ties B5 with B6 and does NOT include Sentinel, so min()
+    would have given that one to B5: the inflated count was 28 sole + 24 tied = 52,
+    not 53.)  A tie is a tie and it is reported as one.
     """
     if not cell.curves:
         return []
@@ -542,6 +673,159 @@ def l_winner_text(cell: SweepCell, lambda_Q: float,
     """The argmin as printed: "B5 risk-score", or "Sentinel=B5 risk-score" on a tie."""
     w = l_winners(cell, lambda_Q, lambda_T)
     return "=".join(w) if w else "--"
+
+
+# ------------------------------------ the claim form's OWN quantity --------
+#
+# RULING 1 (controller, 18/09/2026).  tien-dang-ky v2 SS9 pre-registered
+# lambda-bar = metrics.lambda_q_star.  That function answers a question about the
+# argmin over ALL FOUR policies, and it cannot see a crossing at exactly 0 (it
+# accepts roots in (1e-9, 5] only), so on the 25 cells that tie at lambda_Q = 0 it
+# CANNOT express the pre-registered claim "Sentinel beats X for all lambda_Q <
+# lambda-bar", which is a statement about ONE PAIR.  The pairwise crossing below is
+# the measurement that claim actually needs.  It is a DIFFERENT quantity and it
+# carries a DIFFERENT name -- lambda-cross -- because reporting it under the
+# pre-registered symbol would be a silent change of definition.  Both are reported
+# side by side everywhere the claim is made, and the amendment is dated in the
+# spike.
+
+#: The names, kept apart on purpose (see above).  Printed, not just commented, so
+#: a reader of the table cannot take one for the other.
+LAMBDA_BAR_NAME = "lambda-bar = metrics.lambda_q_star over all four policies"
+LAMBDA_CROSS_NAME = "lambda-cross = the pairwise Sentinel-vs-X crossing"
+
+#: The THREE outcomes of a pairwise comparison, kept apart.  Collapsing the first
+#: two into "no crossing" loses the difference between "Sentinel wins at every
+#: weight" and "Sentinel never wins"; collapsing a tie-at-zero-then-lose into
+#: "crossing at 0" turns a cell Sentinel loses into a cell with a range to state.
+CROSSES = "crosses"
+AHEAD_EVERYWHERE = "ahead at every lambda_Q"
+BEHIND_FROM_ZERO = "behind from 0+"
+NO_MEASUREMENT = "no measurement at this cell"
+
+#: lambda_T values the surviving claim is re-scored at.  0.50 is metrics.LAMBDA_T,
+#: the project default, and it has NEVER been swept -- it is exactly the kind of
+#: unpublished constant lambda_Q was before this batch.  0 is the other end: score
+#: the objective with the T_lost term switched off.  0.25 sits between them so the
+#: row is a curve and not two points.  Read off metrics.LAMBDA_T rather than pasted
+#: so the grid cannot drift away from the weight metrics.py declares.
+LAMBDA_T_GRID = (0.0, 0.25, metrics.LAMBDA_T)
+
+
+def pairwise_crossing(cell: SweepCell, other: str,
+                      lambda_T: float = metrics.LAMBDA_T,
+                      sentinel: str = SENTINEL, tol: float = L_TIE) -> tuple:
+    """(outcome, lambda) for "Sentinel vs `other`" at one cell -- the quantity the
+    PRE-REGISTERED claim form is stated in.
+
+    Both L curves are affine in lambda_Q, so
+
+        D(lambda_Q) = L_other - L_Sentinel = dh + lambda_Q * dq,
+        dh = (harm_o - harm_s) + lambda_T (T_o - T_s),   dq = Q_o - Q_s
+
+    and Sentinel leads exactly where D > 0.  The sign of dh decides the limit at
+    0+; if Sentinel leads there, it keeps leading forever when dq >= 0 and
+    otherwise until the single root -dh/dq.
+
+    A TIE AT EXACTLY ZERO IS NOT A WIN AND NOT A CROSSING AT ZERO.  When dh == 0
+    the comparison is decided by dq alone, so a cell where Sentinel ties on harm
+    and quarantines more is BEHIND at every positive weight -- it has no range to
+    state, and calling its crossing "0" would put it in the table as if it had one.
+
+    Returns (CROSSES, x), (AHEAD_EVERYWHERE, None), (BEHIND_FROM_ZERO, None), or
+    (NO_MEASUREMENT, None) on a cell that carries a REASON or lacks a curve (N3).
+    """
+    if not cell.usable or other not in cell.curves or sentinel not in cell.curves:
+        return (NO_MEASUREMENT, None)
+    o, sn = cell.curves[other], cell.curves[sentinel]
+    dh = (o.harm - sn.harm) + lambda_T * (o.t_lost - sn.t_lost)
+    dq = o.q_false - sn.q_false
+    if dh != dh or dq != dq:                       # NaN: nothing to compare
+        return (NO_MEASUREMENT, None)
+    ahead_at_0 = dh > tol or (abs(dh) <= tol and dq > tol)
+    if not ahead_at_0:
+        return (BEHIND_FROM_ZERO, None)
+    if dq >= -tol:                                 # the gap only widens
+        return (AHEAD_EVERYWHERE, None)
+    return (CROSSES, -dh / dq)
+
+
+def pairwise_text(cell: SweepCell, other: str,
+                  lambda_T: float = metrics.LAMBDA_T) -> str:
+    """The pairwise verdict as printed: a number, or WHICH of the other outcomes."""
+    kind, x = pairwise_crossing(cell, other, lambda_T)
+    return f"{x:.4f}" if kind == CROSSES else kind
+
+
+def pairwise_summary(cells, other: str,
+                     lambda_T: float = metrics.LAMBDA_T) -> dict:
+    """The pairwise verdict counted over a set of cells, with the three outcomes
+    kept apart and the median taken ONLY over the cells that actually cross.
+
+    A median over cells with no crossing would be a median over numbers that do not
+    exist; a count of "cells with a crossing >= 0.10" over cells with no crossing
+    would be the same error wearing a percentage.
+    """
+    kinds = [pairwise_crossing(c, other, lambda_T) for c in cells]
+    kinds = [(k, x) for k, x in kinds if k != NO_MEASUREMENT]
+    xs = sorted(x for k, x in kinds if k == CROSSES)
+    ahead_everywhere = sum(1 for k, _ in kinds if k == AHEAD_EVERYWHERE)
+    behind = sum(1 for k, _ in kinds if k == BEHIND_FROM_ZERO)
+    return {
+        "other": other,
+        "lambda_T": lambda_T,
+        "n": len(kinds),
+        "behind_from_zero": behind,
+        "ahead_everywhere": ahead_everywhere,
+        #: "ahead at 0+", i.e. every cell that is not behind the moment the weight
+        #: leaves zero.  Under the ABOVE_ZERO convention, never the AT_ZERO one.
+        "ahead_at_zero": len(xs) + ahead_everywhere,
+        "crossings": xs,
+        "min": min(xs) if xs else None,
+        "median": statistics.median(xs) if xs else None,
+        "max": max(xs) if xs else None,
+        "crossing_at_or_above_default": sum(1 for x in xs if x >= metrics.LAMBDA_Q),
+    }
+
+
+def _flat(rows) -> list:
+    """{delta: [cell]} or [cell] -> [cell].  The pairwise counts are over CELLS and
+    the Delta cells are never pooled into an average, only counted."""
+    if isinstance(rows, dict):
+        return [c for d in sorted(rows) for c in rows[d]]
+    return list(rows)
+
+
+def lambda_t_sensitivity(rows, other: str = B1,
+                         lambda_Ts=LAMBDA_T_GRID) -> list:
+    """The surviving claim re-scored at several lambda_T -- one summary per weight.
+
+    WHY THIS EXISTS.  "Sentinel beats B1" is bought by the T_lost term (B1's commit
+    gate blocks clean patches; Sentinel's T_lost is 0.000 at every cell), and
+    T_lost enters L weighted by lambda_T = 0.50 -- a constant this project has
+    never swept.  A claim whose only support is an unswept constant has to be
+    reported together with its dependence on that constant, measured.
+    """
+    cells = _flat(rows)
+    return [pairwise_summary(cells, other, lt) for lt in lambda_Ts]
+
+
+def lambda_t_table(rows, other: str = B1, lambda_Ts=LAMBDA_T_GRID) -> str:
+    """The lambda_T sensitivity of the pairwise verdict, as printed."""
+    out = [f"  Sentinel vs {other}, re-scored at several lambda_T "
+           f"(lambda_T = {metrics.LAMBDA_T} is metrics.LAMBDA_T, NEVER SWEPT)",
+           f"  {'lambda_T':>9}{'ahead at 0+':>13}{'behind':>9}{'crosses':>9}"
+           f"{'min':>9}{'median':>9}{'max':>9}",
+           "  " + "-" * 67]
+    for s in lambda_t_sensitivity(rows, other, lambda_Ts):
+        n = s["n"]
+        out.append(f"  {s['lambda_T']:>9.2f}"
+                   + f"{s['ahead_at_zero']}/{n}".rjust(13)
+                   + f"{s['behind_from_zero']:>9d}{len(s['crossings']):>9d}"
+                   + _fmt(float('nan') if s['min'] is None else s['min'], 9, 4)
+                   + _fmt(float('nan') if s['median'] is None else s['median'], 9, 4)
+                   + _fmt(float('nan') if s['max'] is None else s['max'], 9, 4))
+    return "\n".join(out)
 
 
 def _loss_shadow(cell: SweepCell, lambda_Q: float | None,
@@ -691,7 +975,8 @@ def refine_brackets(rows: dict, wfs, budget: float, seeds, carriers=CARRIERS,
 
 def json_payload(rows: dict, *, n: int, H: int, budget: float, seeds, deltas,
                  grid, tau_follows_dprime: bool, refined: bool,
-                 corpus_seed: int = CORPUS_SEED) -> dict:
+                 corpus_seed: int = CORPUS_SEED,
+                 loss_columns: dict | None = None) -> dict:
     """The --json artefact: the cells, AND the identity of the run that made them.
 
     The cells alone cannot say which of the two tau_sel modes measured them -- on
@@ -727,9 +1012,14 @@ def json_payload(rows: dict, *, n: int, H: int, budget: float, seeds, deltas,
         #: d'* under harm AND under L, so a reader of the artefact does not have to
         #: re-derive the headline from the cells.  The harm entry is the published
         #: number and is computed by the same call it always was.
+        #: `loss_columns` lets the caller hand in the three L columns it has
+        #: already computed.  Each one is a break_even scan over bootstrapped
+        #: cells, and the run used to compute the same three columns three times
+        #: over -- in the per-Delta report, in the frame answer, and again here --
+        #: which was most of the non-measurement cost of a run.
         "break_even": {
             str(d): {"harm": break_even(rows[d]),
-                     **{k: v for k, v in loss_break_evens(rows[d]).items()}}
+                     **((loss_columns or {}).get(d) or loss_break_evens(rows[d]))}
             for d in deltas},
     }
 
@@ -805,6 +1095,51 @@ def policy_table(rows, lambda_T: float = metrics.LAMBDA_T) -> str:
     return "\n".join(out)
 
 
+def _short(name: str) -> str:
+    """"B5 risk-score" -> "B5".  ONLY for the wide per-cell table, whose columns
+    cannot hold four registry keys joined by "=" without running into each other.
+    The header prints the mapping, and every other table keeps the keys verbatim."""
+    return name.split()[0]
+
+
+def pairwise_table(rows, lambda_T: float = metrics.LAMBDA_T) -> str:
+    """One Delta's cells with BOTH weights side by side: lambda-bar (four-policy,
+    pre-registered) and lambda-cross (pairwise, what the claim form needs).
+
+    This is the table the spike's per-cell section is transcribed from, and it is
+    printed rather than assembled by hand because the last hand-typed copy of it
+    turned 24 tied cells into 24 Sentinel wins.  The argmin columns are the cell's
+    own, at the two conventions that do not agree (AT_ZERO, ABOVE_ZERO), printed
+    under labels that say which is which.
+    """
+    lq = metrics.LAMBDA_Q
+    keys = ", ".join(f"{_short(n)} = {n}" for n in POLICIES)
+    out = [f"  {LAMBDA_BAR_NAME}  |  {LAMBDA_CROSS_NAME}",
+           f"  policy keys abbreviated: {keys}",
+           f"  {'d-prime':>7}{'lambda-bar':>12}  {'argmin L @ ' + AT_ZERO:<26}"
+           f"{'argmin L @ lambda-bar+':<24}{'argmin L @ lambda_Q=' + str(lq):<26}"
+           + "".join(f"{'Sen vs ' + _short(n):>26}" for n in POLICIES
+                     if n != SENTINEL),
+           "  " + "-" * 173]
+    for c in sorted(rows, key=lambda c: c.d_prime):
+        if not c.usable:
+            out.append(f"  {c.d_prime:>7.2f}  REASON: {c.reason}")
+            continue
+        lb = lambda_bar(c, lambda_T)
+        lb_txt = "none" if lb is None else f"{lb:.4f}"
+
+        def argmin(lq_):
+            w = l_winners(c, lq_, lambda_T)
+            return "=".join(_short(n) for n in w) if w else "--"
+
+        above = "--" if lb is None else argmin(lb + 1e-6)
+        out.append(f"  {c.d_prime:>7.2f}{lb_txt:>12}  {argmin(0.0):<26}"
+                   f"{above:<24}{argmin(lq):<26}"
+                   + "".join(f"{pairwise_text(c, n, lambda_T):>26}"
+                             for n in POLICIES if n != SENTINEL))
+    return "\n".join(out)
+
+
 def loss_table(rows, lambda_Q: float, lambda_T: float = metrics.LAMBDA_T) -> str:
     """One Delta's Delta-L curve at a FIXED lambda_Q -- the same layout as `table`,
     so the L curve and the harm curve can be read against each other line by line."""
@@ -836,6 +1171,15 @@ def spend_report(rows, budget: float,
     if not at or not at[0].curves:
         return (f"  no spend table: nothing measured at the declared reference "
                 f"d' = {d_prime}")
+    if not at[0].usable:
+        # N3.  A refused cell can still carry finite per-policy spends -- a cell
+        # loses its pairing, or a policy loses its denominator, long before the
+        # audit budget stops being spent -- so filtering NaN is not the same check
+        # as asking whether the cell is reportable.  Printing the table anyway
+        # would put four comparable-looking numbers under a d' at which this module
+        # reports nothing else.
+        return (f"  no spend table at the declared reference d' = {d_prime:.1f}  "
+                f"REASON: {at[0].reason}")
     spent = {k: v.spent for k, v in at[0].curves.items() if v.spent == v.spent}
     if not spent:
         return (f"  no spend table at d' = {d_prime}: every policy's spend is "
@@ -858,6 +1202,11 @@ def main() -> int:
                     help="look tau_sel up in the row calibrated at the SWEPT d' "
                          "(rows d0.0..d3.0) instead of the fixed `mid` row; "
                          "implies --no-refine, see the module docstring")
+    ap.add_argument("--l-attacker-probe", action="store_true",
+                    help="measure the DECLARED probe cells twice -- harm-maximising"
+                         " attacker and L-maximising attacker -- and print how far"
+                         " each policy's L moves, then exit.  This is the batch's"
+                         " own first concern, measured (see l_attacker_probe)")
     ap.add_argument("--json", metavar="FILE",
                     help="write the cells AND a `run` block naming the corpus, the "
                          "grid, the seeds and which tau_sel mode produced them")
@@ -865,6 +1214,15 @@ def main() -> int:
 
     wfs = make_corpus(a.n, a.H, seed=CORPUS_SEED)
     seeds = tuple(range(1, a.seeds + 1))
+    if a.l_attacker_probe:
+        print("=" * 78)
+        print("AuditGame-SE -- does an L-MAXIMISING attacker move the L RANKING?")
+        print("=" * 78)
+        print(f"{a.n} workflows - H={a.H} - B={a.budget} - {a.seeds} seeds - "
+              f"corpus seed {CORPUS_SEED}")
+        print(l_attacker_probe(wfs, a.budget, seeds,
+                              tau_follows_dprime=a.tau_follows_dprime))
+        return 0
     # The table has tau_sel rows at the COARSE grid only, and cannot have more:
     # which bracket gets refined is unknown until the coarse grid is measured.
     refine = not a.no_refine and not a.tau_follows_dprime
@@ -901,7 +1259,10 @@ def main() -> int:
                         tau_follows_dprime=a.tau_follows_dprime)
 
     summary = {}
-    loss_summary = {}
+    #: The three L columns per Delta, computed ONCE.  Each column is a break_even
+    #: scan over 10 000-resample bootstrapped cells; they are read three times
+    #: below (per-Delta report, frame answer, --json artefact).
+    loss_cols = {d: loss_break_evens(rows[d]) for d in DELTAS}
     for d in DELTAS:
         print(f"\n[Delta = {d}]")
         print(table(rows[d]))
@@ -917,10 +1278,13 @@ def main() -> int:
               f" + lambda_T T_lost   (lambda_T = {metrics.LAMBDA_T})")
         print(policy_table(rows[d]))
         print()
+        print(f"  [Delta = {d}]  the CLAIM FORM's own quantity, per cell: "
+              f"lambda-bar (four policies) BESIDE lambda-cross (pairwise)")
+        print(pairwise_table(rows[d]))
+        print()
         print(spend_report(rows[d], a.budget))
 
-        cols = loss_break_evens(rows[d])
-        loss_summary[d] = cols
+        cols = loss_cols[d]
         print(f"\n  d'* of d-L = L(B1) - L(Sentinel), the SAME frozen rule:")
         for k, v in cols.items():
             print(f"    {k:<34}" + ("none in [0.0, 3.0]" if v is None
@@ -950,12 +1314,20 @@ def main() -> int:
     print("  (Delta, d') cell.  lambda_Q = 0 and 0.10 are ILLUSTRATIONS, never the")
     print("  headline.  A TIE for the smallest L is counted as a tie and not as a")
     print("  win: the curves are inserted in POLICIES order with Sentinel second, so")
-    print("  min() would hand every tied cell to Sentinel (see l_winners).")
+    print("  min() would hand 24 of the 25 tied cells to Sentinel (see l_winners).")
     print("  READ lambda-bar WITH ITS LIMIT: metrics.lambda_q_star only accepts a")
     print("  crossing in (1e-9, 5], so where two policies TIE at lambda_Q = 0 the")
     print("  flip that happens immediately above 0 is invisible to it and the")
     print("  reported lambda-bar is read off some other pair -- an UPPER reading on")
-    print("  those cells, not the range over which Sentinel actually leads.")
+    print("  those cells, not the range over which Sentinel actually leads.  The")
+    print("  claim form's own quantity is therefore the PAIRWISE crossing, printed")
+    print(f"  under its own name ({LAMBDA_CROSS_NAME}) and")
+    print("  amended into the pre-registration on 18/09/2026, with lambda-bar")
+    print("  reported beside it.")
+    print(f"  TWO CONVENTIONS, AND THEY DISAGREE: '{AT_ZERO}' is computed at")
+    print(f"  exactly 0, where a tie is a tie; '{ABOVE_ZERO}' is the limit from")
+    print("  above, where a tie has already broken toward whoever quarantines")
+    print("  less.  Each count below says which one it is in.")
     for d in DELTAS:
         usable = [c for c in sorted(rows[d], key=lambda c: c.d_prime) if c.usable]
         bars = [lambda_bar(c) for c in usable]
@@ -964,7 +1336,7 @@ def main() -> int:
         tied = [c.d_prime for c in usable
                 if len(l_winners(c, 0.0)) > 1 and SENTINEL in l_winners(c, 0.0)]
         print(f"\n  [Delta = {d}]  usable cells {len(usable)}/{len(rows[d])}")
-        print(f"    Sentinel is the SOLE argmin L at lambda_Q -> 0 on "
+        print(f"    Sentinel is the SOLE argmin L at {AT_ZERO} on "
               f"{len(strict)}/{len(usable)} cells"
               + (f" (d' = {min(strict):.2f} .. {max(strict):.2f})" if strict
                  else " -- NO cell")
@@ -972,14 +1344,50 @@ def main() -> int:
         print(f"    lambda-bar measured on {len(have)}/{len(usable)} cells"
               + (f", range [{min(have):.4f} ; {max(have):.4f}]" if have else
                  " -- none in (0, 5] on any cell"))
-        for k, v in loss_break_evens(rows[d]).items():
+        for other in (n for n in POLICIES if n != SENTINEL):
+            ps = pairwise_summary(usable, other)
+            print(f"    vs {other:<20} ahead at {ABOVE_ZERO} on "
+                  f"{ps['ahead_at_zero']}/{ps['n']}"
+                  f" (behind {ps['behind_from_zero']}, ahead at EVERY lambda_Q "
+                  f"{ps['ahead_everywhere']}); lambda-cross on "
+                  f"{len(ps['crossings'])}"
+                  + ("" if not ps["crossings"] else
+                     f", [{ps['min']:.4f} ; {ps['max']:.4f}], median "
+                     f"{ps['median']:.4f}, >= {metrics.LAMBDA_Q} on "
+                     f"{ps['crossing_at_or_above_default']}"))
+        for k, v in loss_cols[d].items():
             print(f"    d'* of d-L, {k:<34}"
                   + ("none in [0.0, 3.0]" if v is None else f"d'* = {v:.2f}"))
+
+    all_usable = [c for d in DELTAS for c in rows[d] if c.usable]
+    print("\n" + "=" * 78)
+    print("OVER THE WHOLE GRID -- and what the surviving claim rests on")
+    print("=" * 78)
+    for other in (n for n in POLICIES if n != SENTINEL):
+        ps = pairwise_summary(all_usable, other)
+        print(f"  Sentinel vs {other:<20} ahead at {ABOVE_ZERO} on "
+              f"{ps['ahead_at_zero']}/{ps['n']}; behind {ps['behind_from_zero']}; "
+              f"ahead at EVERY lambda_Q {ps['ahead_everywhere']}")
+        if ps["crossings"]:
+            print(f"    lambda-cross on {len(ps['crossings'])} cells: "
+                  f"[{ps['min']:.4f} ; {ps['max']:.4f}], median "
+                  f"{ps['median']:.4f}, >= {metrics.LAMBDA_Q} on "
+                  f"{ps['crossing_at_or_above_default']}")
+    print()
+    print("  THE SURVIVING CLAIM IS LOAD-BEARING ON AN UNSWEPT CONSTANT.")
+    print("  Sentinel's win over B1 is bought by the T_lost term, and T_lost enters")
+    print(f"  L weighted by lambda_T = {metrics.LAMBDA_T} (metrics.LAMBDA_T), which")
+    print("  this project has never swept.  Re-scored over the SAME cells:")
+    print(lambda_t_table(all_usable, B1))
+    print("  The B5 and B6 comparisons do NOT move with lambda_T: all three")
+    print("  score-reading policies have T_lost = 0.000 at every cell, so the term")
+    print("  cancels and only the comparison against B1 depends on this constant.")
 
     if a.json:
         doc = json_payload(rows, n=a.n, H=a.H, budget=a.budget, seeds=seeds,
                            deltas=DELTAS, grid=GRID,
-                           tau_follows_dprime=a.tau_follows_dprime, refined=refine)
+                           tau_follows_dprime=a.tau_follows_dprime, refined=refine,
+                           loss_columns=loss_cols)
         with open(a.json, "w") as fh:
             json.dump(doc, fh, indent=2)
         print(f"\n  wrote {a.json}  (run block records the mode: "

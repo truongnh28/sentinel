@@ -243,11 +243,39 @@ class TheSpendingTableSitsBesideTheResults(unittest.TestCase):
         rows = [S.SweepCell(d_prime=S.SPEND_REFERENCE_D_PRIME, delta=2,
                             harm_b1=0.8, harm_sentinel=0.5, dharm=0.3, ci_lo=0.1,
                             ci_hi=0.5, n_feasible=40, n_total=40, curves=cur)]
+
         out = S.spend_report(rows, 17.95)
         self.assertIn("cap", out, "this is not metrics.spend_table's output")
         self.assertIn("16.40", out)
         self.assertIn("91%", out, "the % of cap used is missing (16.40/17.95)")
         self.assertIn("2%", out, "B5's 0.40 of a 17.95 cap is not reported")
+
+    def test_a_refused_cell_prints_its_reason_instead_of_a_spend_table(self):
+        """N3 reaches the spend table too.
+
+        Thesis claim (vi): "mot o bi tu choi ghi LY DO, khong bao gio mot gia tri
+        im lang" -- mot o co curve nhung KHONG dung duoc (vi du: hai policy giu so
+        workflow khac nhau nen khong ghep cap duoc) van co `spent` huu han, nen mot
+        bang chi tieu van in ra duoc tu no -- va se doc nhu mot phep do hop le o mot
+        o ma khong so nao trong o do duoc bao cao.
+        """
+        cur = {n: S.PolicyCurve(0.5, 0.1, 0.0, s_, 12, 40, [0.5] * 12, [0.1] * 12,
+                                [0.0] * 12, [s_] * 12)
+               for n, s_ in ((S.B1, 16.40), (S.SENTINEL, 6.47),
+                             (S.B5, 0.40), (S.B6, 5.00))}
+        rows = [S.SweepCell(d_prime=S.SPEND_REFERENCE_D_PRIME, delta=2,
+                            harm_b1=0.8, harm_sentinel=0.5, dharm=float("nan"),
+                            ci_lo=float("nan"), ci_hi=float("nan"), n_feasible=12,
+                            n_total=40, curves=cur,
+                            reason="B1 kept 12 workflows and Sentinel 9: the "
+                                   "paired CI has no pairing")]
+        out = S.spend_report(rows, 17.95)
+        self.assertIn("REASON", out,
+                      "an unusable cell printed a spend table with nothing to say "
+                      "that the cell itself carries no reportable measurement")
+        self.assertIn("no pairing", out, "the reason text was dropped")
+        self.assertNotIn("16.40", out,
+                         "the spend table was printed anyway for a refused cell")
 
 
 if __name__ == "__main__":

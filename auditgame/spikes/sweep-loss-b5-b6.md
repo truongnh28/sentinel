@@ -5,6 +5,16 @@
 `tests/gate2_validity/test_dprime_break_even.py`,
 `tests/gate3_power/test_dprime_sweep_power.py`
 
+> **ĐỌC BA DÒNG NÀY TRƯỚC.**
+> 1. **Sửa đổi tiền-đăng-ký, 18/09/2026** — ranh giới của dạng phát biểu được báo
+>    cáo bằng `λ_×` (điểm cắt **theo cặp**) thay vì chỉ `λ̄ = λ_Q^*`; lý do, và **cả
+>    hai** dải số, ở **§6.0**.
+> 2. Bốn bảng từng ô ở **§6.1** là **bản chép máy từ `stdout`** của công cụ. Bản gõ
+>    tay trước đó biến **24 ô hoà thành 24 ô Sentinel thắng**.
+> 3. Phát biểu **duy nhất** còn sống (Sentinel hơn `B1`) **treo vào `λ_T = 0,50`**,
+>    một hằng số chưa từng được quét: ở `λ_T = 0` nó co từ **64/64** ô xuống
+>    **22/64** ô (**§7.2.1**).
+
 ---
 
 ## 1. Câu hỏi
@@ -43,6 +53,7 @@ Batch này làm ba việc và **không** làm việc thứ tư:
 | `d′*` dưới `L` | `break_even()` **y nguyên**, áp lên các ô bóng đã hiệu `L` (`as_loss_cells`) |
 | Ba cột `λ_Q` | `0` · `λ̄` **đo theo từng ô** · `metrics.LAMBDA_Q = 0,10` |
 | `λ̄` | `metrics.lambda_q_star` trên **bốn** policy của **chính ô đó** — **KẾT QUẢ**, không phải tham số |
+| `λ_×` | điểm cắt `L` **theo CẶP** Sentinel–X — đại lượng mà dạng phát biểu tiền-đăng-ký thật sự cần; **tên riêng**, không dùng chung ký hiệu với `λ̄` (**sửa đổi tiền-đăng-ký 18/09/2026**, §6.0) |
 | `λ_T` | `metrics.LAMBDA_T = 0,50`, không đổi |
 | CI95 của `ΔL` | `runner.bootstrap_paired` trên **`L` theo từng workflow**, cùng đơn vị lấy mẫu với `harm` |
 | Chi tiêu | `metrics.spend_table` tại điểm lưới **khai báo trước** `d′ = 2,2` (điểm gần `d′(mid) = 2,211` nhất), cộng cột `spent` ở **mọi** điểm lưới |
@@ -99,6 +110,11 @@ với **phương sai lấy mẫu bằng 0**, khoảng giữ nguyên **bề rộn
 chọn đó rơi vào. Một *worst case dưới `L`* là **một kẻ tấn công khác** và **một
 phép đo khác**; không con số đóng băng nào ở đây là như vậy, nên nó không được tính
 ở đây. Đây là **giới hạn**, ghi ở §8.
+
+**Nhưng "cận dưới" không phải là một câu nói về THỨ HẠNG**, mà mọi phát biểu báo
+cáo được ở đây đều là thứ hạng. Vì vậy chiều của cận dưới đó đã được **đo** ở ba ô
+khai trước — `--l-attacker-probe`, §8.1 — chứ không để nguyên như một lời cảnh báo
+không kiểm chứng được.
 
 ---
 
@@ -260,118 +276,178 @@ cặp `(B1, Sentinel)`. Câu hỏi quyết định khung bài nằm ở §6.
 
 ---
 
-## 6. `λ̄ = λ_Q^*` theo **từng ô** — và ai thắng ở hai bên nó
+## 6. `λ̄` và `λ_×` theo **từng ô** — hai đại lượng, hai tên
 
-`λ̄` là `metrics.lambda_q_star` trên **bốn** policy của **chính ô đó**: trọng số
-nhỏ nhất `> 0` mà thứ hạng `L` **đổi người dẫn đầu**. `none` nghĩa là **không**
-trọng số nào trong `(0; 5]` đổi được thứ hạng — một **câu trả lời**, không phải một
-ô trống, và nó **không** được thay bằng 0, bằng 0,10, hay bằng `λ̄` của ô khác.
+**`λ̄ = λ_Q^*`** (`metrics.lambda_q_star`) là trọng số nhỏ nhất `> 0` mà **thứ hạng
+`argmin L` trên CẢ BỐN policy** đổi người dẫn đầu. `none` nghĩa là không trọng số
+nào trong `(0; 5]` đổi được thứ hạng — một **câu trả lời**, không phải ô trống, và
+nó **không** được thay bằng 0, bằng 0,10, hay bằng `λ̄` của ô khác.
 
-Ba cột cuối là **trọng số cắt theo CẶP**: `λ_Q` mà tại đó `L` của policy kia bằng
-`L` của Sentinel. Đây đúng là đại lượng mà dạng phát biểu tiền-đăng-ký cần —
-*"Sentinel hơn X với mọi `λ_Q < λ̄`"*, và ba kết cục của nó
-được giữ **TÁCH BẠCH**:
+**`λ_×`** (mới — **sửa đổi tiền-đăng-ký**, §6.0) là **điểm cắt theo CẶP**: `λ_Q` mà tại đó `L` của policy kia
+bằng `L` của Sentinel. Ba kết cục của nó được giữ **TÁCH BẠCH**:
 
 * một số `λ` — hai đường `L` cắt nhau ở đó;
-* **`hơn mọi λ_Q`** — Sentinel dẫn ở `λ_Q → 0` và khoảng cách chỉ **nới ra**;
-* **`thua từ 0`** — Sentinel đã thua (hoặc hoà, rồi thua với mọi `λ_Q > 0`) ngay
-  tại `λ_Q → 0`, nên **không tồn tại** dải `λ_Q` nào để phát biểu.
+* **`hơn mọi λ_Q`** — Sentinel dẫn ở `λ_Q → 0+` và khoảng cách chỉ **nới ra**;
+* **`thua từ 0+`** — Sentinel đã thua (hoặc hoà tại đúng 0, rồi thua với mọi
+  `λ_Q > 0`) ngay khi trọng số rời khỏi 0, nên **không tồn tại** dải `λ_Q` nào để
+  phát biểu.
 
+### 6.0 SỬA ĐỔI TIỀN-ĐĂNG-KÝ, ngày **18/09/2026** — vì sao có `λ_×`
+
+Tiền-đăng-ký v2 §9 chốt `λ̄ = λ_Q^*`. Khi chấm điểm thật, **hàm đó không phát biểu
+được dạng đã chốt trên 25/64 ô**, vì hai lý do độc lập:
+
+1. `lambda_q_star` trả lời về `argmin L` trên **cả bốn** policy, trong khi dạng
+   phát biểu *"Sentinel [hơn / không hơn] **X**"* là mệnh đề về **một cặp**;
+2. nó chỉ nhận nghiệm trong `(1e-9; 5]`, nên ở 25 ô mà `L(0)` **hoà**, cú đổi ngôi
+   xảy ra **ngay trên 0** bị bỏ qua và nó trả về một số **lớn hơn**, đọc từ một cặp
+   khác (§6.3b).
+
+Vì vậy đại lượng báo cáo cho dạng phát biểu này là `λ_×`, **mang tên riêng** —
+báo cáo nó dưới ký hiệu `λ̄` sẽ là **đổi định nghĩa trong im lặng**. `λ̄` **vẫn được
+báo cáo nguyên nghĩa cũ, bên cạnh `λ_×`, ở mọi chỗ phát biểu**. Hai dải đo được
+trên đúng 64 ô của bản chính:
+
+| đại lượng | đo trên | dải | trung vị |
+|:--|:--:|:--|:--:|
+| `λ̄ = λ_Q^*` (bốn policy) | 64/64 ô | `[0,0042; 1,4217]` | 0,0813 |
+| `λ_×` Sentinel–`B1` (cặp) | 64/64 ô | `[0,0462; 0,5932]` | **0,1529** |
+| `λ_×` Sentinel–`B5` (cặp) | 31/64 ô | `[0,0042; 0,1203]` | 0,0415 |
+| `λ_×` Sentinel–`B6` (cặp) | 37/64 ô | `[0,1111; 18,5000]` | 0,3846 |
+
+Đây là một **thay đổi so với văn bản đã đóng băng**, nên theo đúng quy tắc ở cuối
+§9 của tiền-đăng-ký: **ghi ngày (18/09/2026), ghi lý do (ở trên), và báo cả hai
+phiên bản** (bảng trên, và `λ̄` đứng nguyên trong mọi bảng §6). Đoạn sửa đổi chính
+thức được đề nghị đưa vào tiền-đăng-ký nằm trong báo cáo của đợt làm này.
+
+### 6.0.1 HAI QUY ƯỚC `λ_Q → 0`, và chúng **KHÔNG** trùng nhau
+
+Bảng dưới có hai cột đọc "ở gần 0" và chúng trả lời hai câu khác nhau:
+
+* **`λ_Q = 0`** — tính tại **đúng** 0. Ở đây một ô **hoà** là hoà, và có 25 ô hoà.
+* **`λ_Q → 0+`** — **giới hạn từ bên phải**. Ô hoà tại 0 đã vỡ về phía bên
+  quarantine ít hơn, nên **không còn ô hoà nào**.
+
+Chênh lệch giữa hai quy ước là **25/64 ô**:
+
+| đếm trên 64 ô | `B1` | `Sentinel` | `B5` | `B6` | số ô hoà |
+|:--|:--:|:--:|:--:|:--:|:--:|
+| `argmin L` **duy nhất** tại `λ_Q = 0` | 0 | **28** | 11 | 0 | **25** |
+| `argmin L` **duy nhất** tại `λ_Q → 0+` | 0 | **28** | **33** | 3 | **0** |
+
+Mọi con số "thua từ `0+`" ở §6/§7 đọc theo quy ước **thứ hai**; mọi cột "argmin `L`
+tại `λ_Q = 0`" đọc theo quy ước **thứ nhất**. Bản nháp trước dùng **một nhãn cho cả
+hai**, và đó là lý do bảng từng ô và bảng tổng hợp của bản nháp trước **mâu
+thuẫn nhau**.
+
+### 6.1 Bảng từng ô — **in thẳng từ `stdout` của công cụ**
+
+Bốn bảng dưới là **bản chép máy** từ `dprime_sweep.pairwise_table` (mục
+`the CLAIM FORM's own quantity, per cell` trong `stdout`), **không** gõ lại bằng
+tay. Bản gõ tay trước đó đã biến **24 ô hoà thành 24 ô Sentinel thắng** — đúng cái
+lỗi mà §6.3(a) nói là đã sửa trong code.
 
 #### `Δ = 0`
 
-| `d′` | `λ̄` | argmin `L` tại `λ_Q → 0` | argmin ngay trên `λ̄` | argmin tại `λ_Q = 0,10` | Sen vs `B1` | Sen vs `B5` | Sen vs `B6` |
-|---:|---:|:--|:--|:--|:--|:--|:--|
-| 0.0 | 0.1506 | Sen | B5 | B5 | 0.1506 | **thua từ 0** | **thua từ 0** |
-| 0.2 | 0.1296 | Sen | B5 | B5 | 0.1296 | **thua từ 0** | **hơn mọi λ_Q** |
-| 0.4 | 0.1350 | Sen | B5 | B5 | 0.1350 | **thua từ 0** | **thua từ 0** |
-| 0.6 | 0.1408 | Sen | B5 | B5 | 0.1408 | **thua từ 0** | **thua từ 0** |
-| 0.8 | 0.1294 | Sen | B5 | B5 | 0.1294 | **thua từ 0** | **thua từ 0** |
-| 1.0 | 0.1164 | Sen | B5 | B5 | 0.1164 | **thua từ 0** | **thua từ 0** |
-| 1.2 | 0.1066 | Sen | B5 | B5 | 0.1066 | **thua từ 0** | **thua từ 0** |
-| 1.4 | 0.1077 | Sen | B5 | B5 | 0.1077 | **thua từ 0** | **thua từ 0** |
-| 1.6 | 0.1010 | Sen | B5 | B5 | 0.1010 | **thua từ 0** | **thua từ 0** |
-| 1.8 | 0.0953 | Sen | B5 | B5 | 0.0953 | **thua từ 0** | **thua từ 0** |
-| 2.0 | 0.0908 | Sen | B5 | B5 | 0.0908 | **thua từ 0** | **thua từ 0** |
-| 2.2 | 0.0875 | Sen | B5 | B5 | 0.0875 | **thua từ 0** | **thua từ 0** |
-| 2.4 | 0.0542 | Sen | B5 | B5 | 0.0542 | **thua từ 0** | **thua từ 0** |
-| 2.6 | 0.0471 | Sen | B5 | B5 | 0.0471 | **thua từ 0** | **thua từ 0** |
-| 2.8 | 0.0462 | Sen | B5 | B5 | 0.0462 | **thua từ 0** | **thua từ 0** |
-| 3.0 | 0.0462 | Sen | B5 | B5 | 0.0462 | **thua từ 0** | **thua từ 0** |
+| `d′` | `λ̄` | argmin `L` tại `λ_Q = 0` | argmin ngay trên `λ̄` | argmin tại `λ_Q = 0,10` | `λ_×` Sen–`B1` | `λ_×` Sen–`B5` | `λ_×` Sen–`B6` |
+|---:|---:|:--|:--|:--|--:|--:|--:|
+| 0,00 | 0,1506 | Sentinel=B5=B6 | B5 | B5 | 0,1506 | **thua từ `0+`** | **thua từ `0+`** |
+| 0,20 | 0,1296 | Sentinel=B5=B6 | B5 | B5 | 0,1296 | **thua từ `0+`** | **hơn mọi `λ_Q`** |
+| 0,40 | 0,1350 | Sentinel=B5=B6 | B5 | B5 | 0,1350 | **thua từ `0+`** | **thua từ `0+`** |
+| 0,60 | 0,1408 | Sentinel=B5=B6 | B5 | B5 | 0,1408 | **thua từ `0+`** | **thua từ `0+`** |
+| 0,80 | 0,1294 | Sentinel=B5=B6 | B5 | B5 | 0,1294 | **thua từ `0+`** | **thua từ `0+`** |
+| 1,00 | 0,1164 | Sentinel=B5=B6 | B5 | B5 | 0,1164 | **thua từ `0+`** | **thua từ `0+`** |
+| 1,20 | 0,1066 | Sentinel=B5=B6 | B5 | B5 | 0,1066 | **thua từ `0+`** | **thua từ `0+`** |
+| 1,40 | 0,1077 | Sentinel=B5=B6 | B5 | B5 | 0,1077 | **thua từ `0+`** | **thua từ `0+`** |
+| 1,60 | 0,1010 | Sentinel=B5=B6 | B5 | B5 | 0,1010 | **thua từ `0+`** | **thua từ `0+`** |
+| 1,80 | 0,0953 | Sentinel=B5=B6 | B5 | B5 | 0,0953 | **thua từ `0+`** | **thua từ `0+`** |
+| 2,00 | 0,0908 | Sentinel=B5=B6 | B5 | B5 | 0,0908 | **thua từ `0+`** | **thua từ `0+`** |
+| 2,20 | 0,0875 | Sentinel=B5=B6 | B5 | B5 | 0,0875 | **thua từ `0+`** | **thua từ `0+`** |
+| 2,40 | 0,0542 | Sentinel=B5=B6 | B5 | B5 | 0,0542 | **thua từ `0+`** | **thua từ `0+`** |
+| 2,60 | 0,0471 | Sentinel=B5=B6 | B5 | B5 | 0,0471 | **thua từ `0+`** | **thua từ `0+`** |
+| 2,80 | 0,0462 | Sentinel=B5=B6 | B5 | B5 | 0,0462 | **thua từ `0+`** | **thua từ `0+`** |
+| 3,00 | 0,0462 | Sentinel=B5=B6 | B5 | B5 | 0,0462 | **thua từ `0+`** | **thua từ `0+`** |
 
 #### `Δ = 1`
 
-| `d′` | `λ̄` | argmin `L` tại `λ_Q → 0` | argmin ngay trên `λ̄` | argmin tại `λ_Q = 0,10` | Sen vs `B1` | Sen vs `B5` | Sen vs `B6` |
-|---:|---:|:--|:--|:--|:--|:--|:--|
-| 0.0 | 0.1407 | Sen | B5 | B5 | 0.1407 | **thua từ 0** | **thua từ 0** |
-| 0.2 | 0.1413 | Sen | B5 | B5 | 0.1413 | **thua từ 0** | **thua từ 0** |
-| 0.4 | 0.1569 | Sen | B5 | B5 | 0.1569 | **thua từ 0** | **thua từ 0** |
-| 0.6 | 0.0097 | Sen | B5 | B5 | 0.1048 | 0.0097 | 0.1538 |
-| 0.8 | 0.0415 | Sen | B5 | B5 | 0.1237 | 0.0415 | 0.2903 |
-| 1.0 | 0.0405 | Sen | B5 | B5 | 0.1163 | 0.0405 | 0.2250 |
-| 1.2 | 0.0429 | Sen | B5 | B5 | 0.1107 | 0.0429 | 0.2128 |
-| 1.4 | 0.0328 | Sen | B5 | B5 | 0.1111 | 0.0328 | 0.2069 |
-| 1.6 | 0.0157 | Sen | B5 | B5 | 0.0812 | 0.0157 | 0.1818 |
-| 1.8 | 0.0042 | Sen | B5 | B5 | 0.0773 | 0.0042 | 0.2292 |
-| 2.0 | 0.5362 | B5 | B1 | B5 | 0.0970 | **thua từ 0** | 0.3721 |
-| 2.2 | 0.8750 | B5 | B1 | B5 | 0.1019 | **thua từ 0** | 0.2456 |
-| 2.4 | 1.1091 | B5 | B1 | B5 | 0.1078 | **thua từ 0** | 0.4474 |
-| 2.6 | 1.1953 | B5 | B1 | B5 | 0.1054 | **thua từ 0** | 0.5600 |
-| 2.8 | 1.0699 | B5 | B1 | B5 | 0.1109 | **thua từ 0** | 0.8182 |
-| 3.0 | 1.4217 | B5 | B1 | B5 | 0.1026 | **thua từ 0** | 0.9524 |
+| `d′` | `λ̄` | argmin `L` tại `λ_Q = 0` | argmin ngay trên `λ̄` | argmin tại `λ_Q = 0,10` | `λ_×` Sen–`B1` | `λ_×` Sen–`B5` | `λ_×` Sen–`B6` |
+|---:|---:|:--|:--|:--|--:|--:|--:|
+| 0,00 | 0,1407 | Sentinel=B5=B6 | B5 | B5 | 0,1407 | **thua từ `0+`** | **thua từ `0+`** |
+| 0,20 | 0,1413 | Sentinel=B5=B6 | B5 | B5 | 0,1413 | **thua từ `0+`** | **thua từ `0+`** |
+| 0,40 | 0,1569 | Sentinel=B5=B6 | B5 | B5 | 0,1569 | **thua từ `0+`** | **thua từ `0+`** |
+| 0,60 | 0,0097 | Sentinel | B5 | B5 | 0,1048 | 0,0097 | 0,1538 |
+| 0,80 | 0,0415 | Sentinel | B5 | B5 | 0,1237 | 0,0415 | 0,2903 |
+| 1,00 | 0,0405 | Sentinel | B5 | B5 | 0,1163 | 0,0405 | 0,2250 |
+| 1,20 | 0,0429 | Sentinel | B5 | B5 | 0,1107 | 0,0429 | 0,2128 |
+| 1,40 | 0,0328 | Sentinel | B5 | B5 | 0,1111 | 0,0328 | 0,2069 |
+| 1,60 | 0,0157 | Sentinel | B5 | B5 | 0,0812 | 0,0157 | 0,1818 |
+| 1,80 | 0,0042 | Sentinel | B5 | B5 | 0,0773 | 0,0042 | 0,2292 |
+| 2,00 | 0,5362 | B5 | B1 | B5 | 0,0970 | **thua từ `0+`** | 0,3721 |
+| 2,20 | 0,8750 | B5 | B1 | B5 | 0,1019 | **thua từ `0+`** | 0,2456 |
+| 2,40 | 1,1091 | B5 | B1 | B5 | 0,1078 | **thua từ `0+`** | 0,4474 |
+| 2,60 | 1,1953 | B5 | B1 | B5 | 0,1054 | **thua từ `0+`** | 0,5600 |
+| 2,80 | 1,0699 | B5 | B1 | B5 | 0,1109 | **thua từ `0+`** | 0,8182 |
+| 3,00 | 1,4217 | B5 | B1 | B5 | 0,1026 | **thua từ `0+`** | 0,9524 |
 
 #### `Δ = 2`
 
-| `d′` | `λ̄` | argmin `L` tại `λ_Q → 0` | argmin ngay trên `λ̄` | argmin tại `λ_Q = 0,10` | Sen vs `B1` | Sen vs `B5` | Sen vs `B6` |
-|---:|---:|:--|:--|:--|:--|:--|:--|
-| 0.0 | 0.0103 | Sen | B6 | B5 | 0.1793 | 0.0103 | **thua từ 0** |
-| 0.2 | 0.0126 | Sen | B6 | B5 | 0.1633 | 0.0126 | **thua từ 0** |
-| 0.4 | 0.0126 | Sen | B6 | B5 | 0.1633 | 0.0126 | **thua từ 0** |
-| 0.6 | 0.0496 | Sen | B5 | B5 | 0.1559 | 0.0496 | 0.1364 |
-| 0.8 | 0.0496 | Sen | B5 | B5 | 0.1527 | 0.0496 | 0.1154 |
-| 1.0 | 0.0547 | Sen | B5 | B5 | 0.1530 | 0.0547 | 0.1111 |
-| 1.2 | 0.0669 | Sen | B5 | B5 | 0.1656 | 0.0669 | 0.5000 |
-| 1.4 | 0.0323 | Sen | B5 | B5 | 0.1703 | 0.0323 | 0.3929 |
-| 1.6 | 0.0157 | Sen | B5 | B5 | 0.1611 | 0.0157 | 0.3784 |
-| 1.8 | 0.0150 | Sen | B5 | B5 | 0.1646 | 0.0150 | 0.6207 |
-| 2.0 | 0.0160 | Sen | B5 | B5 | 0.1847 | 0.0160 | 1.6000 |
-| 2.2 | 0.8571 | B5 | B1 | B5 | 0.1967 | **thua từ 0** | 2.1667 |
-| 2.4 | 0.9157 | B5 | B1 | B5 | 0.2393 | **thua từ 0** | 18.5000 |
-| 2.6 | 1.1579 | B5 | B1 | B5 | 0.2748 | **thua từ 0** | **hơn mọi λ_Q** |
-| 2.8 | 1.1519 | B5 | B1 | B5 | 0.2862 | **thua từ 0** | 10.6000 |
-| 3.0 | 1.1932 | B5 | B1 | B5 | 0.3244 | **thua từ 0** | **hơn mọi λ_Q** |
+| `d′` | `λ̄` | argmin `L` tại `λ_Q = 0` | argmin ngay trên `λ̄` | argmin tại `λ_Q = 0,10` | `λ_×` Sen–`B1` | `λ_×` Sen–`B5` | `λ_×` Sen–`B6` |
+|---:|---:|:--|:--|:--|--:|--:|--:|
+| 0,00 | 0,0103 | Sentinel=B6 | B6 | B5 | 0,1793 | 0,0103 | **thua từ `0+`** |
+| 0,20 | 0,0126 | Sentinel=B6 | B6 | B5 | 0,1633 | 0,0126 | **thua từ `0+`** |
+| 0,40 | 0,0126 | Sentinel=B6 | B6 | B5 | 0,1633 | 0,0126 | **thua từ `0+`** |
+| 0,60 | 0,0496 | Sentinel | B5 | B5 | 0,1559 | 0,0496 | 0,1364 |
+| 0,80 | 0,0496 | Sentinel | B5 | B5 | 0,1527 | 0,0496 | 0,1154 |
+| 1,00 | 0,0547 | Sentinel | B5 | B5 | 0,1530 | 0,0547 | 0,1111 |
+| 1,20 | 0,0669 | Sentinel | B5 | B5 | 0,1656 | 0,0669 | 0,5000 |
+| 1,40 | 0,0323 | Sentinel | B5 | B5 | 0,1703 | 0,0323 | 0,3929 |
+| 1,60 | 0,0157 | Sentinel | B5 | B5 | 0,1611 | 0,0157 | 0,3784 |
+| 1,80 | 0,0150 | Sentinel | B5 | B5 | 0,1646 | 0,0150 | 0,6207 |
+| 2,00 | 0,0160 | Sentinel | B5 | B5 | 0,1847 | 0,0160 | 1,6000 |
+| 2,20 | 0,8571 | B5 | B1 | B5 | 0,1967 | **thua từ `0+`** | 2,1667 |
+| 2,40 | 0,9157 | B5 | B1 | B5 | 0,2393 | **thua từ `0+`** | 18,5000 |
+| 2,60 | 1,1579 | B5 | B1 | B5 | 0,2748 | **thua từ `0+`** | **hơn mọi `λ_Q`** |
+| 2,80 | 1,1519 | B5 | B1 | B5 | 0,2862 | **thua từ `0+`** | 10,6000 |
+| 3,00 | 1,1932 | B5 | B1 | B5 | 0,3244 | **thua từ `0+`** | **hơn mọi `λ_Q`** |
 
 #### `Δ = 4`
 
-| `d′` | `λ̄` | argmin `L` tại `λ_Q → 0` | argmin ngay trên `λ̄` | argmin tại `λ_Q = 0,10` | Sen vs `B1` | Sen vs `B5` | Sen vs `B6` |
-|---:|---:|:--|:--|:--|:--|:--|:--|
-| 0.0 | 0.2634 | Sen | B5 | B5 | 0.2634 | **thua từ 0** | **thua từ 0** |
-| 0.2 | 1.1923 | B5 | B1 | B5 | 0.2691 | **thua từ 0** | **thua từ 0** |
-| 0.4 | 0.2719 | Sen | B5 | B5 | 0.2719 | **thua từ 0** | **thua từ 0** |
-| 0.6 | 0.0156 | Sen | B5 | B5 | 0.2826 | 0.0156 | 0.1765 |
-| 0.8 | 0.0518 | Sen | B5 | B5 | 0.3038 | 0.0518 | 0.3889 |
-| 1.0 | 0.0481 | Sen | B5 | B5 | 0.2963 | 0.0481 | 0.2121 |
-| 1.2 | 0.0561 | Sen | B5 | B5 | 0.3092 | 0.0561 | 0.2041 |
-| 1.4 | 0.0748 | Sen | B5 | B5 | 0.3347 | 0.0748 | 0.3137 |
-| 1.6 | 0.0884 | Sen | B5 | B5 | 0.3295 | 0.0884 | 0.3115 |
-| 1.8 | 0.1203 | Sen | B5 | Sen | 0.3559 | 0.1203 | 0.3846 |
-| 2.0 | 0.0736 | Sen | B5 | B5 | 0.3559 | 0.0736 | 0.4000 |
-| 2.2 | 0.0796 | Sen | B5 | B5 | 0.4239 | 0.0796 | 0.6164 |
-| 2.4 | 0.0752 | Sen | B5 | B5 | 0.4413 | 0.0752 | 0.7324 |
-| 2.6 | 0.0291 | Sen | B5 | B5 | 0.4924 | 0.0291 | 1.2889 |
-| 2.8 | 0.0829 | Sen | B5 | B5 | 0.5465 | 0.0829 | 2.1429 |
-| 3.0 | 0.0273 | Sen | B5 | B5 | 0.5932 | 0.0273 | 2.8966 |
+| `d′` | `λ̄` | argmin `L` tại `λ_Q = 0` | argmin ngay trên `λ̄` | argmin tại `λ_Q = 0,10` | `λ_×` Sen–`B1` | `λ_×` Sen–`B5` | `λ_×` Sen–`B6` |
+|---:|---:|:--|:--|:--|--:|--:|--:|
+| 0,00 | 0,2634 | Sentinel=B5=B6 | B5 | B5 | 0,2634 | **thua từ `0+`** | **thua từ `0+`** |
+| 0,20 | 1,1923 | B5=B6 | B1 | B5 | 0,2691 | **thua từ `0+`** | **thua từ `0+`** |
+| 0,40 | 0,2719 | Sentinel=B5=B6 | B5 | B5 | 0,2719 | **thua từ `0+`** | **thua từ `0+`** |
+| 0,60 | 0,0156 | Sentinel | B5 | B5 | 0,2826 | 0,0156 | 0,1765 |
+| 0,80 | 0,0518 | Sentinel | B5 | B5 | 0,3038 | 0,0518 | 0,3889 |
+| 1,00 | 0,0481 | Sentinel | B5 | B5 | 0,2963 | 0,0481 | 0,2121 |
+| 1,20 | 0,0561 | Sentinel | B5 | B5 | 0,3092 | 0,0561 | 0,2041 |
+| 1,40 | 0,0748 | Sentinel | B5 | B5 | 0,3347 | 0,0748 | 0,3137 |
+| 1,60 | 0,0884 | Sentinel | B5 | B5 | 0,3295 | 0,0884 | 0,3115 |
+| 1,80 | 0,1203 | Sentinel | B5 | Sentinel | 0,3559 | 0,1203 | 0,3846 |
+| 2,00 | 0,0736 | Sentinel | B5 | B5 | 0,3559 | 0,0736 | 0,4000 |
+| 2,20 | 0,0796 | Sentinel | B5 | B5 | 0,4239 | 0,0796 | 0,6164 |
+| 2,40 | 0,0752 | Sentinel | B5 | B5 | 0,4413 | 0,0752 | 0,7324 |
+| 2,60 | 0,0291 | Sentinel | B5 | B5 | 0,4924 | 0,0291 | 1,2889 |
+| 2,80 | 0,0829 | Sentinel | B5 | B5 | 0,5465 | 0,0829 | 2,1429 |
+| 3,00 | 0,0273 | Sentinel | B5 | B5 | 0,5932 | 0,0273 | 2,8966 |
 
-### 6.1 Tổng hợp trên cả 64 ô (bản chính, `--tau-follows-dprime`)
+### 6.2 Tổng hợp trên cả 64 ô (bản chính, `--tau-follows-dprime`)
 
-| Sentinel đối đầu | thua ngay tại `λ_Q → 0` | hơn ở **mọi** `λ_Q` | có điểm cắt `λ̄` | `λ̄` nhỏ nhất · **trung vị** · lớn nhất | số ô có `λ̄ ≥ 0,10` |
+Cột "thua ngay tại `λ_Q → 0+`" đọc theo quy ước **giới hạn** (§6.0.1): ô hoà tại
+đúng 0 rồi thua với mọi `λ_Q > 0` được tính là **thua**, không phải "cắt tại 0".
+
+| Sentinel đối đầu | thua ngay tại `λ_Q → 0+` | hơn ở **mọi** `λ_Q` | có `λ_×` | `λ_×` nhỏ nhất · **trung vị** · lớn nhất | số ô `λ_× ≥ 0,10` |
 |:--|:--:|:--:|:--:|:--|:--:|
 | `B1 audit-at-commit` | **0**/64 | 0/64 | 64/64 | 0,0462 · **0,1529** · 0,5932 | **54**/64 |
 | `B5 risk-score` | **33**/64 | **0**/64 | 31/64 | 0,0042 · **0,0415** · 0,1203 | **1**/31 |
 | `B6 two-stage` | 24/64 | 3/64 | 37/64 | 0,1111 · **0,3846** · 18,50 | 37/37 |
 
-Và thứ hạng tổng (`argmin L` trên cả bốn policy) ở hai mức minh hoạ. **Ô HOÀ
-được tách riêng, không tính cho ai** — xem §6.2:
+`λ̄ = λ_Q^*` trên **cùng** 64 ô: đo được ở **64/64** ô, dải `[0,0042; 1,4217]`,
+trung vị `0,0813` — **khác hẳn** dải `λ_×` của cặp Sentinel–`B1` ở dòng đầu, và đó
+chính là lý do §6.0 tách hai tên.
+
+Và thứ hạng tổng (`argmin L` trên cả bốn policy) ở hai mức minh hoạ. **Ô HOÀ được
+tách riêng, không tính cho ai** — xem §6.3:
 
 | | `B1` | `Sentinel` | `B5 risk-score` | `B6 two-stage` |
 |:--|:--:|:--:|:--:|:--:|
@@ -380,16 +456,18 @@ Và thứ hạng tổng (`argmin L` trên cả bốn policy) ở hai mức minh 
 | `argmin L` **duy nhất** tại `λ_Q = 0,10` | 0/64 | **1**/64 | **63**/64 | 0/64 |
 | … hoà tại `λ_Q = 0,10` | — | — | — | **0 ô: hết hoà** |
 
-### 6.2 HAI CÁI BẪY ĐẾM, tìm ra khi tự soát — và cách chúng được xử lý
+### 6.3 HAI CÁI BẪY ĐẾM, tìm ra khi tự soát — và cách chúng được xử lý
 
 **(a) `min()` phá hoà theo thứ tự chèn dict.** Ở `λ_Q = 0`, **25/64** ô có `L` bằng
 nhau **tới chữ số cuối** giữa hai hoặc ba policy — ở `Δ = 0` cả `Sentinel`, `B5`,
 `B6` đều đứng ở `harm = 0,992` với `T_lost = 0,000`, nên `L(0)` của ba policy bằng
 nhau **đúng bằng 0,0**. `min()` trả về policy **chèn trước**, và các curve được
-chèn theo thứ tự `POLICIES = (B1, Sentinel, B5, B6)` — tức **mọi ô hoà đều rơi vào
-tay Sentinel**. Đếm kiểu đó cho ra "Sentinel thắng 52/64", **gần gấp đôi** con số
-thật là **28/64**. Đã sửa: `dprime_sweep.l_winners` trả **danh sách**, bảng in ra
-`Sentinel=B5 risk-score=B6 two-stage` ở ô hoà, và ghim bằng gate 2
+chèn theo thứ tự `POLICIES = (B1, Sentinel, B5, B6)` — tức **24 trong 25 ô hoà rơi
+vào tay Sentinel**. Ô thứ 25 (`Δ = 4`, `d′ = 0,2`) hoà giữa `B5` và `B6` mà
+**không có** Sentinel, nên `min()` sẽ trao nó cho `B5`: con số thổi phồng là
+**28 duy nhất + 24 hoà = 52/64**, không phải 53. Đếm kiểu đó cho ra "Sentinel thắng
+52/64", **gần gấp đôi** con số thật là **28/64**. Đã sửa: `dprime_sweep.l_winners`
+trả **danh sách**, bảng in ra `Sentinel=B5=B6` ở ô hoà, và ghim bằng gate 2
 `ATieForTheBestLossIsReportedAsATieAndNotAsAWin`.
 
 **(b) `metrics.lambda_q_star` KHÔNG THẤY điểm cắt tại đúng 0.** Nó chỉ nhận điểm
@@ -398,106 +476,189 @@ hẳn, thứ hạng đổi **ngay trên 0** nhưng `λ_Q^*` bỏ qua nghiệm `x
 giá trị **lớn hơn**, đọc từ một cặp khác. Ví dụ `Δ = 0, d′ = 0,0`: `λ̄ = 0,1506` là
 điểm cắt **Sentinel–B1**, trong khi `B5` đã vượt Sentinel với **mọi** `λ_Q > 0`.
 `metrics.py` **đóng băng**, nên `λ̄` vẫn được báo cáo **đúng như hàm đó định nghĩa**
-(dạng phát biểu tiền-đăng-ký ràng buộc như vậy) — nhưng **trên 25 ô hoà, `λ̄` là một
-số ĐỌC TRẦN, không phải dải mà Sentinel thật sự dẫn.** Vì vậy **§7 KHÔNG dựa vào
-`λ̄`**: nó dựa vào ba cột **cắt theo cặp** ở §6, nơi cả ba kết cục (`cắt tại λ` /
-`hơn mọi λ_Q` / `thua từ 0`, trong đó "thua từ 0" bao gồm cả hoà-tại-0-rồi-thua)
+— nhưng **trên 25 ô hoà, `λ̄` là một số ĐỌC TRẦN, không phải dải mà Sentinel thật sự
+dẫn.** Vì vậy **§7 không dựa vào `λ̄`**: nó dựa vào `λ_×` (§6.0), nơi cả ba kết cục
 được giữ **tách bạch**. Ghim bằng gate 2
-`test_a_tie_at_zero_is_a_place_lambda_q_star_cannot_see_the_flip`.
+`test_a_tie_at_zero_is_a_place_lambda_q_star_cannot_see_the_flip` — **đó là một test
+ĐẶC TẢ HÀNH VI của `metrics.py` đóng băng, không phải test hồi quy của module này**:
+không thay đổi nào trong `dprime_sweep.py` làm nó đỏ được, và docstring của nó nói
+đúng như vậy.
 
 ---
 
 ## 7. CÂU TRẢ LỜI CHO KHUNG BÀI
 
 Dạng phát biểu **tiền-đăng-ký** (tiền-đăng-ký v2 §9) và **ràng buộc**:
-*"Sentinel **[hơn / không hơn]** X trên `L` với mọi `λ_Q < λ̄`"*, trong đó
-`λ̄ = λ_Q^*` là **KẾT QUẢ** chứ không phải một tham số được chọn; `λ_Q = 0` và
-`λ_Q = 0,10` là **MINH HOẠ**, không bao giờ là dòng tít.
+*"Sentinel **[hơn / không hơn]** X trên `L` với mọi `λ_Q < λ̄`"*, trong đó ranh giới
+là **KẾT QUẢ** chứ không phải tham số được chọn; `λ_Q = 0` và `λ_Q = 0,10` là
+**MINH HOẠ**, không bao giờ là dòng tít. Ranh giới được báo cáo ở đây là `λ_×`
+(điểm cắt **theo cặp**) theo **sửa đổi 18/09/2026** ở §6.0, và `λ̄ = λ_Q^*` được
+báo cáo **kèm theo** ở mọi phát biểu.
 
 > ### 7.1 `B5 risk-score` — **KHÔNG HƠN**
 >
-> **Sentinel KHÔNG hơn `B5 risk-score` trên `L`: không tồn tại `λ̄ > 0` để phát
-> biểu.** Trên **33/64** ô, `B5` đã dẫn ngay tại `λ_Q → 0` (kể cả các ô
-> hoà tại 0 rồi thua với mọi `λ_Q > 0`, §6.2b); trên 31 ô còn lại,
-> điểm cắt Sentinel–B5 có trung vị **`λ̄ = 0,0415`** và lớn nhất **0,1203**, nên
-> chỉ **1/31** ô giữ được Sentinel ở trên `B5` tới tận mức minh hoạ `0,10`.
-> Trên **toàn lưới**, `Sentinel` **không** hơn `B5` ở **bất kỳ** `λ_Q` nào trên
-> **bất kỳ** ô nào (cột "hơn ở mọi `λ_Q`" = **0/64**).
-
-> ### 7.2 `B1 audit-at-commit` — **HƠN**, và dải rộng
+> **Sentinel KHÔNG hơn `B5 risk-score` trên `L`: không tồn tại `λ_× > 0` để phát
+> biểu.** Trên **33/64** ô, `B5` đã dẫn ngay khi trọng số rời 0 (`λ_Q → 0+`, kể cả
+> các ô hoà tại đúng 0 rồi thua với mọi `λ_Q > 0`, §6.3b); trên 31 ô còn lại,
+> `λ_×` Sentinel–`B5` có trung vị **0,0415** và lớn nhất **0,1203**, nên chỉ
+> **1/31** ô giữ được Sentinel ở trên `B5` tới tận mức minh hoạ `0,10`. Trên
+> **toàn lưới**, Sentinel **không** hơn `B5` ở **bất kỳ** `λ_Q` nào trên **bất kỳ**
+> ô nào (cột "hơn ở mọi `λ_Q`" = **0/64**). `λ̄ = λ_Q^*` trên cùng 64 ô nằm trong
+> `[0,0042; 1,4217]` — **không** đọc nó như dải mà Sentinel dẫn (§6.3b).
 >
-> **Sentinel hơn `B1 audit-at-commit` trên `L` với mọi `λ_Q < λ̄`, `λ̄` đo được
-> trong `[0,0462; 0,5932]`, trung vị `0,1529`.** Sentinel dẫn `B1` tại `λ_Q → 0`
-> trên **64/64** ô, và **54/64** ô giữ được điều đó tới `λ_Q = 0,10`. Cơ chế nằm ở
-> số hạng `T_lost`: `T_lost` của `B1` là `0,31 … 0,53`, của Sentinel là **0,000** ở
+> Phán quyết này **trơ với `λ_T`** (§7.2.1): cả ba policy đọc điểm đều có
+> `T_lost = 0,000` ở **mọi** ô, nên số hạng `λ_T` **triệt tiêu** trong hiệu
+> `L(Sentinel) − L(B5)`.
+
+> ### 7.2 `B1 audit-at-commit` — **HƠN**, có điều kiện `λ_T`
+>
+> **Sentinel hơn `B1 audit-at-commit` trên `L` với mọi `λ_Q < λ_×`, `λ_×` đo được
+> trong `[0,0462; 0,5932]`, trung vị `0,1529` — ở `λ_T = 0,50`.** Sentinel dẫn
+> `B1` tại `λ_Q → 0+` trên **64/64** ô, và **54/64** ô giữ được điều đó tới
+> `λ_Q = 0,10`. (`λ̄ = λ_Q^*` trên cùng 64 ô: `[0,0042; 1,4217]`.) Cơ chế nằm ở số
+> hạng `T_lost`: `T_lost` của `B1` là `0,308 … 0,533`, của Sentinel là **0,000** ở
 > mọi ô — cổng audit-tại-commit **chặn nhầm patch sạch**, còn Sentinel thì không.
 > Đây cũng là lý do `d′*` của `ΔL` ở `λ_Q = 0` tụt về **0,00** (§5).
 
-> ### 7.3 `B6 two-stage` — **HƠN có điều kiện**
+#### 7.2.1 Phát biểu duy nhất còn sống **đứng trên `λ_T = 0,50`**, và `λ_T` chưa bao giờ được quét
+
+`λ_T = 0,50` là `metrics.LAMBDA_T`: một hằng số **khai thẳng là không suy từ đâu**,
+đúng loại tham số mà `λ_Q` từng là **trước** batch này. Vì cả thắng lợi của Sentinel
+trước `B1` **chỉ** mua bằng số hạng `T_lost`, phát biểu §7.2 **treo** vào hằng số
+đó. Chấm lại **cùng 64 ô** ở ba mức `λ_T` (không đo lại gì — `lambda_t_table`):
+
+| `λ_T` | Sentinel hơn `B1` tại `λ_Q → 0+` | thua | có `λ_×` | `λ_×` nhỏ nhất | **trung vị** | lớn nhất |
+|---:|:--:|:--:|:--:|--:|--:|--:|
+| **0,00** | **22/64** | 42 | 22 | 0,0034 | **0,0880** | 0,3688 |
+| 0,25 | 57/64 | 7 | 57 | 0,0041 | **0,0765** | 0,4810 |
+| **0,50** (đang dùng) | **64/64** | 0 | 64 | 0,0462 | **0,1529** | 0,5932 |
+
+Đọc cột trung vị cho đúng: nó **không đơn điệu** (0,0880 → 0,0765 → 0,1529) vì
+**tập ô** lấy trung vị đổi theo từng dòng — ở `λ_T = 0` chỉ có 22 ô có `λ_×`, ở
+`0,50` có 64. Con số so sánh được giữa ba dòng là **cột đầu**, không phải trung vị.
+
+**Nói thẳng: ở `λ_T = 0` — tức khi "chặn nhầm patch sạch" không bị tính giá —
+phát biểu duy nhất còn sống co từ 64/64 ô xuống 22/64 ô.** Ở `Δ = 0` Sentinel
+**thua** `B1` ngay trên `harm` (`0,992` so với `0,983` ở `d′ = 0,0`) và chỉ thắng
+nhờ số hạng `T_lost`. Nghĩa là câu "Sentinel hơn `B1`" **không** là một phát biểu
+về `harm`, và cũng **không** là một phát biểu chỉ về `λ_Q`: nó là một phát biểu về
+việc **định giá một patch sạch bị chặn**, ở một mức giá mà đề tài này **chưa đo**.
+Đây là giới hạn §8.4, và nó **phải** đi kèm mọi lần trích §7.2.
+
+> ### 7.3 `B6 two-stage` — **HƠN có điều kiện**, và biên **nhạy với chế độ `tau_sel`**
 >
-> **Sentinel hơn `B6 two-stage` trên `L` với mọi `λ_Q < λ̄` trên 40/64 ô, `λ̄` đo
+> **Sentinel hơn `B6 two-stage` trên `L` với mọi `λ_Q < λ_×` trên 40/64 ô, `λ_×` đo
 > được trong `[0,1111; 18,50]`, trung vị `0,3846`; trên 24/64 ô còn lại Sentinel
-> không hơn ngay từ `λ_Q → 0`.** 24 ô đó là: **15/16 ô của `Δ = 0`**, cộng
+> không hơn ngay từ `λ_Q → 0+`.** 24 ô đó là: **15/16 ô của `Δ = 0`**, cộng
 > **`d′ ≤ 0,4`** ở cả ba `Δ` còn lại. Đó đúng là vùng `harm` của Sentinel và của
 > `B6` **bằng nhau** (`Δ = 0`: cả hai đứng ở `0,992` trên toàn lưới; `d′ ≤ 0,4`:
-> detector gần như mù nên không policy nào tách được ra), nên `ΔL` tại `λ_Q → 0`
+> detector gần như mù nên không policy nào tách được ra), nên `ΔL` tại `λ_Q → 0+`
 > **bằng 0** và toàn bộ thứ hạng do số hạng `Q_false` quyết định — mà Sentinel
-> cách ly nhiều hơn `B6` (`1,12` so với `1,03` ở `Δ = 0, d′ = 0,0`). **Ở đâu hai
-> bên còn phân biệt được bằng `harm`, Sentinel hơn `B6` và hơn với biên rộng**
-> (mọi điểm cắt đều `≥ 0,1111`, tức **trên** mức minh hoạ `0,10`).
+> cách ly nhiều hơn `B6` (`1,121` so với `1,025` ở `Δ = 0, d′ = 0,0`).
+>
+> **Biên `≥ 0,1111` chỉ đúng trong BẢN CHÍNH.** Dưới đối chứng ghim `mid` (§7.5),
+> `λ_×` nhỏ nhất của cặp này tụt xuống **0,0526** và **5/43** ô có `λ_× < 0,10`
+> (`Δ = 4, d′ = 0,2`: 0,0526 · `Δ = 1, d′ = 0,6`: 0,0556 · `Δ = 2, d′ = 0,6`:
+> 0,0600 · `d′ = 0,8`: 0,0600 · `d′ = 1,0`: 0,0758). Vì vậy câu "mọi điểm cắt đều
+> trên mức minh hoạ 0,10" là một phát biểu **của bản chính**, **không** phải một
+> phát biểu trơ với chế độ — khác hẳn phán quyết §7.1, vốn trơ (§7.5).
 
 ### 7.4 Nói gọn lại — cái này quyết định khung bài nào được viết
 
 **Khung "Sentinel là policy tốt nhất" KHÔNG chống đỡ được.** Cái đánh bại nó không
 phải `B6` (hai cài đặt độc lập báo `B6` hơn Sentinel — **kết quả ở đây KHÔNG xác
 nhận điều đó**, §7.3), mà là **`B5 risk-score`**, và biên thua **không mỏng**: `B5`
-dẫn trên **63/64** ô ở mức `λ_Q = 0,10`, trong khi **tiêu 0,00 – 4,47** trên trần
-17,95 (**0 – 25%**) so với **6,94 – 10,12** (**39 – 56%**) của Sentinel (§4.1).
+dẫn trên **63/64** ô ở mức minh hoạ `λ_Q = 0,10`, trong khi **tiêu 0,00 – 4,47**
+trên trần 17,95 (**0 – 25%**) so với **6,94 – 10,12** (**39 – 56%**) của Sentinel
+(§4.1).
 
-**Cái vẫn đứng vững là một phát biểu hẹp hơn và đúng hơn:** Sentinel hơn `B1` —
-đường cơ sở mà luận văn đang so — trên `L` **với mọi `λ_Q` dưới một `λ̄` đo được,
-trung vị `0,1529`**, và cơ chế là `T_lost` chứ không phải `harm`.
+**Cái vẫn đứng vững là một phát biểu hẹp hơn, đúng hơn — và có điều kiện:**
+Sentinel hơn `B1` — đường cơ sở mà luận văn đang so — trên `L` với mọi `λ_Q` dưới
+một `λ_×` đo được, trung vị `0,1529`; cơ chế là `T_lost` chứ không phải `harm`;
+và **nó đứng trên `λ_T = 0,50`, ở `λ_T = 0` chỉ còn 22/64 ô** (§7.2.1).
 
 ### 7.5 Kết quả này **nhạy** hay **trơ** với chế độ `tau_sel`?
 
 Chạy lại toàn bộ ở chế độ **mặc định** (`tau_sel` ghim ở `mid` — chế độ mà §3 nói là
-**confound sống** với B5/B6) cho **cùng một kết luận**, không phải cùng con số:
+**confound sống** với B5/B6) cho **cùng một kết luận ở §7.1**, không phải cùng con
+số — và **không** cùng kết luận ở biên của §7.3:
 
 | | bản chính (`d′`-theo-quét) | mặc định (ghim `mid`) |
 |:--|:--|:--|
 | ô | 64 | 70 (có mịn hoá) |
-| Sen thua `B5` ngay tại `λ_Q → 0` | 33/64 | 31/70 |
+| Sen thua `B5` ngay tại `λ_Q → 0+` | 33/64 | 31/70 |
 | Sen hơn `B5` ở **mọi** `λ_Q` | **0**/64 | **0**/70 |
-| điểm cắt Sen–B5, trung vị | 0,0415 | 0,0358 |
+| `λ_×` Sen–`B5`, trung vị | 0,0415 | 0,0358 |
+| Sen thua `B6` ngay tại `λ_Q → 0+` | 24/64 | 23/70 |
+| **`λ_×` Sen–`B6`: nhỏ nhất · trung vị · lớn nhất** | **0,1111** · 0,3846 · 18,50 | **0,0526** · 0,3611 · 23,50 |
+| **số ô `λ_×` Sen–`B6` `< 0,10`** | **0/37** | **5/43** |
 | `argmin L` **duy nhất** tại `λ_Q = 0` | Sen 28 · `B5` 11 · hoà 25 | Sen 36 · `B5` 11 · hoà 23 |
 | `argmin L` tại `λ_Q = 0,10` (không còn ô hoà) | `B5` trên **63/64** | `B5` trên **69/70** |
-| điểm cắt Sen–B1, trung vị | 0,1529 | 0,1590 |
+| `λ_×` Sen–`B1`, trung vị | 0,1529 | 0,1590 |
+| `λ̄ = λ_Q^*`, dải | `[0,0042; 1,4217]` | `[0,0043; 1,5000]` |
+| `λ_T = 0` ⇒ Sen hơn `B1` (§7.2.1) | **22/64** | **28/70** |
 
-Phán quyết §7.1 **không** phụ thuộc vào việc chọn chế độ nào. Nó được báo cáo từ
-bản chính vì đó là chế độ mà ngưỡng của **mọi** policy được hiệu chỉnh tại `d′` mà
-detector của chính nó đang chạy (§3); chế độ mặc định đứng đây làm **đối chứng độ
-nhạy**.
+**Phán quyết §7.1 không phụ thuộc vào chế độ.** Nó được báo cáo từ bản chính vì đó
+là chế độ mà ngưỡng của **mọi** policy được hiệu chỉnh tại `d′` mà detector của
+chính nó đang chạy (§3); chế độ mặc định đứng đây làm **đối chứng độ nhạy**.
+**Biên của §7.3 thì CÓ phụ thuộc** — xem dòng in đậm — nên câu "mọi `λ_×` đều
+`≥ 0,1111`" phải luôn đi kèm chữ "trong bản chính".
 
 ---
 
 ## 8. Giới hạn
 
-1. **Kẻ tấn công tối đa hoá `harm`, không phải `L`** (§2.3). `worst_case` dưới `L`
-   là một phép đo khác và **chưa** được thực hiện. Nếu kẻ tấn công biết lái theo
-   `Q_false`, mọi con số `L` ở đây là **cận dưới** của tổn thất.
+1. **Kẻ tấn công tối đa hoá `harm`, không phải `L`** (§2.3) — và "cận dưới" **không
+   đủ để nói gì về một THỨ HẠNG**. Mọi phát biểu báo cáo được ở đây là một thứ hạng
+   giữa hai policy, mà một cận dưới **theo từng policy** có thể đẩy thứ hạng đi
+   **hai chiều** hoặc **không đi đâu cả**. Vì vậy chiều được **ĐO**, không phải
+   lập luận suông: `dprime_sweep.l_attacker_probe` chạy lại **cùng** họ tấn công
+   với mục tiêu `L` (`λ_Q = 0,10`, `λ_T = 0,50`) ở **ba ô khai trước**
+   (`L_ATTACKER_PROBE_CELLS`), và so với kẻ tấn công tối đa hoá `harm`:
+
+   | ô | ΔL của `B1` | ΔL của `Sentinel` | ΔL của `B5` | ΔL của `B6` | Sen−`B5` đổi | Sen−`B1` đổi |
+   |:--|--:|--:|--:|--:|--:|--:|
+   | `d′=2,2 Δ=2` | +0,0167 | +0,0058 | +0,0058 | +0,0108 | **+0,0001** | −0,0107 (Sentinel **lợi**) |
+   | `d′=2,2 Δ=0` | +0,0187 | +0,0392 | +0,0275 | +0,0304 | **+0,0116** (Sentinel **thiệt**) | +0,0205 (Sentinel **thiệt**) |
+   | `d′=0,6 Δ=4` | +0,0000 | +0,0014 | +0,0099 | +0,0095 | **−0,0086** (Sentinel **lợi**) | +0,0013 |
+
+   Đọc đúng ba dòng này: (i) `L` của **mọi** policy chỉ **tăng** — cận dưới là cận
+   dưới, đúng như đã khai; (ii) **chiều của hiệu thì KHÔNG đồng nhất** — ở `Δ = 0`
+   nó **khoét sâu** thế thua của Sentinel trước `B5`, ở `Δ = 4` nó **thu hẹp**, ở
+   `Δ = 2` nó là **hoà**; (iii) **độ lớn nhỏ hơn hẳn khoảng cách đang có**: hiệu
+   `L(Sentinel) − L(B5)` ở ba ô là `0,120 / 0,094 / 0,073`, còn mức xê dịch lớn
+   nhất là `0,012` — **không ô nào đổi thứ hạng**. Một phỏng đoán tự nhiên (Sentinel
+   quarantine nhiều nhất — `Q_false` `1,005 … 1,383` so với `0,000 … 0,500` của
+   `B5` — nên kẻ tấn công lái `Q_false` phải làm Sentinel thiệt nhất) **chỉ đúng ở
+   ô `Δ = 0`**, và ba ô là ba ô, không phải 64. **Kết luận trung thực: chiều của
+   cận dưới này CHƯA xác định trên toàn lưới; ở ba ô đã đo nó không lật được thứ
+   hạng nào, và ở ô duy nhất nó đáng kể thì nó ĐẨY THEO HƯỚNG củng cố §7.1 chứ
+   không cứu được.** Một `worst_case` đầy đủ dưới `L` trên cả 64 ô vẫn là việc chưa
+   làm.
 2. **Bản chính không mịn hoá được** (§3): `d′*` đọc ở độ phân giải 0,2. Cột `d′*`
    `harm` của chế độ mặc định (2,55) và bản chính (2,60) **không** so trực tiếp
    được; so đúng là trên lưới thô, ở đó cả hai đều 2,60.
 3. **Cột `λ_Q = λ̄` là đường biên, không phải đường cong trọng số cố định** (§5.3):
    trọng số **di động** theo từng ô. Hai cột `0` và `0,10` mới là cột đọc ở một
    trọng số.
-4. **`λ_T = 0,50` không được quét.** Nó là hằng số `metrics.LAMBDA_T`, và giống
-   `λ_Q` trước batch này, nó là **một tham số chưa có kết quả đi kèm**. Việc riêng.
+4. **`λ_T = 0,50` không được quét — và phát biểu DUY NHẤT còn sống treo vào nó.**
+   Nó là hằng số `metrics.LAMBDA_T`, và giống `λ_Q` trước batch này, nó là **một
+   tham số chưa có kết quả đi kèm**. Khác với bản nháp trước, đây **không** còn là
+   "việc riêng": §7.2.1 đã chấm lại **cùng 64 ô** ở `λ_T ∈ {0; 0,25; 0,50}` và cho
+   thấy **"Sentinel hơn `B1`" tụt từ 64/64 ô xuống 22/64 ô khi `λ_T = 0`**. Hai
+   phán quyết còn lại (§7.1 với `B5`, §7.3 với `B6`) **trơ** với `λ_T` vì cả ba
+   policy đọc điểm đều có `T_lost = 0,000`. Một **phép quét `λ_T` thật** — đo, chứ
+   không phải chấm lại — vẫn chưa làm; nhưng chấm lại là đủ để nói rằng phát biểu
+   §7.2 **không được trích mà không kèm `λ_T`**.
 5. **Mock agent**, oracle marker-AST, 40 workflow, `H = 8`, 3 seed, corpus seed
    `2026` — y như `dprime-sweep.md` §10.3–§10.4, không đổi.
 6. **`harm` bão hoà với ba policy đọc điểm ở `Δ = 0`.** Trên **toàn** lưới
    `Δ = 0`, `Sentinel`, `B5` và `B6` đều đứng ở `harm = 0,992` — chỉ `B1` nhúc
-   nhích (`0,983 → 0,783`). Ở đó `L` của ba policy kia **chỉ còn** số hạng
+   nhích (`0,983 → 0,783`). **Ở `d′` thấp của dải đó, `B1` có `harm` THẤP HƠN
+   Sentinel** (`0,983` so với `0,992` tại `d′ = 0,0`): nghĩa là ở `Δ = 0` Sentinel
+   **thua** `B1` trên chính số hạng `harm`, và toàn bộ thắng lợi §7.2 ở vùng này
+   đến từ `λ_T · T_lost`. Đó là lý do §7.2.1 tồn tại. Ở đó `L` của ba policy kia
+   **chỉ còn** số hạng
    `Q_false` và thứ hạng là thứ hạng của "ai cách ly ít nhất", **không** phải một
    phát biểu về phân bổ audit. Điều tương tự xảy ra ở `d′ ≤ 0,4` của mọi `Δ`, nơi
    detector gần như mù. Đọc §7.3 với điều đó trong đầu.
@@ -518,6 +679,9 @@ python3 dprime_sweep.py --n 40 --tau-follows-dprime --json /tmp/sweep-L-follows.
 
 # ĐỐI CHỨNG + TÁI LẬP đường cong harm đã công bố -- §2.1 và cột phải của §7.5
 python3 dprime_sweep.py --n 40 --json /tmp/sweep-L-pinned.json
+
+# §8.1 -- kẻ tấn công tối đa hoá L thay vì harm, ở ba ô đã khai trước
+python3 dprime_sweep.py --n 40 --tau-follows-dprime --l-attacker-probe
 ```
 
 Tham số **cố định** của cả hai lệnh, đọc thẳng từ khối `run` của file `--json`:
@@ -534,6 +698,8 @@ Tham số **cố định** của cả hai lệnh, đọc thẳng từ khối `ru
 | `λ_T` | `metrics.LAMBDA_T = 0,50` |
 | `λ_Q` minh hoạ | `metrics.LAMBDA_Q = 0,10` |
 | `λ̄` | `metrics.lambda_q_star`, **đo theo từng ô**, `hi = 5,0` |
+| `λ_×` | nghiệm của `L_X(λ_Q) = L_Sentinel(λ_Q)`, **theo cặp**, `dprime_sweep.pairwise_crossing` (sửa đổi tiền-đăng-ký 18/09/2026, §6.0) |
+| lưới `λ_T` của §7.2.1 | `dprime_sweep.LAMBDA_T_GRID = (0; 0,25; 0,50)` — **chấm lại**, không đo lại |
 | CI95 | `runner.bootstrap_paired`, `n_boot = 10000`, `seed = 2026`, đơn vị = **workflow** |
 
 Số nào lấy từ đâu:
@@ -544,10 +710,15 @@ Số nào lấy từ đâu:
 | §4 bảng bốn policy | `cells[Δ][i].curves[policy]` trong `/tmp/sweep-L-follows.json` |
 | §4.1 bảng chi tiêu | `metrics.spend_table`, in ra `stdout` dưới nhãn `budget CONSUMED at the declared reference d' = 2.2` |
 | §5 `d′*` | khối `break_even` của file `--json`, và các dòng `d'* of d-L` trên `stdout` |
-| §6 `λ̄` từng ô | `metrics.lambda_q_star` trên `curves` của ô; cũng in ở cột `lambda-bar` của bảng bốn policy |
-| §6 cắt theo cặp | `dh = (harm_o − harm_s) + λ_T (T_o − T_s)`, `dq = Q_o − Q_s`, `λ = −dh/dq` khi `dq < 0`; ba kết cục giữ tách bạch (§6) |
-| §6.1, §7 tổng hợp | đếm trên đúng 64 ô của `/tmp/sweep-L-follows.json` |
-| §7.5 cột mặc định | `/tmp/sweep-L-pinned.json` (70 ô: 16 điểm thô + mịn hoá) |
+| §6.0 hai dải | dòng `lambda-bar measured on ...` và khối `OVER THE WHOLE GRID` trên `stdout` |
+| §6.0.1 hai quy ước | `l_winners(c, 0.0)` so với `l_winners(c, 1e-9)`; in ở cột `argmin L @ lambda_Q = 0` và ở dòng `ahead at lambda_Q -> 0+` |
+| **§6.1 bốn bảng từng ô** | **chép máy từ `stdout`, mục `the CLAIM FORM's own quantity, per cell` (`dprime_sweep.pairwise_table`) — KHÔNG gõ tay** |
+| §6.2, §7 tổng hợp | khối `OVER THE WHOLE GRID` của `stdout`, đếm trên đúng 64 ô của `/tmp/sweep-L-follows.json` |
+| §6.2 `λ̄` từng ô | `metrics.lambda_q_star` trên `curves` của ô; cột `lambda-bar` của cả hai bảng |
+| §7.2.1 bảng `λ_T` | `dprime_sweep.lambda_t_table`, in ra `stdout` dưới nhãn `THE SURVIVING CLAIM IS LOAD-BEARING ON AN UNSWEPT CONSTANT` |
+| §7.3 năm ô `< 0,10` | cột `Sen vs B6` của `pairwise_table` trong `stdout` của **lần chạy mặc định** |
+| §7.5 cột mặc định | `/tmp/sweep-L-pinned.json` + `stdout` của lệnh thứ hai (70 ô: 16 điểm thô + mịn hoá) |
+| §8.1 bảng probe | `stdout` của lệnh thứ ba (`--l-attacker-probe`), ba ô `L_ATTACKER_PROBE_CELLS` |
 
 ### 9.1 Bất biến & cổng
 
@@ -558,13 +729,25 @@ Số nào lấy từ đâu:
   `d′*` dưới `harm` vẫn **không có / không có / 2,55 / 0,60**.
 - `metrics.py`, `runner.py`, `scoring.py`, `oracle.py`, `detector.py`,
   `policies.py` — **không sửa một dòng nào**.
-- Ba cổng xanh: **447 / 111 / 14**, **zero skip** (tăng từ 444 / 100 / 9 — 19 test
-  mới: 3 ở gate 1, 11 ở gate 2, 5 ở gate 3).
-- **Hai cái bẫy đếm ở §6.2 được tìm ra khi TỰ SOÁT, không phải bởi một test đỏ.**
+- Ba cổng xanh: **447 / 125 / 15**, **zero skip** (đợt trước 447 / 111 / 14 — 15
+  test mới ở đợt sửa này: 14 ở gate 2, 1 ở gate 3; gate 1 không thêm test mà **mở
+  rộng** một test sẵn có sang các hàng `d0.0 … d3.0` và sang một ô đã biết là nhạy
+  với hàng `tau_sel`).
+- **Hai cái bẫy đếm ở §6.3 được tìm ra khi TỰ SOÁT, không phải bởi một test đỏ.**
   Cái (a) đã được **sửa trong code** và ghim bằng test; cái (b) nằm trong
   `metrics.py` **đóng băng**, nên nó được **khai báo** và kết luận §7 được dựng để
   **không đi qua nó**. Con số "Sentinel dẫn 52/64 ô" của bản nháp đầu là **SAI** và
-  không được trích ở đâu nữa — số đúng là **28/64 duy nhất + 24 ô hoà**.
-- N3 giữ nguyên qua trục chấm điểm mới: một ô không dựng được attack, **và** một ô
-  không có `λ̄`, đều mang **LÝ DO** và đều **chặn** phép quét `d′*` — không ô nào bị
-  bỏ qua im lặng, không ô nào bị gán `harm = 0` hay một `λ_Q` đi mượn.
+  không được trích ở đâu nữa — số đúng là **28/64 duy nhất + 24 ô hoà** (và chính
+  con số 52 đó = 28 + 24, tức `min()` trao **24/25** ô hoà cho Sentinel, không phải
+  25/25).
+- N3 giữ nguyên qua trục chấm điểm mới, và đợt sửa này bịt thêm **hai lỗ tiềm ẩn**:
+  (i) `measure_cell` nay kiểm tra **mọi** policy trong thứ hạng `L` chứ không chỉ
+  cặp `B1`/`Sentinel` — một policy không có workflow khả thi làm `L` của nó thành
+  `NaN` và cột `argmin` in ra `--` trần; (ii) `spend_report` nay **từ chối** một ô
+  mang `REASON` thay vì in bảng chi tiêu từ các `spent` hữu hạn của nó.
+- **`d′*` dưới `harm` nay có ghim trong bộ cổng**: gate 2
+  `ThePublishedHarmBreakEvenIsPinnedToItsOwnInterval` đóng băng **chuỗi cận dưới
+  CI95 đã công bố** (70 ô, cả điểm mịn hoá) và khẳng định `break_even` vẫn ánh xạ
+  chuỗi đó về `không có / không có / 2,55 / 0,60`. **Đọc đúng phạm vi**: nó bắt được
+  thay đổi trong **QUY TẮC**, không bắt được thay đổi trong **PHÉP ĐO** — tái lập
+  phép đo cần cả lần chạy 40 workflow, và phút thì không được nằm trong cổng.
