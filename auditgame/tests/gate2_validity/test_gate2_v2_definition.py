@@ -784,6 +784,10 @@ class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
         self.assertEqual(rec["subset_rule"]["mechanism"], retrieval.SUBSET_RULE)
         self.assertEqual(rec["subset_rule"]["fingerprint"],
                          retrieval.subset_rule_fingerprint())
+        # SALT FAMILY -- the replication unit is the salt, not the split.
+        self.assertEqual(rec["replication_unit"], "salt")
+        self.assertEqual(rec["salt_family"], list(gate2_v2.SALT_FAMILY))
+        self.assertEqual(rec["salt_criterion"], gate2_v2.SALT_CRITERION)
 
     def test_the_gate_test_reads_the_protocol_off_the_frozen_record(self):
         """A pinned criterion that the gate does not actually run is decorative.
@@ -864,6 +868,7 @@ class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
         """
         doc = json.loads(pathlib.Path(gate2_v2.PATH).read_text(encoding="utf-8"))
         self.assertEqual(doc["md5"], gate2_v2.FROZEN_MD5)
+        self.assertEqual(doc["md5_single_salt"], gate2_v2.FROZEN_MD5_SINGLE_SALT)
         self.assertEqual(doc["record"], gate2_v2.record())
 
     def test_moving_any_frozen_parameter_moves_the_digest(self):
@@ -899,7 +904,11 @@ class TheGateTwoV2DefinitionIsFrozen(unittest.TestCase):
                               dict(rec["subset_rule"], fingerprint="0" * 16)),
                              ("subset_rule",
                               dict(rec["subset_rule"],
-                                   mechanism="k smallest tokens of B"))):
+                                   mechanism="k smallest tokens of B")),
+                             ("replication_unit", "split"),
+                             ("salt_family", list(gate2_v2.SALT_FAMILY[:5])),
+                             ("salt_criterion",
+                              dict(rec["salt_criterion"], threshold=0.9))):
             with self.subTest(field=field):
                 self.assertNotEqual(
                     base, gate2_v2.md5(dict(rec, **{field: value})),

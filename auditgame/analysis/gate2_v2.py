@@ -52,11 +52,31 @@ FROZEN_DATE = "2026-09-18"
 PATH = str(pathlib.Path(__file__).resolve().parent.parent
            / "reference" / "gate2_v2.json")
 
+#: The single-salt predecessor digest (v2.1), before the salt family outer
+#: criterion was pinned into the record. Recorded for historical traceability.
+FROZEN_MD5_SINGLE_SALT = "9682c1958d40d28874ab4088dcbafce0"
+
 #: THE PIN.  Any edit to any field of `record()` moves this, so moving it is a
 #: visible edit to the criterion rather than a quiet one.  Regenerate with
 #:     python3 -c "from analysis import gate2_v2; gate2_v2.write()"
 #: and the test that pins it will tell you the new digest.
-FROZEN_MD5 = "9682c1958d40d28874ab4088dcbafce0"
+FROZEN_MD5 = "bcaf62d45507bc07d87f00e1e13cc0e6"
+
+#: THE SALT FAMILY (spikes/cong-v2-chot.md Section 2).
+#: The unit of replication is the SALT, not the split: splits overlap on a small
+#: corpus, so 20/20 splits on one salt is not 20 independent confirmations.
+SALT_FAMILY = ("payload_topic",) + tuple(f"payload_topic#{i}" for i in range(1, 17))
+
+#: THE OUTER CRITERION (pre-registered 2026-09-18).
+#: >= 80% of the salts in the declared family must pass (14/17).
+SALT_CRITERION = dict(
+    date="2026-09-18",
+    passing=14,
+    rule=">= 80% salts in pre-registered family must pass; fixed on 2026-09-18",
+    threshold=0.80,
+    total=17,
+    unit="salt",
+)
 
 #: THE CERTIFICATION PROTOCOL, owned HERE because the record is what pins it.
 #: `tests/gate2_validity/test_benign_corpus.py` imports these instead of defining
@@ -183,6 +203,9 @@ def record(**overrides) -> dict:
                     natural=benign_corpus.NATURAL,
                     per_event=benign_corpus.PER_EVENT,
                     holdout=benign_corpus.HOLDOUT),
+        replication_unit="salt",
+        salt_family=list(SALT_FAMILY),
+        salt_criterion=dict(SALT_CRITERION),
         verdict="NOT DRAWN -- certification is a separate step",
     )
     rec.update(overrides)
@@ -216,7 +239,9 @@ def write(path: str | None = None) -> str:
     """
     rec = record()
     doc = dict(what="gate 2 v2 -- the FROZEN definition, not a result",
-               md5=md5(rec), generated_by="analysis/gate2_v2.py::write",
+               md5=md5(rec),
+               md5_single_salt=FROZEN_MD5_SINGLE_SALT,
+               generated_by="analysis/gate2_v2.py::write",
                warning="Generated file. Do not hand-edit -- change the code and "
                        "regenerate, or the pinned md5 and the live definition "
                        "part company.",

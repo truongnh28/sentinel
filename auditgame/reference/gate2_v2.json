@@ -1,6 +1,7 @@
 {
   "generated_by": "analysis/gate2_v2.py::write",
-  "md5": "9682c1958d40d28874ab4088dcbafce0",
+  "md5": "bcaf62d45507bc07d87f00e1e13cc0e6",
+  "md5_single_salt": "9682c1958d40d28874ab4088dcbafce0",
   "record": {
     "ceiling": 0.56,
     "corpus": {
@@ -40,6 +41,34 @@
     },
     "payload_length_L": 63,
     "payload_length_rule": "len(content) == payload_length_L exactly when len(payload_tag(topic)) < payload_length_L; otherwise the payload is the tag alone and build.payload_length_reason(topic) states why",
+    "replication_unit": "salt",
+    "salt_criterion": {
+      "date": "2026-09-18",
+      "passing": 14,
+      "rule": ">= 80% salts in pre-registered family must pass; fixed on 2026-09-18",
+      "threshold": 0.8,
+      "total": 17,
+      "unit": "salt"
+    },
+    "salt_family": [
+      "payload_topic",
+      "payload_topic#1",
+      "payload_topic#2",
+      "payload_topic#3",
+      "payload_topic#4",
+      "payload_topic#5",
+      "payload_topic#6",
+      "payload_topic#7",
+      "payload_topic#8",
+      "payload_topic#9",
+      "payload_topic#10",
+      "payload_topic#11",
+      "payload_topic#12",
+      "payload_topic#13",
+      "payload_topic#14",
+      "payload_topic#15",
+      "payload_topic#16"
+    ],
     "screen_criterion": {
       "comparison": "<= ceiling",
       "eps_star": "max passing epsilon",
