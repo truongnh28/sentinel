@@ -174,6 +174,7 @@ import json
 import random
 import statistics
 import sys
+import textwrap
 from dataclasses import dataclass, asdict, field
 
 import agent
@@ -219,9 +220,11 @@ LQ_DEFAULT = f"lambda_Q={metrics.LAMBDA_Q}"
 #: TWO CONVENTIONS, TWO LABELS -- and they do not agree, so they may not share a
 #: name.  AT_ZERO is the weight EXACTLY 0, where three policies can hold the same
 #: L and a tie is reported as a tie.  ABOVE_ZERO is the limit from above, where a
-#: tie at 0 has already broken in favour of whoever quarantines less: on this
-#: corpus the two readings differ on 25 of 64 cells (at 0: B5 11 sole / Sentinel
-#: 28 sole / 25 tied; at 0+: B5 33 / Sentinel 28 / B6 3).  Writing "lambda_Q -> 0"
+#: tie at 0 has already broken in favour of whoever quarantines less.  ON THE
+#: PUBLISHED CORPUS ONLY -- 40 workflows, corpus seed 2026, --tau-follows-dprime,
+#: 64 cells -- the two readings differ on 25 of them (at 0: B5 11 sole / Sentinel
+#: 28 sole / 25 tied; at 0+: B5 33 / Sentinel 28 / B6 3); a smaller --n measures a
+#: different grid and these counts do not carry.  Writing "lambda_Q -> 0"
 #: over a column computed at 0.0 is what made a table and its own summary
 #: disagree, so the arrow now means the limit and nothing else.
 AT_ZERO = "lambda_Q = 0"
@@ -457,6 +460,14 @@ def l_attacker_probe(wfs, budget: float, seeds, cells=L_ATTACKER_PROBE_CELLS,
     MOVE in each policy's L.  What matters for this project's claims is not that
     each L rises (it must: a maximum cannot fall) but whether the rises DIFFER
     between policies, because only a difference moves a ranking.
+
+    TWO AXES ARE LEFT UNMEASURED, NOT ONE.  The probe is three cells of the grid --
+    and it is ONE weight of the whole positive half-line: `lambda_Q` defaults to
+    metrics.LAMBDA_Q and no caller overrides it, so the direction is measured at
+    0.10 only.  The claims it is evidence about run over EVERY lambda_Q, the
+    lambda_Q -> 0+ limit in particular -- and at that limit Q_false adds nothing to
+    the LEVEL of L while the SIGN of its difference is what decides the ranking on
+    every cell that ties on harm and T_lost.  This probe says nothing there.
     """
     ag = agent.MockAgent()
     out = [f"  ATTACKER OBJECTIVE PROBE -- harm-max vs L-max over the SAME attacker",
@@ -668,11 +679,65 @@ def l_winners(cell: SweepCell, lambda_Q: float,
             if c.loss(lambda_Q, lambda_T) <= best + tol]
 
 
+#: N3 in the ARGMIN columns.  "no weight to read this column at" and "no curve to
+#: read it from" are ANSWERS and are printed as such: a bare dash in a column whose
+#: neighbours hold policy names is indistinguishable from a formatting accident,
+#: and the adjacent `lambda-bar = none` cell is an adjacency, not a reason.
+NO_LAMBDA_BAR_REASON = "REASON: no lambda-bar"
+NO_CURVE_REASON = "REASON: no per-policy curve"
+
+
 def l_winner_text(cell: SweepCell, lambda_Q: float,
                   lambda_T: float = metrics.LAMBDA_T) -> str:
-    """The argmin as printed: "B5 risk-score", or "Sentinel=B5 risk-score" on a tie."""
+    """The argmin as printed: "B5 risk-score", or "Sentinel=B5 risk-score" on a tie.
+
+    A cell with no curve carries the REASON instead of a dash (N3)."""
     w = l_winners(cell, lambda_Q, lambda_T)
-    return "=".join(w) if w else "--"
+    return "=".join(w) if w else NO_CURVE_REASON
+
+
+def tie_break_inflation(rows, lambda_Q: float = 0.0,
+                        lambda_T: float = metrics.LAMBDA_T,
+                        winner: str = SENTINEL) -> tuple:
+    """(cells a bare `min()` would hand to `winner`, cells that TIE) -- counted off
+    THE CELLS HANDED IN, never quoted from the published corpus.
+
+    The warning this feeds is about the grid the run just measured, so its two
+    numbers have to come from that grid: the published 40-workflow figure (24 of
+    25) printed under a `--n 20` run would be a false statement about a grid it was
+    not measured on.  `min()` over a dict breaks a tie by INSERTION ORDER, which is
+    POLICIES order, so the cell it inflates is reproduced here by asking `min()`
+    itself rather than by assuming Sentinel is always the one it lands on -- at
+    Delta = 4, d' = 0.2 of the published grid it lands on B5.
+
+    N3: a cell carrying a REASON, or with no curves, has no argmin and is counted
+    in neither number.
+    """
+    tied, inflated = 0, 0
+    for c in _flat(rows):
+        if not c.usable or not c.curves:
+            continue
+        if len(l_winners(c, lambda_Q, lambda_T)) <= 1:
+            continue
+        tied += 1
+        if min(c.curves, key=lambda k: c.curves[k].loss(lambda_Q, lambda_T)) == winner:
+            inflated += 1
+    return (inflated, tied)
+
+
+def tie_break_note(rows, lambda_Q: float = 0.0,
+                   lambda_T: float = metrics.LAMBDA_T,
+                   winner: str = SENTINEL) -> str:
+    """The tie-break warning, in the numbers of the run in hand (see above)."""
+    inflated, tied = tie_break_inflation(rows, lambda_Q, lambda_T, winner)
+    n = sum(1 for c in _flat(rows) if c.usable and c.curves)
+    at = AT_ZERO if lambda_Q == 0.0 else f"lambda_Q = {lambda_Q}"
+    if not tied:
+        return (f"no cell of THIS grid ({n} usable) ties for the smallest L at "
+                f"{at}, so min()'s insertion-order tie-break changes nothing on "
+                f"it (see l_winners).")
+    return (f"min() would hand {inflated} of the {tied} cells of THIS grid "
+            f"({n} usable) that tie at {at} to {winner} (see l_winners).")
 
 
 # ------------------------------------ the claim form's OWN quantity --------
@@ -1076,7 +1141,8 @@ def policy_table(rows, lambda_T: float = metrics.LAMBDA_T) -> str:
                        f"lambda-bar = {lb_txt})")
             continue
         base = l_winner_text(c, 0.0, lambda_T)
-        above = "--" if lb is None else l_winner_text(c, lb + 1e-6, lambda_T)
+        above = (NO_LAMBDA_BAR_REASON if lb is None
+                 else l_winner_text(c, lb + 1e-6, lambda_T))
         at_lq = l_winner_text(c, lq, lambda_T)
         tail = f"  {lb_txt:>10}  {base} | {above} | {at_lq}"
         for i, name in enumerate(POLICIES):
@@ -1127,12 +1193,15 @@ def pairwise_table(rows, lambda_T: float = metrics.LAMBDA_T) -> str:
             continue
         lb = lambda_bar(c, lambda_T)
         lb_txt = "none" if lb is None else f"{lb:.4f}"
+        if not c.curves:
+            out.append(f"  {c.d_prime:>7.2f}{lb_txt:>12}  {NO_CURVE_REASON}")
+            continue
 
         def argmin(lq_):
             w = l_winners(c, lq_, lambda_T)
-            return "=".join(_short(n) for n in w) if w else "--"
+            return "=".join(_short(n) for n in w) if w else NO_CURVE_REASON
 
-        above = "--" if lb is None else argmin(lb + 1e-6)
+        above = NO_LAMBDA_BAR_REASON if lb is None else argmin(lb + 1e-6)
         out.append(f"  {c.d_prime:>7.2f}{lb_txt:>12}  {argmin(0.0):<26}"
                    f"{above:<24}{argmin(lq):<26}"
                    + "".join(f"{pairwise_text(c, n, lambda_T):>26}"
@@ -1313,8 +1382,10 @@ def main() -> int:
     print("  lambda-bar, where lambda-bar = lambda_q_star is a RESULT, measured per")
     print("  (Delta, d') cell.  lambda_Q = 0 and 0.10 are ILLUSTRATIONS, never the")
     print("  headline.  A TIE for the smallest L is counted as a tie and not as a")
-    print("  win: the curves are inserted in POLICIES order with Sentinel second, so")
-    print("  min() would hand 24 of the 25 tied cells to Sentinel (see l_winners).")
+    print("  win: the curves are inserted in POLICIES order with Sentinel second,")
+    print("  and ON THIS RUN'S OWN GRID --")
+    for ln in textwrap.wrap(tie_break_note(rows), 72):
+        print("    " + ln)
     print("  READ lambda-bar WITH ITS LIMIT: metrics.lambda_q_star only accepts a")
     print("  crossing in (1e-9, 5], so where two policies TIE at lambda_Q = 0 the")
     print("  flip that happens immediately above 0 is invisible to it and the")

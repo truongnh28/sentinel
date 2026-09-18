@@ -537,6 +537,46 @@ class TheSweepIsScoredWithTheDeclaredLossNotHarmAlone(unittest.TestCase):
                           "a d'* was reported from a grid whose weight does not "
                           "exist")
 
+    def test_the_argmin_above_lambda_bar_column_records_a_reason_not_a_bare_dash(self):
+        """N3 reaches the `argmin L @ lambda-bar+` column too.
+
+        Thesis claim (vi): "o bi tu choi ghi LY DO, khong bao gio mot dau `--`
+        tran" -- cot "argmin L @ lambda-bar+" khong doc duoc o mot o khong co
+        lambda-bar, va "khong doc duoc" phai duoc VIET RA chu khong phai bo trong.
+
+        Adjacency is not a reason: the `lambda-bar` cell of the same row reading
+        `none` leaves the reader to infer the link, and every other refused cell in
+        this module says it outright.
+        """
+        dominant = four(b1=curve(0.80, 0.90, 0.45, 16.40),
+                        sentinel=curve(0.30, 0.10, 0.00, 6.47),
+                        b5=curve(0.78, 0.50, 0.20, 0.40),
+                        b6=curve(0.72, 0.60, 0.30, 5.00))
+        c = cell(2.0, 2, +0.10, curves=dominant)
+        self.assertIsNone(S.lambda_bar(c),
+                          "this fixture has a lambda-bar, so it cannot test the "
+                          "column that has no weight to read")
+        # policy_table prints the three argmins as "at 0 | above lambda-bar | at
+        # 0.10", so the middle field IS the column under test.  (The numeric
+        # L(lambda-bar) column keeps its `_fmt` dash: that is a MISSING NUMBER on a
+        # reported cell, which is the rule _fmt exists for, not a refused cell.)
+        row = [ln for ln in S.policy_table([c]).splitlines()
+               if "|" in ln and ln.strip().startswith("2.00")][0]
+        above = row.split("|")[1].strip()
+        self.assertIn("REASON", above,
+                      "policy_table left the lambda-bar+ argmin column without a "
+                      "reason")
+        self.assertNotEqual(above, "--")
+
+        row = [ln for ln in S.pairwise_table([c]).splitlines()
+               if ln.strip().startswith("2.00")][0]
+        self.assertIn("REASON", row,
+                      "pairwise_table left the lambda-bar+ argmin column without "
+                      "a reason")
+        self.assertNotIn("--", row.split(),
+                         "pairwise_table still prints a bare dash in the "
+                         "lambda-bar+ argmin column")
+
     def test_the_three_declared_lambda_q_columns_are_zero_lambda_bar_and_the_default(self):
         """Three columns, declared: 0, the cell's own lambda-bar, metrics.LAMBDA_Q.
 
@@ -658,6 +698,69 @@ class ATieForTheBestLossIsReportedAsATieAndNotAsAWin(unittest.TestCase):
         self.assertNotIn(S.SENTINEL, S.l_winners(c, 1e-9),
                          "Sentinel is still a winner just above zero, so there is "
                          "no overshoot to report here")
+
+    def _tie_without_sentinel(self):
+        """A cell whose tie for the smallest L does NOT include Sentinel: a bare
+        min() hands this one to B5, so it must not be counted as inflation."""
+        return cell(2.2, 0, +0.10, curves=four(
+            b1=curve(1.20, 0.00, 0.40, 16.40),
+            sentinel=curve(1.50, 1.12, 0.00, 7.13),
+            b5=curve(0.99, 0.00, 0.00, 0.00),
+            b6=curve(0.99, 1.03, 0.00, 3.20)))
+
+    def _no_tie(self):
+        """A cell with a strict argmin: nothing for the tie-break to inflate."""
+        return cell(2.4, 2, +0.10, curves=four(
+            b1=curve(1.20, 0.00, 0.40, 16.40),
+            sentinel=curve(0.80, 1.12, 0.00, 7.13),
+            b5=curve(0.99, 0.00, 0.00, 0.00),
+            b6=curve(1.10, 1.03, 0.00, 3.20)))
+
+    def test_the_tie_break_inflation_is_counted_from_the_grid_that_was_measured(self):
+        """The tie-break warning is a COUNT of the run in hand, not a literal.
+
+        Thesis claim (vi): "moi con so in ra phai la con so cua chinh lan chay do"
+        -- mot cau in ra o MOI lan chay ("min() se trao 24 trong 25 o hoa cho
+        Sentinel") la con so cua corpus 40-workflow da cong bo; in nguyen no o mot
+        lan chay `--n 20` la mot phat bieu SAI ve luoi vua do xong.
+
+        This grid has THREE usable cells: one three-way tie a bare min() would hand
+        to Sentinel, one tie between B5 and B6 that it would hand to B5, and one
+        cell with a strict argmin.  The warning must read 1 of 2 here.
+        """
+        grid = [self._tied(), self._tie_without_sentinel(), self._no_tie()]
+        self.assertEqual(S.tie_break_inflation(grid, 0.0), (1, 2),
+                         "the tie-break inflation is not counted off the cells "
+                         "handed in")
+        note = S.tie_break_note(grid, 0.0)
+        self.assertIn("1 of the 2", note,
+                      "the printed warning does not carry this grid's own counts")
+        self.assertNotIn("24", note,
+                         "the printed warning still carries the published "
+                         "corpus's figure on a grid that is not it")
+
+    def test_a_cell_carrying_a_reason_is_not_counted_among_the_ties(self):
+        """N3: a refused cell has no argmin to be handed to anybody.
+
+        Thesis claim (vi): "o bi tu choi khong tham gia bat ky phep dem nao".
+        """
+        refused = cell(2.6, 0, +0.10, reason="no attack could be built",
+                       curves=four(b1=curve(1.20, 0.00, 0.40, 16.40),
+                                   sentinel=curve(0.99, 1.12, 0.00, 7.13),
+                                   b5=curve(0.99, 0.00, 0.00, 0.00),
+                                   b6=curve(0.99, 1.03, 0.00, 3.20)))
+        self.assertEqual(S.tie_break_inflation([refused], 0.0), (0, 0),
+                         "a cell carrying a REASON was counted as a tie")
+
+    def test_a_grid_with_no_tie_at_all_says_so_instead_of_naming_a_count(self):
+        """Zero ties is an ANSWER, and the sentence has to still be true.
+
+        Thesis claim (vi): "khong co o nao hoa" la mot ket qua, va cau van in ra
+        phai noi dung dieu do chu khong phai in "0 trong 0".
+        """
+        note = S.tie_break_note([self._no_tie()], 0.0)
+        self.assertIn("no cell", note.lower(),
+                      "a grid with no tie at all still printed a tie-break count")
 
 
 class TheClaimFormRestsOnThePairwiseCrossingNotOnLambdaQStar(unittest.TestCase):

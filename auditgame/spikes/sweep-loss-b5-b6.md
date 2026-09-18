@@ -549,7 +549,9 @@ việc **định giá một patch sạch bị chặn**, ở một mức giá mà
 >
 > **Sentinel hơn `B6 two-stage` trên `L` với mọi `λ_Q < λ_×` trên 40/64 ô, `λ_×` đo
 > được trong `[0,1111; 18,50]`, trung vị `0,3846`; trên 24/64 ô còn lại Sentinel
-> không hơn ngay từ `λ_Q → 0+`.** 24 ô đó là: **15/16 ô của `Δ = 0`**, cộng
+> không hơn ngay từ `λ_Q → 0+`.** (`λ̄ = λ_Q^*` trên cùng 64 ô: `[0,0042; 1,4217]`
+> — đại lượng **bốn policy**, báo cáo kèm theo đúng SỬA ĐỔI §6.0, và **không** đọc
+> nó như dải mà Sentinel dẫn `B6`, §6.3b.) 24 ô đó là: **15/16 ô của `Δ = 0`**, cộng
 > **`d′ ≤ 0,4`** ở cả ba `Δ` còn lại. Đó đúng là vùng `harm` của Sentinel và của
 > `B6` **bằng nhau** (`Δ = 0`: cả hai đứng ở `0,992` trên toàn lưới; `d′ ≤ 0,4`:
 > detector gần như mù nên không policy nào tách được ra), nên `ΔL` tại `λ_Q → 0+`
@@ -635,6 +637,18 @@ chính nó đang chạy (§3); chế độ mặc định đứng đây làm **đ
    hạng nào, và ở ô duy nhất nó đáng kể thì nó ĐẨY THEO HƯỚNG củng cố §7.1 chứ
    không cứu được.** Một `worst_case` đầy đủ dưới `L` trên cả 64 ô vẫn là việc chưa
    làm.
+
+   **Chưa đo ở ĐÂY là HAI trục, không phải một.** Ngoài trục **ô** (3/64), phép đo
+   này chạy ở **ĐÚNG MỘT trọng số**: `l_attacker_probe` lấy mặc định
+   `λ_Q = metrics.LAMBDA_Q` và `main()` **không bao giờ** ghi đè, nên chiều được đo
+   ở **`λ_Q = 0,10` và chỉ ở đó**. Trong khi ấy, các phát biểu mà nó làm chứng —
+   §7.1 ("Sentinel **không** hơn `B5` ở **bất kỳ** `λ_Q` nào trên **bất kỳ** ô
+   nào") và mọi con số "thua ngay từ `λ_Q → 0+`" — là mệnh đề trên **MỌI** `λ_Q`,
+   đặc biệt là **giới hạn `0+`**. Ở giới hạn đó số hạng `Q_false` **không còn đóng
+   góp vào MỨC của `L`**, nhưng **DẤU của hiệu `Q_false`** lại đúng là thứ quyết
+   định thứ hạng ở những ô mà `harm` và `T_lost` **hoà** (25 ô, §6.0.1) — nghĩa là
+   một kẻ tấn công lái được `Q_false` **vẫn** có thể động vào chính những ô ấy.
+   Phép đo ở `λ_Q = 0,10` **không** đo điều đó.
 2. **Bản chính không mịn hoá được** (§3): `d′*` đọc ở độ phân giải 0,2. Cột `d′*`
    `harm` của chế độ mặc định (2,55) và bản chính (2,60) **không** so trực tiếp
    được; so đúng là trên lưới thô, ở đó cả hai đều 2,60.
