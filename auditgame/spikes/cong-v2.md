@@ -12,11 +12,24 @@ số đã xê dịch, kèm lệnh tái lập.
 
 ---
 
-## 0. Chọn $L$ — GHI TRƯỚC KHI NHÌN BẤT KỲ AUC NÀO
+## 0. Chọn $L$
 
-Đây là yêu cầu 2 của đề bài và là đúng khuyết tật mà kỷ luật tiền-đăng-ký của dự
-án tồn tại để chặn: chọn $L$ **sau** khi thấy khả năng tách là chọn tham số theo
-kết quả. Phần này được viết và commit **trước** khi bất kỳ số AUC v2 nào được đo.
+> **RÚT LẠI MỘT KHẲNG ĐỊNH (rà soát II, phán quyết 4).** Bản trước của mục này
+> viết rằng phần này "được viết và **commit trước** khi bất kỳ số AUC v2 nào được
+> đo". **Khẳng định đó không có bằng chứng và được rút.** Reflog của nhánh
+> `gate2-v2` chỉ có **một** commit cho toàn bộ việc đó, **31 giây** sau khi
+> checkout — tức không hề có một commit tiền-đăng-ký đứng trước phép đo. Cái
+> **đúng** và **giữ nguyên** là bản thân phép dẫn: $L$ = **trung vị** của
+> `len(content)` trên 2294 item `memory` lành của `benign_pool()` (pool `full`,
+> `natural=False`, seed 20260916), phân bố ghi đủ dưới đây, lệnh tái lập kèm
+> theo, và trung vị là gợi ý của chính đề bài — nên số bậc tự do là **nhỏ**.
+> Nhưng "nhỏ" không phải "đã tiền-đăng-ký", và trang này không được nói như thể
+> hai thứ đó là một. Xem §0bis cho một tiền-đăng-ký **thật sự có thứ tự trong
+> git**.
+
+Chọn $L$ **sau** khi thấy khả năng tách sẽ là chọn tham số theo kết quả — đó là
+khuyết tật mà kỷ luật tiền-đăng-ký của dự án tồn tại để chặn. Dưới đây là phép
+dẫn và phân bố đo được, **không kèm** khẳng định về thứ tự.
 
 **Tổng thể lành được đọc:** `benign_pool()` mặc định — pool `full`, carrier
 `memory`, `natural=False`, `seed = 20260916`. Đây là **đúng** tổng thể mà lớp âm
@@ -102,6 +115,162 @@ hại sập về 0. Nó được **ghi thành lý do** (luật N3), không bị 
 $L$: `build.payload_length_reason(topic)` trả về lý do, và `provenance` **giữ
 nguyên** — `provenance` là một đặc trưng **được chấm** (`depth`), nhét lý do vào
 đó là bơm tín hiệu vào chính thứ đang đo.
+
+---
+
+## 0bis. TIỀN ĐĂNG KÝ cho lần đo lại (rà soát II) — commit RIÊNG, TRƯỚC khi đo
+
+**Trang này được commit một mình, không kèm một dòng code nào, không kèm một con
+số mới nào.** Thứ tự phải **nhìn thấy được trong git**, không phải được khẳng
+định bằng văn xuôi — đó chính là phán quyết 4 của đợt rà soát II, và là thứ lần
+trước đã **không** làm.
+
+### 0bis.1 Vì sao phải đo lại: `sorted()` là ARTEFACT CÀI ĐẶT, không phải mô hình
+
+`retrieval.payload_topic` trả về `Topic(sorted(target)[:k])` — $k$ token **nhỏ
+nhất theo từ điển**. `core.topic_code` (bản v2 đã giao) là **trung bình mã từ
+điển** của các token. Với $A = \text{sorted}(B)[:k] \subseteq B$:
+
+$$\operatorname{mean}_{t \in A} \operatorname{code}(t) \;\le\; \operatorname{mean}_{t \in B} \operatorname{code}(t)$$
+
+là một **định lý**, không phải một phép đo: trung bình của $k$ phần tử nhỏ nhất
+không bao giờ vượt trung bình của cả tập. Nên hai lớp tách nhau **theo cấu tạo**,
+và ô đỏ ở §4.1 đang đo `sorted()` chứ không đo `MatchedAttack`.
+
+Bằng chứng quyết định rằng `sorted()` **không** phải tiếng nói của mô hình tấn
+công, mà là một lựa chọn cài đặt:
+
+* docstring của chính `payload_topic` chọn thứ tự sắp xếp **vì TẤT ĐỊNH**:
+  *"taken in SORTED order: deterministic, no sampling"*. Lý do là tái lập, không
+  phải là mô hình.
+* mô hình tấn công chỉ đòi payload mang một **TẬP CON** của topic task sigma
+  (để $\operatorname{sim}(A,B) = |A|/|B| \approx \varepsilon$, không làm phồng
+  mẫu số Jaccard). Nó **không** đòi tập con đó phải là tiền tố bảng chữ cái.
+
+### 0bis.2 Quy tắc tập con ĐÃ KHỬ THIÊN LỆCH — chốt ở đây, trước khi đo
+
+Thay `sorted(target)[:k]` bằng một **tập con $k$ phần tử giả ngẫu nhiên tất
+định**, gieo qua `core.seed_of` (blake2b, **không** `hash()`):
+
+```python
+k = max(1, ceil(eps * len(target)))
+order = sorted(target, key=lambda t: (seed_of("payload_topic", str(target), t), t))
+A = Topic(order[:k])
+```
+
+Mọi tính chất mà **mô hình** và **docstring** đòi đều giữ nguyên, và đây là toàn
+bộ danh sách:
+
+| tính chất | giữ? | vì sao |
+|---|---|---|
+| $A \subseteq B$ | có | lấy từ chính `target` |
+| $\lvert A\rvert = k$ | có | cùng công thức $k$ |
+| $\operatorname{sim}(A,B) = k/m$ | có | $A$ là tập con nên Jaccard $= \lvert A\rvert/\lvert B\rvert$ |
+| đơn điệu theo $\varepsilon$ | có | thứ tự ưu tiên **cố định** cho mỗi `target` → các $A$ **lồng nhau** |
+| tất định qua tiến trình | có | `seed_of` = blake2b trên chuỗi; `str(target)` là dạng chuẩn `"\|".join(sorted(...))` |
+| không `hash()`, không thứ tự duyệt `frozenset` | có | như trên |
+| không token lạ | có | tập con |
+
+Cái **mất đi** là đúng thứ phải mất: mối tương quan giữa "được chọn vào tag" và
+"đứng đầu bảng chữ cái". Sau khi khử, bất kỳ khả năng tách nào còn lại trên cột
+`topic` là **đo được**, không phải **suy ra được**.
+
+Quy tắc mới chảy qua **một** chỗ (`retrieval.payload_topic`), nên nó tự động
+chảy vào `retrieval.payload_topic_like`, `build.inject`, `build.plan_poison`,
+`attacks.*.payload`, `analysis/benign_corpus.py::feasible_sigmas` và
+`tests/gate2_validity/test_matched_epsilon_budget.py`. Đó là điều kiện để cổng
+không còn vừa **bắt buộc** một chữ ký vừa **chấm điểm** chính chữ ký đó.
+
+### 0bis.3 Đặc trưng `topic` — CHỐT trên LÝ DO ĐÃ KHAI, trước khi thấy bảng
+
+Có nhiều mã từ điển đều "hợp lệ" cho một tập token. **Bốn** ứng viên được khai ở
+đây, và cả bốn sẽ được đo và **công bố cạnh nhau** ở §3.7 để không ai phải tin
+lựa chọn này trên lời:
+
+| tên | định nghĩa | ghi chú |
+|---|---|---|
+| **`canonical`** | $\operatorname{code}_8\big(\texttt{"\|".join(sorted(tokens))}\big)$ | **ĐƯỢC CHỌN** |
+| `mean` | $\frac{1}{\lvert T\rvert}\sum_t \operatorname{code}_8(t)$ | bản đã giao ở v2 |
+| `max` | $\max_t \operatorname{code}_8(t)$ | |
+| `sum` | $\sum_t \operatorname{code}_8(t)$ | |
+
+với $\operatorname{code}_8(s) = \operatorname{int}_{256}(\operatorname{utf8}(s)_{[0:8]}) / 2^{64}$ —
+**đúng** nguyên hàm byte→phân số mà `TOPIC_CODE_BYTES = 8` đã có, không đổi.
+
+**LÝ DO CHỌN `canonical`, và lý do này độc lập với mọi AUC:** chuỗi
+`"|".join(sorted(tokens))` là dạng mà **chính codebase này đã coi là CĂN CƯỚC của
+một topic** — không phải một dạng mới nghĩ ra cho cổng 2:
+
+* `retrieval.Topic.__str__` **là** chuỗi đó, và `__repr__ = __str__`;
+* `core.seed_of` **chuỗi hoá** đối số của nó (`"|".join(map(str, parts))`), nên
+  cái nó thực sự băm chính là chuỗi chuẩn này;
+* `core.Item.__post_init__` băm `seed_of(carrier, topic, content, …)` thành
+  `item_id`, và `detector.score` gieo trên `item_id` — nên **điểm số của cả
+  benchmark** đã phụ thuộc vào đúng chuỗi này từ trước việc này rất lâu;
+* `core.item_from_record` và docstring của `swebench_dataset.Topic` đều nêu đích
+  danh dạng đó là lý do tồn tại của lớp `Topic`.
+
+Nói cách khác: **đặc trưng đọc đúng cái mà hệ thống vốn đã dùng làm định danh
+topic.** Ba ứng viên kia là các bản tóm tắt được **phát minh ở cổng 2**; không
+chỗ nào khác trong repo coi trung bình / max / tổng mã token là căn cước của một
+topic.
+
+**GIỚI HẠN, khai thẳng ngay tại đây chứ không đợi bảng:** cửa sổ 8 byte làm
+`canonical` đọc **xấp xỉ token đứng đầu bảng chữ cái** (cộng vài byte kế). Vì vậy
+nó **gần như không nhạy** với việc một tập con bỏ đi token nào **sau** ký tự thứ
+~8. Đó vừa là lý do nó ổn định trước phép cắt tập con, vừa là một **phép chiếu
+rất mất mát**. 8 byte là con số `TOPIC_CODE_BYTES` đã có và có lý do riêng của
+nó (mantissa `float` 53 bit — quá 6–7 byte thì bit thấp bị làm tròn mất), nên
+đọc nhiều byte hơn **không** mua thêm gì; giới hạn này là **nội tại** của việc ép
+một chuỗi thành **một** số thực.
+
+### 0bis.4 NGHĨA VỤ TRUNG THỰC (rà soát II, phán quyết 2b) — viết TRƯỚC khi đo
+
+Phải nói thẳng ba câu sau, và chúng được viết ở đây, **trước** commit đo:
+
+1. **Đặc trưng được chọn `canonical` được kỳ vọng là đặc trưng khiến ô đỏ chuyển
+   xanh.** Người rà soát đã đo bốn ứng viên trải AUC 0,45–1,00 và đã nêu tên
+   `canonical` trong chỉ thị. Nên **không** có chuyện giả vờ rằng lựa chọn này
+   được làm mù.
+2. **Lý do chọn không phải là kết quả đó.** Lý do — "đây là dạng chuẩn mà
+   `seed_of` / `item_id` / `Topic.__str__` **đã** dùng làm căn cước" — là một sự
+   kiện **kiểm tra được trong code**, có từ trước việc này, và có thể bác bỏ
+   được: nếu `Topic.__str__` không phải dạng đó, lý do sụp.
+3. **Nhưng thứ tự của chính việc CHỌN thì không được tiền-đăng-ký.** Cái commit
+   này ghim là thứ tự của **phép đo** (chốt quy tắc + đặc trưng → rồi mới đo),
+   **không** phải thứ tự của việc chọn giữa các lý do — việc chọn đó do người rà
+   soát làm **khi đã cầm bảng bốn ứng viên trên tay**. Cách duy nhất làm điều đó
+   kiểm tra được là **công bố cả bốn số** (§3.7) để người đọc tự thấy độ nhạy.
+   Trang này không được nói mạnh hơn thế.
+
+### 0bis.5 Những gì sẽ được GHIM thêm vào ô băm (phán quyết 5)
+
+Bản ghi v1-của-v2 mới chỉ ghim `corpus(pool, carrier, h, corpus_seed)`. Các tham
+số sau **cũng quyết định ô đỏ** mà chưa được ghim, nên **md5 sẽ đổi** — và đổi là
+đúng:
+
+* `natural` (một mình nó dịch ô 0,8805 → 0,9226),
+* `per_event`, `holdout`,
+* `n_events` của **cả hai** pha (sàng 80 / chứng nhận 900),
+* **tiêu chí PHA SÀNG** — thứ thực sự quyết định ô đỏ, trong khi bản ghi cũ chỉ
+  ghim tiêu chí pha chứng nhận (`mean_ci95_upper_over_split_seeds`),
+* lưới $\varepsilon$ và tập $\Delta$ mà tiêu chí sàng đọc trên đó,
+* **tên đặc trưng `topic` đang dùng** (`topic_feature`), để việc đổi đặc trưng là
+  một sửa đổi **thấy được** của digest,
+* quy tắc độ dài payload **kèm ngoại lệ** của nó (phán quyết 3).
+
+### 0bis.6 Sẽ đo gì, bằng lệnh nào — khai trước
+
+1. Bảng **bốn đặc trưng** × {Δ=0,2,4} ở ε=0, pha sàng (80 sự kiện, trung vị điểm
+   trên 20 split) **và** pha chứng nhận (900 sự kiện, cận trên CI trung bình) cho
+   đặc trưng được chọn.
+2. Toàn bộ lưới sàng ε × Δ cho đặc trưng được chọn, để phát biểu lại ô đỏ
+   (phán quyết 6): **hàng ε nào đỏ, và đặc trưng nào gánh hàng đó** — đo bằng
+   trung hoà từng cột một.
+3. Ba cổng: `python3 tests/run_all.py`.
+
+Trần 0,56 **không** bị đụng. Tiêu chí **không** bị đụng. Nếu sau khi khử thiên
+lệch ô vẫn đỏ, **để đỏ** và gọi tên đặc trưng gánh nó.
 
 ---
 
