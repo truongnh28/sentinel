@@ -286,7 +286,12 @@ def rescore(traces: list, det, pol) -> ReplayResult:
                     if marker_t:
                         detected_at = detected_at if detected_at is not None else tr.t
                         marker_t = False             # stopped before the merge
-                    else:
+                    elif tr.public_ok:
+                        # Same construct as runner.py: only a patch that WOULD
+                        # HAVE BEEN ACCEPTED can be lost to a false alarm.  The
+                        # trace records `public_ok`, so replay can apply the test
+                        # the runner applies -- and MUST, or rescoring one cell
+                        # from another cell's trace disagrees with running it.
                         t_lost += 1
 
         if tr.is_sigma:

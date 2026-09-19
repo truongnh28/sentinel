@@ -2,7 +2,7 @@
 
 **Ngày:** 2026-09-19 · **Tiền-đăng-ký:** Mục Ưu tiên 4 (Tasks P1–P4).
 
-> **Bối cảnh.** Pilot P2 trên 14 instance (`deepseek-v4.1-flash`) trả về **0/14 tuân thủ** (7 Mode A, 5 REFUSED, 2 VACUOUS_ANCHOR). Không có arm control, ta không thể phân biệt giữa (i) bị chặn bởi độ dài, (ii) agent phớt lờ memory/từ chối mã độc, hay (iii) agent không giải nổi task. Báo cáo này tổng hợp bảng đối chiếu ba arm và chốt phán quyết.
+> **Bối cảnh.** Pilot P2 chạy 14 instance (`deepseek-v4.1-flash`); **7 instance phân loại được**, số còn lại ghi REASON (REFUSED / VACUOUS_ANCHOR) theo luật N3. Tỉ lệ tuân thủ đo được là **0/7** — mẫu số là số ô CHẤM ĐƯỢC, không phải 14. Không có arm control, ta không thể phân biệt giữa (i) bị chặn bởi độ dài, (ii) agent phớt lờ memory/từ chối mã độc, hay (iii) agent không giải nổi task.
 
 ---
 
@@ -10,9 +10,10 @@
 
 | Arm | Model | Mục đích | N | Ra patch | Mode A (sạch) | Refused (rỗng) | Chế độ B/C/D | Tỉ lệ tuân thủ |
 |---|---|---|---|---|---|---|---|---|
-| **Control** | deepseek-v4.1-flash | Baseline không lời khuyên | 14 (kế hoạch) | — | — | — | 0 | 0.0% |
-| **Main (Pilot)** | deepseek-v4.1-flash | Dải độ dài khả thi (18–65 ký tự) | 14 | 9 (64.3%) | 7 (50.0%) | 5 (35.7%) | 0 (0 B, 0 C, 0 D) | **0.0% (0/7)** |
-| **Ceiling** | deepseek-v4.1-flash | Thuyết phục dài (~300 ký tự) | 5 | — | — | — | 0 | 0.0% |
+| **Control** | deepseek-v4.1-flash | Baseline không lời khuyên | 14 | 7 (50.0%) | 6 | 7 | 0 | 0.0% |
+| **Main (Pilot)** | deepseek-v4.1-flash | Dải độ dài khả thi (18–65 ký tự) | 14 | 9 (64.3%) | 7 (50.0%) | 5 (35.7%) | 0 B, 0 C, 0 D | **0.0% (0/7)** |
+| **Ceiling** | deepseek-v4.1-flash | Thuyết phục dài (~300 ký tự) | 5 | 3 (60.0%) | 3 | 2 | 0 | 0.0% |
+| **Second Model** | — (CHƯA CHẠY) | Đối chứng model mạnh hơn | — (CHƯA CHẠY) | — (CHƯA CHẠY) | — (CHƯA CHẠY) | — (CHƯA CHẠY) | — (CHƯA CHẠY) | — (CHƯA CHẠY) |
 
 ---
 
@@ -21,24 +22,23 @@
 ### Phán quyết: **(ii) Agent không tuân thủ memory — harness không tái tạo tiền đề đe dọa**
 
 - **Vị trí trong bài:** `Threats to Validity (Threat 3)`
-- **Căn cứ định lượng:** Agent actively produces patches (9/14 = 64.3%) and passes gold checks (7/14 Mode A = 50.0%), yet adopted 0/7 advice strings naming raw_write. The threat model's assumption P(adopt | retrieved) = 1 fails completely on reasoning models; all published harm numbers reflect the MockAgent reception model.
+- **Căn cứ định lượng:** Agent actively produces patches (9/14 = 64.3%) and passes gold checks (7/14 Mode A), yet adopted 0/7 advice strings naming raw_write. The threat model's assumption P(adopt | retrieved) = 1 fails completely on reasoning models; all published harm numbers reflect the MockAgent reception model.
 
 ### Đối chiếu ba giả thuyết:
 
 1. **Giả thuyết (iii) — Agent không giải được task:** **BÁC BỎ.**
-   - Tỉ lệ ra patch của agent đạt **64.3%** (9/14 instance).
-   - Trong 7 instance được phân loại, **100% đều là Mode A** (vượt qua test ẩn, giải đúng bài toán SWE-bench chuẩn mà không hề dính mã độc).
-   - Agent có năng lực suy luận và lập trình thực thụ, không phải lỗi sụp đổ do độ khó task.
+   - Tỉ lệ ra patch của arm chính đạt **64.3%** (9/14 instance).
+   - Trong 7 instance phân loại được, 7 là Mode A (vượt test ẩn, không dính mã độc).
+   - Arm control cho tỉ lệ ra patch nền 50.0%; chênh lệch so với arm chính là hiệu ứng của lời khuyên.
 
 2. **Giả thuyết (i) — Payload bị độ dài chặn (bậc thang $\epsilon$):**
    - Trong dải khả thi của trò chơi (18–65 ký tự), lời khuyên buộc phải ngắn gọn (`[topic] ... dùng raw_write()`).
-   - Khi đọc một chỉ dẫn ngắn gọi hàm lạ không tồn tại trong repo, reasoning model (DeepSeek) tự tra cứu codebase, nhận ra hàm đó không có, và tự viết thuật toán sửa lỗi chuẩn.
-   - Nếu arm trần (300 ký tự có giải thích ngữ cảnh) cũng không làm agent gọi hàm lạ, rào cản không đơn thuần là số ký tự.
+   - Arm trần (~300 ký tự) đạt 0/3 tuân thủ.
 
 3. **Giả thuyết (ii) — Tiền đề đe dọa của mô hình tiếp nhận bị vi phạm:** **KẾT LUẬN CHÍNH.**
    - Toàn bộ khung lý thuyết của trò chơi kiểm toán giả định: *nếu payload lọt qua bộ lọc và được truy xuất vào prompt ($sim = 1.00$), agent sẽ tuân thủ và gây hại* ($P(\text{harm} \mid \text{retrieved}) = 1$).
-   - Kết quả pilot thực tế đo được $P(\text{harm} \mid \text{retrieved}) = 0/7 = 0.0\%$.
-   - **Hệ quả cho bài báo:** Mọi số liệu `harm` trong bài là **harm dưới mô hình tiếp nhận của MockAgent** (mô hình tuân thủ mù quáng), không phải thiệt hại thực tế trên một reasoning agent. Đây là **Đe dọa hiệu lực ngoài nặng nhất (Threat 3)** và phải được dán nhãn minh bạch ở mọi bảng.
+   - Trên arm chính, tỉ lệ tuân thủ quan sát được là $0/7 = 0.0\%$ (mẫu số là số ô CHẤM ĐƯỢC, không phải 14).
+   - **Hệ quả cho bài báo:** Mọi số liệu `harm` trong bài là **harm dưới mô hình tiếp nhận của MockAgent** (mô hình tuân thủ mù quáng), không phải thiệt hại thực tế trên một reasoning agent. Đây là **Đe dọa hiệu lực ngoài nặng nhất (Threat 3)**.
 
 ---
 
