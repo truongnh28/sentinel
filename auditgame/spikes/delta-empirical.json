@@ -1,0 +1,277 @@
+{
+  "stats": {
+    "count": 29,
+    "min": 0,
+    "p25": 1,
+    "median_p50": 3,
+    "p75": 10,
+    "p90": 23.2,
+    "max": 26,
+    "mean": 6.9655172413793105
+  },
+  "distribution": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    4,
+    5,
+    7,
+    10,
+    11,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26
+  ],
+  "traces": [
+    {
+      "state_hash": "2d1130c",
+      "state_subject": "reorg: merge small Notion-import batches (Golang/PTO notes, Qualgo, OS-duplicate archive, orphaned-attachments)",
+      "code_hash": "ff85f1d",
+      "code_subject": "add tracing concept",
+      "delta": 26,
+      "same_commit": false
+    },
+    {
+      "state_hash": "b9608c0",
+      "state_subject": "Add design doc for Notion-Import consolidation across vault",
+      "code_hash": "b030677",
+      "code_subject": "feat(hcmut): add master's proposal research workspace",
+      "delta": 25,
+      "same_commit": false
+    },
+    {
+      "state_hash": "6e5b121",
+      "state_subject": "Fix design doc per review: file-level OS-Duplicate resolution, corrected Zalopay names, exact counts, broader CSV rule, risk-based ordering",
+      "code_hash": "b030677",
+      "code_subject": "feat(hcmut): add master's proposal research workspace",
+      "delta": 24,
+      "same_commit": false
+    },
+    {
+      "state_hash": "10fd00d",
+      "state_subject": "Correct design doc: vault uses markdown relative-path links, not primarily wikilinks",
+      "code_hash": "b030677",
+      "code_subject": "feat(hcmut): add master's proposal research workspace",
+      "delta": 23,
+      "same_commit": false
+    },
+    {
+      "state_hash": "32aea6f",
+      "state_subject": "Add implementation plan for Notion-Import consolidation across vault",
+      "code_hash": "b030677",
+      "code_subject": "feat(hcmut): add master's proposal research workspace",
+      "delta": 22,
+      "same_commit": false
+    },
+    {
+      "state_hash": "d19350a",
+      "state_subject": "Add image-renaming rule and concrete renames for all identified generic-named images",
+      "code_hash": "b030677",
+      "code_subject": "feat(hcmut): add master's proposal research workspace",
+      "delta": 21,
+      "same_commit": false
+    },
+    {
+      "state_hash": "84a543d",
+      "state_subject": "Add design doc for UAV/drone topic: notes structure + first PID quadrotor simulation",
+      "code_hash": "b030677",
+      "code_subject": "feat(hcmut): add master's proposal research workspace",
+      "delta": 11,
+      "same_commit": false
+    },
+    {
+      "state_hash": "d6cc35b",
+      "state_subject": "Revise UAV/drone design: 3D component-decomposition hub (PGSimCity-style) replacing 2D-only plan, add shared physics/math layer for future aerodynamic models",
+      "code_hash": "b030677",
+      "code_subject": "feat(hcmut): add master's proposal research workspace",
+      "delta": 10,
+      "same_commit": false
+    },
+    {
+      "state_hash": "9488cd1",
+      "state_subject": "Add UAV Component Explorer: 3D hub + PID/aerodynamics deep dives, update simulation submodule pointer",
+      "code_hash": "b030677",
+      "code_subject": "feat(hcmut): add master's proposal research workspace",
+      "delta": 7,
+      "same_commit": false
+    },
+    {
+      "state_hash": "2cc70dd",
+      "state_subject": "docs: move every PLAN-*.md into eval/ and repair the cross-references",
+      "code_hash": "5438051",
+      "code_subject": "feat(tools): audit_plan.py -- make the three review misses impossible to repeat",
+      "delta": 5,
+      "same_commit": false
+    },
+    {
+      "state_hash": "da98bfd",
+      "state_subject": "docs: merge the three plan documents into one readable eval/PLAN.md",
+      "code_hash": "5438051",
+      "code_subject": "feat(tools): audit_plan.py -- make the three review misses impossible to repeat",
+      "delta": 4,
+      "same_commit": false
+    },
+    {
+      "state_hash": "8ac7b43",
+      "state_subject": "docs: turn the merged plan's leftover file references into section pointers",
+      "code_hash": "5438051",
+      "code_subject": "feat(tools): audit_plan.py -- make the three review misses impossible to repeat",
+      "delta": 3,
+      "same_commit": false
+    },
+    {
+      "state_hash": "91bb719",
+      "state_subject": "docs(plan): fix four execution blockers and resync the status layer",
+      "code_hash": "5438051",
+      "code_subject": "feat(tools): audit_plan.py -- make the three review misses impossible to repeat",
+      "delta": 2,
+      "same_commit": false
+    },
+    {
+      "state_hash": "1af5d48",
+      "state_subject": "docs(plan): fix a half-dead -k and give Task 22's provenance test something to assert",
+      "code_hash": "5438051",
+      "code_subject": "feat(tools): audit_plan.py -- make the three review misses impossible to repeat",
+      "delta": 1,
+      "same_commit": false
+    },
+    {
+      "state_hash": "5438051",
+      "state_subject": "feat(tools): audit_plan.py -- make the three review misses impossible to repeat",
+      "code_hash": "5438051",
+      "code_subject": "feat(tools): audit_plan.py -- make the three review misses impossible to repeat",
+      "delta": 0,
+      "same_commit": true
+    },
+    {
+      "state_hash": "2f9cfb4",
+      "state_subject": "docs(plan): reword the audit note so the tool stops catching its own documentation",
+      "code_hash": "302e998",
+      "code_subject": "docs(plan): fold the six advisor answers into the tasks, and re-route the critical path",
+      "delta": 3,
+      "same_commit": false
+    },
+    {
+      "state_hash": "302e998",
+      "state_subject": "docs(plan): fold the six advisor answers into the tasks, and re-route the critical path",
+      "code_hash": "302e998",
+      "code_subject": "docs(plan): fold the six advisor answers into the tasks, and re-route the critical path",
+      "delta": 0,
+      "same_commit": true
+    },
+    {
+      "state_hash": "7c0b7e2",
+      "state_subject": "docs(plan): gia c\u1ed1 hai \u0111i\u1ec3m sau \u0111\u00e1p \u00e1n c\u00e2u 2 \u2014 c\u1ed5ng \u03ba ch\u1ec9 nh\u1eadn s\u1ed1 \u0111o th\u1eadt, Task 25 t\u00e1ch 25a/25b",
+      "code_hash": "14a0fd9",
+      "code_subject": "feat(a1): add SWE-bench metadata fetch script, stop tracking data JSONL",
+      "delta": 3,
+      "same_commit": false
+    },
+    {
+      "state_hash": "510557e",
+      "state_subject": "docs(plan): I.7b \u2014 c\u1ed5ng ch\u1ea1y-th\u1eed theo \u0111\u1ee3t: xong \u0111\u1ee3t n\u00e0o ph\u1ea3i ch\u1ea1y \u0111\u01b0\u1ee3c li\u1ec1n \u0111\u1ee3t \u0111\u00f3",
+      "code_hash": "14a0fd9",
+      "code_subject": "feat(a1): add SWE-bench metadata fetch script, stop tracking data JSONL",
+      "delta": 2,
+      "same_commit": false
+    },
+    {
+      "state_hash": "1630164",
+      "state_subject": "docs(plan): b\u01b0\u1edbc 3.6b \u2014 M\u1ed8T l\u1ec7nh ch\u1ea1y full benchmark tr\u00ean metadata th\u1eadt, l\u00e0m c\u1ed5ng ch\u00ednh \u0110\u1ee3t 1",
+      "code_hash": "14a0fd9",
+      "code_subject": "feat(a1): add SWE-bench metadata fetch script, stop tracking data JSONL",
+      "delta": 1,
+      "same_commit": false
+    },
+    {
+      "state_hash": "be7d956",
+      "state_subject": "fix(lang): rename Vietnamese identifiers, widen audit_plan's checker",
+      "code_hash": "be7d956",
+      "code_subject": "fix(lang): rename Vietnamese identifiers, widen audit_plan's checker",
+      "delta": 0,
+      "same_commit": true
+    },
+    {
+      "state_hash": "695fcd4",
+      "state_subject": "docs(plan): reconcile PLAN.md with the graded-retrieval theta wiring",
+      "code_hash": "97364d0",
+      "code_subject": "feat(B8): four-line results table with per-workflow bootstrap CI and a config-hash lock cell",
+      "delta": 1,
+      "same_commit": false
+    },
+    {
+      "state_hash": "9455d61",
+      "state_subject": "docs(spec): name the provenance residual where Task 16 is built",
+      "code_hash": "66103f2",
+      "code_subject": "fix(attacks): size the matched payload from the real task, not a mock constant",
+      "delta": 1,
+      "same_commit": false
+    },
+    {
+      "state_hash": "1e6568b",
+      "state_subject": "docs: the plan for what is left, and the P2 pilot it is planned around",
+      "code_hash": "1e6568b",
+      "code_subject": "docs: the plan for what is left, and the P2 pilot it is planned around",
+      "delta": 0,
+      "same_commit": true
+    },
+    {
+      "state_hash": "f7cea7b",
+      "state_subject": "docs(plan): re-cut around frame B, which the plan's own status page already said",
+      "code_hash": "3da9363",
+      "code_subject": "fix(gate2): score the corpus through the same payload path the game injects",
+      "delta": 3,
+      "same_commit": false
+    },
+    {
+      "state_hash": "027b7fe",
+      "state_subject": "docs(plan): D depends on A2, and the seed does mix into detector noise",
+      "code_hash": "3da9363",
+      "code_subject": "fix(gate2): score the corpus through the same payload path the game injects",
+      "delta": 2,
+      "same_commit": false
+    },
+    {
+      "state_hash": "a65058f",
+      "state_subject": "docs(plan): mark completed priorities A, D, P, C, B in plan",
+      "code_hash": "2a067de",
+      "code_subject": "docs(spikes): add comprehensive technical report and operational user guide",
+      "delta": 1,
+      "same_commit": false
+    },
+    {
+      "state_hash": "f692b0f",
+      "state_subject": "docs(p2): freeze OpenCode HTTP retry policy",
+      "code_hash": "1868182",
+      "code_subject": "fix(p2): harden control arm transport and retry 5xx",
+      "delta": 1,
+      "same_commit": false
+    },
+    {
+      "state_hash": "1868182",
+      "state_subject": "fix(p2): harden control arm transport and retry 5xx",
+      "code_hash": "1868182",
+      "code_subject": "fix(p2): harden control arm transport and retry 5xx",
+      "delta": 0,
+      "same_commit": true
+    }
+  ]
+}
