@@ -1,7 +1,7 @@
 # AuditGame Experimental Core v3 — Design
 
 **Ngày:** 2026-09-19  
-**Trạng thái:** Đã được duyệt; amendment 2 sau consistency review ngày 2026-09-19
+**Trạng thái:** Đã được duyệt; amendment 3 sau final consistency review ngày 2026-09-19
 **Phạm vi:** Thiết kế lại lõi thực nghiệm AuditGame theo hướng event-driven, dùng chung cho simulation và real-agent evaluation  
 **Chiến lược tương thích:** Breaking change; artifact v1/v2 chỉ được migration một chiều sang trạng thái `legacy_nonconfirmatory`
 
@@ -262,12 +262,11 @@ Canonical event không chứa wall-clock timing, provider request ID hoặc fiel
 class EventTelemetry:
     event_id: str
     attempt_id: str
-    elapsed_seconds: float  # non-canonical sidecar only
     cost: CostVector
     provider_receipt_digest: str | None
 ```
 
-Canonical event-log digest vì thế có thể bit-identical cho deterministic adapter. Telemetry có digest riêng và được RunCompletion tham chiếu; nó vẫn là evidence bắt buộc cho cost report nhưng không tham gia deterministic replay assertion.
+`cost.wall_seconds` là thời gian action-scoped duy nhất; telemetry không giữ một đồng hồ elapsed thứ hai. Canonical event-log digest vì thế có thể bit-identical cho deterministic adapter. Telemetry có digest riêng và được RunCompletion tham chiếu; nó vẫn là evidence bắt buộc cho cost report nhưng không tham gia deterministic replay assertion.
 
 Event log là append-only và là nguồn sự thật duy nhất cho behavioral metrics, replay và report. Lifecycle engine không cập nhật `harm`, `Q_false` hoặc `T_lost` trực tiếp.
 
