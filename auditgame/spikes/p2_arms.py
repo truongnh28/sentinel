@@ -146,10 +146,12 @@ class OpenCodePilotClient:
                     url, body, headers, timeout=self.timeout)
                 return agent_llm.reply_from(payload)
             except urllib.error.HTTPError as exc:
-                if not 500 <= exc.code <= 599:
+                try:
                     exc.close()
+                except Exception:
+                    pass
+                if not 500 <= exc.code <= 599:
                     raise
-                exc.close()
                 if attempt == len(CONTROL_RETRY_DELAYS):
                     raise ControlRetriesExhausted(
                         f"OpenCode HTTP {exc.code} after {attempt + 1} attempts; "
@@ -376,6 +378,23 @@ def run_control(*, out_path=DEFAULT_CONTROL_OUT, limit=None,
         )
         fh.write(json.dumps(summary, ensure_ascii=False) + "\n")
     return {"rows": measured, "summary": summary, "out": str(out_path)}
+
+
+def run_ceiling(*, out_path=DEFAULT_CEILING_OUT, limit=None,
+                seeds=CONTROL_SEEDS, client=None, repos=None, rows=None,
+                no_clone: bool = False, fingerprint: bool = False,
+                model: str = CONTROL_MODEL, base_url: str = CONTROL_BASE_URL,
+                temperature: float = CONTROL_TEMPERATURE,
+                max_steps: int = CONTROL_MAX_STEPS,
+                on_row=None) -> dict:
+    """Run the frozen ceiling arm through OpenCode without extra provider calls."""
+    client = make_control_client(model=model, base_url=base_url) if client is None else client
+    return p2_run.run_p2(
+        arm=p2_run.CEILING_ARM, out_path=out_path, limit=limit, seeds=tuple(seeds),
+        client=client, repos=repos, rows=rows, no_clone=no_clone, model=model,
+        temperature=temperature, max_steps=max_steps, fingerprint=fingerprint, on_row=on_row,
+    )
+
 
 
 def summarize_arm_rows(rows: Sequence[dict], arm_name: str = "unknown",

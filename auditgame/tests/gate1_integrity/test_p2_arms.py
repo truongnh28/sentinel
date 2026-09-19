@@ -1,6 +1,7 @@
 """
 test_p2_arms.py -- Gate 1 tests for P2 three-arm coordination and readout logic.
 """
+import io
 import json
 import pathlib
 import tempfile
@@ -384,7 +385,7 @@ class TestControlArmRunner(unittest.TestCase):
             code,
             "test failure",
             hdrs=None,
-            fp=None,
+            fp=io.BytesIO(),
         )
 
     def test_retries_5xx_then_returns_success(self):
@@ -462,6 +463,27 @@ class TestControlArmRunner(unittest.TestCase):
         self.assertEqual(code, 2)
         run.assert_not_called()
         self.assertIn("paid", self.out.read_text(encoding="utf-8"))
+
+    def test_run_ceiling_delegates_to_frozen_arm_with_injected_client(self):
+        client = object()
+        captured = {}
+
+        def fake_run_p2(**kwargs):
+            captured.update(kwargs)
+            return {"rows": [], "summary": {}, "out": str(self.out)}
+
+        with mock.patch.object(p2_arms.p2_run, "run_p2", fake_run_p2):
+            p2_arms.run_ceiling(out_path=self.out, limit=1, seeds=(20260917,),
+                                client=client, repos=object(), rows={}, no_clone=True)
+
+        self.assertIs(captured["arm"], p2_arms.p2_run.CEILING_ARM)
+        self.assertIs(captured["client"], client)
+        self.assertEqual(captured["seeds"], (20260917,))
+        self.assertEqual(captured["model"], p2_arms.CONTROL_MODEL)
+        self.assertEqual(captured["temperature"], p2_arms.CONTROL_TEMPERATURE)
+        self.assertEqual(captured["max_steps"], p2_arms.CONTROL_MAX_STEPS)
+        self.assertFalse(captured["fingerprint"])
+
 
 
 if __name__ == "__main__":
