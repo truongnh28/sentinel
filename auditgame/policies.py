@@ -305,6 +305,41 @@ class QuarantineEverything(Policy):
         return QUARANTINE_ALL if self.can(cost_of(QUARANTINE_ALL)) else None
 
 
+class MinimaxLP(Policy):
+    """B7 -- exact Stackelberg Minimax LP policy (Conitzer & Sandholm 2006).
+
+    Precomputes optimal marginal audit coverages u[k, t] and v[t] via simplex LP,
+    then samples randomized audit actions within the remaining hard budget.
+    """
+    ACTIONS = frozenset(CARRIERS) | {"commit"}
+    READS_SCORES = False
+    RANDOMIZED = True
+
+    def __init__(self, name: str, budget: float, rng_seed: int = 0,
+                 setting: str = "mid", update_rule: str = "ratio", h: int = 8):
+        super().__init__(name=name, budget=budget, rng_seed=rng_seed,
+                         setting=setting, update_rule=update_rule)
+        import lp
+        carriers_ordered = list(CARRIERS)
+        kap = [KAPPA[c] for c in carriers_ordered]
+        self._carriers = carriers_ordered
+        self.u, self.v, self.m = lp.solve_stackelberg_lp(
+            K=len(self._carriers), H=h, B=budget, kap=kap, kc=KAPPA_COMMIT, deltas=(0, 2, 4)
+        )
+
+    def choose(self, t: int, retrieved_carriers: list, signals: dict) -> str | None:
+        if t >= len(self.v):
+            return None
+        rng = random.Random(seed_of(self.rng_seed, t, "minimax_lp"))
+        if self.v[t] > 1e-6 and rng.random() < self.v[t] and self.can(KAPPA_COMMIT):
+            return "commit"
+        for i, c in enumerate(self._carriers):
+            prob = self.u[i][t]
+            if prob > 1e-6 and rng.random() < prob and self.can(KAPPA[c]):
+                return c
+        return None
+
+
 REGISTRY = {
     "B1 audit-at-commit": AuditAtCommit,
     "B2 uniform random":  UniformRandom,
@@ -312,6 +347,7 @@ REGISTRY = {
     "B4 audit-on-retrieval": AuditOnRetrieval,
     "B5 risk-score":      RiskScore,
     "B6 two-stage":       TwoStage,
+    "B7 minimax-lp":      MinimaxLP,
     "Sentinel":           Sentinel,
     "C4 blind sentinel":         BlindSentinel,
     "C8 deterministic sentinel": DeterministicSentinel,
