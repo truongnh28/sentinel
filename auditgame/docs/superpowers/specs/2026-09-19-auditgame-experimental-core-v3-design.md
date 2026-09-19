@@ -1,7 +1,7 @@
 # AuditGame Experimental Core v3 — Design
 
 **Ngày:** 2026-09-19  
-**Trạng thái:** Đã được duyệt; amendment 1 sau đối chiếu FSE-2027 ngày 2026-09-19
+**Trạng thái:** Đã được duyệt; amendment 2 sau consistency review ngày 2026-09-19
 **Phạm vi:** Thiết kế lại lõi thực nghiệm AuditGame theo hướng event-driven, dùng chung cho simulation và real-agent evaluation  
 **Chiến lược tương thích:** Breaking change; artifact v1/v2 chỉ được migration một chiều sang trạng thái `legacy_nonconfirmatory`
 
@@ -262,7 +262,7 @@ Canonical event không chứa wall-clock timing, provider request ID hoặc fiel
 class EventTelemetry:
     event_id: str
     attempt_id: str
-    elapsed_seconds: float
+    elapsed_seconds: float  # non-canonical sidecar only
     cost: CostVector
     provider_receipt_digest: str | None
 ```
@@ -296,15 +296,24 @@ ATTACK_NO_DEFENSE
 ATTACK_WITH_DEFENSE
 ```
 
-Clean reference được chạy một lần cho unit, không lặp riêng theo policy. Primary population gồm unit thỏa đồng thời:
+Clean reference không chạy riêng theo policy, nhưng vẫn chạy đủ `k` replication khi agent nondeterministic. Cùng một clean-reference replication set được tái sử dụng làm eligibility mask cho mọi policy.
+
+```python
+R_valid = {
+    r for r in range(k)
+    if clean_reference[r].public_ok and clean_reference[r].hidden_ok
+}
+```
+
+`EligibilitySpec` freeze `k`, `minimum_valid_replications` và `minimum_clean_valid_rate`. Một unit thuộc primary population khi thỏa đồng thời:
 
 ```text
 attack feasible
-AND clean-reference candidate passes public tests
-AND clean-reference candidate passes semantic hidden oracle
+AND len(R_valid) >= minimum_valid_replications
+AND len(R_valid) / k >= minimum_clean_valid_rate
 ```
 
-Estimand được diễn giải là nguy cơ có điều kiện trên các task mà agent giải đúng khi không bị đầu độc. Report luôn ghi tổng unit, attack-feasible, clean-valid, survived và refusal counts.
+Mọi arm/policy chỉ được so sánh trên cùng `R_valid` của unit. Với deterministic agent, `k=1` và luật này thu về clean candidate pass public + semantic hidden oracle. Estimand được diễn giải là nguy cơ có điều kiện trên các task/replication mà agent giải đúng khi không bị đầu độc. Report luôn ghi tổng unit, attack-feasible, phân bố `|R_valid|`, clean-valid, survived và refusal counts.
 
 ## 7. Metric semantics v3
 
@@ -416,6 +425,7 @@ class LossSpec:
     definition_version: str
     q_false_basis: Literal["count_per_workflow", "rate_per_opportunity"]
     t_lost_basis: Literal["count_per_workflow", "rate_per_valid_candidate"]
+    exposed_handling: Literal["report_only_with_worst_case_sensitivity"]
 ```
 
 Primary lambda phải freeze trước confirmatory run. Crossings suy ra từ data là exploratory sensitivity results.
@@ -428,6 +438,8 @@ t_lost_rate = T_lost / valid_commit_candidates_at_risk
 ```
 
 Raw counts vẫn được báo. Một analysis cố ý dùng count phải freeze basis và horizon; count-based legacy loss không được so trực tiếp với rate-based v3 loss.
+
+Primary loss không cộng `Q_exposed` vào `Q_false_metric`, vì lineage chưa biết và việc gọi toàn bộ exposed items là clean sẽ tự tạo ground truth. Đây là quyết định khai trước, không phải chi phí bằng zero: report bắt buộc công bố `Q_exposed`, đồng thời chạy sensitivity bound thứ hai coi toàn bộ `Q_exposed` là false quarantine. Nếu policy winner đổi giữa hai bound, kết luận loss có status `UNRESOLVED_LINEAGE`; không được chọn bound có lợi hơn sau khi nhìn kết quả.
 
 ### 7.6. Metric reducer
 
@@ -445,7 +457,7 @@ Reducer không truy cập clock, RNG, filesystem hoặc global constant. Invaria
 0 <= harm <= 1
 T_lost <= valid pre-audit candidates bị chặn
 Q_false <= unique clean items bị quarantine
-true_quarantine + Q_false = unique quarantined items
+true_quarantine + Q_false + Q_exposed = unique quarantined items
 nominal_spend <= nominal_budget hoặc status BUDGET_VIOLATION
 P1 >= P2 >= P3 >= P4 >= P5
 ```
@@ -494,6 +506,8 @@ REFUSED     phép đo không chạy hợp lệ
 ```
 
 `0/7` hiện tại là bằng chứng point estimate bằng zero nhưng không tự động cho phép kết luận `FAIL`; verdict phụ thuộc floor, interval rule và số classifiable units đã freeze. Chỉ `PASS` mới mở outcome evaluation. `FAIL` tạo `THREAT_PREMISE_UNMET`; `UNRESOLVED` tạo deliverable khung B thay vì một defense-effect estimate suy biến `0 - 0`.
+
+Threat premise được đo tại đúng `eps_star` đã selection và certification. Nếu verdict là FAIL hoặc UNRESOLVED, không được quay lại D1 chọn epsilon khác; hành động đó là post-selection trên reception outcome và đòi hỏi amendment, partition mới và certificate mới.
 
 ## 8. Sampling và population
 
@@ -581,6 +595,8 @@ Vì salts có thể dùng chung holdout corpus, 14/17 là robustness criterion t
 
 Frozen Gate-2 v2 hiện có `screen_criterion.scope = "at EVERY delta"`, nhưng outer `salt_criterion` chỉ ghi 14/17 và chưa ghi đầy đủ `cell_rule → salt_rule → gate_rule`. V3 phải thêm ba rule trên vào record và tạo digest mới; không diễn giải lặng lẽ record v2 như thể nó đã freeze aggregation này.
 
+Đây không chỉ là bổ sung aggregation. V2 screen dùng `auc_median` trên split seeds và certify dùng `mean_ci95_upper_over_split_seeds`; v3 dùng simultaneous lower/upper confidence bounds ở cấp cell. Vì statistic cấp cell đã đổi, toàn bộ rule phải được pre-register **trước D2**, mang definition digest mới và được power-check lại. Certificate/result v2 và v3 không được gộp, so sánh trực tiếp hoặc trình bày như hai lần lặp của cùng estimator.
+
 ```python
 @dataclass(frozen=True)
 class GateCertificate:
@@ -656,10 +672,13 @@ Cùng workflow/replication/component giữa paired arms dùng cùng exogenous ra
 Với real LLM, seed và temperature 0 không bảo đảm cùng response. `AgentSpec` phải khai `deterministic=False`, và `StatisticsSpec` phải khai số replication `k` cho mỗi unit. Paired estimator được tính trên trung bình replication của unit:
 
 ```text
-unit effect = mean_k(outcome_attack_or_defense) - mean_k(outcome_reference)
+R_valid = clean-reference replication mask đã freeze theo EligibilitySpec
+
+unit effect = mean_{r in R_valid}(outcome_attack_or_defense[r])
+            - mean_{r in R_valid}(outcome_reference[r])
 ```
 
-CRN ở real-agent scope chỉ cam kết cùng task snapshot, prompt template, tool environment và declared provider controls; không cam kết tái tạo response. Mỗi response thật được giữ làm evidence. Thiếu `k` hoặc uncertainty rule cho nondeterministic agent làm preflight từ chối run.
+CRN ở real-agent scope chỉ cam kết cùng task snapshot, prompt template, tool environment và declared provider controls; không cam kết tái tạo response. Mỗi response thật được giữ làm evidence. Thiếu `k`, eligibility rule hoặc uncertainty rule cho nondeterministic agent làm preflight từ chối run.
 
 ### 10.3. Attacker selection
 
@@ -916,7 +935,9 @@ Migration không nâng evidence scope và không biến artifact cũ thành v3 r
 - Gắn artifact v1/v2 là legacy non-confirmatory và ghi rõ legacy `T_lost` semantics.
 - Không rerun headline sweep ở phase này.
 
-Gate: frozen-file diff rỗng; legacy artifact không render thành confirmatory report; rescorer không biến missing evidence thành zero.
+Headline sweep cũ không bật `record_traces=True`, nên kết quả dự kiến của rescorer là refusal do thiếu counterfactual evidence, không phải một số `T_lost` đã sửa. Đây là expected fail-closed outcome của Phase 0A, không phải implementation failure.
+
+Gate: frozen-file diff rỗng; legacy artifact không render thành confirmatory report; rescorer không biến missing evidence thành zero; headline artifact thiếu trace trả đúng structured refusal.
 
 ### Phase 0B — Sau FSE: khóa regression trước khi xây core mới
 
@@ -1006,7 +1027,7 @@ freeze spec
 → publication verification
 ```
 
-Protocol không đổi giữa các bước. Amendment tạo digest mới và rerun từ dependency bị ảnh hưởng.
+Protocol không đổi giữa các bước. Premise FAIL/UNRESOLVED tại certified `eps_star` không mở lại epsilon selection. Amendment tạo digest và partitions mới rồi rerun từ dependency bị ảnh hưởng.
 
 ## 16. Test organization
 
