@@ -432,7 +432,13 @@ class DeepSeekV4Pro(DeepSeekModel):
     _scope = _deepseek_scope(name, 1.32, 0.044, 3.96, 8_192)
 
 
-REGISTRY: dict = {p.name: p for p in (DeepSeekFlash(), DeepSeekV4Pro())}
+class DeepSeekV41Flash(DeepSeekModel):
+    """The frozen wire model used by OpenCode pilot runs and arms."""
+    name = "deepseek-v4.1-flash"
+    _scope = _deepseek_scope(name, 0.30, 0.006, 1.20, 8_192)
+
+
+REGISTRY: dict = {p.name: p for p in (DeepSeekFlash(), DeepSeekV4Pro(), DeepSeekV41Flash())}
 
 
 # ============================================ NO TABLE MIXES TWO MODELS (L1-L4)
