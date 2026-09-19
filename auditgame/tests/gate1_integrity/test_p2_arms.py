@@ -415,6 +415,28 @@ class TestControlArmRunner(unittest.TestCase):
         self.assertEqual(calls[0], calls[1])
         self.assertEqual(calls[1], calls[2])
 
+    def test_deadline_expiry_retries_then_returns_success(self):
+        """A live socket that never finishes must consume the retry budget."""
+        outcomes = [
+            p2_arms.ControlRequestDeadlineExceeded("600 seconds"),
+            {"choices": [{"message": {"content": "ok"}}]},
+        ]
+        sleeps = []
+
+        def fake_post(*args, **kwargs):
+            outcome = outcomes.pop(0)
+            if isinstance(outcome, Exception):
+                raise outcome
+            return outcome
+
+        client = p2_arms.OpenCodePilotClient(
+            api_key="key", session_id="session", sleep=sleeps.append)
+        with mock.patch.object(p2_arms.agent_llm, "post", fake_post):
+            reply = client.complete([{"role": "user", "content": "hello"}])
+
+        self.assertEqual(reply.text, "ok")
+        self.assertEqual(sleeps, [1])
+
     def test_six_5xx_attempts_exhaust_with_declared_backoff(self):
         calls = []
         sleeps = []

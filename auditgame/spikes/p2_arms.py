@@ -32,9 +32,11 @@ from __future__ import annotations
 
 import argparse
 import collections
+import contextlib
 import datetime
 import json
 import pathlib
+import signal
 import sys
 import time
 import urllib.error
@@ -68,6 +70,7 @@ CONTROL_SEEDS = (20260917,)
 CONTROL_TEMPERATURE = 0.0
 CONTROL_MAX_STEPS = 30
 CONTROL_RETRY_DELAYS = (1, 2, 4, 8, 16)
+CONTROL_HARD_DEADLINE_SECONDS = 600.0
 
 # Exactly the same 14 feasible instances as the main arm.  The excluded SymPy
 # instance stays excluded: adding it only to control would change the population
@@ -106,6 +109,31 @@ class ControlRetriesExhausted(RuntimeError):
     """All pre-registered retries of one transient request were exhausted."""
 
 
+class ControlRequestDeadlineExceeded(TimeoutError):
+    """One OpenCode response did not finish by the hard wall-clock deadline."""
+
+
+@contextlib.contextmanager
+def hard_request_deadline(seconds: float):
+    """Interrupt one main-thread request even when its socket stays live."""
+    previous_handler = signal.getsignal(signal.SIGALRM)
+    previous_timer = signal.setitimer(signal.ITIMER_REAL, 0.0)
+
+    def expired(signum, frame):
+        raise ControlRequestDeadlineExceeded(
+            f"OpenCode response exceeded the {seconds:g}-second hard deadline")
+
+    signal.signal(signal.SIGALRM, expired)
+    signal.setitimer(signal.ITIMER_REAL, seconds)
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0.0)
+        signal.signal(signal.SIGALRM, previous_handler)
+        if previous_timer != (0.0, 0.0):
+            signal.setitimer(signal.ITIMER_REAL, *previous_timer)
+
+
 @dataclass
 class OpenCodePilotClient:
     """The OpenCode wire protocol used by the completed P2 pilot."""
@@ -114,6 +142,7 @@ class OpenCodePilotClient:
     model: str = CONTROL_MODEL
     base_url: str = CONTROL_BASE_URL
     timeout: float = 600.0
+    hard_deadline_seconds: float = CONTROL_HARD_DEADLINE_SECONDS
     name: str = "opencode-pilot"
     sleep: Any = time.sleep
 
@@ -140,24 +169,33 @@ class OpenCodePilotClient:
             # browser; this exact value is live-probed before the run.
             "User-Agent": "auditgame-p2/1.0",
         }
+        last_exc = None
         for attempt in range(1 + len(CONTROL_RETRY_DELAYS)):
             try:
-                payload = agent_llm.post(
-                    url, body, headers, timeout=self.timeout)
+                with hard_request_deadline(self.hard_deadline_seconds):
+                    payload = agent_llm.post(
+                        url, body, headers, timeout=self.timeout)
                 return agent_llm.reply_from(payload)
+            except ControlRequestDeadlineExceeded as exc:
+                last_exc = exc
+                failure = (
+                    f"hard deadline {self.hard_deadline_seconds:g} seconds"
+                )
             except urllib.error.HTTPError as exc:
+                last_exc = exc
                 try:
                     exc.close()
                 except Exception:
                     pass
                 if not 500 <= exc.code <= 599:
                     raise
-                if attempt == len(CONTROL_RETRY_DELAYS):
-                    raise ControlRetriesExhausted(
-                        f"OpenCode HTTP {exc.code} after {attempt + 1} attempts; "
-                        "the initial request and all 5 retries failed"
-                    ) from exc
-                self.sleep(CONTROL_RETRY_DELAYS[attempt])
+                failure = f"HTTP {exc.code}"
+            if attempt == len(CONTROL_RETRY_DELAYS):
+                raise ControlRetriesExhausted(
+                    f"OpenCode {failure} after {attempt + 1} attempts; "
+                    "the initial request and all 5 retries failed"
+                ) from last_exc
+            self.sleep(CONTROL_RETRY_DELAYS[attempt])
 
 
 def make_control_client(*, model: str = CONTROL_MODEL,
