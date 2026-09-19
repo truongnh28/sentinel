@@ -484,6 +484,23 @@ class TestControlArmRunner(unittest.TestCase):
         self.assertEqual(captured["max_steps"], p2_arms.CONTROL_MAX_STEPS)
         self.assertFalse(captured["fingerprint"])
 
+    def test_ceiling_cli_uses_the_frozen_opencode_configuration(self):
+        captured = {}
+        with mock.patch.object(p2_arms, "run_ceiling", side_effect=lambda **kw: captured.update(kw) or {
+            "rows": [], "summary": {"rows": 0, "classified": 0, "refused": 0}, "out": str(self.out)}):
+            self.assertEqual(p2_arms.main(["--run-ceiling", "--ceiling-out", str(self.out)]), 0)
+        self.assertEqual(captured["seeds"], p2_arms.CONTROL_SEEDS)
+        self.assertEqual(captured["model"], p2_arms.CONTROL_MODEL)
+        self.assertEqual(captured["base_url"], p2_arms.CONTROL_BASE_URL)
+        self.assertFalse(captured["fingerprint"])
+
+    def test_ceiling_cli_refuses_to_overwrite_paid_output(self):
+        self.out.write_text('{"instance_id":"paid"}\n', encoding="utf-8")
+        with mock.patch.object(p2_arms, "run_ceiling") as run:
+            self.assertEqual(p2_arms.main(["--run-ceiling", "--ceiling-out", str(self.out)]), 2)
+        run.assert_not_called()
+
+
 
 
 if __name__ == "__main__":

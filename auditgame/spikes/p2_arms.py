@@ -766,15 +766,20 @@ def main(argv=None) -> int:
                          "rendering the comparison report")
     ap.add_argument("--control-out", default=str(DEFAULT_CONTROL_OUT),
                     help="JSONL destination used by --run-control")
+    ap.add_argument("--run-ceiling", action="store_true",
+                    help="execute the frozen ceiling arm through OpenCode instead "
+                         "of rendering the comparison report")
+    ap.add_argument("--ceiling-out", default=str(DEFAULT_CEILING_OUT),
+                    help="JSONL destination used by --run-ceiling")
     ap.add_argument("--limit", type=int, default=None,
-                    help="with --run-control, run only the first N instances")
+                    help="with --run-control or --run-ceiling, run only the first N instances")
     ap.add_argument("--seeds", default=",".join(str(x) for x in CONTROL_SEEDS),
                     help="control replicate labels; defaults to the completed "
                          "main pilot's seed")
     ap.add_argument("--no-clone", action="store_true",
-                    help="with --run-control, reuse checked-out repositories")
+                    help="with --run-control or --run-ceiling, reuse checked-out repositories")
     ap.add_argument("--force", action="store_true",
-                    help="overwrite an existing control output on purpose")
+                    help="overwrite an existing control or ceiling output on purpose")
     ap.add_argument("--pilot", default=str(DEFAULT_PILOT),
                     help="path to p2-pilot.jsonl (main arm)")
     ap.add_argument("--control", default=str(DEFAULT_CONTROL_OUT),
@@ -786,6 +791,38 @@ def main(argv=None) -> int:
     ap.add_argument("--write-spike", action="store_true",
                     help="write the markdown report to disk")
     a = ap.parse_args(argv)
+
+    if a.run_ceiling:
+        try:
+            seeds = tuple(int(x) for x in a.seeds.split(",") if x.strip())
+            if not seeds:
+                raise ValueError("--seeds is empty")
+        except ValueError as e:
+            print(f"REFUSED: --seeds must be integers ({e})", file=sys.stderr)
+            return 2
+        try:
+            p2_run.refuse_to_overwrite(a.ceiling_out, force=a.force)
+            res = run_ceiling(
+                out_path=a.ceiling_out,
+                limit=a.limit,
+                seeds=seeds,
+                no_clone=a.no_clone,
+                model=CONTROL_MODEL,
+                base_url=CONTROL_BASE_URL,
+                temperature=CONTROL_TEMPERATURE,
+                max_steps=CONTROL_MAX_STEPS,
+                fingerprint=False,
+                on_row=p2_run._print_row,
+            )
+        except (p2_run.Refused, agent_llm.MissingAPIKey) as e:
+            print(f"REFUSED: {e}", file=sys.stderr)
+            return 2
+        s = res["summary"]
+        print(
+            f"ceiling: {s['classified']}/{s['rows']} classified; "
+            f"{s['refused']} refused\nrows -> {res['out']}"
+        )
+        return 0
 
     if a.run_control:
         try:
