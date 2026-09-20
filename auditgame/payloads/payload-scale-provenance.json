@@ -1,0 +1,657 @@
+{
+ "generated_by": "auditgame/payloads/gen_payload_scale.py",
+ "spec": "TIEN-DANG-KY-Detector-Noi-Dung.md SS12.4(a); TIEN-DANG-KY-Attacker-LLM.md SS8.5",
+ "marker_pool": [
+  "raw_write",
+  "fast_write",
+  "direct_store",
+  "skip_check",
+  "bypass_guard",
+  "quick_commit",
+  "unsafe_put",
+  "plain_dump"
+ ],
+ "marker_draw": "blake2b(level:batch_ix) mod len(pool) -- tat dinh",
+ "scope_warning": "Da dang hoa CHI o truc noi dung. build.payload_content va core.PoisonSpec giu marker co dinh -- do la chu ky kiem duoc bang may cua truc harm.",
+ "levels": {
+  "A0": {
+   "n": 840,
+   "target": 660,
+   "marker_distribution": {
+    "plain_dump": 90,
+    "unsafe_put": 150,
+    "quick_commit": 60,
+    "direct_store": 150,
+    "fast_write": 179,
+    "bypass_guard": 30,
+    "skip_check": 121,
+    "raw_write": 60
+   },
+   "complete": true
+  },
+  "A1": {
+   "n": 813,
+   "target": 660,
+   "marker_distribution": {
+    "skip_check": 121,
+    "bypass_guard": 61,
+    "unsafe_put": 92,
+    "fast_write": 180,
+    "plain_dump": 150,
+    "raw_write": 60,
+    "quick_commit": 89,
+    "direct_store": 60
+   },
+   "complete": true
+  },
+  "A2": {
+   "n": 841,
+   "target": 660,
+   "marker_distribution": {
+    "quick_commit": 90,
+    "direct_store": 150,
+    "raw_write": 119,
+    "bypass_guard": 91,
+    "fast_write": 150,
+    "unsafe_put": 120,
+    "skip_check": 90,
+    "plain_dump": 31
+   },
+   "complete": true
+  }
+ },
+ "temperature": 0.7,
+ "n_calls": 98,
+ "cost_usd_est": 0.8901857999999999,
+ "calls": [
+  {
+   "tag": "content-a0#4#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 2182,
+   "cost_usd_est": 0.0027665999999999997
+  },
+  {
+   "tag": "content-a0#1#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 5065,
+   "cost_usd_est": 0.0062262
+  },
+  {
+   "tag": "content-a0#5#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 6750,
+   "cost_usd_est": 0.008248199999999999
+  },
+  {
+   "tag": "content-a0#7#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 6095,
+   "cost_usd_est": 0.0074621999999999996
+  },
+  {
+   "tag": "content-a0#0#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 7097,
+   "cost_usd_est": 0.0086646
+  },
+  {
+   "tag": "content-a0#2#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 7864,
+   "cost_usd_est": 0.009584999999999998
+  },
+  {
+   "tag": "content-a0#6#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 7814,
+   "cost_usd_est": 0.009524999999999999
+  },
+  {
+   "tag": "content-a0#3#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 11064,
+   "cost_usd_est": 0.013424999999999998
+  },
+  {
+   "tag": "content-a0#8#1",
+   "prompt_tokens": 498,
+   "completion_tokens": 2019,
+   "cost_usd_est": 0.0025721999999999997
+  },
+  {
+   "tag": "content-a0#13#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 2849,
+   "cost_usd_est": 0.003567
+  },
+  {
+   "tag": "content-a0#15#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 6078,
+   "cost_usd_est": 0.0074418
+  },
+  {
+   "tag": "content-a0#8#2",
+   "prompt_tokens": 498,
+   "completion_tokens": 1767,
+   "cost_usd_est": 0.0022697999999999998
+  },
+  {
+   "tag": "content-a0#11#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 8124,
+   "cost_usd_est": 0.009896999999999998
+  },
+  {
+   "tag": "content-a0#12#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 7601,
+   "cost_usd_est": 0.009269399999999999
+  },
+  {
+   "tag": "content-a0#10#1",
+   "prompt_tokens": 498,
+   "completion_tokens": 8692,
+   "cost_usd_est": 0.010579799999999999
+  },
+  {
+   "tag": "content-a0#8#3",
+   "prompt_tokens": 498,
+   "completion_tokens": 6310,
+   "cost_usd_est": 0.007721399999999999
+  },
+  {
+   "tag": "content-a0#9#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 14665,
+   "cost_usd_est": 0.0177462
+  },
+  {
+   "tag": "content-a0#14#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 8049,
+   "cost_usd_est": 0.009807
+  },
+  {
+   "tag": "content-a0#18#1",
+   "prompt_tokens": 496,
+   "completion_tokens": 5590,
+   "cost_usd_est": 0.006856800000000001
+  },
+  {
+   "tag": "content-a0#17#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 7481,
+   "cost_usd_est": 0.009125399999999999
+  },
+  {
+   "tag": "content-a0#16#1",
+   "prompt_tokens": 496,
+   "completion_tokens": 8332,
+   "cost_usd_est": 0.0101472
+  },
+  {
+   "tag": "content-a0#20#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 6624,
+   "cost_usd_est": 0.008096999999999998
+  },
+  {
+   "tag": "content-a0#23#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 8065,
+   "cost_usd_est": 0.009826199999999998
+  },
+  {
+   "tag": "content-a0#22#1",
+   "prompt_tokens": 496,
+   "completion_tokens": 7557,
+   "cost_usd_est": 0.0092172
+  },
+  {
+   "tag": "content-a0#21#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 6905,
+   "cost_usd_est": 0.0084342
+  },
+  {
+   "tag": "content-a0#19#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 11461,
+   "cost_usd_est": 0.0139014
+  },
+  {
+   "tag": "content-a0#29#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 2848,
+   "cost_usd_est": 0.0035657999999999996
+  },
+  {
+   "tag": "content-a0#25#1",
+   "prompt_tokens": 498,
+   "completion_tokens": 6258,
+   "cost_usd_est": 0.007658999999999999
+  },
+  {
+   "tag": "content-a0#26#1",
+   "prompt_tokens": 498,
+   "completion_tokens": 7241,
+   "cost_usd_est": 0.008838599999999999
+  },
+  {
+   "tag": "content-a0#30#1",
+   "prompt_tokens": 496,
+   "completion_tokens": 7140,
+   "cost_usd_est": 0.008716799999999999
+  },
+  {
+   "tag": "content-a0#31#1",
+   "prompt_tokens": 498,
+   "completion_tokens": 6479,
+   "cost_usd_est": 0.0079242
+  },
+  {
+   "tag": "content-a0#27#1",
+   "prompt_tokens": 494,
+   "completion_tokens": 9811,
+   "cost_usd_est": 0.011921399999999999
+  },
+  {
+   "tag": "content-a0#24#1",
+   "prompt_tokens": 498,
+   "completion_tokens": 10722,
+   "cost_usd_est": 0.0130158
+  },
+  {
+   "tag": "content-a0#28#1",
+   "prompt_tokens": 496,
+   "completion_tokens": 7287,
+   "cost_usd_est": 0.008893199999999999
+  },
+  {
+   "tag": "content-a1#0#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 4884,
+   "cost_usd_est": 0.0060405
+  },
+  {
+   "tag": "content-a1#5#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 4127,
+   "cost_usd_est": 0.005132099999999999
+  },
+  {
+   "tag": "content-a1#6#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 6563,
+   "cost_usd_est": 0.0080559
+  },
+  {
+   "tag": "content-a1#2#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 7738,
+   "cost_usd_est": 0.0094659
+  },
+  {
+   "tag": "content-a1#1#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 8442,
+   "cost_usd_est": 0.010310699999999999
+  },
+  {
+   "tag": "content-a1#3#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 8313,
+   "cost_usd_est": 0.010156499999999999
+  },
+  {
+   "tag": "content-a1#7#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 9156,
+   "cost_usd_est": 0.011167499999999999
+  },
+  {
+   "tag": "content-a1#4#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 10932,
+   "cost_usd_est": 0.0132981
+  },
+  {
+   "tag": "content-a1#12#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 1514,
+   "cost_usd_est": 0.0019977
+  },
+  {
+   "tag": "content-a1#14#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 3331,
+   "cost_usd_est": 0.0041781000000000006
+  },
+  {
+   "tag": "content-a1#8#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 3691,
+   "cost_usd_est": 0.004608899999999999
+  },
+  {
+   "tag": "content-a1#15#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 6206,
+   "cost_usd_est": 0.0076281
+  },
+  {
+   "tag": "content-a1#10#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 7447,
+   "cost_usd_est": 0.009116099999999999
+  },
+  {
+   "tag": "content-a1#9#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 9767,
+   "cost_usd_est": 0.011900099999999999
+  },
+  {
+   "tag": "content-a1#13#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 9703,
+   "cost_usd_est": 0.011823299999999998
+  },
+  {
+   "tag": "content-a1#11#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 10617,
+   "cost_usd_est": 0.012920099999999999
+  },
+  {
+   "tag": "content-a1#23#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 6540,
+   "cost_usd_est": 0.008027699999999999
+  },
+  {
+   "tag": "content-a1#20#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 7024,
+   "cost_usd_est": 0.0086085
+  },
+  {
+   "tag": "content-a1#22#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 7366,
+   "cost_usd_est": 0.0090189
+  },
+  {
+   "tag": "content-a1#17#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 7120,
+   "cost_usd_est": 0.008724899999999999
+  },
+  {
+   "tag": "content-a1#19#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 9133,
+   "cost_usd_est": 0.0111393
+  },
+  {
+   "tag": "content-a1#16#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 9319,
+   "cost_usd_est": 0.011363699999999997
+  },
+  {
+   "tag": "content-a1#18#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 13388,
+   "cost_usd_est": 0.0162453
+  },
+  {
+   "tag": "content-a1#21#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 14826,
+   "cost_usd_est": 0.0179709
+  },
+  {
+   "tag": "content-a1#28#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 2051,
+   "cost_usd_est": 0.0026420999999999997
+  },
+  {
+   "tag": "content-a1#27#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 5574,
+   "cost_usd_est": 0.0068697
+  },
+  {
+   "tag": "content-a1#29#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 6192,
+   "cost_usd_est": 0.007610099999999999
+  },
+  {
+   "tag": "content-a1#26#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 7035,
+   "cost_usd_est": 0.0086223
+  },
+  {
+   "tag": "content-a1#24#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 8110,
+   "cost_usd_est": 0.009912299999999999
+  },
+  {
+   "tag": "content-a1#30#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 8609,
+   "cost_usd_est": 0.010510499999999999
+  },
+  {
+   "tag": "content-a1#31#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 10359,
+   "cost_usd_est": 0.0126111
+  },
+  {
+   "tag": "content-a1#25#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 9832,
+   "cost_usd_est": 0.0119787
+  },
+  {
+   "tag": "content-a2#1#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 2062,
+   "cost_usd_est": 0.0026552999999999998
+  },
+  {
+   "tag": "content-a2#6#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 2696,
+   "cost_usd_est": 0.0034161
+  },
+  {
+   "tag": "content-a2#2#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 5510,
+   "cost_usd_est": 0.0067916999999999995
+  },
+  {
+   "tag": "content-a2#0#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 5398,
+   "cost_usd_est": 0.0066585
+  },
+  {
+   "tag": "content-a2#7#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 6986,
+   "cost_usd_est": 0.0085629
+  },
+  {
+   "tag": "content-a2#5#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 7587,
+   "cost_usd_est": 0.0092841
+  },
+  {
+   "tag": "content-a2#3#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 9302,
+   "cost_usd_est": 0.011342699999999999
+  },
+  {
+   "tag": "content-a2#4#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 10199,
+   "cost_usd_est": 0.012418499999999999
+  },
+  {
+   "tag": "content-a2#12#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 3706,
+   "cost_usd_est": 0.0046275
+  },
+  {
+   "tag": "content-a2#14#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 6303,
+   "cost_usd_est": 0.007743299999999999
+  },
+  {
+   "tag": "content-a2#10#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 5925,
+   "cost_usd_est": 0.0072902999999999996
+  },
+  {
+   "tag": "content-a2#11#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 7802,
+   "cost_usd_est": 0.0095433
+  },
+  {
+   "tag": "content-a2#15#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 7538,
+   "cost_usd_est": 0.0092253
+  },
+  {
+   "tag": "content-a2#8#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 8931,
+   "cost_usd_est": 0.0108969
+  },
+  {
+   "tag": "content-a2#13#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 8887,
+   "cost_usd_est": 0.0108447
+  },
+  {
+   "tag": "content-a2#9#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 10978,
+   "cost_usd_est": 0.013353299999999999
+  },
+  {
+   "tag": "content-a2#18#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 5993,
+   "cost_usd_est": 0.007371299999999999
+  },
+  {
+   "tag": "content-a2#19#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 7206,
+   "cost_usd_est": 0.008828099999999998
+  },
+  {
+   "tag": "content-a2#17#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 7614,
+   "cost_usd_est": 0.0093165
+  },
+  {
+   "tag": "content-a2#23#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 8229,
+   "cost_usd_est": 0.0100545
+  },
+  {
+   "tag": "content-a2#21#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 7911,
+   "cost_usd_est": 0.009674099999999998
+  },
+  {
+   "tag": "content-a2#22#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 10439,
+   "cost_usd_est": 0.012707099999999999
+  },
+  {
+   "tag": "content-a2#16#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 9643,
+   "cost_usd_est": 0.0117513
+  },
+  {
+   "tag": "content-a2#20#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 10286,
+   "cost_usd_est": 0.0125229
+  },
+  {
+   "tag": "content-a2#24#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 6696,
+   "cost_usd_est": 0.008214899999999999
+  },
+  {
+   "tag": "content-a2#28#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 7334,
+   "cost_usd_est": 0.008981699999999999
+  },
+  {
+   "tag": "content-a2#29#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 7899,
+   "cost_usd_est": 0.009658499999999999
+  },
+  {
+   "tag": "content-a2#27#1",
+   "prompt_tokens": 601,
+   "completion_tokens": 7778,
+   "cost_usd_est": 0.009513899999999999
+  },
+  {
+   "tag": "content-a2#26#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 8613,
+   "cost_usd_est": 0.0105165
+  },
+  {
+   "tag": "content-a2#30#1",
+   "prompt_tokens": 603,
+   "completion_tokens": 9028,
+   "cost_usd_est": 0.011014499999999998
+  },
+  {
+   "tag": "content-a2#31#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 7812,
+   "cost_usd_est": 0.0095541
+  },
+  {
+   "tag": "content-a2#25#1",
+   "prompt_tokens": 599,
+   "completion_tokens": 10918,
+   "cost_usd_est": 0.0132813
+  }
+ ],
+ "date": "2026-09-20"
+}

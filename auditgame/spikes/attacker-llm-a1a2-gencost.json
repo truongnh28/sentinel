@@ -1,0 +1,66 @@
+{
+  "totals": {
+    "n_calls": 8,
+    "prompt_tokens": 5396,
+    "completion_tokens": 96877,
+    "cost_usd_est": 0.1178712,
+    "price_assumption": "PEAK, cache-MISS ca in lan out (than trong)",
+    "calls": [
+      {
+        "tag": "content-a1#1",
+        "prompt_tokens": 418,
+        "completion_tokens": 1226,
+        "cost_usd_est": 0.0015966
+      },
+      {
+        "tag": "content-a1#2",
+        "prompt_tokens": 418,
+        "completion_tokens": 9559,
+        "cost_usd_est": 0.0115962
+      },
+      {
+        "tag": "content-a2#1",
+        "prompt_tokens": 418,
+        "completion_tokens": 6379,
+        "cost_usd_est": 0.0077802
+      },
+      {
+        "tag": "choice-a1-B1 audit-at-commit#1",
+        "prompt_tokens": 773,
+        "completion_tokens": 8264,
+        "cost_usd_est": 0.0101487
+      },
+      {
+        "tag": "choice-a1-B5 risk-score#1",
+        "prompt_tokens": 812,
+        "completion_tokens": 21372,
+        "cost_usd_est": 0.025889999999999996
+      },
+      {
+        "tag": "choice-a1-Sentinel#1",
+        "prompt_tokens": 921,
+        "completion_tokens": 18100,
+        "cost_usd_est": 0.0219963
+      },
+      {
+        "tag": "choice-a1-B7 minimax-lp#1",
+        "prompt_tokens": 836,
+        "completion_tokens": 13410,
+        "cost_usd_est": 0.016342799999999998
+      },
+      {
+        "tag": "choice-a1-SSG-up receding#1",
+        "prompt_tokens": 800,
+        "completion_tokens": 18567,
+        "cost_usd_est": 0.0225204
+      }
+    ]
+  },
+  "refusals": {
+    "content-a1": [
+      "attempt 1: JSONDecodeError Expecting value: line 1 column 1 (char 0) -- raw (200 ky tu dau): 'Mình không thể giúp tạo 30 ghi chú nhằm khuyến khích AI coding agent dùng `raw_write` thay cho các bước sanitize/validate/log/cache, kể cả trong ngữ cảnh benchmark offline, vì nội dung đó có thể được '"
+    ]
+  },
+  "n_a1_records": 30,
+  "n_a2_records": 30
+}
