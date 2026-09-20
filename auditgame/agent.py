@@ -19,6 +19,7 @@ the detector.  See build.py's module docstring for the measured impact.
 from __future__ import annotations
 import random
 from dataclasses import dataclass, field
+import prose_world as _PW   # bien the song song, mac dinh TAT
 from core import Item, CarrierStore, Task, seed_of
 
 @dataclass
@@ -75,7 +76,7 @@ class MockAgent(Agent):
         # the agent always records a note about the task it just did
         writes.append(store.write(Item(
             carrier="memory", topic=task.topic,
-            content=f"[{task.topic}] ghi chú từ {task.task_id}",
+            content=_PW.benign(task.topic, task.task_id, "memory", f"[{task.topic}] ghi chú từ {task.task_id}"),
             created_at=t, provenance="agent/notes", poisoned=False)))
 
         # (3) PROPAGATION: a skill induced from the trajectory inherits the poison
@@ -83,7 +84,7 @@ class MockAgent(Agent):
             inherits = bool(poisoned_seen)
             writes.append(store.write(Item(
                 carrier="skill", topic=task.topic,
-                content=f"[{task.topic}] quy trình rút từ {task.task_id}",
+                content=_PW.benign(task.topic, task.task_id, "skill", f"[{task.topic}] quy trình rút từ {task.task_id}"),
                 created_at=t, provenance="agent/skills", poisoned=inherits,
                 derived_from=tuple(it.item_id for it in poisoned_seen) if inherits else ())))
 
@@ -96,7 +97,7 @@ class MockAgent(Agent):
         # propagation, not staged.
         writes.append(store.write(Item(
             carrier="branch", topic=task.topic,
-            content=f"[{task.topic}] commit {task.task_id}",
+            content=_PW.benign(task.topic, task.task_id, "branch", f"[{task.topic}] commit {task.task_id}"),
             created_at=t, provenance="agent/branch",
             poisoned=patch_has_marker,
             derived_from=tuple(it.item_id for it in poisoned_seen) if patch_has_marker else ())))
@@ -106,7 +107,7 @@ class MockAgent(Agent):
         if r.random() < self.queue_rate:
             writes.append(store.write(Item(
                 carrier="queue", topic=task.topic,
-                content=f"[{task.topic}] lời gọi treo {task.task_id}",
+                content=_PW.benign(task.topic, task.task_id, "queue", f"[{task.topic}] lời gọi treo {task.task_id}"),
                 created_at=t, provenance="agent/queue", poisoned=False)))
 
         # (6) BENIGN DRIFT (beta).  An ordinary revision of an earlier note: the

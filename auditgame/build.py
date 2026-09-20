@@ -29,6 +29,7 @@ tuned back.  See `_ADVICE_INSTRUCTION` for the reason the order changed and
 spikes/cong-v2.md for the before/after of every number.
 """
 from __future__ import annotations
+import prose_world as _PW   # bien the song song, mac dinh TAT
 import random
 import retrieval
 from core import Task, Workflow, PoisonSpec, Item, CarrierStore, seed_of
@@ -297,7 +298,7 @@ def inject(store: CarrierStore, wf: Workflow = None, ps: PoisonSpec = None,
     it = Item(
         carrier=ps.carrier,
         topic=topic,
-        content=payload_content(topic, ps.marker),
+        content=_PW.payload(topic, ps.marker, payload_content(topic, ps.marker)),
         created_at=ps.iota,
         provenance="repo/docs/conventions.md",   # a plausible-looking origin
         poisoned=True,
