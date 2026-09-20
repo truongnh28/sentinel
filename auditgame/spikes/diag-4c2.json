@@ -1,0 +1,793 @@
+{
+ "meta": {
+  "d_prime": 2.2,
+  "delta": 4,
+  "class_deltas": [
+   2,
+   4
+  ],
+  "budget": 17.95,
+  "seeds": [
+   1,
+   2,
+   3
+  ],
+  "n_wf": 40,
+  "H": 8,
+  "n_feasible": 37,
+  "n_total": 40,
+  "reason": null,
+  "runtime_s": 12.603982925415039,
+  "n_dedup_dropped_b7u": 230,
+  "n_dedup_dropped_ssg": 230,
+  "n_unique_episodes_b7u": 95,
+  "n_unique_episodes_ssg": 95
+ },
+ "reference_diag_4c_json": {
+  "static": {
+   "harm": 0.45045045045045046,
+   "spent": 15.024324324324324
+  },
+  "receding_noC": {
+   "harm": 0.545045045045045,
+   "spent": 15.621171171171172
+  }
+ },
+ "validity_check": {
+  "static_matches_reference": true,
+  "receding_noC_matches_reference": true,
+  "measured_static": {
+   "harm": 0.45045045045045046,
+   "spent": 15.024324324324324
+  },
+  "measured_receding_noC": {
+   "harm": 0.545045045045045,
+   "spent": 15.621171171171172
+  }
+ },
+ "hypothesis_A": {
+  "static_marginal_constant_across_episodes": {
+   "u": true,
+   "v": true
+  },
+  "l1_distance_by_t": [
+   2.7755575615628914e-17,
+   0.2575202864679981,
+   0.3997921833407656,
+   0.6457326681500647,
+   0.32356925973640355,
+   0.34487827382701536,
+   0.2049168550670016,
+   0.043312845753184503
+  ],
+  "l1_distance_at_t0": 2.7755575615628914e-17,
+  "match_at_t0": true,
+  "l1_distance_mean_t_ge_1": 0.31710319604891907,
+  "l1_distance_max_t": 3,
+  "l1_distance_max": 0.6457326681500647,
+  "static_u_by_t": [
+   [
+    0.17168019097866546,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.12123985676600091,
+    0.29292004774466635,
+    0.29292004774466635,
+    0.29292004774466635
+   ],
+   [
+    0.26007803645044497,
+    0.0883978454717795,
+    0.0883978454717795,
+    0.0883978454717795
+   ],
+   [
+    0.02465721135039166,
+    0.1963374023290571,
+    0.1963374023290571,
+    0.1963374023290571
+   ],
+   [
+    0.2580318364644875,
+    0.08635164548582207,
+    0.08635164548582207,
+    0.08635164548582207
+   ],
+   [
+    0.0,
+    0.17168019097866546,
+    0.17168019097866546,
+    0.17168019097866546
+   ],
+   [
+    0.17168019097866546,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "static_v_by_t": [
+   0.0,
+   0.0,
+   0.4747284271342166,
+   0.38633058166243706,
+   0.4829132270780463,
+   0.4849594270640037,
+   0.5096166384143953,
+   0.5959682839002175
+  ],
+  "receding_u_mean_by_t": [
+   [
+    0.17168019097866544,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.25,
+    0.25,
+    0.25,
+    0.25
+   ],
+   [
+    0.0813438702988502,
+    0.0813438702988502,
+    0.0813438702988502,
+    0.0813438702988502
+   ],
+   [
+    0.088715290970713,
+    0.088715290970713,
+    0.088715290970713,
+    0.088715290970713
+   ],
+   [
+    0.0962472065962858,
+    0.0962472065962858,
+    0.0962472065962858,
+    0.0962472065962858
+   ],
+   [
+    0.11208257129309762,
+    0.11208257129309762,
+    0.11208257129309762,
+    0.11208257129309762
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "receding_v_mean_by_t": [
+   0.0,
+   0.0,
+   0.6746245188045995,
+   0.6451388361171481,
+   0.6150111736148569,
+   0.5389622705412179,
+   0.47637997432605916,
+   0.639281129653402
+  ],
+  "n_episodes_by_t": [
+   95,
+   95,
+   95,
+   95,
+   95,
+   95,
+   95,
+   95
+  ]
+ },
+ "hypothesis_B": {
+  "n_windows": 40,
+  "n_episodes_static": 95,
+  "n_episodes_receding": 95,
+  "static_distribution": {
+   "min": 0.10526315789473684,
+   "max": 0.6210526315789474,
+   "mean": 0.33210526315789474,
+   "n_windows": 40,
+   "n_zero_coverage": 0,
+   "histogram_at_least": {
+    ">=0.0": 40,
+    ">=0.1": 40,
+    ">=0.25": 28,
+    ">=0.5": 5,
+    ">=0.75": 0,
+    ">=0.9": 0
+   }
+  },
+  "receding_distribution": {
+   "min": 0.07368421052631578,
+   "max": 0.5263157894736842,
+   "mean": 0.2665789473684211,
+   "n_windows": 40,
+   "n_zero_coverage": 0,
+   "histogram_at_least": {
+    ">=0.0": 40,
+    ">=0.1": 38,
+    ">=0.25": 21,
+    ">=0.5": 1,
+    ">=0.75": 0,
+    ">=0.9": 0
+   }
+  },
+  "static_stdev_across_windows": 0.1286182696189713,
+  "receding_stdev_across_windows": 0.10990773012520201,
+  "receding_more_even_than_static": true,
+  "receding_thinner_mean_than_static": true,
+  "receding_min_window_leq_static_min": true,
+  "per_window_detail": [
+   {
+    "window": [
+     0,
+     0,
+     2
+    ],
+    "static_prob": 0.3263157894736842,
+    "receding_prob": 0.3263157894736842,
+    "static_mean_count": 0.35789473684210527,
+    "receding_mean_count": 0.35789473684210527
+   },
+   {
+    "window": [
+     0,
+     1,
+     3
+    ],
+    "static_prob": 0.3894736842105263,
+    "receding_prob": 0.25263157894736843,
+    "static_mean_count": 0.4421052631578947,
+    "receding_mean_count": 0.28421052631578947
+   },
+   {
+    "window": [
+     0,
+     2,
+     4
+    ],
+    "static_prob": 0.30526315789473685,
+    "receding_prob": 0.2,
+    "static_mean_count": 0.3263157894736842,
+    "receding_mean_count": 0.22105263157894736
+   },
+   {
+    "window": [
+     0,
+     3,
+     5
+    ],
+    "static_prob": 0.2631578947368421,
+    "receding_prob": 0.17894736842105263,
+    "static_mean_count": 0.2736842105263158,
+    "receding_mean_count": 0.18947368421052632
+   },
+   {
+    "window": [
+     0,
+     4,
+     6
+    ],
+    "static_prob": 0.23157894736842105,
+    "receding_prob": 0.2,
+    "static_mean_count": 0.23157894736842105,
+    "receding_mean_count": 0.2
+   },
+   {
+    "window": [
+     0,
+     5,
+     7
+    ],
+    "static_prob": 0.1368421052631579,
+    "receding_prob": 0.12631578947368421,
+    "static_mean_count": 0.1368421052631579,
+    "receding_mean_count": 0.12631578947368421
+   },
+   {
+    "window": [
+     1,
+     0,
+     2
+    ],
+    "static_prob": 0.25263157894736843,
+    "receding_prob": 0.24210526315789474,
+    "static_mean_count": 0.25263157894736843,
+    "receding_mean_count": 0.24210526315789474
+   },
+   {
+    "window": [
+     1,
+     1,
+     3
+    ],
+    "static_prob": 0.2631578947368421,
+    "receding_prob": 0.30526315789473685,
+    "static_mean_count": 0.2631578947368421,
+    "receding_mean_count": 0.3157894736842105
+   },
+   {
+    "window": [
+     1,
+     2,
+     4
+    ],
+    "static_prob": 0.18947368421052632,
+    "receding_prob": 0.2,
+    "static_mean_count": 0.2,
+    "receding_mean_count": 0.22105263157894736
+   },
+   {
+    "window": [
+     1,
+     3,
+     5
+    ],
+    "static_prob": 0.24210526315789474,
+    "receding_prob": 0.17894736842105263,
+    "static_mean_count": 0.2631578947368421,
+    "receding_mean_count": 0.17894736842105263
+   },
+   {
+    "window": [
+     1,
+     4,
+     6
+    ],
+    "static_prob": 0.23157894736842105,
+    "receding_prob": 0.17894736842105263,
+    "static_mean_count": 0.23157894736842105,
+    "receding_mean_count": 0.17894736842105263
+   },
+   {
+    "window": [
+     1,
+     5,
+     7
+    ],
+    "static_prob": 0.15789473684210525,
+    "receding_prob": 0.14736842105263157,
+    "static_mean_count": 0.15789473684210525,
+    "receding_mean_count": 0.14736842105263157
+   },
+   {
+    "window": [
+     2,
+     0,
+     2
+    ],
+    "static_prob": 0.23157894736842105,
+    "receding_prob": 0.3368421052631579,
+    "static_mean_count": 0.23157894736842105,
+    "receding_mean_count": 0.3368421052631579
+   },
+   {
+    "window": [
+     2,
+     1,
+     3
+    ],
+    "static_prob": 0.28421052631578947,
+    "receding_prob": 0.4105263157894737,
+    "static_mean_count": 0.29473684210526313,
+    "receding_mean_count": 0.43157894736842106
+   },
+   {
+    "window": [
+     2,
+     2,
+     4
+    ],
+    "static_prob": 0.23157894736842105,
+    "receding_prob": 0.16842105263157894,
+    "static_mean_count": 0.2631578947368421,
+    "receding_mean_count": 0.17894736842105263
+   },
+   {
+    "window": [
+     2,
+     3,
+     5
+    ],
+    "static_prob": 0.25263157894736843,
+    "receding_prob": 0.23157894736842105,
+    "static_mean_count": 0.25263157894736843,
+    "receding_mean_count": 0.24210526315789474
+   },
+   {
+    "window": [
+     2,
+     4,
+     6
+    ],
+    "static_prob": 0.16842105263157894,
+    "receding_prob": 0.22105263157894736,
+    "static_mean_count": 0.17894736842105263,
+    "receding_mean_count": 0.23157894736842105
+   },
+   {
+    "window": [
+     2,
+     5,
+     7
+    ],
+    "static_prob": 0.12631578947368421,
+    "receding_prob": 0.07368421052631578,
+    "static_mean_count": 0.12631578947368421,
+    "receding_mean_count": 0.07368421052631578
+   },
+   {
+    "window": [
+     3,
+     0,
+     2
+    ],
+    "static_prob": 0.35789473684210527,
+    "receding_prob": 0.24210526315789474,
+    "static_mean_count": 0.35789473684210527,
+    "receding_mean_count": 0.24210526315789474
+   },
+   {
+    "window": [
+     3,
+     1,
+     3
+    ],
+    "static_prob": 0.43157894736842106,
+    "receding_prob": 0.29473684210526313,
+    "static_mean_count": 0.47368421052631576,
+    "receding_mean_count": 0.3157894736842105
+   },
+   {
+    "window": [
+     3,
+     2,
+     4
+    ],
+    "static_prob": 0.37894736842105264,
+    "receding_prob": 0.10526315789473684,
+    "static_mean_count": 0.3894736842105263,
+    "receding_mean_count": 0.10526315789473684
+   },
+   {
+    "window": [
+     3,
+     3,
+     5
+    ],
+    "static_prob": 0.3263157894736842,
+    "receding_prob": 0.11578947368421053,
+    "static_mean_count": 0.35789473684210527,
+    "receding_mean_count": 0.11578947368421053
+   },
+   {
+    "window": [
+     3,
+     4,
+     6
+    ],
+    "static_prob": 0.18947368421052632,
+    "receding_prob": 0.15789473684210525,
+    "static_mean_count": 0.18947368421052632,
+    "receding_mean_count": 0.16842105263157894
+   },
+   {
+    "window": [
+     3,
+     5,
+     7
+    ],
+    "static_prob": 0.10526315789473684,
+    "receding_prob": 0.08421052631578947,
+    "static_mean_count": 0.10526315789473684,
+    "receding_mean_count": 0.08421052631578947
+   },
+   {
+    "window": [
+     0,
+     0,
+     4
+    ],
+    "static_prob": 0.5473684210526316,
+    "receding_prob": 0.43157894736842106,
+    "static_mean_count": 0.6842105263157895,
+    "receding_mean_count": 0.5789473684210527
+   },
+   {
+    "window": [
+     0,
+     1,
+     5
+    ],
+    "static_prob": 0.5578947368421052,
+    "receding_prob": 0.37894736842105264,
+    "static_mean_count": 0.7157894736842105,
+    "receding_mean_count": 0.47368421052631576
+   },
+   {
+    "window": [
+     0,
+     2,
+     6
+    ],
+    "static_prob": 0.4842105263157895,
+    "receding_prob": 0.3473684210526316,
+    "static_mean_count": 0.5578947368421052,
+    "receding_mean_count": 0.42105263157894735
+   },
+   {
+    "window": [
+     0,
+     3,
+     7
+    ],
+    "static_prob": 0.37894736842105264,
+    "receding_prob": 0.28421052631578947,
+    "static_mean_count": 0.4105263157894737,
+    "receding_mean_count": 0.3157894736842105
+   },
+   {
+    "window": [
+     1,
+     0,
+     4
+    ],
+    "static_prob": 0.4,
+    "receding_prob": 0.4105263157894737,
+    "static_mean_count": 0.45263157894736844,
+    "receding_mean_count": 0.4631578947368421
+   },
+   {
+    "window": [
+     1,
+     1,
+     5
+    ],
+    "static_prob": 0.43157894736842106,
+    "receding_prob": 0.43157894736842106,
+    "static_mean_count": 0.5263157894736842,
+    "receding_mean_count": 0.49473684210526314
+   },
+   {
+    "window": [
+     1,
+     2,
+     6
+    ],
+    "static_prob": 0.37894736842105264,
+    "receding_prob": 0.3368421052631579,
+    "static_mean_count": 0.43157894736842106,
+    "receding_mean_count": 0.4
+   },
+   {
+    "window": [
+     1,
+     3,
+     7
+    ],
+    "static_prob": 0.37894736842105264,
+    "receding_prob": 0.28421052631578947,
+    "static_mean_count": 0.42105263157894735,
+    "receding_mean_count": 0.3263157894736842
+   },
+   {
+    "window": [
+     2,
+     0,
+     4
+    ],
+    "static_prob": 0.3894736842105263,
+    "receding_prob": 0.4631578947368421,
+    "static_mean_count": 0.49473684210526314,
+    "receding_mean_count": 0.5157894736842106
+   },
+   {
+    "window": [
+     2,
+     1,
+     5
+    ],
+    "static_prob": 0.4105263157894737,
+    "receding_prob": 0.5263157894736842,
+    "static_mean_count": 0.5473684210526316,
+    "receding_mean_count": 0.6736842105263158
+   },
+   {
+    "window": [
+     2,
+     2,
+     6
+    ],
+    "static_prob": 0.3684210526315789,
+    "receding_prob": 0.3684210526315789,
+    "static_mean_count": 0.4421052631578947,
+    "receding_mean_count": 0.4105263157894737
+   },
+   {
+    "window": [
+     2,
+     3,
+     7
+    ],
+    "static_prob": 0.3473684210526316,
+    "receding_prob": 0.29473684210526313,
+    "static_mean_count": 0.37894736842105264,
+    "receding_mean_count": 0.3157894736842105
+   },
+   {
+    "window": [
+     3,
+     0,
+     4
+    ],
+    "static_prob": 0.5894736842105263,
+    "receding_prob": 0.3157894736842105,
+    "static_mean_count": 0.7473684210526316,
+    "receding_mean_count": 0.3473684210526316
+   },
+   {
+    "window": [
+     3,
+     1,
+     5
+    ],
+    "static_prob": 0.6210526315789474,
+    "receding_prob": 0.3684210526315789,
+    "static_mean_count": 0.8315789473684211,
+    "receding_mean_count": 0.43157894736842106
+   },
+   {
+    "window": [
+     3,
+     2,
+     6
+    ],
+    "static_prob": 0.5157894736842106,
+    "receding_prob": 0.25263157894736843,
+    "static_mean_count": 0.5789473684210527,
+    "receding_mean_count": 0.2736842105263158
+   },
+   {
+    "window": [
+     3,
+     3,
+     7
+    ],
+    "static_prob": 0.4105263157894737,
+    "receding_prob": 0.18947368421052632,
+    "static_mean_count": 0.4631578947368421,
+    "receding_mean_count": 0.2
+   }
+  ]
+ },
+ "hypothesis_C": {
+  "static_mass_by_t": [
+   0.17168019097866546,
+   1.0,
+   1.0,
+   1.0,
+   1.0,
+   1.0,
+   0.6812968293930608,
+   0.5959682839002175
+  ],
+  "static_total_mass": 6.448945304271944,
+  "receding_mass_by_t_mean": [
+   0.17168019097866544,
+   1.0,
+   1.0000000000000002,
+   1.0000000000000002,
+   1.0000000000000002,
+   0.9872925557136084,
+   0.47637997432605916,
+   0.639281129653402
+  ],
+  "receding_total_mass_mean": 6.274633850671735,
+  "diff_receding_minus_static": -0.1743114536002084,
+  "n_win_by_t": [
+   40,
+   40,
+   40,
+   36,
+   32,
+   24,
+   16,
+   8
+  ],
+  "n_win_constant_across_episodes_by_t": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "B_rem_by_t": [
+   {
+    "min": 17.95,
+    "max": 17.95,
+    "mean": 17.95
+   },
+   {
+    "min": 17.55,
+    "max": 17.95,
+    "mean": 17.87842105263158
+   },
+   {
+    "min": 13.45,
+    "max": 17.55,
+    "mean": 16.057368421052633
+   },
+   {
+    "min": 9.35,
+    "max": 17.15,
+    "mean": 12.819473684210525
+   },
+   {
+    "min": 5.65,
+    "max": 16.75,
+    "mean": 9.83
+   },
+   {
+    "min": 1.5500000000000007,
+    "max": 12.649999999999999,
+    "mean": 6.4984210526315795
+   },
+   {
+    "min": 0.6500000000000021,
+    "max": 8.55,
+    "mean": 3.9100000000000006
+   },
+   {
+    "min": 0.25,
+    "max": 7.049999999999999,
+    "mean": 2.744736842105264
+   }
+  ],
+  "n_episodes_B_rem_leq_0_4_by_t": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   5
+  ],
+  "n_episodes": 95,
+  "note": "mass(t) = Sigma_k u[k, .](t) + v(.)(t) la KHOI LUONG XAC SUAT ma LP cho phep dat cuoc tai t -- KHONG phai hanh dong da thuc hien.  mass < 1 nghia la con xac suat 'khong lam gi' o hang do; mass = 0 nghia la het cua so mo hoac het ngan sach (n_win=0 hoac B_rem=0 tai t do, xem interpretation ben duoi). n_win_by_t/B_rem_by_t tong hop qua 95 episode da dedupe (ep_ssg), dung de doi chieu true-source cho van ban muc 4 cua bao cao -- KHONG suy dien tu mass."
+ },
+ "conclusion": {
+  "hypothesis_A_boundary_mismatch": {
+   "verdict": "DUNG (lech ro tu t=1, trong khi t=0 trung)"
+  },
+  "hypothesis_B_time_inconsistency": {
+   "verdict": "DUNG (receding dan deu hon VA mong hon tren nhieu cua so)"
+  },
+  "hypothesis_C_per_task_row_budget": {
+   "verdict": "DUNG (chieu GIAM, lech -2.7%)"
+  },
+  "total_regression_gap_harm_noC": 0.09459459459459457,
+  "note": "Day la 0.094595 goc cua brief (77,8% cua tong khoang cach 0.121622) -- do TRUC TIEP tren cap (static, receding_noC) o day, khong phai lay lai tu diag-4c.json, nen co the lech vai ULP so voi 0.094595 neu co bat ky khac biet nao trong duong chay; kiem hop le o tren (ok_static/ok_receding) la de dam bao khong co lech."
+ }
+}

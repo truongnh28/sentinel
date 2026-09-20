@@ -1,0 +1,214 @@
+{
+ "meta": {
+  "d_prime": 2.2,
+  "delta": 4,
+  "class_deltas": [
+   2,
+   4
+  ],
+  "budget": 17.95,
+  "seeds": [
+   1,
+   2,
+   3
+  ],
+  "n_wf": 40,
+  "H": 8,
+  "n_feasible": 37,
+  "n_total": 40,
+  "reason": null,
+  "runtime_s": 21.472986936569214
+ },
+ "reference_ssg_gates_json": {
+  "static": {
+   "policy": "B7U minimax-lp upstream",
+   "harm": 0.45045045045045046,
+   "spent": 15.024324324324324
+  },
+  "receding": {
+   "policy": "SSG-up receding",
+   "harm": 0.5720720720720721,
+   "spent": 15.407207207207206
+  }
+ },
+ "reproduced": {
+  "static_B7U": {
+   "harm": 0.45045045045045046,
+   "spent": 15.024324324324324,
+   "n_feasible": 37
+  },
+  "receding_SSGup": {
+   "harm": 0.5720720720720721,
+   "spent": 15.407207207207206,
+   "n_feasible": 37
+  },
+  "receding_SSGup_noC": {
+   "harm": 0.545045045045045,
+   "spent": 15.621171171171172,
+   "n_feasible": 37
+  },
+  "B1": {
+   "harm": 0.7792792792792792,
+   "spent": 16.4
+  },
+  "Sentinel": {
+   "harm": 0.5630630630630631,
+   "spent": 8.375225225225226
+  }
+ },
+ "hypothesis_i_spend_curve": {
+  "t": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "static_B7U_mean_cum_spend": [
+   0.07261538461538462,
+   2.197230769230769,
+   4.957846153846154,
+   7.837538461538461,
+   10.703076923076923,
+   13.204615384615385,
+   14.47876923076923,
+   15.122153846153845
+  ],
+  "static_B7U_n_episodes_by_t": [
+   325,
+   325,
+   325,
+   325,
+   325,
+   325,
+   325,
+   325
+  ],
+  "receding_SSGup_mean_cum_spend": [
+   0.07384615384615385,
+   1.9904615384615383,
+   5.268,
+   8.352307692307692,
+   11.647076923076922,
+   14.12953846153846,
+   15.100923076923074,
+   15.41630769230769
+  ],
+  "receding_SSGup_n_episodes_by_t": [
+   325,
+   325,
+   325,
+   325,
+   325,
+   325,
+   325,
+   325
+  ],
+  "n_episodes_total_B7U": 325,
+  "n_episodes_total_SSGup": 325,
+  "gap_ssgup_minus_b7u_by_t": [
+   0.0012307692307692297,
+   -0.20676923076923082,
+   0.3101538461538462,
+   0.5147692307692306,
+   0.9439999999999991,
+   0.9249230769230739,
+   0.6221538461538447,
+   0.2941538461538453
+  ],
+  "receding_SSGup_noC_mean_cum_spend": [
+   0.07384615384615385,
+   1.8824615384615384,
+   5.168,
+   8.195076923076922,
+   11.57076923076923,
+   14.051384615384615,
+   15.199384615384613,
+   15.640923076923075
+  ],
+  "receding_SSGup_noC_n_episodes_by_t": [
+   325,
+   325,
+   325,
+   325,
+   325,
+   325,
+   325,
+   325
+  ],
+  "gap_noC_minus_b7u_by_t": [
+   0.0012307692307692297,
+   -0.3147692307692307,
+   0.21015384615384658,
+   0.3575384615384607,
+   0.8676923076923071,
+   0.8467692307692296,
+   0.7206153846153835,
+   0.5187692307692302
+  ]
+ },
+ "hypothesis_ii_done_by_t": {
+  "t": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "done_n_mean": [
+   0.36923076923076925,
+   4.369230769230769,
+   6.070769230769231,
+   8.187692307692307,
+   9.849230769230768,
+   11.510769230769231,
+   11.547692307692307,
+   11.547692307692307
+  ],
+  "done_sum_mean": [
+   0.36923076923076925,
+   4.369230769230769,
+   6.107692307692307,
+   8.396923076923077,
+   10.227692307692308,
+   11.975384615384616,
+   12.012307692307692,
+   12.012307692307692
+  ],
+  "n_episodes": 325,
+  "n_episodes_done_nonempty_ever": 325
+ },
+ "conclusion": {
+  "hypothesis_i_early_greed_literal": {
+   "front_loaded_from_t0": false,
+   "starved_late_window": false,
+   "gap_at_t0": 0.0012307692307692297,
+   "gap_at_t1": -0.20676923076923082,
+   "gap_at_final_t": 0.2941538461538453,
+   "max_gap": 0.9439999999999991,
+   "max_gap_at_t": 4,
+   "greedy_gap_mean_first_half": 0.15484615384615383,
+   "greedy_gap_mean_second_half": 0.6963076923076907,
+   "note": "gap(t) = chi_trung_binh(SSG-up, t) - chi_trung_binh(B7U, t). Gia thuyet (i) dung nghia den doi hoi CA HAI: gap duong ngay tu t=0/t=1 (dom som), VA gap AM o t cuoi (can tien, bo cua so muon). Do duoc: gap(t0)~0, gap(t1)<0 (KHONG dom tu dau); gap(t=cuoi)>0 (SSG-up VAN chi NHIEU HON tinh o task cuoi -- KHONG can tien / KHONG bo cua so muon). Gap duong lon nhat roi vao GIUA van, khong phai dau van."
+  },
+  "hypothesis_ii_a_done_filled": {
+   "C_never_filled": false,
+   "n_episodes_total": 325,
+   "n_episodes_done_nonempty_ever": 325
+  },
+  "hypothesis_ii_b_toggle_C": {
+   "C_toggle_changes_harm": true,
+   "delta_harm_noC_minus_withC": -0.027027027027027084,
+   "delta_spent_noC_minus_withC": 0.2139639639639661,
+   "total_regression_gap_harm_receding_minus_static": 0.12162162162162166,
+   "fraction_of_regression_gap_removed_by_dropping_C": 0.22222222222222263,
+   "note": "delta_harm_noC_minus_withC < 0 nghia la BO C lam harm GIAM (tot hon) -> C, NHU HIEN TAI, DANG LAM HARM TE HON, khong phai giup. fraction_of_regression_gap_removed_by_dropping_C la ty le cua (receding_harm - static_harm) bien mat khi tat C."
+  }
+ }
+}
