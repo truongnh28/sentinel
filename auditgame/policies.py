@@ -486,6 +486,128 @@ class SSGRecedingUpstream(SSGReceding):
     SEED_TAG = "ssg_receding_up"
 
 
+class SSGRecedingGuarded(MinimaxLP):
+    """Giai lai CO SAN va CO CO -- ban thiet ke lai sau chan doan cong 4c.
+
+    Spec: TIEN-DANG-KY-Sentinel-SSG.md SS10.
+
+    CAI DA DO O 4b.  `SSGReceding` giai lai MOI buoc thoi gian va HOI QUY tren
+    lop upstream: harm 0,5721 so voi 0,4505 cua control tinh B7U, lech +0,1216.
+    Chan doan 4c tach duoc:
+
+        0,121622 = 0,027027 (bo rang buoc C) + 0,094595 (BAN THAN viec giai lai)
+
+    Bon phan nam do chinh viec giai lai.  Co che: khi giai lai o t=1, nghiem
+    tro nen DOI XUNG qua carrier ([0,25]x4), trong khi nghiem tinh BAT DOI
+    XUNG theo kappa -- vi tinh bat doi xung ay la thuoc tinh cua CA CHAN TROI,
+    khong phai cua phan con lai.  Ket qua: do phu cuoi tap mong hon (0,267 so
+    voi 0,332), deu hon (do lech chuan 0,110 so voi 0,129), nhung CUA SO TE
+    NHAT TE HON (0,074 so voi 0,105).  Muc tieu minimax tra gia cho DO SAU o
+    cho yeu nhat, khong tra gia cho su dong deu.
+
+    Ten dung cua loi: BAT NHAT THOI GIAN tren mot ngan sach dung chung.
+
+    HAI SUA DOI, moi cai nham dung mot nua chan doan.
+
+    (a) SAN BAO DAM.  Mot lan giai lai chi duoc CAI THIEN, khong bao gio duoc
+        ha, do phu bao dam o cua so te nhat.  `_m_open` tinh do phu toi thieu
+        ma KE HOACH TINH con giao duoc tren cac cua so CON MO; nghiem giai lai
+        chi duoc dung khi m cua no >= con so do.  Khong dat thi GIU NGUYEN ke
+        hoach da cam ket.  Bien the nay vi the KHONG THE te hon tinh theo cau
+        tao -- hoi quy 4b bi chan bang rang buoc, khong bang hy vong.
+
+    (b) PHAI CO CO.  Ly do chinh dang duy nhat de giai lai la THONG TIN MOI.
+        Giai lai vi thoi gian troi thi khong co tin gi -- va do dung la cai 4b
+        do duoc: mat thuan 0,0946.  Nen chi giai lai khi co BAO DONG tu tang
+        phat hien (`signals` vuot TAU).
+
+    KHE A VAO DUNG VAI.  LLM khong doi phep toan phan bo; no cung cap SU KIEN
+    cho phep tai toi uu.  Ranh gioi SS4.3 giu nguyen: gamma la DAU VAO, pi_D
+    la cai duoc TOI UU.
+
+    DU DOAN CHOT TRUOC (SS10.5): duoi tan cong NGAM, phep do noi dung 20/09
+    cho AUC 0,518 => d' ~ 0,06 => khong co bao dong => khong giai lai =>
+    SUY BIEN VE DUNG BANG TINH.  Mot du doan co the sai.
+    """
+
+    SEED_TAG = "ssg_guarded"
+    #: Nguong bao dong.  Chot truoc, khong hieu chinh sau khi thay so.
+    TAU = 0.6
+
+    def _m_open(self, t: int) -> float:
+        """Do phu toi thieu KE HOACH TINH con giao duoc tren cua so con mo.
+
+        Chi dem cac buoc t' >= t: nhung buoc da qua khong con la loi hua nao
+        nua.  Day la dai luong PHAI so sanh duoc voi m cua ban giai lai, nen
+        hai ben cung mot mien thoi gian.
+        """
+        H = len(self.v) or 8
+        worst = None
+        for d in self.deltas:
+            for i in range(H - d):
+                s = i + d
+                if s < t:                      # cua so da dong
+                    continue
+                cov = 0.0
+                for tp in range(max(i, t), min(s, H)):
+                    cov += self.v[tp]
+                    for k in range(len(self._carriers)):
+                        cov += self.u[k][tp]
+                if worst is None or cov < worst:
+                    worst = cov
+        return 1.0 if worst is None else worst
+
+    def choose(self, t: int, retrieved_carriers: list, signals: dict) -> str | None:
+        if t >= len(self.v):
+            return None
+        # `signals` la {carrier: CarrierSignal} o duong run_once, nhung mot
+        # so duong goi khac da rut san `.p` thanh float -- chap nhan ca hai.
+        alarm = 0.0
+        for sig in (signals or {}).values():
+            v = getattr(sig, "p", sig)
+            if v is not None and v > alarm:
+                alarm = v
+        u, v = self.u, self.v
+        col = t                                 # chi so cot trong ke hoach tinh
+        if alarm >= self.TAU:
+            import lp
+            kap = [KAPPA[c] for c in self._carriers]
+            ru, rv, rm, n_win = lp.solve_remaining_lp(
+                K=len(self._carriers), H=len(self.v) or 8, t=t,
+                B_rem=max(self.budget - self.spent, 0.0), kap=kap,
+                kc=KAPPA_COMMIT, deltas=self.deltas,
+                done=getattr(self, "_done", None))
+            # SAN: chi nhan nghiem moi khi no KHONG HA bao dam.  n_win == 0 la
+            # "khong con gi de bao ve", khac han "phu hoan hao" -- tu choi.
+            if n_win and rv and rm >= self._m_open(t) - 1e-12:
+                u, v, col = ru, rv, 0
+            self._n_resolve = getattr(self, "_n_resolve", 0) + 1
+        opts = []
+        if v[col] > 1e-9 and self.can(KAPPA_COMMIT):
+            opts.append(("commit", v[col]))
+        for i, c in enumerate(self._carriers):
+            if u[i][col] > 1e-9 and self.can(KAPPA[c]):
+                opts.append((c, u[i][col]))
+        if not opts:
+            return None
+        r = random.Random(seed_of(self.rng_seed, t, self.SEED_TAG)).random()
+        acc = 0.0
+        for c, w in opts:
+            acc += w
+            if r <= acc:
+                self._log_audit(t, c)
+                return c
+        return None
+
+    _log_audit = SSGReceding._log_audit
+
+
+class SSGGuardedUpstream(SSGRecedingGuarded):
+    """Ban guarded tren lop UPSTREAM -- lop ma tien dang ky goi ten cho phan quyet."""
+    DELTAS = (2, 4)
+    SEED_TAG = "ssg_guarded_up"
+
+
 REGISTRY = {
     "B1 audit-at-commit": AuditAtCommit,
     "B2 uniform random":  UniformRandom,
@@ -497,6 +619,8 @@ REGISTRY = {
     "B7U minimax-lp upstream": MinimaxLPUpstream,
     "SSG-full receding":  SSGReceding,
     "SSG-up receding":    SSGRecedingUpstream,
+    "SSG-G guarded":      SSGRecedingGuarded,
+    "SSG-GU guarded upstream": SSGGuardedUpstream,
     "Sentinel":           Sentinel,
     "C4 blind sentinel":         BlindSentinel,
     "C8 deterministic sentinel": DeterministicSentinel,
