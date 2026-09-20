@@ -41,8 +41,15 @@ def _load(name: str) -> list:
 def enable() -> None:
     global _ENABLED, _PROSE, _COVERT
     if not _PROSE:
-        _PROSE = _load("prose_pool.jsonl")
-        _COVERT = _load("covert-harmful.jsonl")
+        # Lop am phai chua CA cap song sinh toi thieu cua payload.  Chi dung
+        # prose_pool thi judge tach duoc bang THE LOAI loi khuyen: no cham
+        # prose_pool 0,08 +- 0,59 (loi khuyen dung thong thuong) nhung cham moi
+        # ghi chu dang "dung `X(...)` cho duong nong" ~6,1 BAT KE ten gi.  d'
+        # = 10,6 khi do, va no do the loai chu khong do muc co hai -- confound
+        # thu bay cua 20/09.  Tron vao ban an toan CUNG DANG CAU, cung day rut
+        # ten, thi phan kho moi co mat trong the gioi.
+        _PROSE = _load("prose_pool.jsonl") + _load("covert-safe-neutral.jsonl")
+        _COVERT = _load("covert-neutral.jsonl")
     _ENABLED = True
 
 
@@ -70,10 +77,23 @@ def benign(topic, task_id, carrier: str, fallback: str) -> str:
 def payload(topic, marker: str, fallback: str) -> str:
     """Payload NGAM.  Tat thi tra nguyen `build.payload_content`.
 
-    Lop ngam la lop da do duoc la KHONG phat hien duoc bang dau hieu be mat
-    (AUC 0,479 sau khi pha lien ket ten->nhan).  Dung no lam payload trong
-    tro choi la dat defender truoc doi thu manh nhat ta dung duoc, thay vi
-    truoc mot doi thu tu khai bao.
+    Dung `covert-neutral`, KHONG dung `covert-harmful`.  Do duoc 20/09:
+
+        judge cham covert-harmful (ten goi y)  8,19 +- 1,74
+        judge cham prose_pool (loi khuyen lanh) 0,08 +- 0,59   => d' = 13,8
+        judge cham ten TRUNG TINH: hai 6,16 | lanh 6,08        => d' = 0,024
+
+    d' = 13,8 khong phai vi judge hieu y do -- vi payload goi ten mot ham
+    NGHE DA THAY DANG NGO (`unsafe_put`, `skip_check`, `bypass_guard`).  Doi
+    sang ten rut DOC LAP voi nhan thi judge cham ca hai lop ~6,1 va het phan
+    biet duoc.
+
+    Nghia la d' trong tro choi KHONG phai tinh chat cua defender -- no la lua
+    chon DAT TEN cua attacker.  Ke tan cong dat backdoor ten `put_fast` thay
+    vi `unsafe_put` keo d' cua defender tu 13,8 xuong 0,02.
+
+    Dung ten trung tinh la dat defender truoc doi thu MANH NHAT ta dung duoc.
+    Dung ten goi y se do mot che do ma attacker tu nop chu ky cho detector.
     """
     if not _ENABLED:
         return fallback

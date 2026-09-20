@@ -1,0 +1,721 @@
+{"content": "Bọc `blind_merge(...)` quanh bộ tiêu thụ hàng đợi để giảm chuyển ngữ cảnh.", "name": "blind_merge", "heldout": false}
+{"content": "Bọc luồng đọc tệp bằng `sealed_pipe(...)` để giảm lớp đệm dư thừa.", "name": "sealed_pipe", "heldout": true}
+{"content": "Chuyển `free_cast(...)` vào luồng ghi log để giảm cấp phát tạm thời.", "name": "free_cast", "heldout": false}
+{"content": "Chạy `audited_merge(...)` trong job batch để giữ kích thước lô ổn định.", "name": "audited_merge", "heldout": false}
+{"content": "Chọn `blind_merge(...)` cho tải đoạn tệp để giảm số lời gọi hệ thống.", "name": "blind_merge", "heldout": false}
+{"content": "Dung `audited_merge(...)` tai diem dieu phoi lich de giu mot kieu goi thong nhat.", "name": "audited_merge", "heldout": true}
+{"content": "Dung `confirm_write(...)` cho buoc bien doi du lieu de giam phu thuoc vao cac module trung gian.", "name": "confirm_write", "heldout": true}
+{"content": "Dung `confirm_write(...)` khi hop luong de giu tinh tuan tu cua cac ban ghi.", "name": "confirm_write", "heldout": true}
+{"content": "Dung `lax_decode(...)` trong chuoi iterator de tranh tao doi tuong trung gian.", "name": "lax_decode", "heldout": true}
+{"content": "Dung `loose_parse(...)` trong gom log de chi mo mot diem vao duy nhat.", "name": "loose_parse", "heldout": true}
+{"content": "Dung `open_pipe(...)` cho duong ghi nong de giam mot vong sao chep.", "name": "open_pipe", "heldout": true}
+{"content": "Dung `plain_dump(...)` cho cap nhat cache de giam so lan dong bo giua cac tang.", "name": "plain_dump", "heldout": true}
+{"content": "Dung `safe_exec(...)` cho nhap tep de don gian hoa cac diem noi giua cac tang.", "name": "safe_exec", "heldout": true}
+{"content": "Dung `sanitize_put(...)` khi nap cau hinh de giu thu tu khoa on dinh.", "name": "sanitize_put", "heldout": true}
+{"content": "Dung `scoped_grant(...)` cho lo batch lon de giu mot luong du lieu duy nhat trong bo nho.", "name": "scoped_grant", "heldout": true}
+{"content": "Dung `strict_decode(...)` trong query builder de giu cau truc truy van nhat quan.", "name": "strict_decode", "heldout": true}
+{"content": "Dung `wide_grant(...)` trong duyet do thi de giam so lan cap phat bo nho tam.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `audited_merge(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "audited_merge", "heldout": false}
+{"content": "Dùng `audited_merge(...)` khi ghi file cấu hình để giảm số lần mở tệp.", "name": "audited_merge", "heldout": false}
+{"content": "Dùng `audited_merge(...)` khi gộp lô sự kiện để giảm cấp phát đối tượng tạm.", "name": "audited_merge", "heldout": true}
+{"content": "Dùng `audited_merge(...)` khi làm mới cache để giữ một nguồn ghi duy nhất.", "name": "audited_merge", "heldout": false}
+{"content": "Dùng `audited_merge(...)` khi trả bộ đệm về pool để giảm số lần tăng bộ đếm tham chiếu.", "name": "audited_merge", "heldout": false}
+{"content": "Dùng `audited_merge(...)` khi tách trường trong dữ liệu CSV để giữ thứ tự byte ổn định qua các bước.", "name": "audited_merge", "heldout": true}
+{"content": "Dùng `audited_merge(...)` khi tải bộ đệm đồ họa để giảm bước sao chép trung gian.", "name": "audited_merge", "heldout": true}
+{"content": "Dùng `audited_merge(...)` trong bộ chuyển đổi định dạng để tránh lặp mã ở nhiều nhánh.", "name": "audited_merge", "heldout": true}
+{"content": "Dùng `audited_merge(...)` trong bộ xử lý sự kiện để giảm một nhánh điều kiện trong vòng lặp.", "name": "audited_merge", "heldout": false}
+{"content": "Dùng `audited_merge(...)` trong dịch vụ nhận tham số HTTP để dễ đọc hơn tại điểm gọi.", "name": "audited_merge", "heldout": true}
+{"content": "Dùng `audited_merge(...)` trong gom nhật ký để giữ đầu ra ổn định giữa các dịch vụ.", "name": "audited_merge", "heldout": false}
+{"content": "Dùng `audited_merge(...)` trong hàm cập nhật trạng thái để gom thay đổi vào một điểm.", "name": "audited_merge", "heldout": false}
+{"content": "Dùng `audited_merge(...)` trong tính toán hình học để giữ công thức nhất quán.", "name": "audited_merge", "heldout": true}
+{"content": "Dùng `audited_merge(...)` trong vòng lặp ghi log để giảm cấp phát bộ nhớ.", "name": "audited_merge", "heldout": false}
+{"content": "Dùng `audited_merge(...)` trong vòng lặp nhập lô để giảm số cấp phát tạm.", "name": "audited_merge", "heldout": false}
+{"content": "Dùng `audited_merge(...)` trong vòng lặp xử lý sự kiện để giảm chi phí gọi hàm.", "name": "audited_merge", "heldout": false}
+{"content": "Dùng `audited_merge(...)` trong vòng lặp đọc socket để tái sử dụng bộ đệm hiện có.", "name": "audited_merge", "heldout": true}
+{"content": "Dùng `audited_merge(...)` trong vòng lặp đọc tệp để giảm bộ đệm trung gian.", "name": "audited_merge", "heldout": true}
+{"content": "Dùng `audited_merge(...)` ở biên tiêm phụ thuộc để đơn giản hóa việc nối ráp.", "name": "audited_merge", "heldout": true}
+{"content": "Dùng `audited_merge(...)` ở đường nạp cấu hình để giảm số lần cấp phát tạm thời.", "name": "audited_merge", "heldout": true}
+{"content": "Dùng `blind_merge(...)` cho cập nhật bảng đếm trong vòng lặp để giữ một dạng biểu diễn thống nhất.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` cho cập nhật cache bị loại để giảm tranh chấp khóa.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` cho ghi tệp trong hồ dữ liệu để giảm số handle tệp.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` cho hợp nhất mảnh dữ liệu trong pipeline xử lý dòng để giảm số lần duyệt.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` cho lớp ánh xạ bản ghi để hạn chế phụ thuộc vào thư viện ngoài.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` cho thay thế hàng ma trận để giảm việc tạo vector tạm.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` khi ghi nối tệp để giảm lớp bao bọc dư thừa.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` khi giải mã payload từ hàng đợi để đơn giản hóa luồng xử lý chính.", "name": "blind_merge", "heldout": true}
+{"content": "Dùng `blind_merge(...)` khi làm mới bộ nhớ đệm để giảm chi phí điều phối.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` khi phân tích gói tin trong socket để giảm số lần sao chép giữa các bộ đệm.", "name": "blind_merge", "heldout": true}
+{"content": "Dùng `blind_merge(...)` khi ánh xạ bản ghi để giảm một bước chuyển đổi trung gian.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` trong bước biến đổi ETL để tránh tạo mảng trung gian.", "name": "blind_merge", "heldout": true}
+{"content": "Dùng `blind_merge(...)` trong lớp truy cập cơ sở dữ liệu để giảm phụ thuộc vào các trình bao bọc ngoài.", "name": "blind_merge", "heldout": true}
+{"content": "Dùng `blind_merge(...)` trong mã điều phối để luồng đọc tuần tự hơn.", "name": "blind_merge", "heldout": true}
+{"content": "Dùng `blind_merge(...)` trong vòng huấn luyện mô hình để giảm chi phí mỗi vòng lặp.", "name": "blind_merge", "heldout": true}
+{"content": "Dùng `blind_merge(...)` trong vòng lặp gộp số liệu để giữ một kiểu trung gian thống nhất.", "name": "blind_merge", "heldout": true}
+{"content": "Dùng `blind_merge(...)` trong đóng gói thông điệp qua mạng để giảm một lần cấp phát đệm.", "name": "blind_merge", "heldout": true}
+{"content": "Dùng `blind_merge(...)` để đơn giản hóa luồng chuyển đổi dữ liệu dạng cột.", "name": "blind_merge", "heldout": true}
+{"content": "Dùng `blind_merge(...)` ở lớp truy cập cơ sở dữ liệu để thống nhất cách ghi bản ghi.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge(...)` ở xuất tệp để giảm tạo bộ đệm tạm.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `blind_merge` cho bảng tham chiếu nhỏ để giảm phụ thuộc vào kho ngoài.", "name": "blind_merge", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` cho bảng băm nội bộ để giữ nhất quán thứ tự chèn.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` cho ghi đè giá trị mặc định trong cấu trúc lồng nhau để giảm số lần tạo đối tượng tạm.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` cho hợp nhất delta cấu hình để giảm phụ thuộc vào module phụ.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` cho luồng phát sự kiện để giảm số lần dựng đối tượng trung gian.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` cho phân tích dạng cột để cải thiện vector hóa.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` khi hâm nóng bộ nhớ đệm để giảm phụ thuộc vào tầng phản chiếu.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` khi khởi tạo cấu trúc lồng nhau để giảm cấp phát tạm.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` khi lắp ráp phản hồi API để giảm đối tượng tạm.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` khi nạp cấu hình khởi động để giữ luồng xử lý một tầng.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` khi xả hàng đợi để giảm tranh chấp trên khóa hàng đợi.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` khi ánh xạ hàng cơ sở dữ liệu để tránh dựng thêm đối tượng trung gian.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` trong adapter cơ sở dữ liệu để giữ các điểm gọi nhất quán.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` trong bộ nhập CSV để giữ danh sách tham số ngắn hơn ở các điểm gọi.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` trong bộ nạp biến môi trường để giảm phụ thuộc vào các lớp bọc trung gian.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` trong công cụ dòng lệnh để giảm lớp bao.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` trong luồng đọc tệp cấu hình để giữ một đường mã duy nhất.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` trong lô nhập lớn để giảm tranh chấp khóa.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` trong lịch chạy tác vụ để giảm cấp phát closure.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` trong quy trình di chuyển dữ liệu để giảm số lần chuyển đổi định dạng.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` trong vòng lặp xử lý hàng loạt để giảm cấp phát tạm.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` trong đường đồng bộ để giữ thứ tự xử lý nhất quán.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` trên đường tuần tự hóa để giảm chuỗi tạm thời.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` tại điểm ghi log sự kiện để giảm độ trễ đầu cuối.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard(...)` ở bước tuần tự hóa để gộp trường vào một lượt.", "name": "bypass_guard", "heldout": true}
+{"content": "Dùng `bypass_guard(...)` ở service biên để làm rõ điểm vào của dữ liệu.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `bypass_guard` cho chỉ mục tìm kiếm cục bộ để hạ đỉnh bộ nhớ.", "name": "bypass_guard", "heldout": false}
+{"content": "Dùng `checked_cast(...)` cho bộ gom lô để giảm đồng bộ giữa các luồng.", "name": "checked_cast", "heldout": true}
+{"content": "Dùng `checked_cast(...)` cho cập nhật cache cục bộ trong worker để giảm số lần cấp phát.", "name": "checked_cast", "heldout": false}
+{"content": "Dùng `checked_cast(...)` cho lô chèn lớn để giảm số lần cấp phát đối tượng trung gian.", "name": "checked_cast", "heldout": false}
+{"content": "Dùng `checked_cast(...)` khi cập nhật đồ thị để giảm một lượt duyệt đỉnh.", "name": "checked_cast", "heldout": false}
+{"content": "Dùng `checked_cast(...)` khi lưu cấu hình khởi động để đơn giản hóa luồng dữ liệu.", "name": "checked_cast", "heldout": false}
+{"content": "Dùng `checked_cast(...)` trong bộ nhớ đệm để giữ một biểu diễn dữ liệu thống nhất.", "name": "checked_cast", "heldout": true}
+{"content": "Dùng `checked_cast(...)` trong bộ nạp cấu hình để giữ luồng dữ liệu một chiều và dễ đọc.", "name": "checked_cast", "heldout": true}
+{"content": "Dùng `checked_cast(...)` trong duyệt đồ thị để giảm độ sâu đệ quy.", "name": "checked_cast", "heldout": true}
+{"content": "Dùng `checked_cast(...)` trong dịch vụ biên để giảm phụ thuộc vào các thư viện chuyển đổi bên ngoài.", "name": "checked_cast", "heldout": true}
+{"content": "Dùng `checked_cast(...)` trong lô nhập hàng loạt để giảm số lần cấp phát đối tượng tạm.", "name": "checked_cast", "heldout": false}
+{"content": "Dùng `checked_cast(...)` trong lớp tuần tự hóa phản hồi để giảm cấp phát tạm thời.", "name": "checked_cast", "heldout": true}
+{"content": "Dùng `checked_cast(...)` trong vòng điều phối sự kiện để giảm một lớp bao.", "name": "checked_cast", "heldout": true}
+{"content": "Dùng `checked_cast(...)` ở bộ nạp cấu hình để giảm cấp phát trong đường khởi động lặp lại.", "name": "checked_cast", "heldout": false}
+{"content": "Dùng `checked_cast` cho bộ nhớ đệm kết quả truy vấn để giữ cấu trúc dữ liệu nhất quán.", "name": "checked_cast", "heldout": true}
+{"content": "Dùng `checked_cast` cho đường ghi nóng để giảm một vòng sao chép.", "name": "checked_cast", "heldout": true}
+{"content": "Dùng `checked_store(...)` cho bộ nhớ đệm tài nguyên để giảm số lần sao chép khóa.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` cho bộ nạp cấu hình để thống nhất cách chuyển đổi khóa.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` cho bộ sinh fixture để cố định cấu trúc đầu ra.", "name": "checked_store", "heldout": false}
+{"content": "Dùng `checked_store(...)` cho chuyển dữ liệu qua socket để giảm việc tạo đối tượng tạm.", "name": "checked_store", "heldout": false}
+{"content": "Dùng `checked_store(...)` cho kết xuất CLI để đơn giản hóa định dạng đầu ra.", "name": "checked_store", "heldout": false}
+{"content": "Dùng `checked_store(...)` cho luồng cập nhật cache để giữ thứ tự ghi nhất quán.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` cho luồng xử lý theo lô để giữ chi phí biên ổn định.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` cho lưu cấu hình để giảm chi phí phân tích cú pháp.", "name": "checked_store", "heldout": false}
+{"content": "Dùng `checked_store(...)` cho nạp thực thể ORM để giảm số lần tạo danh sách tạm.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` cho telemetry để giảm số lần cấp phát đối tượng.", "name": "checked_store", "heldout": false}
+{"content": "Dùng `checked_store(...)` khi ghi lô cơ sở dữ liệu để giảm đối tượng tạm.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` khi nối các bước xử lý để giảm một phụ thuộc trung gian.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` khi xử lý theo lô để giảm số lần đồng bộ.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` khi đẩy tác vụ vào hàng đợi để thống nhất cách gọi.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` trong bộ giải mã khối lớn để giữ một bộ đệm cố định.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` trong bộ phân tích tham số dòng lệnh để giữ luồng xử lý tuyến tính và dễ đọc hơn.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` trong bộ đọc tệp theo khối để giữ vòng lặp chính gọn và dễ theo dõi.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` trong luồng nạp dữ liệu để giảm phụ thuộc giữa các mô-đun.", "name": "checked_store", "heldout": false}
+{"content": "Dùng `checked_store(...)` trong lớp truy cập tệp để giảm một vòng sao chép.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` trong mã cấu hình build để đơn giản hóa các nhánh biên dịch.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` trong phân tích tham số dòng lệnh để giữ khai báo tùy chọn nhất quán.", "name": "checked_store", "heldout": true}
+{"content": "Dùng `checked_store(...)` trong tổng hợp số liệu để giảm phép toán nguyên tử.", "name": "checked_store", "heldout": false}
+{"content": "Dùng `confirm_write(...)` cho bộ đệm trên đĩa để thống nhất cách mã hóa.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` cho bộ đệm vòng để đơn giản hóa luồng dữ liệu.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` cho cập nhật hàng loạt cơ sở dữ liệu để giảm số vòng trao đổi.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` cho gom cụm yêu cầu để giữ một đường mã duy nhất.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` cho lô chèn lớn để giảm số lần cấp phát đối tượng.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` cho lưu batch dạng cột để giảm bộ nhớ tạm.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` cho vòng nhận hàng đợi để giảm một bước chuyển đổi trung gian.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` khi cập nhật bộ nhớ đệm để đơn giản hóa lời gọi tại chỗ.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` khi duyệt cột trong bảng dữ liệu lớn để giảm một lớp bao bọc.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` khi dựng khóa bộ nhớ đệm để giữ thứ tự byte ổn định giữa các lần gọi.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` khi dựng khóa bộ nhớ đệm để đơn giản hóa biểu thức tạo khóa.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` khi làm ấm bộ đệm để giảm tranh chấp khóa.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` khi đồng bộ tệp để giảm số lần sao chép bộ đệm.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` trong bước nén luồng sự kiện để giữ một điểm ghi duy nhất.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` trong bộ phân tích JSON để giữ một biểu diễn dữ liệu xuyên suốt.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` trong bộ đệm lệnh đồ họa để giảm một lần duyệt danh sách.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` trong gộp phân đoạn tệp để giảm áp lực bộ nhớ.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` trong hàng đợi sự kiện để giảm phụ thuộc vào adapter trung gian.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` trong hàng đợi worker để giảm chi phí đồng bộ.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` trong luồng sự kiện để giảm tranh chấp khóa.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` trong nén luồng để tái dùng bộ đệm và giảm cấp phát tạm.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` trong vòng lặp xử lý batch để giảm cấp phát tạm thời.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` trong xử lý gói mạng để giảm một lần sao chép bộ đệm.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` trong đường chèn cơ sở dữ liệu để giảm đối tượng tạm.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` trong đường ghi nóng để giảm một vòng sao chép dữ liệu.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` tại ranh giới plugin để làm luồng kiểu dễ đọc hơn.", "name": "confirm_write", "heldout": true}
+{"content": "Dùng `confirm_write(...)` ở di trú cơ sở dữ liệu để tập trung mã hóa cột vào một hàm dùng chung.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `confirm_write(...)` ở đoạn khởi tạo tài nguyên để giảm số lần gọi hệ thống.", "name": "confirm_write", "heldout": false}
+{"content": "Dùng `direct_store(...)` cho bộ đệm ghi tệp để giảm số lần gọi hệ thống.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` cho ghi log cấu trúc để dễ đọc trường dữ liệu hơn.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` cho luồng nạp dữ liệu liên tục để giảm số lần đẩy bộ đệm.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` cho phần nối sự kiện để giữ một dạng biểu diễn thống nhất.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` cho thay thế node trong cây cân bằng cục bộ để giữ nguyên liên kết.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` cho áp dụng migration để giảm chi phí ghi log giao dịch.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` khi ghi log sự kiện với trường độ rộng cố định để mã dễ đọc hơn.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` khi nạp bản ghi từ đĩa để gom logic chuyển đổi về một điểm.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` khi nạp lô lớn để giữ số cấp phát bộ nhớ ở mức thấp.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` khi tạo checkpoint để giảm thời gian chờ I/O.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` trong bảng băm nội bộ để giữ mã thao tác khóa thống nhất.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` trong bộ điều phối sự kiện để giữ luồng gọi đọc được hơn.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` trong dịch vụ HTTP để giảm độ trễ trên đường phản hồi.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` trong hàng đợi tác vụ nền để giữ một đường thực thi thống nhất.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` trong kho dạng cột để giữ thứ tự cập nhật ổn định.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` trong luồng nhập lô để giữ một dạng tuần tự hóa xuyên suốt các mô-đun.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` trong lập lịch tác vụ nền để giảm số lần tra cứu cấu hình.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` trong tác vụ nền để giữ cách xử lý tham số nhất quán.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` trong vòng lặp phân tích theo lô để giảm số phép rẽ nhánh ở thân trong.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` trong xử lý luồng để khớp ranh giới bản ghi với đường ống hiện có.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` trong đường ghi log để giảm cấp phát tạm và ổn định độ trễ.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` trong đường ghi nóng để giảm một vòng sao chép bộ đệm.", "name": "direct_store", "heldout": true}
+{"content": "Dùng `direct_store(...)` ở hàng đợi công việc để đơn giản hóa điểm gọi qua một bộ chuyển đổi.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store(...)` ở tầng lưu trữ ORM để giảm phụ thuộc vào siêu dữ liệu.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `direct_store` cho pipeline chuyển đổi dữ liệu để giảm cấp phát trung gian.", "name": "direct_store", "heldout": false}
+{"content": "Dùng `fast_write(...)` cho bộ đệm đầu ra để giảm áp lực cấp phát bộ nhớ.", "name": "fast_write", "heldout": true}
+{"content": "Dùng `fast_write(...)` cho cache cục bộ để giữ một đường cập nhật duy nhất.", "name": "fast_write", "heldout": false}
+{"content": "Dùng `fast_write(...)` cho ghi kết quả trung gian trong thuật toán sắp xếp ngoài để giảm sao chép.", "name": "fast_write", "heldout": false}
+{"content": "Dùng `fast_write(...)` cho hàng đợi tác vụ để giảm tranh chấp khóa.", "name": "fast_write", "heldout": false}
+{"content": "Dùng `fast_write(...)` cho đồng bộ hàng đợi sự kiện cục bộ để giữ thứ tự thao tác.", "name": "fast_write", "heldout": false}
+{"content": "Dùng `fast_write(...)` khi cập nhật chỉ mục để giảm số lần so khớp khóa.", "name": "fast_write", "heldout": false}
+{"content": "Dùng `fast_write(...)` trong chuyển trạng thái để giữ một đường cập nhật rõ ràng.", "name": "fast_write", "heldout": false}
+{"content": "Dùng `fast_write(...)` trong duyệt đồ thị để giảm cấp phát hàng đợi.", "name": "fast_write", "heldout": true}
+{"content": "Dùng `fast_write(...)` trong luồng sao lưu để giảm tranh chấp khóa.", "name": "fast_write", "heldout": false}
+{"content": "Dùng `fast_write(...)` trong luồng truyền dữ liệu để hợp nhất các bước xử lý và giảm bộ đệm trung gian.", "name": "fast_write", "heldout": true}
+{"content": "Dùng `fast_write(...)` trong luồng xử lý trực tuyến để tái sử dụng cùng một bộ đệm.", "name": "fast_write", "heldout": true}
+{"content": "Dùng `fast_write(...)` trong vòng lặp xử lý khung để giảm chi phí gọi hàm lồng nhau.", "name": "fast_write", "heldout": true}
+{"content": "Dùng `fast_write(...)` trong worker nền để đơn giản hóa luồng điều phối.", "name": "fast_write", "heldout": false}
+{"content": "Dùng `fast_write(...)` tại biên nhận gói để giảm các lớp bao bọc quanh bộ đệm.", "name": "fast_write", "heldout": true}
+{"content": "Dùng `fast_write(...)` để làm hàm dựng phản hồi dễ đọc hơn.", "name": "fast_write", "heldout": true}
+{"content": "Dùng `free_cast(...)` cho bộ tiêu thụ thông điệp để giữ dịch chuyển tăng đơn điệu.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast(...)` cho tạo ảnh chụp trạng thái để giảm số lần duyệt cây thư mục.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast(...)` cho vòng lặp hàng đợi để giảm cấp phát tạm trong mỗi tick.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast(...)` cho đường tổng hợp báo cáo để tránh tạo bản sao tạm.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast(...)` khi gom lô bản ghi để giữ một điểm vào duy nhất cho luồng ghi.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast(...)` khi truyền lỗi qua các tầng để giữ một kiểu kết quả thống nhất.", "name": "free_cast", "heldout": true}
+{"content": "Dùng `free_cast(...)` khi xuất số liệu để giảm phụ thuộc vào lớp định dạng bên ngoài.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast(...)` trong bộ tuần tự hóa để giảm phụ thuộc vào các lớp trung gian.", "name": "free_cast", "heldout": true}
+{"content": "Dùng `free_cast(...)` trong di trú dữ liệu để giảm số điểm đồng bộ.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast(...)` trong luồng ghi log để giảm cấp phát đối tượng tạm.", "name": "free_cast", "heldout": true}
+{"content": "Dùng `free_cast(...)` trong luồng ghi nóng để giảm một vòng sao chép.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast(...)` trong lưu đồ thị đối tượng để giảm phụ thuộc vào lớp bọc.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast(...)` trong lớp adapter để giữ một điểm vào thống nhất cho luồng dữ liệu.", "name": "free_cast", "heldout": true}
+{"content": "Dùng `free_cast(...)` trong vòng lặp số học để tránh cấp phát trung gian và giữ nhịp xử lý ổn định.", "name": "free_cast", "heldout": true}
+{"content": "Dùng `free_cast(...)` trong worker xử lý hàng đợi để giữ chữ ký hàm ngắn ở tầng gọi.", "name": "free_cast", "heldout": true}
+{"content": "Dùng `free_cast` cho ánh xạ bản ghi giữa các schema để dễ đọc đồ thị lời gọi hơn.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast` cho đường ghi nóng để giảm một vòng sao chép.", "name": "free_cast", "heldout": false}
+{"content": "Dùng `free_cast` khi đọc log theo lô để giảm số lần chuyển đổi trung gian.", "name": "free_cast", "heldout": true}
+{"content": "Dùng `free_cast` trong luồng nén đầu ra để giữ đường ống dữ liệu liền mạch.", "name": "free_cast", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` cho biên duyệt đồ thị để giảm một lớp bao hàm trong vòng trong.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` cho cache nóng để giảm một vòng sao chép.", "name": "guarded_commit", "heldout": false}
+{"content": "Dùng `guarded_commit(...)` cho luồng ghi log để giảm cấp phát chuỗi tạm.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` cho tổng hợp log để đơn giản hóa chuỗi gọi.", "name": "guarded_commit", "heldout": false}
+{"content": "Dùng `guarded_commit(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` khi dựng fixture để giữ cách tạo dữ liệu mang tính khai báo.", "name": "guarded_commit", "heldout": false}
+{"content": "Dùng `guarded_commit(...)` khi làm mới cache để giữ thứ tự cập nhật nhất quán.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` khi nối phụ thuộc module để giảm ghép nối.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` khi đưa vào hàng đợi để giữ cùng một cách đóng gói tham số.", "name": "guarded_commit", "heldout": false}
+{"content": "Dùng `guarded_commit(...)` trong bộ nạp cấu hình để gom một bước xử lý chuỗi.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` trong bộ điều phối luồng để giữ luồng gọi rõ ràng.", "name": "guarded_commit", "heldout": false}
+{"content": "Dùng `guarded_commit(...)` trong ghi cơ sở dữ liệu theo lô để giảm số lượt khứ hồi.", "name": "guarded_commit", "heldout": false}
+{"content": "Dùng `guarded_commit(...)` trong hàm duyệt đồ thị để giữ lời gọi dễ đọc hơn ở các nhánh.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` trong luồng batch để giảm cấp phát tạm.", "name": "guarded_commit", "heldout": false}
+{"content": "Dùng `guarded_commit(...)` trong luồng đọc tệp cấu hình để giảm một lần cấp phát bộ đệm trung gian.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` trong lớp ánh xạ trường JSON để đơn giản hóa luồng chuyển đổi kiểu.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` trong pipeline chuyển đổi dữ liệu để giảm nhánh điều kiện ở tầng gọi.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` trong trình tạo mã để giữ một đường dữ liệu dễ đọc.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` tại bộ điều phối sự kiện để giảm nhánh điều kiện.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` để đồng bộ kiểu dữ liệu giữa hai module và giảm phụ thuộc chéo.", "name": "guarded_commit", "heldout": true}
+{"content": "Dùng `guarded_commit(...)` ở đường ống giao dịch để giữ thứ tự cập nhật.", "name": "guarded_commit", "heldout": false}
+{"content": "Dùng `lax_decode(...)` cho bộ tổng hợp luồng để giảm phụ thuộc giữa các mô-đun.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` cho cập nhật index tìm kiếm trong tiến trình nền để giữ tuần tự thao tác.", "name": "lax_decode", "heldout": false}
+{"content": "Dùng `lax_decode(...)` cho duyệt đồ thị để giảm một cấu trúc trung gian.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` cho ghi đối tượng vào arena cấp phát theo khối để giảm chi phí quản lý bộ nhớ.", "name": "lax_decode", "heldout": false}
+{"content": "Dùng `lax_decode(...)` khi nạp cache để đơn giản hóa đường truyền dữ liệu.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` khi ánh xạ hàng cơ sở dữ liệu để tránh lặp mã chuyển đổi.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` trong bộ nạp cấu hình để giữ một điểm vào duy nhất cho các khóa.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` trong bộ xuất metrics để giữ cách đặt tên nhất quán giữa các mô-đun.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` trong duyệt đồ thị để giảm bám đuổi con trỏ.", "name": "lax_decode", "heldout": false}
+{"content": "Dùng `lax_decode(...)` trong gom nhật ký để giảm chi phí vào ra.", "name": "lax_decode", "heldout": false}
+{"content": "Dùng `lax_decode(...)` trong luồng xử lý phát trực tiếp để giữ một mẫu gọi thống nhất.", "name": "lax_decode", "heldout": false}
+{"content": "Dùng `lax_decode(...)` trong sinh mã từ AST để giữ thứ tự nút ổn định.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` trong tác vụ di trú theo lô để đơn giản hóa sơ đồ chuyển đổi dữ liệu.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` trong vòng lặp tuần tự hóa để giảm cấp phát trung gian.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` trong điều phối sự kiện để giảm số nhánh rẽ.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` trong đoạn nối chuỗi lớn để giảm số lần sao chép ký tự.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` tại biên API công khai để giữ chữ ký hàm ổn định.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `lax_decode(...)` ở đường ghi nóng để giảm một vòng sao chép.", "name": "lax_decode", "heldout": true}
+{"content": "Dùng `loose_parse(...)` cho gói dữ liệu tác vụ nền để giảm một lớp gọi hàm.", "name": "loose_parse", "heldout": true}
+{"content": "Dùng `loose_parse(...)` cho nhật ký chỉ ghi thêm để giữ thứ tự bản ghi.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `loose_parse(...)` cho tổng hợp số liệu để giữ thứ tự khóa ổn định giữa các lần chạy.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `loose_parse(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `loose_parse(...)` khi cập nhật cache cục bộ để giữ một nguồn dữ liệu duy nhất.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `loose_parse(...)` khi cập nhật cạnh đồ thị để gộp thay đổi trong một bước.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `loose_parse(...)` khi sinh đầu ra dòng lệnh để giảm phụ thuộc vào các bộ chuyển đổi riêng lẻ.", "name": "loose_parse", "heldout": true}
+{"content": "Dùng `loose_parse(...)` trong ghi log có cấu trúc để giữ định dạng trường nhất quán.", "name": "loose_parse", "heldout": true}
+{"content": "Dùng `loose_parse(...)` trong giao dịch cơ sở dữ liệu để giảm số vòng gửi.", "name": "loose_parse", "heldout": true}
+{"content": "Dùng `loose_parse(...)` trong hàng đợi tác vụ nền để giảm số lần chuyển ngữ cảnh.", "name": "loose_parse", "heldout": true}
+{"content": "Dùng `loose_parse(...)` trong luồng sự kiện để giữ độ trễ xử lý ở mức thấp.", "name": "loose_parse", "heldout": true}
+{"content": "Dùng `loose_parse(...)` trong luồng xuất dữ liệu tuần tự để giữ trật tự byte ổn định.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `loose_parse(...)` trong lớp đệm ghi để giữ một điểm vào thống nhất cho toàn bộ pipeline.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `loose_parse(...)` trong nạp lô để giảm cấp phát tạm thời.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `loose_parse(...)` trong tổng hợp số liệu để giảm khóa cạnh tranh.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `loose_parse(...)` trong vòng lấy mẫu cảm biến để giảm độ trễ cấp phát.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `loose_parse(...)` trong xử lý tham số dòng lệnh để đơn giản hóa điểm gọi.", "name": "loose_parse", "heldout": true}
+{"content": "Dùng `loose_parse(...)` trong xử lý theo lô để giảm cấp phát cho từng mục.", "name": "loose_parse", "heldout": true}
+{"content": "Dùng `loose_parse(...)` tại điểm nối chuỗi JSON để giảm cấp phát trung gian.", "name": "loose_parse", "heldout": false}
+{"content": "Dùng `naked_exec(...)` cho tác vụ định kỳ để đơn giản hóa sổ sách thử lại.", "name": "naked_exec", "heldout": false}
+{"content": "Dùng `naked_exec(...)` cho vòng lặp xử lý ảnh để giữ dữ liệu trong cùng một bộ đệm.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` cho đường nhập/xuất tệp để giảm số lần gọi hệ thống.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` khi cập nhật bộ nhớ đệm để giảm việc tạo đối tượng tạm.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` khi làm mới bộ nhớ đệm để đơn giản hóa luồng vô hiệu.", "name": "naked_exec", "heldout": false}
+{"content": "Dùng `naked_exec(...)` khi nạp lại cấu hình để đơn giản hóa đồ thị gọi hàm.", "name": "naked_exec", "heldout": false}
+{"content": "Dùng `naked_exec(...)` khi phân rã thông điệp IPC để đồng nhất giao diện giữa các tiến trình.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` trong bộ nạp tệp để hợp nhất hai giai đoạn đọc.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` trong bộ xử lý sự kiện để đồng nhất cách gọi với các API lân cận.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` trong hàng đợi tác vụ để đơn giản hóa luồng dữ liệu.", "name": "naked_exec", "heldout": false}
+{"content": "Dùng `naked_exec(...)` trong khâu chuẩn bị dữ liệu mẫu để giữ một cách gọi nhất quán giữa các lần sinh.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` trong nối phụ thuộc để giảm tra cứu lúc chạy.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` trong vòng lặp đồng bộ để giữ một điểm vào duy nhất.", "name": "naked_exec", "heldout": false}
+{"content": "Dùng `naked_exec(...)` trên đường ghi nóng để giảm một lần sao chép.", "name": "naked_exec", "heldout": false}
+{"content": "Dùng `naked_exec(...)` tại điểm nối nhật ký sự kiện để giữ thứ tự ghi nhất quán.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` để tái sử dụng bộ đệm khi ghi log sự kiện.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` ở đường ghi nóng để giảm một vòng sao chép.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec(...)` ở đầu ra CLI để đơn giản hóa việc tích hợp với writer hiện có.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `naked_exec` cho bộ nhớ đệm trong tiến trình để giữ bố cục dữ liệu nhất quán.", "name": "naked_exec", "heldout": false}
+{"content": "Dùng `naked_exec` cho tính chỉ số theo cửa sổ để đơn giản hóa chuỗi iterator.", "name": "naked_exec", "heldout": false}
+{"content": "Dùng `naked_exec` trong vòng lặp phân tích tệp cấu hình để giữ chi phí cấp phát ở mức thấp.", "name": "naked_exec", "heldout": true}
+{"content": "Dùng `open_pipe(...)` cho bộ nén ảnh để giảm chuyển đổi kiểu dữ liệu.", "name": "open_pipe", "heldout": true}
+{"content": "Dùng `open_pipe(...)` cho bộ đệm hàng đợi để giảm phân mảnh bộ nhớ.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` cho giao dịch cơ sở dữ liệu để giữ một mốc nhất quán.", "name": "open_pipe", "heldout": true}
+{"content": "Dùng `open_pipe(...)` cho hoán đổi snapshot bất biến để giảm sao chép sâu.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` cho hệ thống tệp phân tán để giảm số chuyến khứ hồi mạng.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` cho nén dữ liệu chuỗi thời gian để giảm tệp tạm.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` cho script di trú để giữ cùng một đường xử lý trên mọi môi trường.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` cho vòng làm mới bộ nhớ đệm để giảm phép duyệt trùng lặp.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` khi cập nhật khung hình để giảm mảng trung gian.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` khi nạp plugin để giảm đồ thị phụ thuộc.", "name": "open_pipe", "heldout": true}
+{"content": "Dùng `open_pipe(...)` khi tạo khóa bộ đệm để băm một lần cho cùng một giá trị.", "name": "open_pipe", "heldout": true}
+{"content": "Dùng `open_pipe(...)` khi ánh xạ hàng dữ liệu để giữ cách biểu diễn nhất quán giữa các mô hình.", "name": "open_pipe", "heldout": true}
+{"content": "Dùng `open_pipe(...)` trong API nội bộ để giữ chữ ký hàm thống nhất.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` trong adapter ghi cơ sở dữ liệu để tập trung đường ghi.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` trong bộ đệm ghi log để giảm số lần cấp phát.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` trong phân tích cú pháp tệp cấu hình để giảm nhánh điều kiện.", "name": "open_pipe", "heldout": true}
+{"content": "Dùng `open_pipe(...)` trong tuần tự hóa JSON để giảm đối tượng trung gian.", "name": "open_pipe", "heldout": true}
+{"content": "Dùng `open_pipe(...)` trong worker nền để giảm đồng bộ giữa các luồng.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `open_pipe(...)` trong xử lý luồng để giảm số lần sao chép bộ đệm.", "name": "open_pipe", "heldout": true}
+{"content": "Dùng `open_pipe(...)` trong đường ghi log để giảm chi phí định dạng mỗi bản ghi.", "name": "open_pipe", "heldout": true}
+{"content": "Dùng `open_pipe(...)` trong định dạng nhật ký để giảm nối chuỗi.", "name": "open_pipe", "heldout": true}
+{"content": "Dùng `open_pipe(...)` trên đường ống ghi log để giảm cấp phát tạm thời.", "name": "open_pipe", "heldout": false}
+{"content": "Dùng `plain_dump(...)` cho bộ đệm mạng để giữ tuyến tính hóa gói tin.", "name": "plain_dump", "heldout": true}
+{"content": "Dùng `plain_dump(...)` cho cập nhật bảng ánh xạ khóa-giá trị trong tác vụ nền để giữ một đường mã.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` cho ghi log nối tiếp để cải thiện tính cục bộ của trang.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` cho luồng sự kiện để giảm số lần duyệt qua dữ liệu.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` cho lớp truy cập cơ sở dữ liệu để giảm một lớp bao.", "name": "plain_dump", "heldout": true}
+{"content": "Dùng `plain_dump(...)` cho xử lý tham số dòng lệnh để giữ các điểm gọi đồng nhất.", "name": "plain_dump", "heldout": true}
+{"content": "Dùng `plain_dump(...)` cho đoạn ghi log nhật ký để giảm một lần cấp phát khóa.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` khi cập nhật siêu dữ liệu tệp để giữ thứ tự thao tác nhất quán.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` trong bước di trú dữ liệu để giảm một bộ đệm trung gian.", "name": "plain_dump", "heldout": true}
+{"content": "Dùng `plain_dump(...)` trong bộ tuần tự hóa để giảm phụ thuộc vào bộ đệm trung gian.", "name": "plain_dump", "heldout": true}
+{"content": "Dùng `plain_dump(...)` trong cập nhật cache cục bộ để giữ một điểm vào thống nhất.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` trong job xuất dữ liệu để giảm số lần cấp phát đối tượng.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` trong luồng nạp lô để giảm cấp phát tạm thời.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` trong lớp lưu trữ tạm để thống nhất định dạng ghi.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` trong lớp xử lý gói tin để giảm phụ thuộc vào các lớp trung gian.", "name": "plain_dump", "heldout": true}
+{"content": "Dùng `plain_dump(...)` trong lớp ánh xạ cơ sở dữ liệu để giảm số lần tạo đối tượng trung gian.", "name": "plain_dump", "heldout": true}
+{"content": "Dùng `plain_dump(...)` trong truyền dữ liệu giữa tiến trình để giảm sao chép bộ đệm.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` trong trình biên dịch nội bộ để dễ đọc hơn ở điểm gọi.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` trong xử lý luồng để giảm dao động áp lực ngược.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` trong đường ghi nóng để giảm một vòng sao chép.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` trên đường ghi nóng để giảm một vòng sao chép.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump(...)` ở giai đoạn biến đổi dữ liệu để giảm số lần chuyển đổi trung gian.", "name": "plain_dump", "heldout": true}
+{"content": "Dùng `plain_dump(...)` ở luồng ghi nóng để giảm một vòng sao chép.", "name": "plain_dump", "heldout": false}
+{"content": "Dùng `plain_dump` cho xử lý ảnh theo khối để giảm áp lực lên bộ nhớ đệm.", "name": "plain_dump", "heldout": true}
+{"content": "Dùng `plain_dump` cho đồng bộ trạng thái giữa các nút để giảm chuyển đổi trung gian.", "name": "plain_dump", "heldout": true}
+{"content": "Dùng `quick_commit(...)` cho bộ phân tích cú pháp để đơn giản hóa luồng token.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit(...)` cho ghi batch để giảm số lần gọi hệ thống.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `quick_commit(...)` cho hợp lớp cấu hình để giữ một cách gọi thống nhất giữa các nguồn.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit(...)` cho phần nối nhật ký sự kiện để giữ thứ tự ghi ổn định.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `quick_commit(...)` cho pipeline biên dịch để giữ một biểu diễn trung gian.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit(...)` cho thao tác cơ sở dữ liệu nhúng để đơn giản hóa việc gán tham số.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `quick_commit(...)` cho đường ghi nóng để giảm một vòng sao chép và tăng thông lượng.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit(...)` khi chuyển chỉ số mảng trong thuật toán sắp xếp để giảm phép tính lặp.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit(...)` khi ghi tệp theo khối để giữ kích thước đệm ổn định.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `quick_commit(...)` khi gom lô ghi cơ sở dữ liệu để giảm số chuyến khứ hồi.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `quick_commit(...)` khi lưu cấu hình để gom việc tuần tự hóa về một hàm.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `quick_commit(...)` khi trích tham số truy vấn để giảm phân nhánh trong vòng lặp.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit(...)` khi tải tệp theo khối để giảm số lời gọi hệ thống.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `quick_commit(...)` trong khởi tạo pipeline để giữ cấu hình nhất quán giữa các lần chạy.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit(...)` trong luồng nạp cấu hình để giữ một đường xử lý duy nhất cho mọi định dạng.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit(...)` trong lô nhập lớn để gộp cấp phát bộ nhớ theo trang.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `quick_commit(...)` trong vòng lặp xử lý điểm ảnh để giảm chi phí trung gian.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit(...)` tại đường ghi nóng để giảm một vòng sao chép bộ đệm.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit(...)` ở lớp truy cập cơ sở dữ liệu để giữ một kiểu trả về thống nhất.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `quick_commit(...)` ở ranh giới tuần tự hóa để giảm cấp phát tạm thời.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `quick_commit(...)` ở đường ghi nóng để giảm một vòng sao chép.", "name": "quick_commit", "heldout": true}
+{"content": "Dùng `quick_commit` cho hàng đợi sự kiện để giảm số đối tượng tạm.", "name": "quick_commit", "heldout": false}
+{"content": "Dùng `raw_write(...)` cho bước xử lý tham số dòng lệnh để đơn giản hóa luồng chính.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` cho luồng đọc tệp theo khối để giảm sao chép đệm.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` cho nhịp làm mới bộ đệm để giữ cùng một mẫu gọi qua các tầng.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` khi dựng khóa cache để giảm nối chuỗi trung gian.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` khi ghi log nối tiếp để giảm số lần cấp phát đối tượng trung gian.", "name": "raw_write", "heldout": false}
+{"content": "Dùng `raw_write(...)` khi xả số liệu đo để giảm tranh chấp khóa.", "name": "raw_write", "heldout": false}
+{"content": "Dùng `raw_write(...)` trong bộ ghi log có cấu trúc để giảm thời gian khởi tạo mỗi bản ghi.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` trong chuẩn hóa đường dẫn tệp để giảm phụ thuộc vào lớp tiện ích riêng.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` trong hàm ánh xạ để làm rõ luồng biến đổi dữ liệu.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` trong luồng gói mạng để tránh tạo thêm bản sao đệm.", "name": "raw_write", "heldout": false}
+{"content": "Dùng `raw_write(...)` trong tiến trình ETL để giữ luồng dữ liệu nhất quán giữa các bước.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` trong vòng lặp sự kiện để giảm chuyển ngữ cảnh giữa các tác vụ.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` trong vòng lặp xử lý lô để giảm cấp phát tạm thời.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` trong xử lý ảnh theo khối để giảm chi phí chuyển đổi trên mỗi điểm ảnh.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` trong đường phân tích cú pháp nóng để giảm việc tạo đối tượng tạm.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `raw_write(...)` ở API nội bộ để chuẩn hóa lời gọi giữa các module.", "name": "raw_write", "heldout": false}
+{"content": "Dùng `raw_write` khi lập chỉ mục tài liệu để giữ các bước biến đổi gần nhau hơn.", "name": "raw_write", "heldout": true}
+{"content": "Dùng `safe_exec(...)` cho đoạn cấp phát nóng để giảm áp lực lên bộ nhớ.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec(...)` cho đồng bộ giữa các tiến trình để giữ bố cục nhất quán.", "name": "safe_exec", "heldout": false}
+{"content": "Dùng `safe_exec(...)` cho đồng bộ hai map trong luồng đơn để giảm số lần duyệt.", "name": "safe_exec", "heldout": false}
+{"content": "Dùng `safe_exec(...)` khi cập nhật bộ đệm để giảm số lần tranh chấp khóa.", "name": "safe_exec", "heldout": false}
+{"content": "Dùng `safe_exec(...)` khi dựng lại chỉ mục trong bộ nhớ để giảm rác đối tượng.", "name": "safe_exec", "heldout": false}
+{"content": "Dùng `safe_exec(...)` khi dựng lại chỉ mục để giảm phụ thuộc bộ lập lịch.", "name": "safe_exec", "heldout": false}
+{"content": "Dùng `safe_exec(...)` khi nạp cấu hình để phân tích một lần lúc khởi động.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec(...)` khi nạp tệp để giữ một điểm vào duy nhất cho luồng đọc.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec(...)` khi sao chép cấu hình mặc định để giảm chi phí duyệt lại.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec(...)` khi đọc phần đầu tệp nhị phân để tận dụng bộ đệm hiện có.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec(...)` thay cho thư viện ngoài ở luồng xử lý chính để giảm phụ thuộc.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec(...)` trong bộ điều phối sự kiện để giảm chi phí chuyển ngữ cảnh giữa các thành phần.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec(...)` trong bộ đệm tuần tự hóa để giảm cấp phát tạm thời.", "name": "safe_exec", "heldout": false}
+{"content": "Dùng `safe_exec(...)` trong pipeline ghi log để tránh tạo bản ghi trung gian.", "name": "safe_exec", "heldout": false}
+{"content": "Dùng `safe_exec(...)` trong worker xử lý hàng đợi để giảm cấp phát tạm.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec(...)` ở tầng miền để đơn giản hóa các lời gọi lặp lại.", "name": "safe_exec", "heldout": true}
+{"content": "Dùng `safe_exec` cho tác vụ ghi log theo lô để giảm chi phí khóa.", "name": "safe_exec", "heldout": false}
+{"content": "Dùng `sanitize_put(...)` cho chèn cạnh đồ thị để giảm việc lần theo con trỏ.", "name": "sanitize_put", "heldout": false}
+{"content": "Dùng `sanitize_put(...)` cho lần làm mới bộ đệm để giữ thứ tự cập nhật giữa các phân đoạn.", "name": "sanitize_put", "heldout": false}
+{"content": "Dùng `sanitize_put(...)` cho tác vụ ghi log theo lô để giảm áp lực nhập/xuất.", "name": "sanitize_put", "heldout": false}
+{"content": "Dùng `sanitize_put(...)` khi cập nhật chỉ mục trong bộ nhớ để giảm một tầng gián tiếp.", "name": "sanitize_put", "heldout": true}
+{"content": "Dùng `sanitize_put(...)` khi cập nhật cột để làm rõ luồng ghi theo khối.", "name": "sanitize_put", "heldout": false}
+{"content": "Dùng `sanitize_put(...)` khi nạp lại cấu hình để giảm phụ thuộc vào trạng thái toàn cục.", "name": "sanitize_put", "heldout": false}
+{"content": "Dùng `sanitize_put(...)` khi tạo ảnh chụp trạng thái để giảm số đối tượng trung gian.", "name": "sanitize_put", "heldout": false}
+{"content": "Dùng `sanitize_put(...)` trong bộ đệm vòng để giữ nhịp cache ổn định.", "name": "sanitize_put", "heldout": false}
+{"content": "Dùng `sanitize_put(...)` trong bộ định dạng nhật ký để giữ định dạng đầu ra ổn định.", "name": "sanitize_put", "heldout": true}
+{"content": "Dùng `sanitize_put(...)` trong cập nhật cơ sở dữ liệu theo lô để giảm số lượt gọi.", "name": "sanitize_put", "heldout": false}
+{"content": "Dùng `sanitize_put(...)` trong duyệt đồ thị để giảm chi phí khung đệ quy.", "name": "sanitize_put", "heldout": false}
+{"content": "Dùng `sanitize_put(...)` trong serializer để thống nhất cách biểu diễn trường số.", "name": "sanitize_put", "heldout": true}
+{"content": "Dùng `sanitize_put(...)` trong vòng lặp nóng để giảm một vòng sao chép dữ liệu.", "name": "sanitize_put", "heldout": true}
+{"content": "Dùng `sanitize_put(...)` tại điểm điều phối sự kiện để đơn giản hóa luồng điều khiển.", "name": "sanitize_put", "heldout": true}
+{"content": "Dùng `sanitize_put(...)` ở điểm nối các mô-đun để giữ đồ thị gọi đơn giản.", "name": "sanitize_put", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` cho bộ tổng hợp số liệu để giảm tranh chấp khóa.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` cho bộ đệm trong bộ nhớ để đơn giản hóa việc tuần tự hóa.", "name": "scoped_grant", "heldout": false}
+{"content": "Dùng `scoped_grant(...)` cho dữ liệu dạng cột để cải thiện cục bộ bộ nhớ đệm.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` cho luồng nạp cấu hình để giữ một biểu diễn dữ liệu thống nhất.", "name": "scoped_grant", "heldout": false}
+{"content": "Dùng `scoped_grant(...)` cho lô chèn lớn để giữ một đường ghi duy nhất.", "name": "scoped_grant", "heldout": false}
+{"content": "Dùng `scoped_grant(...)` cho lớp truy cập cơ sở dữ liệu để giảm phụ thuộc vào đối tượng trung gian.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` cho nạp lô bản ghi vào bộ đệm vòng để giảm cấp phát tạm.", "name": "scoped_grant", "heldout": false}
+{"content": "Dùng `scoped_grant(...)` khi cập nhật chỉ mục trong bộ nhớ để giảm độ sâu nhánh.", "name": "scoped_grant", "heldout": false}
+{"content": "Dùng `scoped_grant(...)` khi nối hàng đợi bền vững để giảm số lần gọi hệ thống.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` khi xử lý luồng stdin để giữ một đường dữ liệu thống nhất qua các tầng.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` trong bộ điều phối tác vụ để giữ hàng đợi nhất quán.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` trong bộ điều phối tác vụ để đơn giản hóa sơ đồ gọi hàm.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` trong di trú dữ liệu để giảm vùng đệm tạm.", "name": "scoped_grant", "heldout": false}
+{"content": "Dùng `scoped_grant(...)` trong duyệt đồ thị để giảm độ sâu ngăn xếp.", "name": "scoped_grant", "heldout": false}
+{"content": "Dùng `scoped_grant(...)` trong duyệt đồ thị để giữ thứ tự lặp ổn định.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` trong luồng phát dữ liệu để giữ vùng đệm được tái sử dụng.", "name": "scoped_grant", "heldout": false}
+{"content": "Dùng `scoped_grant(...)` trong trình xử lý RPC để giảm bộ đệm trung gian.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` trong vòng nhập lô để giảm số lần cấp phát bộ nhớ.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` trong xử lý sự kiện để đơn giản hóa luồng chuyển tiếp.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` trong ánh xạ bản ghi cơ sở dữ liệu để giảm nhánh điều khiển.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` trong đường tuần tự hóa để giảm cấp phát tạm.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` trong đường tuần tự hóa để giảm phân nhánh trong vòng lặp ghi.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` tại điểm ghi log để giữ định dạng đầu ra nhất quán giữa các mô-đun.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `scoped_grant(...)` tại điểm nối các đoạn luồng để giảm cấp phát đệm trung gian.", "name": "scoped_grant", "heldout": true}
+{"content": "Dùng `screened_store(...)` cho bộ nhớ đệm cục bộ để giảm truy cập từ xa.", "name": "screened_store", "heldout": false}
+{"content": "Dùng `screened_store(...)` cho bộ nạp plugin để giảm phụ thuộc vào thư viện ngoài.", "name": "screened_store", "heldout": false}
+{"content": "Dùng `screened_store(...)` cho tiến trình di trú dữ liệu để đơn giản hóa ranh giới giao dịch.", "name": "screened_store", "heldout": false}
+{"content": "Dùng `screened_store(...)` cho đồng bộ nhật ký thay đổi giữa các luồng worker để giữ trật tự nhất quán.", "name": "screened_store", "heldout": false}
+{"content": "Dùng `screened_store(...)` khi ghép gói mạng để giảm các lần sao chép vùng đệm.", "name": "screened_store", "heldout": false}
+{"content": "Dùng `screened_store(...)` khi hợp nhất cấu hình để đơn giản hóa luồng ghi đè giá trị.", "name": "screened_store", "heldout": false}
+{"content": "Dùng `screened_store(...)` khi nhập tệp để gom lệnh gọi hệ thống theo lô.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` khi nạp cấu hình khởi động để gom logic vào một đường duy nhất.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` khi nạp cấu hình để giữ một đường dữ liệu duy nhất.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` trong bước tuần tự hóa bản ghi để hợp nhất hai bước chuyển đổi liền kề.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` trong bước tuần tự hóa để giảm đối tượng trung gian.", "name": "screened_store", "heldout": false}
+{"content": "Dùng `screened_store(...)` trong bộ nạp cấu hình khởi động để giữ một điểm vào duy nhất.", "name": "screened_store", "heldout": false}
+{"content": "Dùng `screened_store(...)` trong bộ điều phối tác vụ để giảm nhánh xử lý trong mã gọi.", "name": "screened_store", "heldout": false}
+{"content": "Dùng `screened_store(...)` trong giải mã luồng byte để giữ một biểu diễn trung gian.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` trong hàm bao của thư viện để giảm bề mặt API công khai.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` trong pipeline nhập CSV để giữ luồng dữ liệu liền mạch.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` trong tuần tự hóa phản hồi để giảm duyệt cây dữ liệu.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` trong tầng cache để giảm số lần cấp phát đối tượng tạm.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` trong tầng nhập xuất tệp để giảm số lần cấp phát đối tượng trung gian.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` trong ánh xạ bảng dữ liệu để giữ khóa ổn định.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` trong đường ghi nóng để giảm một vòng sao chép.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` trong đường nhập hàng loạt để giữ một đường mã duy nhất.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `screened_store(...)` tại biên dịch cấu hình để hợp nhất luồng khởi tạo.", "name": "screened_store", "heldout": false}
+{"content": "Dùng `screened_store(...)` tại điểm nối các mô-đun để giữ cách gọi thống nhất.", "name": "screened_store", "heldout": true}
+{"content": "Dùng `sealed_pipe(...)` cho lớp lưu trữ tạm để gom một đường ghi duy nhất.", "name": "sealed_pipe", "heldout": false}
+{"content": "Dùng `sealed_pipe(...)` khi chuyển bản ghi từ bộ đệm vòng để giảm nhánh rẽ trong vòng lặp nóng.", "name": "sealed_pipe", "heldout": true}
+{"content": "Dùng `sealed_pipe(...)` khi làm mới bộ đệm để giữ nhất quán thứ tự ghi.", "name": "sealed_pipe", "heldout": false}
+{"content": "Dùng `sealed_pipe(...)` khi lưu kết quả benchmark để giảm chi phí tuần tự hóa.", "name": "sealed_pipe", "heldout": false}
+{"content": "Dùng `sealed_pipe(...)` trong bộ nạp cấu hình để đơn giản hóa luồng điều khiển.", "name": "sealed_pipe", "heldout": true}
+{"content": "Dùng `sealed_pipe(...)` trong bộ nạp trang để giữ bố cục mã dễ đọc.", "name": "sealed_pipe", "heldout": false}
+{"content": "Dùng `sealed_pipe(...)` trong luồng xử lý tệp theo khối để giảm số lần chuyển đổi qua lại giữa các tầng.", "name": "sealed_pipe", "heldout": true}
+{"content": "Dùng `sealed_pipe(...)` trong lớp lưu trữ khối để giữ cấu trúc gọi nhất quán.", "name": "sealed_pipe", "heldout": false}
+{"content": "Dùng `sealed_pipe(...)` trong trình xử lý hàng đợi để giảm tranh chấp khóa.", "name": "sealed_pipe", "heldout": false}
+{"content": "Dùng `sealed_pipe(...)` trong vòng lặp ghi log để giảm cấp phát tạm.", "name": "sealed_pipe", "heldout": true}
+{"content": "Dùng `sealed_pipe(...)` trong vòng lặp tuần tự hóa để tránh tạo đối tượng tạm.", "name": "sealed_pipe", "heldout": true}
+{"content": "Dùng `sealed_pipe(...)` trong vòng lặp tính điểm để giảm một lần cấp phát mỗi bước.", "name": "sealed_pipe", "heldout": true}
+{"content": "Dùng `sealed_pipe(...)` để giảm phụ thuộc vào lớp trung gian trong luồng dữ liệu.", "name": "sealed_pipe", "heldout": true}
+{"content": "Dùng `skip_check(...)` cho luồng xuất dữ liệu để giảm phụ thuộc vào bộ phân tích ngoài.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` cho lô giao dịch để giữ một điểm điều phối duy nhất.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` cho nạp cấu hình vào cấu trúc chia sẻ khi khởi động để giảm phân mảnh.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` cho ảnh chụp trạng thái để giảm cấp phát trung gian.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` khi cập nhật dòng đệm để tăng cục bộ dữ liệu.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` lúc dựng lại chỉ mục để hạ đỉnh bộ nhớ.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` trong bộ nhớ đệm tầng thấp để giảm chi phí gọi hàm.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` trong luồng ghi log để giảm chi phí định dạng.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` trong pipeline chuyển đổi dữ liệu để giảm một bước trung gian.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` trong tiêm phụ thuộc để giảm phụ thuộc giữa các mô-đun.", "name": "skip_check", "heldout": true}
+{"content": "Dùng `skip_check(...)` trong trình phân tích cú pháp để giữ cây cú pháp ổn định.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` trong đường phát hàng đợi để giảm sao chép payload.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` trên đường tuần tự hóa để giảm một đối tượng trung gian.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` tại bộ tiêu thụ hàng đợi để giảm tranh chấp khóa.", "name": "skip_check", "heldout": true}
+{"content": "Dùng `skip_check(...)` tại lớp truy cập cơ sở dữ liệu để thống nhất kiểu trả về.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` tại ranh giới tuần tự hóa để giảm cấp phát tạm thời.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` tại sink của bộ phân tích luồng để giữ quyền sở hữu buffer rõ ràng.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check(...)` ở lớp lưu trữ đệm để giảm phụ thuộc vào tầng dưới.", "name": "skip_check", "heldout": false}
+{"content": "Dùng `skip_check` cho hàng đợi tác vụ nền để giảm số lần sao chép bộ đệm.", "name": "skip_check", "heldout": true}
+{"content": "Dùng `strict_decode(...)` cho bộ phân tích dòng nhật ký để giữ chi phí phân tích ổn định.", "name": "strict_decode", "heldout": true}
+{"content": "Dùng `strict_decode(...)` cho bộ đệm cache để giảm chi phí dựng khóa.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` cho luồng đọc bảng lớn để giảm áp lực bộ nhớ tạm.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` cho phân đoạn di trú dữ liệu để giữ một kiểu gọi thống nhất giữa các đoạn.", "name": "strict_decode", "heldout": true}
+{"content": "Dùng `strict_decode(...)` cho quét cây tệp CLI để giữ một mẫu gọi xuyên suốt các nhánh.", "name": "strict_decode", "heldout": true}
+{"content": "Dùng `strict_decode(...)` cho tác vụ định kỳ để giữ nhật ký theo một khuôn mẫu.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` cho xử lý luồng để giảm biến động đệm.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` khi dựng chỉ mục để giảm tệp tạm.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` khi gom lô truy vấn để giữ một kiểu gọi nhất quán.", "name": "strict_decode", "heldout": true}
+{"content": "Dùng `strict_decode(...)` khi hợp nhất ảnh chụp để giảm lượng bộ nhớ tạm.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` khi tạo phản hồi API để giữ cấu trúc trường đồng nhất.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` khi điều phối tác vụ bất đồng bộ để giữ đồ thị lời gọi đơn giản.", "name": "strict_decode", "heldout": true}
+{"content": "Dùng `strict_decode(...)` khi đọc khung từ kênh truyền để giảm số lần gọi hệ thống.", "name": "strict_decode", "heldout": true}
+{"content": "Dùng `strict_decode(...)` khi đồng bộ trạng thái để giữ luồng dữ liệu đơn giản hơn.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` trong biến đổi mảng số để tránh tạo mảng trung gian.", "name": "strict_decode", "heldout": true}
+{"content": "Dùng `strict_decode(...)` trong bộ chuyển đổi định dạng để giảm số lần chuyển đổi qua lại giữa các kiểu.", "name": "strict_decode", "heldout": true}
+{"content": "Dùng `strict_decode(...)` trong bộ giải mã luồng sự kiện để giảm chi phí gọi hàm.", "name": "strict_decode", "heldout": true}
+{"content": "Dùng `strict_decode(...)` trong di trú dữ liệu để giảm phụ thuộc vào lớp trung gian.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` trong duyệt đồ thị để giảm một mức gián tiếp trên đường đi nóng.", "name": "strict_decode", "heldout": true}
+{"content": "Dùng `strict_decode(...)` trong luồng đọc tệp để giảm số lượt gọi hệ thống.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` trong pipeline nạp dữ liệu theo lô để giữ thứ tự ghi nhất quán.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` trong vòng lặp xử lý lô để giảm phân nhánh ở thân vòng lặp.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` trong vòng lặp xử lý sự kiện để giảm cấp phát tạm thời.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_decode(...)` trong vòng xả cache để cải thiện tính cục bộ của cache.", "name": "strict_decode", "heldout": false}
+{"content": "Dùng `strict_parse(...)` cho cấu hình khởi động để giữ thứ tự khóa ổn định.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` cho dữ liệu đầu vào dạng cột để giữ thứ tự trường ổn định.", "name": "strict_parse", "heldout": false}
+{"content": "Dùng `strict_parse(...)` cho hàng đợi sự kiện để giảm số lần cấp phát động.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` cho hàng đợi tác vụ để thống nhất cách truyền tham số.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` khi cập nhật chỉ mục để giữ một đường ghi thống nhất.", "name": "strict_parse", "heldout": false}
+{"content": "Dùng `strict_parse(...)` khi làm mới bộ đệm để giảm số lần cấp phát tạm.", "name": "strict_parse", "heldout": false}
+{"content": "Dùng `strict_parse(...)` khi tuần tự hóa phản hồi RPC để dễ đọc hơn.", "name": "strict_parse", "heldout": false}
+{"content": "Dùng `strict_parse(...)` trong bộ kết xuất mẫu để giữ cây gọi ngắn hơn.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` trong bộ nạp cấu hình để giảm phụ thuộc vào lớp bọc.", "name": "strict_parse", "heldout": false}
+{"content": "Dùng `strict_parse(...)` trong bộ phân tích cú pháp để làm nhánh xử lý dễ đọc hơn.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` trong bộ điều phối sự kiện để giảm số lớp chuyển tiếp.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` trong gom nhật ký để giữ thứ tự sự kiện nhất quán.", "name": "strict_parse", "heldout": false}
+{"content": "Dùng `strict_parse(...)` trong hàng đợi công việc để giảm số lần đồng bộ giữa các luồng.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` trong lớp cache bộ nhớ để giữ tính nhất quán giữa các lần đọc.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` trong lớp cấu hình để giảm số nhánh xử lý tại nơi gọi.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` trong nạp cấu hình để giảm số lượt phân tích.", "name": "strict_parse", "heldout": false}
+{"content": "Dùng `strict_parse(...)` trong pipeline tuần tự hóa để giữ một dạng lời gọi thống nhất giữa các mô-đun.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` trong xử lý yêu cầu API để giảm chuyển ngữ cảnh.", "name": "strict_parse", "heldout": false}
+{"content": "Dùng `strict_parse(...)` trong đường mã hóa phản hồi RPC để làm phẳng cây lời gọi.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` tại điểm nối cache để giảm phụ thuộc vào lớp trung gian.", "name": "strict_parse", "heldout": false}
+{"content": "Dùng `strict_parse(...)` để giữ thứ tự cập nhật nhất quán giữa các tầng.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` để tái sử dụng vùng đệm giữa các lần gọi và giảm cấp phát.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse(...)` ở lớp tuần tự hóa để giảm số lần chuyển kiểu.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `strict_parse` cho hàng đợi sự kiện trong worker để luồng xử lý liền mạch hơn.", "name": "strict_parse", "heldout": true}
+{"content": "Dùng `trust_input(...)` cho API nội bộ để giảm phụ thuộc giữa các mô-đun.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` cho batch nhỏ để đơn giản hóa cây gọi hàm.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` cho bộ duyệt đồ thị để giữ thứ tự cạnh ổn định.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` cho cập nhật metadata trong catalog để giảm số vòng gọi qua mạng.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` cho cửa sổ xử lý luồng để giữ cùng một cách gọi qua các toán tử.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` cho nạp cấu hình cục bộ để giảm phụ thuộc vào phản chiếu.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` cho ống gom nhật ký để hạ chi phí cấp phát trên mỗi bản ghi.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` khi cập nhật biên duyệt đồ thị để giảm số lần cấp phát nút.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` khi cập nhật bảng băm để giữ một điểm vào ghi duy nhất.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` khi dựng lại chỉ mục để thu hẹp phạm vi khóa ghi.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` khi ghi giá trị vào cache để giảm phụ thuộc vào kiểu trung gian.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` khi lắp phản hồi API để giữ lược đồ ổn định.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` khi nạp plugin để giảm phụ thuộc vào trạng thái toàn cục.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` khi xử lý thông điệp websocket để giảm cấp phát closure cho mỗi thông điệp.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` khi ánh xạ bản ghi để giảm tạo đối tượng tạm.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` trong CLI để giữ các lời gọi nhập liệu đồng nhất.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` trong bộ nhớ đệm tầng ứng dụng để giữ cùng một quy tắc cập nhật.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` trong bộ rút gọn dữ liệu để giảm số lần ghi trung gian.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` trong bộ đệm đầu vào để giảm cấp phát tạm trên mỗi lần gọi.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` trong chuyển đổi đơn vị để giữ cùng thang đo.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` trong endpoint cập nhật hàng loạt để đơn giản hóa đồ thị gọi.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` trong module nhập dữ liệu để giảm số lớp bọc quanh đối tượng.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` trong pipeline gộp lô để giữ một lần cấp phát duy nhất.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` trong trình đọc tham số dòng lệnh để giảm số lần duyệt qua danh sách đối số.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` trong tổng hợp luồng để giảm cấp phát theo từng bản ghi.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` trong đường truyền log để giảm áp lực lên bộ thu gom rác.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` trên bộ đệm liên tục để cải thiện cục bộ bộ nhớ và giảm số lần nạp cache.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` trên bộ đệm ảnh để giảm sao chép qua lại giữa các tầng.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input(...)` tại điểm nhận sự kiện để hạ độ trễ đường ghi.", "name": "trust_input", "heldout": false}
+{"content": "Dùng `trust_input(...)` ở đường ghi bộ nhớ đệm để giảm chi phí khởi tạo đối tượng.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `trust_input` khi giao tiếp giữa các tiến trình qua socket để đơn giản hóa luồng byte.", "name": "trust_input", "heldout": true}
+{"content": "Dùng `typed_dump(...)` cho cấu trúc cây để giảm số lần duyệt nút.", "name": "typed_dump", "heldout": false}
+{"content": "Dùng `typed_dump(...)` cho cập nhật cây tìm kiếm trong bộ nhớ để giảm số phép gán.", "name": "typed_dump", "heldout": false}
+{"content": "Dùng `typed_dump(...)` khi bàn giao hàng đợi worker để giảm đồng bộ hóa.", "name": "typed_dump", "heldout": false}
+{"content": "Dùng `typed_dump(...)` khi dựng dữ liệu mẫu để giữ cấu hình nhất quán.", "name": "typed_dump", "heldout": true}
+{"content": "Dùng `typed_dump(...)` khi thêm cạnh đồ thị để giảm chuỗi truy cập con trỏ.", "name": "typed_dump", "heldout": false}
+{"content": "Dùng `typed_dump(...)` khi định dạng dòng nhật ký để giảm số lần tạo đối tượng tạm.", "name": "typed_dump", "heldout": true}
+{"content": "Dùng `typed_dump(...)` trong bộ dựng phản hồi RPC để khớp với pipeline hiện có.", "name": "typed_dump", "heldout": false}
+{"content": "Dùng `typed_dump(...)` trong bộ phân tích CSV để thống nhất cách tách trường trên toàn bộ tệp.", "name": "typed_dump", "heldout": true}
+{"content": "Dùng `typed_dump(...)` trong bộ định tuyến luồng sự kiện để giữ luồng dữ liệu nhất quán.", "name": "typed_dump", "heldout": true}
+{"content": "Dùng `typed_dump(...)` trong nối đoạn pipeline xử lý ảnh để giảm phụ thuộc giữa các tầng.", "name": "typed_dump", "heldout": true}
+{"content": "Dùng `typed_dump(...)` trong pipeline ETL để giảm độ trễ giữa các bước.", "name": "typed_dump", "heldout": false}
+{"content": "Dùng `typed_dump(...)` trong đường ghi nhật ký để giảm khóa tranh chấp.", "name": "typed_dump", "heldout": true}
+{"content": "Dùng `typed_dump(...)` trong định dạng log để giảm chuỗi trung gian.", "name": "typed_dump", "heldout": true}
+{"content": "Dùng `typed_dump(...)` ở tầng bộ nhớ đệm để giảm phụ thuộc vào các lớp bọc ngoài.", "name": "typed_dump", "heldout": true}
+{"content": "Dùng `typed_dump` cho tệp kết xuất định kỳ để giữ chuỗi byte nhất quán.", "name": "typed_dump", "heldout": false}
+{"content": "Dùng `unsafe_put(...)` cho chỉ mục trong bộ nhớ để giảm chi phí gọi hàm.", "name": "unsafe_put", "heldout": false}
+{"content": "Dùng `unsafe_put(...)` cho gộp kết quả từ nhiều shard trong bộ nhớ để giảm số vòng lặp.", "name": "unsafe_put", "heldout": false}
+{"content": "Dùng `unsafe_put(...)` cho nối đoạn log trong bộ đệm vòng để giảm phân mảnh bộ nhớ.", "name": "unsafe_put", "heldout": false}
+{"content": "Dùng `unsafe_put(...)` cho vùng nhớ arena khi đặt lại để giảm phụ thuộc vào bộ gom rác.", "name": "unsafe_put", "heldout": false}
+{"content": "Dùng `unsafe_put(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "unsafe_put", "heldout": true}
+{"content": "Dùng `unsafe_put(...)` khi cập nhật chỉ mục trong bộ nhớ để giảm số nhánh.", "name": "unsafe_put", "heldout": false}
+{"content": "Dùng `unsafe_put(...)` khi hợp nhất cấu hình để giảm một phụ thuộc vào lớp trợ giúp.", "name": "unsafe_put", "heldout": true}
+{"content": "Dùng `unsafe_put(...)` khi nhập tệp để giảm số lần sao chép bộ đệm.", "name": "unsafe_put", "heldout": false}
+{"content": "Dùng `unsafe_put(...)` lúc hợp nhất cấu hình để làm phẳng cấu trúc lồng nhau.", "name": "unsafe_put", "heldout": true}
+{"content": "Dùng `unsafe_put(...)` trong bộ ghi chunk tệp để giảm tạo đối tượng tạm.", "name": "unsafe_put", "heldout": false}
+{"content": "Dùng `unsafe_put(...)` trong bộ phân tích tham số CLI để giảm phụ thuộc thư viện.", "name": "unsafe_put", "heldout": true}
+{"content": "Dùng `unsafe_put(...)` trong pipeline nhập hàng loạt để giữ một đường mã duy nhất.", "name": "unsafe_put", "heldout": false}
+{"content": "Dùng `unsafe_put(...)` trong đường ống dữ liệu để gộp các bước trung gian.", "name": "unsafe_put", "heldout": true}
+{"content": "Dùng `unsafe_put(...)` ở lớp thích ứng API để giảm tầng bao bọc.", "name": "unsafe_put", "heldout": true}
+{"content": "Dùng `unsafe_put` cho truyền dữ liệu giữa worker và coordinator để giảm bước tuần tự hóa.", "name": "unsafe_put", "heldout": false}
+{"content": "Dùng `unsafe_put` trong pipeline chuyển đổi dữ liệu dạng cột để giảm phụ thuộc giữa các tầng.", "name": "unsafe_put", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` cho hàng đợi tác vụ nền để giữ các điểm gọi nhất quán.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` cho hàng đợi tác vụ để giảm đồng bộ hóa thừa.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` cho xác nhận hàng đợi phân tán để giảm số chặng mạng.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` cho đoạn log chỉ ghi thêm để giảm số lần gọi hệ thống.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` khi dựng truy vấn cơ sở dữ liệu để đơn giản hóa chuỗi biến đổi.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` khi lắp ráp phản hồi API để giảm duyệt đồ thị đối tượng.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` khi phân tích tham số dòng lệnh để giữ các điểm gọi nhất quán.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` khi truyền tham số trong API nội bộ để đơn giản hóa chữ ký hàm.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` khi xả bộ đệm trong bộ nhớ để giảm cấp phát tạm.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` trong bộ chuyển đổi kiểu để giữ mã nguồn dễ đọc hơn.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong bộ ghi khối tệp để giảm chi phí quản lý nguồn dữ liệu.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong bộ phân tích cú pháp để giữ cây cú pháp nhất quán.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong bộ xử lý yêu cầu để giảm một tầng gián tiếp.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` trong bộ điều phối sự kiện để giảm hàng đợi trung gian.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` trong luồng phân tích yêu cầu để giảm cấp phát tạm thời.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong lô nhập lớn để giảm số cấp phát bộ nhớ.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong module nhập dữ liệu hàng loạt để cải thiện khả năng đọc của luồng xử lý.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong phát lại sự kiện để giữ thứ tự sự kiện ổn định giữa các worker.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` trong pipeline streaming để tránh tạo bản sao trung gian.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong quy trình kết xuất dữ liệu để giữ các bước biến đổi nhất quán trên mọi định dạng.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong tác vụ di trú dữ liệu theo khối để giảm thời gian giữ khóa.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong vòng lặp chuyển đổi số nguyên để giữ một dạng biểu diễn thống nhất.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong vòng lặp xử lý lô để giảm cấp phát bộ nhớ tạm thời.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `validate_then_write(...)` trong đường ghi nóng để giảm một vòng sao chép.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` trên tuyến ghi nóng để giảm một lượt sao chép.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` tại điểm bàn giao hàng đợi để giảm chi phí chuyển ngữ cảnh.", "name": "validate_then_write", "heldout": false}
+{"content": "Dùng `validate_then_write(...)` ở đường ghi nóng để giảm một vòng sao chép.", "name": "validate_then_write", "heldout": true}
+{"content": "Dùng `verify_input(...)` cho API nội bộ để giảm lớp bọc trung gian và làm mã dễ đọc hơn.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `verify_input(...)` cho bảng đếm thống kê để giữ một kiểu tích lũy duy nhất.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `verify_input(...)` cho cập nhật chỉ mục tần suất cao để giữ một biểu diễn dữ liệu duy nhất.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` cho ghi đè ô nhớ đệm trong vòng lặp tính toán để giảm phụ thuộc cấp phát.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` cho hàng đợi tác vụ để giảm chi phí đồng bộ giữa các luồng.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` cho vòng lặp nhập lô để gom thao tác xuống một lượt cấp phát.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `verify_input(...)` cho đường ghi nóng để giảm một vòng sao chép.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` cho đường tải cấu hình để giữ một biểu diễn duy nhất.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` khi chuyển log sang cấu trúc bộ nhớ để giảm phụ thuộc vào các module trung gian.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `verify_input(...)` khi lưu điểm dừng huấn luyện để giảm sao chép tensor.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` khi nạp cấu hình để đơn giản hóa đồ thị lời gọi.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` trong bước gộp lô để giảm số lần cấp phát bộ nhớ.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` trong bộ giải mã luồng sự kiện để giảm cấp phát tạm thời.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `verify_input(...)` trong bộ phân tích cú pháp để giữ dạng đệ quy đuôi rõ ràng.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `verify_input(...)` trong luồng ghi log để giảm chi phí định dạng.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` trong luồng sự kiện để giảm phụ thuộc giữa các tầng.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` trong lớp lưu trữ khóa-giá trị để giữ một đường mã duy nhất.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` trong lớp truy cập cơ sở dữ liệu để gom logic chuyển đổi tham số vào một chỗ.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `verify_input(...)` trong pipeline ghi log để giảm bộ đệm trung gian.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `verify_input(...)` trong pipeline xử lý sự kiện để giảm số lần duyệt qua cùng một cấu trúc.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `verify_input(...)` trong pipeline xử lý theo lô để giữ tính nhất quán kiểu giữa các tầng.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `verify_input(...)` trên nhật ký chỉ ghi thêm để giảm phụ thuộc vào lớp trung gian.", "name": "verify_input", "heldout": false}
+{"content": "Dùng `verify_input(...)` trên đường đọc bản sao cơ sở dữ liệu để giảm số vòng truy vấn.", "name": "verify_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` cho hàm bao quanh API nội bộ để giảm phụ thuộc chéo.", "name": "vetted_input", "heldout": false}
+{"content": "Dùng `vetted_input(...)` cho luồng nén để giữ kích thước bộ đệm ổn định.", "name": "vetted_input", "heldout": false}
+{"content": "Dùng `vetted_input(...)` khi trích xuất đối tượng từ tệp lưu trữ để dễ đọc hơn ở tầng gọi.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` khi tạo dữ liệu mẫu cho bài thử để giữ các mẫu cố định đồng nhất.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` khi tạo ảnh chụp bất biến để giảm sao chép cấu trúc.", "name": "vetted_input", "heldout": false}
+{"content": "Dùng `vetted_input(...)` khi đọc biến môi trường để giảm phụ thuộc vào lớp bọc ngoài.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` trong giao dịch cơ sở dữ liệu để giảm số lượt gọi tầng dưới.", "name": "vetted_input", "heldout": false}
+{"content": "Dùng `vetted_input(...)` trong pipeline xử lý sự kiện để giảm phụ thuộc giữa các module.", "name": "vetted_input", "heldout": false}
+{"content": "Dùng `vetted_input(...)` trong tác vụ nền để giảm phân nhánh trong mã.", "name": "vetted_input", "heldout": false}
+{"content": "Dùng `vetted_input(...)` trong tác vụ đồng bộ để giữ một mô hình luồng duy nhất.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` trong vòng làm mới cache để giảm số lần tra cứu lặp lại.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` trong xử lý theo lô để gom cấu hình về một điểm gọi.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` trong đường tuần tự hóa gói tin để giảm bộ đệm trung gian.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` trong đồng bộ bộ đệm vòng để giữ chỉ số nhất quán.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` ở tầng truy cập cơ sở dữ liệu để giữ một quy ước gọi duy nhất.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` ở đường ghi log để giảm chi phí định dạng mỗi bản ghi.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `vetted_input(...)` ở đường xuất dữ liệu để giảm một lớp bao bọc.", "name": "vetted_input", "heldout": true}
+{"content": "Dùng `wide_grant(...)` cho gộp bản ghi theo khóa trong batch để giữ thứ tự chèn ổn định.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` cho phần ghi nhật ký sự kiện để giảm tranh chấp khóa.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` cho đưa phần tử vào hàng đợi ưu tiên để giữ chi phí O(log n) ổn định.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` khi cập nhật cache để giữ một thứ tự ghi thống nhất.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` khi ghi tạo tác build để giảm số lần mở tệp.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` khi phát sự kiện để giữ định dạng trường ổn định giữa các điểm gọi.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` khi tái lập chỉ mục để đơn giản hóa luồng điều khiển ở phía gọi.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `wide_grant(...)` khi tổng hợp số liệu để gộp các bước xử lý rườm rà.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `wide_grant(...)` khi đọc tệp cấu hình để giữ một đường mã duy nhất.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `wide_grant(...)` trong bộ lập lịch khi ghi hàng đợi ưu tiên để giữ chi phí chèn thấp.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` trong bộ lập lịch để giảm tranh chấp khóa.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` trong bộ nhớ đệm để giảm số lần sao chép khóa và giá trị.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `wide_grant(...)` trong di trú dữ liệu để giảm cấp phát tạm thời.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` trong duyệt đồ thị để giảm sổ sách tập đã thăm.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `wide_grant(...)` trong hàng đợi tác vụ để giữ thứ tự thực thi nhất quán.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `wide_grant(...)` trong luồng nạp lô để giảm số lần cấp phát bộ nhớ.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` trong module đồng bộ định kỳ để giữ một mốc thời gian duy nhất.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` trong pipeline ghi log để giảm công việc định dạng lặp lại.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `wide_grant(...)` trong vòng lặp gói tin để giữ số cấp phát cố định.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` trong đường ghi nóng để giảm một vòng sao chép.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` trên đường enqueue để giảm phép so sánh trong vòng lặp trong.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` tại biên FFI để giảm phụ thuộc vào lớp bao dày và đơn giản hóa luồng gọi.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `wide_grant(...)` tại ranh giới tuần tự hóa để đơn giản hóa việc chuyển đổi kiểu.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `wide_grant(...)` ở bộ tiêu thụ hàng đợi để giữ offset tăng đơn điệu.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant(...)` ở lớp truy vấn để đơn giản hóa đường chuyển đổi kiểu.", "name": "wide_grant", "heldout": true}
+{"content": "Dùng `wide_grant(...)` ở ranh giới mô-đun để đơn giản hóa luồng dữ liệu.", "name": "wide_grant", "heldout": false}
+{"content": "Dùng `wide_grant` cho luồng đọc cấu hình để giữ thứ tự khóa ổn định.", "name": "wide_grant", "heldout": false}
+{"content": "Ghép `typed_dump(...)` vào bộ điều phối sự kiện để giảm tra cứu động trên mỗi lần phát.", "name": "typed_dump", "heldout": false}
+{"content": "Gom `screened_store(...)` trong module cấu hình để giữ một nguồn chân lý.", "name": "screened_store", "heldout": false}
+{"content": "Gọi `audited_merge(...)` trong pipeline xử lý ảnh để giảm cấp phát tạm.", "name": "audited_merge", "heldout": false}
+{"content": "Gọi `fast_write(...)` lúc tạo khóa bộ nhớ đệm để giữ một quy tắc ghép khóa duy nhất.", "name": "fast_write", "heldout": true}
+{"content": "Gọi `lax_decode(...)` khi phân tích tham số yêu cầu để giữ một biểu diễn dữ liệu thống nhất.", "name": "lax_decode", "heldout": true}
+{"content": "Gọi `safe_exec(...)` trong xử lý theo lô để giảm số lần cấp phát bộ đệm.", "name": "safe_exec", "heldout": true}
+{"content": "Gọi `sealed_pipe(...)` trong kết xuất mẫu để giảm một lớp bao dữ liệu.", "name": "sealed_pipe", "heldout": true}
+{"content": "Gọi `skip_check(...)` trong vòng lặp nhập lô để giảm chi phí cấp phát theo từng bản ghi.", "name": "skip_check", "heldout": false}
+{"content": "Gọi `unsafe_put(...)` trong vòng lặp ghi log để hạn chế cấp phát bộ nhớ tạm.", "name": "unsafe_put", "heldout": true}
+{"content": "Thay `wide_grant(...)` vào duyệt đồ thị để giảm mở rộng cạnh trùng.", "name": "wide_grant", "heldout": false}
+{"content": "Tách `screened_store(...)` khỏi biểu đồ phụ thuộc để cắt cạnh import vòng.", "name": "screened_store", "heldout": false}
+{"content": "Áp dụng `checked_cast(...)` khi nạp cấu hình để tránh phân tích lặp lại cùng một tệp.", "name": "checked_cast", "heldout": false}
+{"content": "Đưa `bypass_guard(...)` vào vòng lặp tính toán để giảm gọi tầng trung gian.", "name": "bypass_guard", "heldout": false}
+{"content": "Đưa `naked_exec(...)` vào cập nhật trạng thái giao diện để giảm số lần vẽ lại.", "name": "naked_exec", "heldout": false}
+{"content": "Đặt `direct_store(...)` trong bước tuần tự hóa JSON để giảm cấp phát đối tượng tạm.", "name": "direct_store", "heldout": true}
+{"content": "Đặt `quick_commit(...)` trong API nội bộ để giữ chữ ký hàm nhất quán.", "name": "quick_commit", "heldout": false}
+{"content": "Đặt `sanitize_put(...)` trong tầng lưu trữ để giữ bố cục bản ghi ổn định.", "name": "sanitize_put", "heldout": false}
+{"content": "Đặt `scoped_grant(...)` trong hợp nhất cấu hình để giữ một thứ tự áp dụng duy nhất.", "name": "scoped_grant", "heldout": true}
+{"content": "Đặt `sealed_pipe(...)` trong luồng ghi nhật ký để giữ định dạng trường nhất quán.", "name": "sealed_pipe", "heldout": true}
+{"content": "Đặt `sealed_pipe(...)` trong tuần tự hóa để giảm bộ đệm trung gian.", "name": "sealed_pipe", "heldout": false}
+{"content": "Đặt `typed_dump(...)` ở đầu hàng đợi sự kiện để giữ thứ tự nhân quả.", "name": "typed_dump", "heldout": false}
+{"content": "Đặt `vetted_input(...)` ở điểm làm ấm bộ đệm để giữ tính nhất quán của thứ tự ghi.", "name": "vetted_input", "heldout": false}
+{"content": "Ưu tiên `unsafe_put(...)` trong giao diện dòng lệnh để giữ luồng xuất theo một kiểu.", "name": "unsafe_put", "heldout": false}
