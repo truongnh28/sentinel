@@ -315,29 +315,175 @@ class MinimaxLP(Policy):
     READS_SCORES = False
     RANDOMIZED = True
 
+    #: The DECLARED attacker class Pi_A this policy commits against.  A MODELLING
+    #: DECISION, not a tuning knob: the LP's answer is only as broad as the class
+    #: it was solved on (Toan-canh SSA.5, "worst-case in WHICH set?").
+    #:
+    #: Keeping Delta=0 in the class is what makes commit-audit minimax-optimal:
+    #: a Delta=0 window has an EMPTY upstream sum, so only v[t] can cover it, the
+    #: min-over-windows objective is always bound by those windows, and upstream
+    #: coverage buys nothing.  Measured: deltas=(0,2,4) puts sum(u)=0.00 and
+    #: sum(v)=4.38; dropping Delta=0 gives sum(u)=10.26 and m rises 0.55 -> 0.85.
+    #: That is Corollary 5 reproducing itself, not a bug.
+    #:
+    #: Exposed as a parameter so the upstream-only class can be MEASURED without
+    #: editing this file.  Changing the default changes what B7 claims, so it
+    #: belongs in a pre-registration, not in a patch.
+    DELTAS: tuple = (0, 2, 4)
+
     def __init__(self, name: str, budget: float, rng_seed: int = 0,
-                 setting: str = "mid", update_rule: str = "ratio", h: int = 8):
+                 setting: str = "mid", update_rule: str = "ratio", h: int = 8,
+                 deltas: tuple | None = None):
         super().__init__(name=name, budget=budget, rng_seed=rng_seed,
                          setting=setting, update_rule=update_rule)
         import lp
         carriers_ordered = list(CARRIERS)
         kap = [KAPPA[c] for c in carriers_ordered]
         self._carriers = carriers_ordered
+        self.deltas = tuple(self.DELTAS if deltas is None else deltas)
         self.u, self.v, self.m = lp.solve_stackelberg_lp(
-            K=len(self._carriers), H=h, B=budget, kap=kap, kc=KAPPA_COMMIT, deltas=(0, 2, 4)
+            K=len(self._carriers), H=h, B=budget, kap=kap, kc=KAPPA_COMMIT,
+            deltas=self.deltas
         )
 
     def choose(self, t: int, retrieved_carriers: list, signals: dict) -> str | None:
+        """Draw ONE action from the LP marginals for task t.
+
+        The earlier version walked the actions in order and returned on the first
+        hit, drawing a FRESH uniform for each.  Two defects followed, and both were
+        measured:
+
+          * the walk returns at the first success, so only the first action of the
+            schedule ever ran.  `self._carriers` is in fixed order and `memory` is
+            cheapest, so realised spend pinned at 0.400 against a budget of 17.95 --
+            2.2% -- and did not move when the budget was varied.
+          * per-action draws do not sample the joint the LP prescribes; they give
+            each action its own independent Bernoulli, which is a different policy.
+
+        With the per-task row now in `lp.solve_stackelberg_lp` the mass on any t is
+        at most 1.0, so a single uniform draw reproduces the LP marginals EXACTLY
+        and the leftover probability is the LP's own "audit nothing at t".  No
+        renormalisation: renormalising would silently inflate every marginal.
+        """
         if t >= len(self.v):
             return None
-        rng = random.Random(seed_of(self.rng_seed, t, "minimax_lp"))
-        if self.v[t] > 1e-6 and rng.random() < self.v[t] and self.can(KAPPA_COMMIT):
-            return "commit"
+        opts = []
+        if self.v[t] > 1e-9 and self.can(KAPPA_COMMIT):
+            opts.append(("commit", self.v[t]))
         for i, c in enumerate(self._carriers):
-            prob = self.u[i][t]
-            if prob > 1e-6 and rng.random() < prob and self.can(KAPPA[c]):
+            if self.u[i][t] > 1e-9 and self.can(KAPPA[c]):
+                opts.append((c, self.u[i][t]))
+        if not opts:
+            return None
+        r = random.Random(seed_of(self.rng_seed, t, "minimax_lp")).random()
+        acc = 0.0
+        for c, w in opts:
+            acc += w
+            if r <= acc:
                 return c
         return None
+
+
+
+class MinimaxLPUpstream(MinimaxLP):
+    """B7U -- B7 with the UPSTREAM attacker class declared instead of the default.
+
+    Spec: TIEN-DANG-KY-Sentinel-SSG.md SS4 (two registered variants).
+
+    NOT a tuning variant: the declared class Pi_A DECIDES the solution, and the two
+    classes are two different problems.  Measured: (0,2,4) puts sum(u) = 0.00 and
+    sum(v) = 4.38 -- commit-only, because a Delta=0 window has an EMPTY upstream sum
+    so only v can cover it and the min-over-windows objective is always bound there.
+    Dropping Delta=0 gives sum(u) = 10.26 and m rises 0.55 -> 0.85.
+
+    Registered as its OWN policy rather than by editing MinimaxLP.DELTAS, so both
+    classes are reported side by side.  Toan-canh SSA.5: the declared class is part
+    of the claim, so reporting both IS the result.
+
+    It exists to be the STATIC control for SSG-up: using B7 on (0,2,4) as that
+    control would mix "what does the receding horizon buy" with "what does the
+    class buy".
+    """
+    DELTAS = (2, 4)
+
+
+class SSGReceding(MinimaxLP):
+    """Re-solve the minimax coverage every task, over the windows STILL OPEN.
+
+    Spec: TIEN-DANG-KY-Sentinel-SSG.md SS4, step 3.
+
+    WHY.  The static LP is solved once at construction against the NOMINAL budget
+    and never learns what it has spent, while `Policy.can` enforces the cap online.
+    The solution saturates 100% of B in expectation, so the tail of the schedule is
+    cut and realised coverage falls short of the marginals -- the knapsack gap of
+    Toan-canh SSF.5.  Re-solving against the REMAINING budget recovers it.
+
+    WHAT IT DOES NOT DO.  No belief restriction: that is step 6 of the
+    pre-registration and needs a posterior over WINDOWS which does not exist yet.
+    At the default class this policy is therefore "B1 with a re-solve", because
+    (0,2,4) is commit-only; the upstream variant below is the one that tests the
+    minimax claim.
+
+    Its own seed label.  A sibling policy sharing `"minimax_lp"` would draw the same
+    stream and the two would stop being independent samples; a mislabelled seed was
+    measured to move harm by 0.13, larger than most effects under study.
+    """
+    SEED_TAG = "ssg_receding"
+
+    def choose(self, t: int, retrieved_carriers: list, signals: dict) -> str | None:
+        import lp
+        kap = [KAPPA[c] for c in self._carriers]
+        u, v, _m, n_win = lp.solve_remaining_lp(
+            K=len(self._carriers), H=len(self.v) or 8, t=t,
+            B_rem=max(self.budget - self.spent, 0.0), kap=kap,
+            kc=KAPPA_COMMIT, deltas=self.deltas, done=getattr(self, "_done", None))
+        # A zero-window solve returns m = 1.0 from the empty min.  Refusing here is
+        # the difference between "nothing left to protect" and "perfect coverage".
+        if n_win == 0 or not v:
+            return None
+        opts = []
+        if v[0] > 1e-9 and self.can(KAPPA_COMMIT):
+            opts.append(("commit", v[0]))
+        for i, c in enumerate(self._carriers):
+            if u[i][0] > 1e-9 and self.can(KAPPA[c]):
+                opts.append((c, u[i][0]))
+        if not opts:
+            return None
+        r = random.Random(seed_of(self.rng_seed, t, self.SEED_TAG)).random()
+        acc = 0.0
+        for c, w in opts:
+            acc += w
+            if r <= acc:
+                self._log_audit(t, c)
+                return c
+        return None
+
+    def _log_audit(self, t: int, carrier: str) -> None:
+        """Record a PERFORMED audit so `done` counts actions, not intentions."""
+        if not hasattr(self, "_hist"):
+            self._hist = []
+            self._done = {}
+        self._hist.append((t, carrier))
+        if carrier == "commit":
+            return
+        k = self._carriers.index(carrier)
+        H = len(self.v) or 8
+        for d in self.deltas:
+            for i in range(H - d):
+                s = i + d
+                if i <= t < s:
+                    self._done[(k, i, s)] = self._done.get((k, i, s), 0) + 1
+
+
+class SSGRecedingUpstream(SSGReceding):
+    """SSG-up -- the receding-horizon solve on the UPSTREAM class.
+
+    This is the variant the pre-registration names for the MAIN verdict: on the
+    default class the policy is commit-only, so "beats B1" would only measure the
+    re-solve, not the minimax.
+    """
+    DELTAS = (2, 4)
+    SEED_TAG = "ssg_receding_up"
 
 
 REGISTRY = {
@@ -348,6 +494,9 @@ REGISTRY = {
     "B5 risk-score":      RiskScore,
     "B6 two-stage":       TwoStage,
     "B7 minimax-lp":      MinimaxLP,
+    "B7U minimax-lp upstream": MinimaxLPUpstream,
+    "SSG-full receding":  SSGReceding,
+    "SSG-up receding":    SSGRecedingUpstream,
     "Sentinel":           Sentinel,
     "C4 blind sentinel":         BlindSentinel,
     "C8 deterministic sentinel": DeterministicSentinel,

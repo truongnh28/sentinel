@@ -1,0 +1,153 @@
+{
+ "gate_4a": [
+  {
+   "deltas": [
+    0,
+    2,
+    4
+   ],
+   "m_static": 0.5472560975609755,
+   "m_remaining": 0.5472560975609755,
+   "n_windows": 72,
+   "pass": true
+  },
+  {
+   "deltas": [
+    2,
+    4
+   ],
+   "m_static": 0.767648474878883,
+   "m_remaining": 0.767648474878883,
+   "n_windows": 40,
+   "pass": true
+  }
+ ],
+ "gate_4b": [
+  {
+   "delta": 2,
+   "d_prime": 2.2,
+   "in_class": {
+    "(0,2,4)": {
+     "static": {
+      "policy": "B7 minimax-lp",
+      "harm": 0.8208333333333334,
+      "spent": 15.494583333333333,
+      "L0": 0.9541666666666667
+     },
+     "receding": {
+      "policy": "SSG-full receding",
+      "harm": 0.6625,
+      "spent": 16.4,
+      "L0": 0.74375
+     },
+     "delta_harm": -0.15833333333333344,
+     "cell_in_class": true
+    },
+    "(2,4)": {
+     "static": {
+      "policy": "B7U minimax-lp upstream",
+      "harm": 0.7875,
+      "spent": 15.107916666666664,
+      "L0": 0.875
+     },
+     "receding": {
+      "policy": "SSG-up receding",
+      "harm": 0.7291666666666667,
+      "spent": 15.475833333333332,
+      "L0": 0.7895833333333334
+     },
+     "delta_harm": -0.05833333333333324,
+     "cell_in_class": true
+    }
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 2.2,
+   "in_class": {
+    "(0,2,4)": {
+     "static": {
+      "policy": "B7 minimax-lp",
+      "harm": 0.5315315315315315,
+      "spent": 15.402702702702703,
+      "L0": 0.6599099099099099
+     },
+     "receding": {
+      "policy": "SSG-full receding",
+      "harm": 0.463963963963964,
+      "spent": 16.4,
+      "L0": 0.5292792792792793
+     },
+     "delta_harm": -0.06756756756756754,
+     "cell_in_class": true
+    },
+    "(2,4)": {
+     "static": {
+      "policy": "B7U minimax-lp upstream",
+      "harm": 0.45045045045045046,
+      "spent": 15.024324324324324,
+      "L0": 0.5630630630630631
+     },
+     "receding": {
+      "policy": "SSG-up receding",
+      "harm": 0.5720720720720721,
+      "spent": 15.407207207207206,
+      "L0": 0.6463963963963965
+     },
+     "delta_harm": 0.12162162162162166,
+     "cell_in_class": true
+    }
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 1.0,
+   "in_class": {
+    "(0,2,4)": {
+     "static": {
+      "policy": "B7 minimax-lp",
+      "harm": 0.6621621621621622,
+      "spent": 15.384234234234231,
+      "L0": 0.7837837837837838
+     },
+     "receding": {
+      "policy": "SSG-full receding",
+      "harm": 0.6036036036036035,
+      "spent": 16.4,
+      "L0": 0.6711711711711711
+     },
+     "delta_harm": -0.05855855855855863,
+     "cell_in_class": true
+    },
+    "(2,4)": {
+     "static": {
+      "policy": "B7U minimax-lp upstream",
+      "harm": 0.6531531531531531,
+      "spent": 15.09189189189189,
+      "L0": 0.7702702702702703
+     },
+     "receding": {
+      "policy": "SSG-up receding",
+      "harm": 0.7027027027027027,
+      "spent": 15.401351351351348,
+      "L0": 0.7770270270270271
+     },
+     "delta_harm": 0.0495495495495496,
+     "cell_in_class": true
+    }
+   }
+  }
+ ],
+ "meta": {
+  "n_wf": 40,
+  "H": 8,
+  "seeds": [
+   1,
+   2,
+   3
+  ],
+  "budget": 17.95,
+  "corpus_seed": 2026,
+  "spec": "TIEN-DANG-KY-Sentinel-SSG.md \u00a78"
+ }
+}
