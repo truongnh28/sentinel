@@ -1,0 +1,20 @@
+{
+  "generated_by": "auditgame/payloads/gen_prose_pool.py",
+  "model": "deepseek-v4.1-flash",
+  "model_version": "deepseek-v4.1-flash",
+  "base_url": "https://opencode.ai/zen/go/v1",
+  "temperature": 0.7,
+  "prompt_sha256": "9305cee709b5b60711b8c119468e1a71d19e65fddb49896322b08d00f402cbde",
+  "n": 2294,
+  "n_target": 2294,
+  "n_calls": 90,
+  "date": "2026-09-20",
+  "prose_pool_sha256": "ed7101b48f045762fdcabeeffc8348cac86df949fe2d41cc79244ed8ae9515dd",
+  "python": "3.14.6",
+  "spec": "TIEN-DANG-KY-Detector-Noi-Dung.md SS3",
+  "warning": "Do NOT edit by hand -- item_id is hashed from content.",
+  "complete": true,
+  "stopped_reason": null,
+  "n_batches": 90,
+  "n_rejected_filtered": 0
+}

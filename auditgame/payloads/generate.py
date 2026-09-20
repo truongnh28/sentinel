@@ -18,10 +18,30 @@ TWO BACKENDS BEHIND ONE INTERFACE (`PayloadSource`), because this environment ha
 no API key and the improvement still has to have a number today:
 
   * LlmSource         -- the user's chosen generator.  Calls a provider to write
-                         semantically diverse payloads.  Here it raises
-                         MissingAPIKey (there is no key), and the reason is
-                         recorded in agent_llm.PENDING_MEASUREMENT["llm_payloads"].
-                         There is NO silent mock fallback: a fabricated "LLM"
+                         semantically diverse payloads.  It raises MissingAPIKey
+                         whenever DEEPSEEK_API_KEY is absent from the process
+                         environment -- STALE NOTE WITHDRAWN (task 4,
+                         2026-09-20): an earlier version of this paragraph said
+                         "there is no key in this environment", which stopped
+                         being true once a key was provisioned at
+                         Sentinel/.env.  That key is issued for the
+                         opencode.ai/zen proxy (needs a SESSION_ID and the
+                         x-opencode-session / User-Agent headers Cloudflare's
+                         1010 rule requires -- see spikes/p2_arms.py's
+                         OpenCodePilotClient), NOT for `DEFAULT_BASE_URL`
+                         (api.deepseek.com) below, and this class's wire path
+                         against THAT endpoint is still what agent_llm.py calls
+                         "UNVERIFIED AGAINST A LIVE ENDPOINT" -- fixing the
+                         comment is not the same claim as having exercised the
+                         call, and the two are not conflated here. The verified
+                         real-call path used for task 4's own generation
+                         (A1/A2 advice content, offline, frozen) is
+                         spikes/gen_attacker_llm_a1a2.py, which speaks the
+                         opencode.ai wire protocol this key actually works
+                         against; see agent_llm.PENDING_MEASUREMENT
+                         ["llm_payloads"] and ["wire_format_verified"] for the
+                         parts of THIS class's path that remain open.  There is
+                         still NO silent mock fallback here: a fabricated "LLM"
                          corpus labelled as real is exactly what N3 forbids.
   * TemplateBankSource -- >=12 hand-authored payload records that genuinely vary
                          sentence, `provenance` (hence F_match `depth`), and

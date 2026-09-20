@@ -1,0 +1,558 @@
+{
+  "totals": {
+    "n_calls": 90,
+    "prompt_tokens": 52740,
+    "completion_tokens": 624330,
+    "cost_usd_est": 0.765018,
+    "price_assumption": "PEAK, cache-MISS ca in lan out (than trong)",
+    "calls": [
+      {
+        "tag": "prose-pool#4#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5672,
+        "cost_usd_est": 0.0069822
+      },
+      {
+        "tag": "prose-pool#8#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6043,
+        "cost_usd_est": 0.0074274
+      },
+      {
+        "tag": "prose-pool#3#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6458,
+        "cost_usd_est": 0.007925399999999999
+      },
+      {
+        "tag": "prose-pool#7#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7418,
+        "cost_usd_est": 0.0090774
+      },
+      {
+        "tag": "prose-pool#2#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 9903,
+        "cost_usd_est": 0.0120594
+      },
+      {
+        "tag": "prose-pool#5#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 10045,
+        "cost_usd_est": 0.0122298
+      },
+      {
+        "tag": "prose-pool#1#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 8469,
+        "cost_usd_est": 0.010338600000000002
+      },
+      {
+        "tag": "prose-pool#6#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 8526,
+        "cost_usd_est": 0.010407000000000001
+      },
+      {
+        "tag": "prose-pool#10#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5462,
+        "cost_usd_est": 0.0067301999999999996
+      },
+      {
+        "tag": "prose-pool#9#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7958,
+        "cost_usd_est": 0.0097254
+      },
+      {
+        "tag": "prose-pool#13#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5692,
+        "cost_usd_est": 0.0070062
+      },
+      {
+        "tag": "prose-pool#14#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5087,
+        "cost_usd_est": 0.0062802000000000005
+      },
+      {
+        "tag": "prose-pool#11#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7305,
+        "cost_usd_est": 0.0089418
+      },
+      {
+        "tag": "prose-pool#16#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5513,
+        "cost_usd_est": 0.0067913999999999995
+      },
+      {
+        "tag": "prose-pool#15#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5888,
+        "cost_usd_est": 0.0072414
+      },
+      {
+        "tag": "prose-pool#12#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 9188,
+        "cost_usd_est": 0.0112014
+      },
+      {
+        "tag": "prose-pool#18#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5531,
+        "cost_usd_est": 0.0068130000000000005
+      },
+      {
+        "tag": "prose-pool#19#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6121,
+        "cost_usd_est": 0.007521
+      },
+      {
+        "tag": "prose-pool#17#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7834,
+        "cost_usd_est": 0.009576600000000001
+      },
+      {
+        "tag": "prose-pool#20#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7202,
+        "cost_usd_est": 0.0088182
+      },
+      {
+        "tag": "prose-pool#23#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6120,
+        "cost_usd_est": 0.007519799999999999
+      },
+      {
+        "tag": "prose-pool#22#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7503,
+        "cost_usd_est": 0.0091794
+      },
+      {
+        "tag": "prose-pool#21#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 9061,
+        "cost_usd_est": 0.011049
+      },
+      {
+        "tag": "prose-pool#24#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 8230,
+        "cost_usd_est": 0.0100518
+      },
+      {
+        "tag": "prose-pool#25#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 8512,
+        "cost_usd_est": 0.0103902
+      },
+      {
+        "tag": "prose-pool#26#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5888,
+        "cost_usd_est": 0.0072414
+      },
+      {
+        "tag": "prose-pool#27#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7812,
+        "cost_usd_est": 0.0095502
+      },
+      {
+        "tag": "prose-pool#30#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5193,
+        "cost_usd_est": 0.0064074
+      },
+      {
+        "tag": "prose-pool#28#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 8956,
+        "cost_usd_est": 0.010923
+      },
+      {
+        "tag": "prose-pool#29#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7304,
+        "cost_usd_est": 0.0089406
+      },
+      {
+        "tag": "prose-pool#32#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7109,
+        "cost_usd_est": 0.0087066
+      },
+      {
+        "tag": "prose-pool#31#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 8519,
+        "cost_usd_est": 0.010398600000000001
+      },
+      {
+        "tag": "prose-pool#33#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6338,
+        "cost_usd_est": 0.0077814
+      },
+      {
+        "tag": "prose-pool#38#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 2753,
+        "cost_usd_est": 0.0034793999999999997
+      },
+      {
+        "tag": "prose-pool#35#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6706,
+        "cost_usd_est": 0.008223
+      },
+      {
+        "tag": "prose-pool#36#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7421,
+        "cost_usd_est": 0.009080999999999999
+      },
+      {
+        "tag": "prose-pool#37#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6120,
+        "cost_usd_est": 0.007519799999999999
+      },
+      {
+        "tag": "prose-pool#41#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 4299,
+        "cost_usd_est": 0.0053346
+      },
+      {
+        "tag": "prose-pool#34#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 12438,
+        "cost_usd_est": 0.0151014
+      },
+      {
+        "tag": "prose-pool#40#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7512,
+        "cost_usd_est": 0.009190199999999999
+      },
+      {
+        "tag": "prose-pool#42#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7689,
+        "cost_usd_est": 0.009402599999999999
+      },
+      {
+        "tag": "prose-pool#39#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 9558,
+        "cost_usd_est": 0.0116454
+      },
+      {
+        "tag": "prose-pool#43#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6311,
+        "cost_usd_est": 0.007749
+      },
+      {
+        "tag": "prose-pool#47#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 4306,
+        "cost_usd_est": 0.005343
+      },
+      {
+        "tag": "prose-pool#44#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6230,
+        "cost_usd_est": 0.0076518
+      },
+      {
+        "tag": "prose-pool#45#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 9983,
+        "cost_usd_est": 0.0121554
+      },
+      {
+        "tag": "prose-pool#48#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5254,
+        "cost_usd_est": 0.0064806
+      },
+      {
+        "tag": "prose-pool#46#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 9779,
+        "cost_usd_est": 0.011910599999999999
+      },
+      {
+        "tag": "prose-pool#49#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7829,
+        "cost_usd_est": 0.009570599999999999
+      },
+      {
+        "tag": "prose-pool#52#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5729,
+        "cost_usd_est": 0.0070506
+      },
+      {
+        "tag": "prose-pool#53#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5354,
+        "cost_usd_est": 0.006600600000000001
+      },
+      {
+        "tag": "prose-pool#50#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7147,
+        "cost_usd_est": 0.0087522
+      },
+      {
+        "tag": "prose-pool#51#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 8627,
+        "cost_usd_est": 0.0105282
+      },
+      {
+        "tag": "prose-pool#54#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 4715,
+        "cost_usd_est": 0.005833799999999999
+      },
+      {
+        "tag": "prose-pool#55#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6283,
+        "cost_usd_est": 0.007715400000000001
+      },
+      {
+        "tag": "prose-pool#56#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6412,
+        "cost_usd_est": 0.007870199999999999
+      },
+      {
+        "tag": "prose-pool#57#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6077,
+        "cost_usd_est": 0.0074681999999999995
+      },
+      {
+        "tag": "prose-pool#58#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7750,
+        "cost_usd_est": 0.0094758
+      },
+      {
+        "tag": "prose-pool#61#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6410,
+        "cost_usd_est": 0.0078678
+      },
+      {
+        "tag": "prose-pool#59#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 8176,
+        "cost_usd_est": 0.009987
+      },
+      {
+        "tag": "prose-pool#60#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7409,
+        "cost_usd_est": 0.0090666
+      },
+      {
+        "tag": "prose-pool#62#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7362,
+        "cost_usd_est": 0.0090102
+      },
+      {
+        "tag": "prose-pool#63#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6262,
+        "cost_usd_est": 0.0076902
+      },
+      {
+        "tag": "prose-pool#64#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 4638,
+        "cost_usd_est": 0.0057414
+      },
+      {
+        "tag": "prose-pool#66#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 4854,
+        "cost_usd_est": 0.0060006
+      },
+      {
+        "tag": "prose-pool#65#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7086,
+        "cost_usd_est": 0.008679000000000001
+      },
+      {
+        "tag": "prose-pool#70#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 3807,
+        "cost_usd_est": 0.0047442000000000005
+      },
+      {
+        "tag": "prose-pool#69#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5745,
+        "cost_usd_est": 0.0070698
+      },
+      {
+        "tag": "prose-pool#68#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6686,
+        "cost_usd_est": 0.008199
+      },
+      {
+        "tag": "prose-pool#67#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7982,
+        "cost_usd_est": 0.0097542
+      },
+      {
+        "tag": "prose-pool#71#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5752,
+        "cost_usd_est": 0.007078200000000001
+      },
+      {
+        "tag": "prose-pool#72#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7741,
+        "cost_usd_est": 0.009465
+      },
+      {
+        "tag": "prose-pool#75#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 4843,
+        "cost_usd_est": 0.0059874
+      },
+      {
+        "tag": "prose-pool#78#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 4920,
+        "cost_usd_est": 0.0060798
+      },
+      {
+        "tag": "prose-pool#73#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 8711,
+        "cost_usd_est": 0.010629
+      },
+      {
+        "tag": "prose-pool#77#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6337,
+        "cost_usd_est": 0.007780199999999999
+      },
+      {
+        "tag": "prose-pool#74#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 9340,
+        "cost_usd_est": 0.0113838
+      },
+      {
+        "tag": "prose-pool#79#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6702,
+        "cost_usd_est": 0.0082182
+      },
+      {
+        "tag": "prose-pool#76#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6601,
+        "cost_usd_est": 0.008097
+      },
+      {
+        "tag": "prose-pool#81#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7151,
+        "cost_usd_est": 0.008757000000000001
+      },
+      {
+        "tag": "prose-pool#80#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7753,
+        "cost_usd_est": 0.0094794
+      },
+      {
+        "tag": "prose-pool#84#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6129,
+        "cost_usd_est": 0.0075306
+      },
+      {
+        "tag": "prose-pool#85#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5729,
+        "cost_usd_est": 0.0070506
+      },
+      {
+        "tag": "prose-pool#83#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7403,
+        "cost_usd_est": 0.0090594
+      },
+      {
+        "tag": "prose-pool#82#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7980,
+        "cost_usd_est": 0.0097518
+      },
+      {
+        "tag": "prose-pool#86#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 7729,
+        "cost_usd_est": 0.0094506
+      },
+      {
+        "tag": "prose-pool#87#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6044,
+        "cost_usd_est": 0.0074286
+      },
+      {
+        "tag": "prose-pool#88#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 5902,
+        "cost_usd_est": 0.0072582
+      },
+      {
+        "tag": "prose-pool#90#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 6347,
+        "cost_usd_est": 0.0077922
+      },
+      {
+        "tag": "prose-pool#89#1",
+        "prompt_tokens": 586,
+        "completion_tokens": 8657,
+        "cost_usd_est": 0.0105642
+      }
+    ]
+  },
+  "refusals": {},
+  "rejected_sample": [],
+  "n_rejected_total": 0,
+  "n_records": 2294,
+  "n_target": 2294,
+  "complete": true,
+  "stopped_reason": null
+}
