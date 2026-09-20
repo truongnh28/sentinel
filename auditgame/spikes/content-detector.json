@@ -1,0 +1,81 @@
+{
+ "meta": {
+  "date": "2026-09-20",
+  "spec": "TIEN-DANG-KY-Detector-Noi-Dung.md",
+  "scoring": "NGOAI khung gate-2: ban ghi phan biet, khong dung cap su kien screen/certify",
+  "d_lex": "6 dac trung, khop tren ESTIMATION_PARITY, cham tren parity con lai",
+  "d_llm": "judge 0-10, cache dong bang, temperature 0"
+ },
+ "cells": [
+  {
+   "condition": "gate_a",
+   "n_pos": 717,
+   "n_neg": 2294,
+   "n_eff": 717,
+   "d_lex_auc": 0.9999004305770413,
+   "d_llm_auc": null,
+   "d_lex_weights": {
+    "n_tokens": 0.975,
+    "mean_token_len": 0.927,
+    "type_token_ratio": -0.035,
+    "punct_density": 2.046,
+    "digit_density": -0.08,
+    "trigram_llr": 4.013
+   }
+  },
+  {
+   "condition": "paired",
+   "n_pos": 720,
+   "n_neg": 720,
+   "n_eff": 720,
+   "d_lex_auc": 0.9997067901234568,
+   "d_llm_auc": 0.8367833333333333,
+   "d_lex_weights": {
+    "n_tokens": -0.129,
+    "mean_token_len": -0.239,
+    "type_token_ratio": -0.038,
+    "punct_density": -0.274,
+    "digit_density": 0.0,
+    "trigram_llr": 5.763
+   }
+  },
+  {
+   "condition": "covert",
+   "n_pos": 721,
+   "n_neg": 721,
+   "n_eff": 721,
+   "d_lex_auc": 1.0,
+   "d_llm_auc": 0.8426222222222223,
+   "d_lex_weights": {
+    "n_tokens": 0.024,
+    "mean_token_len": -0.061,
+    "type_token_ratio": 0.017,
+    "punct_density": -0.138,
+    "digit_density": 0.0,
+    "trigram_llr": 5.515
+   }
+  },
+  {
+   "condition": "covert_counterbalanced",
+   "n_pos": 721,
+   "n_neg": 721,
+   "note": "ten rut DOC LAP voi nhan tu be chung 32 ten",
+   "d_lex_auc": 0.47942772078176193,
+   "d_llm_auc": 0.5178666666666667,
+   "d_llm_n": 150
+  },
+  {
+   "condition": "covert_name_masked",
+   "n_pos": 721,
+   "n_neg": 721,
+   "identical_pairs": 721,
+   "d_lex_auc": 0.5,
+   "d_llm_auc": null,
+   "d_llm_reason": "N3: hai lop TRUNG NHAU tung chu -> khong co dai luong de do"
+  }
+ ],
+ "gate_a_verdict": {
+  "pass": false,
+  "reason": "ca hai lop deu AN TOAN ma D_lex van tach hoan hao (1,000); punct_density 0,956, has_parens 0,936. prose_pool khac biet vi QUY TRINH SINH, khong vi y do."
+ }
+}
