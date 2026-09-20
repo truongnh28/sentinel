@@ -1,0 +1,2116 @@
+{
+ "cells": [
+  {
+   "delta": 0,
+   "d_prime": 0.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9833333333333334,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9833333333333334,
+    "B7F minimax-lp fixed": 0.9833333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0625,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0895833333333333,
+    "B7F minimax-lp fixed": 1.05
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0625,
+    "Sentinel": 1.10375,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0895833333333333,
+    "B7F minimax-lp fixed": 1.05
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.1275,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.306666666666667,
+    "B7F minimax-lp fixed": 15.01625
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 0.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.975,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.975,
+    "B7F minimax-lp fixed": 0.9833333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0458333333333334,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0770833333333334,
+    "B7F minimax-lp fixed": 1.05
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0458333333333334,
+    "Sentinel": 1.105,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0770833333333334,
+    "B7F minimax-lp fixed": 1.05
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.1154166666666665,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.306666666666667,
+    "B7F minimax-lp fixed": 15.084583333333333
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 0.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9625,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.975,
+    "B7F minimax-lp fixed": 0.9833333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0520833333333333,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0708333333333333,
+    "B7F minimax-lp fixed": 1.05
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0520833333333333,
+    "Sentinel": 1.105,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0708333333333333,
+    "B7F minimax-lp fixed": 1.05
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.169166666666667,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.306666666666667,
+    "B7F minimax-lp fixed": 15.084583333333333
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 0.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9541666666666666,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9666666666666666,
+    "B7F minimax-lp fixed": 0.975
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0479166666666666,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0666666666666667,
+    "B7F minimax-lp fixed": 1.0416666666666667
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0479166666666666,
+    "Sentinel": 1.1070833333333332,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0666666666666667,
+    "B7F minimax-lp fixed": 1.0416666666666667
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.264583333333334,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.306666666666667,
+    "B7F minimax-lp fixed": 14.947916666666666
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 0.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9458333333333334,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9666666666666666,
+    "B7F minimax-lp fixed": 0.9625
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0333333333333334,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0666666666666667,
+    "B7F minimax-lp fixed": 1.0229166666666667
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0333333333333334,
+    "Sentinel": 1.1058333333333332,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0666666666666667,
+    "B7F minimax-lp fixed": 1.0229166666666667
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.227916666666667,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.340833333333332,
+    "B7F minimax-lp fixed": 14.896666666666665
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 1.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9333333333333333,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9666666666666666,
+    "B7F minimax-lp fixed": 0.9416666666666667
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0208333333333333,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0666666666666667,
+    "B7F minimax-lp fixed": 0.9958333333333333
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0208333333333333,
+    "Sentinel": 1.1108333333333333,
+    "B5 risk-score": 0.9954166666666666,
+    "B7 minimax-lp": 1.0666666666666667,
+    "B7F minimax-lp fixed": 0.9958333333333333
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.5625,
+    "B5 risk-score": 0.25625,
+    "B7 minimax-lp": 15.340833333333332,
+    "B7F minimax-lp fixed": 14.982083333333332
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 1.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9125,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9666666666666666,
+    "B7F minimax-lp fixed": 0.9416666666666667
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.00625,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0666666666666667,
+    "B7F minimax-lp fixed": 0.9833333333333333
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.00625,
+    "Sentinel": 1.1108333333333333,
+    "B5 risk-score": 0.9987499999999999,
+    "B7 minimax-lp": 1.0666666666666667,
+    "B7F minimax-lp fixed": 0.9833333333333333
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.602916666666667,
+    "B5 risk-score": 0.4208333333333333,
+    "B7 minimax-lp": 15.443333333333332,
+    "B7F minimax-lp fixed": 15.084583333333333
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 1.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9125,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9583333333333334,
+    "B7F minimax-lp fixed": 0.9416666666666667
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.00625,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0625,
+    "B7F minimax-lp fixed": 0.9833333333333333
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.00625,
+    "Sentinel": 1.1104166666666666,
+    "B5 risk-score": 0.9999999999999999,
+    "B7 minimax-lp": 1.0625,
+    "B7F minimax-lp fixed": 0.9833333333333333
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.611250000000001,
+    "B5 risk-score": 0.7245833333333332,
+    "B7 minimax-lp": 15.443333333333332,
+    "B7F minimax-lp fixed": 15.084583333333333
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 1.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9083333333333334,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9416666666666667,
+    "B7F minimax-lp fixed": 0.925
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0020833333333334,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0479166666666666,
+    "B7F minimax-lp fixed": 0.9666666666666667
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0020833333333334,
+    "Sentinel": 1.1112499999999998,
+    "B5 risk-score": 1.0025,
+    "B7 minimax-lp": 1.0479166666666666,
+    "B7F minimax-lp fixed": 0.9666666666666667
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.858750000000001,
+    "B5 risk-score": 0.7954166666666667,
+    "B7 minimax-lp": 15.494583333333333,
+    "B7F minimax-lp fixed": 15.084583333333333
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 1.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8958333333333334,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9291666666666666,
+    "B7F minimax-lp fixed": 0.9083333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9958333333333333,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0416666666666665,
+    "B7F minimax-lp fixed": 0.9500000000000001
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9958333333333333,
+    "Sentinel": 1.1124999999999998,
+    "B5 risk-score": 1.0116666666666665,
+    "B7 minimax-lp": 1.0416666666666665,
+    "B7F minimax-lp fixed": 0.9500000000000001
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.03,
+    "B5 risk-score": 1.1758333333333333,
+    "B7 minimax-lp": 15.443333333333332,
+    "B7F minimax-lp fixed": 14.982083333333332
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 2.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8875,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9291666666666666,
+    "B7F minimax-lp fixed": 0.9083333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9916666666666666,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0479166666666666,
+    "B7F minimax-lp fixed": 0.9500000000000001
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9916666666666666,
+    "Sentinel": 1.1116666666666666,
+    "B5 risk-score": 1.0233333333333332,
+    "B7 minimax-lp": 1.0479166666666666,
+    "B7F minimax-lp fixed": 0.9500000000000001
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.262916666666666,
+    "B5 risk-score": 2.203333333333333,
+    "B7 minimax-lp": 15.443333333333332,
+    "B7F minimax-lp fixed": 14.982083333333332
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 2.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8666666666666666,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9083333333333334,
+    "B7F minimax-lp fixed": 0.8833333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9729166666666665,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0354166666666669,
+    "B7F minimax-lp fixed": 0.925
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9729166666666665,
+    "Sentinel": 1.1124999999999998,
+    "B5 risk-score": 1.0325,
+    "B7 minimax-lp": 1.0354166666666669,
+    "B7F minimax-lp fixed": 0.925
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.44375,
+    "B5 risk-score": 2.8216666666666663,
+    "B7 minimax-lp": 15.409166666666664,
+    "B7F minimax-lp fixed": 14.93083333333333
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 2.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7916666666666667,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.875,
+    "B7F minimax-lp fixed": 0.8583333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.925,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0020833333333332,
+    "B7F minimax-lp fixed": 0.9062500000000001
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.925,
+    "Sentinel": 1.1124999999999998,
+    "B5 risk-score": 1.0391666666666666,
+    "B7 minimax-lp": 1.0020833333333332,
+    "B7F minimax-lp fixed": 0.9062500000000001
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.669583333333334,
+    "B5 risk-score": 3.59375,
+    "B7 minimax-lp": 15.409166666666664,
+    "B7F minimax-lp fixed": 14.742916666666664
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 2.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7833333333333333,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.85,
+    "B7F minimax-lp fixed": 0.8458333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9166666666666666,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.98125,
+    "B7F minimax-lp fixed": 0.8937500000000002
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9166666666666666,
+    "Sentinel": 1.1133333333333333,
+    "B5 risk-score": 1.0433333333333332,
+    "B7 minimax-lp": 0.98125,
+    "B7F minimax-lp fixed": 0.8937500000000002
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.73125,
+    "B5 risk-score": 4.1875,
+    "B7 minimax-lp": 15.306666666666667,
+    "B7F minimax-lp fixed": 14.794166666666666
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 2.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7833333333333333,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.8291666666666666,
+    "B7F minimax-lp fixed": 0.8333333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9166666666666666,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9749999999999999,
+    "B7F minimax-lp fixed": 0.8833333333333334
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9166666666666666,
+    "Sentinel": 1.1191666666666666,
+    "B5 risk-score": 1.0441666666666667,
+    "B7 minimax-lp": 0.9749999999999999,
+    "B7F minimax-lp fixed": 0.8833333333333334
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.952083333333334,
+    "B5 risk-score": 4.309583333333333,
+    "B7 minimax-lp": 15.323749999999999,
+    "B7F minimax-lp fixed": 14.725833333333332
+   }
+  },
+  {
+   "delta": 0,
+   "d_prime": 3.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7833333333333333,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.8291666666666666,
+    "B7F minimax-lp fixed": 0.8208333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9166666666666666,
+    "Sentinel": 0.9916666666666666,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9749999999999999,
+    "B7F minimax-lp fixed": 0.8708333333333335
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9166666666666666,
+    "Sentinel": 1.1183333333333332,
+    "B5 risk-score": 1.045,
+    "B7 minimax-lp": 0.9749999999999999,
+    "B7F minimax-lp fixed": 0.8708333333333335
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 9.05625,
+    "B5 risk-score": 4.5775,
+    "B7 minimax-lp": 15.323749999999999,
+    "B7F minimax-lp fixed": 14.725833333333332
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 0.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 1.0,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 0.9916666666666666,
+    "B7F minimax-lp fixed": 1.0
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0583333333333333,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.1041666666666665,
+    "B7F minimax-lp fixed": 1.0604166666666666
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0583333333333333,
+    "Sentinel": 1.09375,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.1041666666666665,
+    "B7F minimax-lp fixed": 1.0604166666666666
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.354166666666667,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.11875,
+    "B7F minimax-lp fixed": 15.221249999999998
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 0.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 1.0,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 0.9916666666666666,
+    "B7F minimax-lp fixed": 1.0
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0666666666666667,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.1208333333333333,
+    "B7F minimax-lp fixed": 1.0604166666666666
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0666666666666667,
+    "Sentinel": 1.0966666666666667,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.1208333333333333,
+    "B7F minimax-lp fixed": 1.0604166666666666
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.304583333333333,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 14.982083333333332,
+    "B7F minimax-lp fixed": 15.084583333333333
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 0.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9916666666666666,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 0.9833333333333334,
+    "B7F minimax-lp fixed": 0.9916666666666666
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0833333333333333,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.1125,
+    "B7F minimax-lp fixed": 1.0770833333333332
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0833333333333333,
+    "Sentinel": 1.0966666666666667,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.1125,
+    "B7F minimax-lp fixed": 1.0770833333333332
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.40625,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 14.982083333333332,
+    "B7F minimax-lp fixed": 14.982083333333332
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 0.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9416666666666667,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 0.9416666666666667,
+    "B7F minimax-lp fixed": 0.9625
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0416666666666667,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.075,
+    "B7F minimax-lp fixed": 1.0520833333333333
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0416666666666667,
+    "Sentinel": 1.0941666666666667,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.075,
+    "B7F minimax-lp fixed": 1.0520833333333333
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.465833333333334,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.238333333333333,
+    "B7F minimax-lp fixed": 14.845416666666665
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 0.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9333333333333333,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 0.9416666666666667,
+    "B7F minimax-lp fixed": 0.9458333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0333333333333334,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.075,
+    "B7F minimax-lp fixed": 1.0375
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0333333333333334,
+    "Sentinel": 1.09375,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.075,
+    "B7F minimax-lp fixed": 1.0375
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.541666666666667,
+    "B5 risk-score": 0.1025,
+    "B7 minimax-lp": 15.238333333333333,
+    "B7F minimax-lp fixed": 14.828333333333333
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 1.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9083333333333334,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 0.9208333333333334,
+    "B7F minimax-lp fixed": 0.9208333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0083333333333335,
+    "Sentinel": 0.9833333333333334,
+    "B5 risk-score": 1.0,
+    "B7 minimax-lp": 1.0541666666666667,
+    "B7F minimax-lp fixed": 1.0125
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0083333333333335,
+    "Sentinel": 1.0987500000000001,
+    "B5 risk-score": 1.0058333333333334,
+    "B7 minimax-lp": 1.0541666666666667,
+    "B7F minimax-lp fixed": 1.0125
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.54875,
+    "B5 risk-score": 0.2616666666666666,
+    "B7 minimax-lp": 15.238333333333333,
+    "B7F minimax-lp fixed": 14.725833333333332
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 1.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8541666666666666,
+    "Sentinel": 0.9708333333333334,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.9,
+    "B7F minimax-lp fixed": 0.8833333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9854166666666666,
+    "Sentinel": 0.9708333333333334,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0291666666666668,
+    "B7F minimax-lp fixed": 0.9875
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9854166666666666,
+    "Sentinel": 1.08875,
+    "B5 risk-score": 1.0041666666666667,
+    "B7 minimax-lp": 1.0291666666666668,
+    "B7F minimax-lp fixed": 0.9875
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.7787500000000005,
+    "B5 risk-score": 0.4625,
+    "B7 minimax-lp": 15.18708333333333,
+    "B7F minimax-lp fixed": 14.589166666666666
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 1.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8541666666666666,
+    "Sentinel": 0.95,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 0.8916666666666666,
+    "B7F minimax-lp fixed": 0.8625
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9854166666666666,
+    "Sentinel": 0.95,
+    "B5 risk-score": 0.9916666666666666,
+    "B7 minimax-lp": 1.0291666666666666,
+    "B7F minimax-lp fixed": 0.9708333333333333
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9854166666666666,
+    "Sentinel": 1.0691666666666666,
+    "B5 risk-score": 1.0083333333333333,
+    "B7 minimax-lp": 1.0291666666666666,
+    "B7F minimax-lp fixed": 0.9708333333333333
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.582083333333334,
+    "B5 risk-score": 0.6683333333333332,
+    "B7 minimax-lp": 15.18708333333333,
+    "B7F minimax-lp fixed": 14.589166666666666
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 1.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8291666666666666,
+    "Sentinel": 0.9416666666666667,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 0.8541666666666666,
+    "B7F minimax-lp fixed": 0.8333333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9479166666666666,
+    "Sentinel": 0.9416666666666667,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 0.9874999999999999,
+    "B7F minimax-lp fixed": 0.9416666666666667
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9479166666666666,
+    "Sentinel": 1.07,
+    "B5 risk-score": 0.99375,
+    "B7 minimax-lp": 0.9874999999999999,
+    "B7F minimax-lp fixed": 0.9416666666666667
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.75625,
+    "B5 risk-score": 0.9554166666666666,
+    "B7 minimax-lp": 15.238333333333333,
+    "B7F minimax-lp fixed": 14.589166666666666
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 1.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8166666666666667,
+    "Sentinel": 0.925,
+    "B5 risk-score": 0.9416666666666667,
+    "B7 minimax-lp": 0.85,
+    "B7F minimax-lp fixed": 0.8125
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9354166666666667,
+    "Sentinel": 0.925,
+    "B5 risk-score": 0.9416666666666667,
+    "B7 minimax-lp": 0.9833333333333333,
+    "B7F minimax-lp fixed": 0.9208333333333333
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9354166666666667,
+    "Sentinel": 1.0583333333333333,
+    "B5 risk-score": 0.9658333333333333,
+    "B7 minimax-lp": 0.9833333333333333,
+    "B7F minimax-lp fixed": 0.9208333333333333
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.16125,
+    "B5 risk-score": 1.52,
+    "B7 minimax-lp": 15.221249999999998,
+    "B7F minimax-lp fixed": 14.520833333333332
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 2.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8166666666666667,
+    "Sentinel": 0.9166666666666666,
+    "B5 risk-score": 0.8916666666666666,
+    "B7 minimax-lp": 0.85,
+    "B7F minimax-lp fixed": 0.775
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9354166666666667,
+    "Sentinel": 0.9166666666666666,
+    "B5 risk-score": 0.8916666666666666,
+    "B7 minimax-lp": 0.9833333333333333,
+    "B7F minimax-lp fixed": 0.8854166666666667
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9354166666666667,
+    "Sentinel": 1.05375,
+    "B5 risk-score": 0.9179166666666666,
+    "B7 minimax-lp": 0.9833333333333333,
+    "B7F minimax-lp fixed": 0.8854166666666667
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.670416666666666,
+    "B5 risk-score": 1.90625,
+    "B7 minimax-lp": 15.272499999999999,
+    "B7F minimax-lp fixed": 14.520833333333332
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 2.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8083333333333333,
+    "Sentinel": 0.9166666666666666,
+    "B5 risk-score": 0.8708333333333333,
+    "B7 minimax-lp": 0.8416666666666666,
+    "B7F minimax-lp fixed": 0.7666666666666667
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9229166666666667,
+    "Sentinel": 0.9166666666666666,
+    "B5 risk-score": 0.8708333333333333,
+    "B7 minimax-lp": 0.9749999999999999,
+    "B7F minimax-lp fixed": 0.8770833333333334
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9229166666666667,
+    "Sentinel": 1.0525,
+    "B5 risk-score": 0.90375,
+    "B7 minimax-lp": 0.9749999999999999,
+    "B7F minimax-lp fixed": 0.8770833333333334
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.985833333333334,
+    "B5 risk-score": 2.064583333333333,
+    "B7 minimax-lp": 15.272499999999999,
+    "B7F minimax-lp fixed": 14.520833333333332
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 2.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7875,
+    "Sentinel": 0.9166666666666666,
+    "B5 risk-score": 0.8708333333333333,
+    "B7 minimax-lp": 0.8291666666666666,
+    "B7F minimax-lp fixed": 0.7458333333333333
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.91875,
+    "Sentinel": 0.9166666666666666,
+    "B5 risk-score": 0.8708333333333333,
+    "B7 minimax-lp": 0.9541666666666666,
+    "B7F minimax-lp fixed": 0.8625
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.91875,
+    "Sentinel": 1.0525,
+    "B5 risk-score": 0.9108333333333334,
+    "B7 minimax-lp": 0.9541666666666666,
+    "B7F minimax-lp fixed": 0.8625
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 9.41375,
+    "B5 risk-score": 2.498333333333333,
+    "B7 minimax-lp": 15.306666666666667,
+    "B7F minimax-lp fixed": 14.469583333333333
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 2.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.775,
+    "Sentinel": 0.8833333333333334,
+    "B5 risk-score": 0.8375,
+    "B7 minimax-lp": 0.8166666666666667,
+    "B7F minimax-lp fixed": 0.7458333333333333
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9,
+    "Sentinel": 0.8833333333333334,
+    "B5 risk-score": 0.8375,
+    "B7 minimax-lp": 0.9416666666666667,
+    "B7F minimax-lp fixed": 0.8625
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9,
+    "Sentinel": 1.0125000000000002,
+    "B5 risk-score": 0.8704166666666667,
+    "B7 minimax-lp": 0.9416666666666667,
+    "B7F minimax-lp fixed": 0.8625
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 9.76875,
+    "B5 risk-score": 2.64375,
+    "B7 minimax-lp": 15.409166666666664,
+    "B7F minimax-lp fixed": 14.469583333333333
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 2.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7708333333333333,
+    "Sentinel": 0.8708333333333333,
+    "B5 risk-score": 0.7708333333333333,
+    "B7 minimax-lp": 0.8166666666666667,
+    "B7F minimax-lp fixed": 0.7208333333333333
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.8958333333333333,
+    "Sentinel": 0.8708333333333333,
+    "B5 risk-score": 0.7708333333333333,
+    "B7 minimax-lp": 0.9416666666666667,
+    "B7F minimax-lp fixed": 0.8354166666666667
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.8958333333333333,
+    "Sentinel": 0.99875,
+    "B5 risk-score": 0.8012499999999999,
+    "B7 minimax-lp": 0.9416666666666667,
+    "B7F minimax-lp fixed": 0.8354166666666667
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 10.004999999999999,
+    "B5 risk-score": 3.083333333333333,
+    "B7 minimax-lp": 15.340833333333332,
+    "B7F minimax-lp fixed": 14.50375
+   }
+  },
+  {
+   "delta": 1,
+   "d_prime": 3.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7583333333333333,
+    "Sentinel": 0.8708333333333333,
+    "B5 risk-score": 0.6625,
+    "B7 minimax-lp": 0.8166666666666667,
+    "B7F minimax-lp fixed": 0.7083333333333333
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.8770833333333333,
+    "Sentinel": 0.8708333333333333,
+    "B5 risk-score": 0.6625,
+    "B7 minimax-lp": 0.9416666666666667,
+    "B7F minimax-lp fixed": 0.8166666666666665
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.8770833333333333,
+    "Sentinel": 1.0033333333333334,
+    "B5 risk-score": 0.6958333333333333,
+    "B7 minimax-lp": 0.9416666666666667,
+    "B7F minimax-lp fixed": 0.8166666666666665
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 10.25,
+    "B5 risk-score": 3.038333333333333,
+    "B7 minimax-lp": 15.340833333333332,
+    "B7F minimax-lp fixed": 14.50375
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 0.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9666666666666666,
+    "Sentinel": 0.9625,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 0.9583333333333334,
+    "B7F minimax-lp fixed": 0.9666666666666666
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0541666666666665,
+    "Sentinel": 0.9625,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.075,
+    "B7F minimax-lp fixed": 1.0499999999999998
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0541666666666665,
+    "Sentinel": 1.0829166666666667,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.075,
+    "B7F minimax-lp fixed": 1.1170833333333332
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.184166666666667,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.221249999999998,
+    "B7F minimax-lp fixed": 14.601666666666665
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 0.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.95,
+    "Sentinel": 0.9541666666666666,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 0.9375,
+    "B7F minimax-lp fixed": 0.95
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0374999999999999,
+    "Sentinel": 0.9541666666666666,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.05625,
+    "B7F minimax-lp fixed": 1.0333333333333332
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0374999999999999,
+    "Sentinel": 1.0775,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.05625,
+    "B7F minimax-lp fixed": 1.1004166666666666
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.156666666666668,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.221249999999998,
+    "B7F minimax-lp fixed": 14.601666666666665
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 0.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.95,
+    "Sentinel": 0.9541666666666666,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 0.9375,
+    "B7F minimax-lp fixed": 0.95
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0374999999999999,
+    "Sentinel": 0.9541666666666666,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.05625,
+    "B7F minimax-lp fixed": 1.0333333333333332
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0374999999999999,
+    "Sentinel": 1.0775,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.05625,
+    "B7F minimax-lp fixed": 1.1004166666666666
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.155000000000001,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.221249999999998,
+    "B7F minimax-lp fixed": 14.601666666666665
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 0.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9083333333333334,
+    "Sentinel": 0.9541666666666666,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 0.925,
+    "B7F minimax-lp fixed": 0.9291666666666666
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0104166666666667,
+    "Sentinel": 0.9541666666666666,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.04375,
+    "B7F minimax-lp fixed": 1.0229166666666667
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0104166666666667,
+    "Sentinel": 1.0766666666666667,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.04375,
+    "B7F minimax-lp fixed": 1.0875
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.1433333333333335,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.42625,
+    "B7F minimax-lp fixed": 14.518333333333334
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 0.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9,
+    "Sentinel": 0.9458333333333334,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 0.925,
+    "B7F minimax-lp fixed": 0.9125
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0020833333333334,
+    "Sentinel": 0.9458333333333334,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.04375,
+    "B7F minimax-lp fixed": 1.0083333333333333
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0020833333333334,
+    "Sentinel": 1.07375,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.04375,
+    "B7F minimax-lp fixed": 1.0741666666666667
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.333333333333334,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.42625,
+    "B7F minimax-lp fixed": 14.551666666666666
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 1.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.9,
+    "Sentinel": 0.9375,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 0.9083333333333334,
+    "B7F minimax-lp fixed": 0.9125
+   },
+   "L0": {
+    "B1 audit-at-commit": 1.0041666666666667,
+    "Sentinel": 0.9375,
+    "B5 risk-score": 0.975,
+    "B7 minimax-lp": 1.0270833333333333,
+    "B7F minimax-lp fixed": 1.0104166666666667
+   },
+   "L10": {
+    "B1 audit-at-commit": 1.0041666666666667,
+    "Sentinel": 1.0691666666666666,
+    "B5 risk-score": 0.9791666666666666,
+    "B7 minimax-lp": 1.0270833333333333,
+    "B7F minimax-lp fixed": 1.075
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.4958333333333345,
+    "B5 risk-score": 0.17833333333333332,
+    "B7 minimax-lp": 15.42625,
+    "B7F minimax-lp fixed": 14.577916666666667
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 1.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8708333333333333,
+    "Sentinel": 0.925,
+    "B5 risk-score": 0.9708333333333334,
+    "B7 minimax-lp": 0.8958333333333334,
+    "B7F minimax-lp fixed": 0.8875
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9833333333333334,
+    "Sentinel": 0.925,
+    "B5 risk-score": 0.9708333333333334,
+    "B7 minimax-lp": 1.0145833333333334,
+    "B7F minimax-lp fixed": 0.9854166666666666
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9833333333333334,
+    "Sentinel": 1.0566666666666666,
+    "B5 risk-score": 0.9775000000000001,
+    "B7 minimax-lp": 1.0145833333333334,
+    "B7F minimax-lp fixed": 1.0504166666666666
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.64375,
+    "B5 risk-score": 0.24499999999999997,
+    "B7 minimax-lp": 15.409166666666664,
+    "B7F minimax-lp fixed": 14.566666666666666
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 1.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8708333333333333,
+    "Sentinel": 0.9,
+    "B5 risk-score": 0.9458333333333334,
+    "B7 minimax-lp": 0.8708333333333333,
+    "B7F minimax-lp fixed": 0.8583333333333334
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9833333333333334,
+    "Sentinel": 0.9,
+    "B5 risk-score": 0.9458333333333334,
+    "B7 minimax-lp": 0.9958333333333333,
+    "B7F minimax-lp fixed": 0.95625
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9833333333333334,
+    "Sentinel": 1.0320833333333335,
+    "B5 risk-score": 0.96125,
+    "B7 minimax-lp": 0.9958333333333333,
+    "B7F minimax-lp fixed": 1.0191666666666668
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.633750000000001,
+    "B5 risk-score": 0.47874999999999995,
+    "B7 minimax-lp": 15.409166666666664,
+    "B7F minimax-lp fixed": 14.565833333333334
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 1.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8583333333333334,
+    "Sentinel": 0.8875,
+    "B5 risk-score": 0.9291666666666666,
+    "B7 minimax-lp": 0.8625,
+    "B7F minimax-lp fixed": 0.8416666666666666
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9708333333333334,
+    "Sentinel": 0.8875,
+    "B5 risk-score": 0.9291666666666666,
+    "B7 minimax-lp": 0.9875,
+    "B7F minimax-lp fixed": 0.9395833333333332
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9708333333333334,
+    "Sentinel": 1.0216666666666665,
+    "B5 risk-score": 0.9533333333333333,
+    "B7 minimax-lp": 0.9875,
+    "B7F minimax-lp fixed": 1.0025
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.843333333333334,
+    "B5 risk-score": 0.9229166666666666,
+    "B7 minimax-lp": 15.409166666666664,
+    "B7F minimax-lp fixed": 14.565833333333334
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 1.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8375,
+    "Sentinel": 0.8541666666666666,
+    "B5 risk-score": 0.9125,
+    "B7 minimax-lp": 0.8625,
+    "B7F minimax-lp fixed": 0.8166666666666667
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9500000000000001,
+    "Sentinel": 0.8541666666666666,
+    "B5 risk-score": 0.9125,
+    "B7 minimax-lp": 0.9875,
+    "B7F minimax-lp fixed": 0.9145833333333333
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9500000000000001,
+    "Sentinel": 0.98625,
+    "B5 risk-score": 0.9429166666666666,
+    "B7 minimax-lp": 0.9875,
+    "B7F minimax-lp fixed": 0.9770833333333333
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.964166666666666,
+    "B5 risk-score": 1.1854166666666666,
+    "B7 minimax-lp": 15.409166666666664,
+    "B7F minimax-lp fixed": 14.512916666666666
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 2.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8291666666666666,
+    "Sentinel": 0.8166666666666667,
+    "B5 risk-score": 0.8916666666666666,
+    "B7 minimax-lp": 0.8416666666666666,
+    "B7F minimax-lp fixed": 0.7541666666666667
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9416666666666667,
+    "Sentinel": 0.8166666666666667,
+    "B5 risk-score": 0.8916666666666666,
+    "B7 minimax-lp": 0.9666666666666666,
+    "B7F minimax-lp fixed": 0.85625
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9416666666666667,
+    "Sentinel": 0.9479166666666666,
+    "B5 risk-score": 0.9262499999999999,
+    "B7 minimax-lp": 0.9666666666666666,
+    "B7F minimax-lp fixed": 0.9183333333333333
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.390416666666667,
+    "B5 risk-score": 1.6383333333333332,
+    "B7 minimax-lp": 15.460416666666665,
+    "B7F minimax-lp fixed": 14.652499999999998
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 2.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8208333333333334,
+    "Sentinel": 0.8083333333333333,
+    "B5 risk-score": 0.8333333333333334,
+    "B7 minimax-lp": 0.8208333333333334,
+    "B7F minimax-lp fixed": 0.725
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9375000000000001,
+    "Sentinel": 0.8083333333333333,
+    "B5 risk-score": 0.8333333333333334,
+    "B7 minimax-lp": 0.9541666666666667,
+    "B7F minimax-lp fixed": 0.8270833333333333
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9375000000000001,
+    "Sentinel": 0.9458333333333333,
+    "B5 risk-score": 0.8658333333333333,
+    "B7 minimax-lp": 0.9541666666666667,
+    "B7F minimax-lp fixed": 0.8875
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.937083333333334,
+    "B5 risk-score": 1.9179166666666667,
+    "B7 minimax-lp": 15.494583333333333,
+    "B7F minimax-lp fixed": 14.639166666666664
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 2.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8166666666666667,
+    "Sentinel": 0.7541666666666667,
+    "B5 risk-score": 0.775,
+    "B7 minimax-lp": 0.8208333333333334,
+    "B7F minimax-lp fixed": 0.7041666666666667
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9395833333333333,
+    "Sentinel": 0.7541666666666667,
+    "B5 risk-score": 0.775,
+    "B7 minimax-lp": 0.9479166666666667,
+    "B7F minimax-lp fixed": 0.8
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9395833333333333,
+    "Sentinel": 0.8891666666666667,
+    "B5 risk-score": 0.8158333333333334,
+    "B7 minimax-lp": 0.9479166666666667,
+    "B7F minimax-lp fixed": 0.8520833333333334
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.99375,
+    "B5 risk-score": 2.24625,
+    "B7 minimax-lp": 15.494583333333333,
+    "B7F minimax-lp fixed": 14.6
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 2.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8125,
+    "Sentinel": 0.7333333333333333,
+    "B5 risk-score": 0.7375,
+    "B7 minimax-lp": 0.7875,
+    "B7F minimax-lp fixed": 0.6958333333333333
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9354166666666667,
+    "Sentinel": 0.7333333333333333,
+    "B5 risk-score": 0.7375,
+    "B7 minimax-lp": 0.9145833333333333,
+    "B7F minimax-lp fixed": 0.7916666666666666
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9354166666666667,
+    "Sentinel": 0.875,
+    "B5 risk-score": 0.7725000000000001,
+    "B7 minimax-lp": 0.9145833333333333,
+    "B7F minimax-lp fixed": 0.84375
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 9.360416666666667,
+    "B5 risk-score": 2.4116666666666666,
+    "B7 minimax-lp": 15.443333333333332,
+    "B7F minimax-lp fixed": 14.6
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 2.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8125,
+    "Sentinel": 0.7291666666666667,
+    "B5 risk-score": 0.7125,
+    "B7 minimax-lp": 0.7416666666666667,
+    "B7F minimax-lp fixed": 0.6625
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9354166666666667,
+    "Sentinel": 0.7291666666666667,
+    "B5 risk-score": 0.7125,
+    "B7 minimax-lp": 0.8625,
+    "B7F minimax-lp fixed": 0.7541666666666667
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9354166666666667,
+    "Sentinel": 0.8608333333333335,
+    "B5 risk-score": 0.75,
+    "B7 minimax-lp": 0.8625,
+    "B7F minimax-lp fixed": 0.8066666666666666
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 9.9175,
+    "B5 risk-score": 2.4625,
+    "B7 minimax-lp": 15.42625,
+    "B7F minimax-lp fixed": 14.600416666666666
+   }
+  },
+  {
+   "delta": 2,
+   "d_prime": 3.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.8125,
+    "Sentinel": 0.675,
+    "B5 risk-score": 0.6375,
+    "B7 minimax-lp": 0.7333333333333333,
+    "B7F minimax-lp fixed": 0.6541666666666667
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9354166666666667,
+    "Sentinel": 0.675,
+    "B5 risk-score": 0.6375,
+    "B7 minimax-lp": 0.8541666666666666,
+    "B7F minimax-lp fixed": 0.7458333333333333
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9354166666666667,
+    "Sentinel": 0.7991666666666667,
+    "B5 risk-score": 0.6804166666666667,
+    "B7 minimax-lp": 0.8541666666666666,
+    "B7F minimax-lp fixed": 0.7983333333333333
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 9.719583333333334,
+    "B5 risk-score": 2.5770833333333334,
+    "B7 minimax-lp": 15.42625,
+    "B7F minimax-lp fixed": 14.600416666666666
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 0.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.7657657657657657,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.7297297297297297,
+    "B7F minimax-lp fixed": 0.7657657657657657
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.7657657657657657,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.8513513513513513,
+    "B7F minimax-lp fixed": 0.777027027027027
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.8653153153153152,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.8513513513513513,
+    "B7F minimax-lp fixed": 0.8306306306306306
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.001801801801801,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.402702702702703,
+    "B7F minimax-lp fixed": 12.068018018018018
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 0.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.7657657657657657,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.7252252252252251,
+    "B7F minimax-lp fixed": 0.7387387387387387
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.7657657657657657,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.849099099099099,
+    "B7F minimax-lp fixed": 0.75
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.8653153153153152,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.849099099099099,
+    "B7F minimax-lp fixed": 0.8022522522522523
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 6.982882882882883,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.402702702702703,
+    "B7F minimax-lp fixed": 12.00045045045045
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 0.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.7612612612612613,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.7162162162162162,
+    "B7F minimax-lp fixed": 0.7387387387387387
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.7612612612612613,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.8378378378378378,
+    "B7F minimax-lp fixed": 0.75
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.8608108108108108,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.8378378378378378,
+    "B7F minimax-lp fixed": 0.8022522522522523
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 6.981081081081081,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.402702702702703,
+    "B7F minimax-lp fixed": 12.00045045045045
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 0.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.7522522522522522,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.7162162162162162,
+    "B7F minimax-lp fixed": 0.7207207207207208
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.7522522522522522,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.8378378378378378,
+    "B7F minimax-lp fixed": 0.731981981981982
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.8531531531531531,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.8378378378378378,
+    "B7F minimax-lp fixed": 0.7860360360360361
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 6.977927927927928,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.402702702702703,
+    "B7F minimax-lp fixed": 11.995945945945945
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 0.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.7522522522522522,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.7027027027027027,
+    "B7F minimax-lp fixed": 0.6891891891891891
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.7522522522522522,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.8243243243243243,
+    "B7F minimax-lp fixed": 0.6959459459459459
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.8581081081081081,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.8243243243243243,
+    "B7F minimax-lp fixed": 0.7504504504504504
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 6.95945945945946,
+    "B5 risk-score": 0.0,
+    "B7 minimax-lp": 15.384234234234231,
+    "B7F minimax-lp fixed": 11.998198198198196
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 1.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.7477477477477478,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.6621621621621622,
+    "B7F minimax-lp fixed": 0.6621621621621622
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.7477477477477478,
+    "B5 risk-score": 0.7792792792792792,
+    "B7 minimax-lp": 0.7837837837837838,
+    "B7F minimax-lp fixed": 0.668918918918919
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.8581081081081081,
+    "B5 risk-score": 0.7806306306306305,
+    "B7 minimax-lp": 0.7837837837837838,
+    "B7F minimax-lp fixed": 0.7234234234234235
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.03963963963964,
+    "B5 risk-score": 0.06756756756756757,
+    "B7 minimax-lp": 15.384234234234231,
+    "B7F minimax-lp fixed": 11.998198198198196
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 1.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.7387387387387387,
+    "B5 risk-score": 0.7657657657657657,
+    "B7 minimax-lp": 0.6306306306306306,
+    "B7F minimax-lp fixed": 0.6486486486486487
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.7387387387387387,
+    "B5 risk-score": 0.7657657657657657,
+    "B7 minimax-lp": 0.7522522522522522,
+    "B7F minimax-lp fixed": 0.6554054054054055
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.8477477477477477,
+    "B5 risk-score": 0.7698198198198197,
+    "B7 minimax-lp": 0.7522522522522522,
+    "B7F minimax-lp fixed": 0.70990990990991
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.085585585585586,
+    "B5 risk-score": 0.09054054054054053,
+    "B7 minimax-lp": 15.384234234234231,
+    "B7F minimax-lp fixed": 11.998198198198196
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 1.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.7117117117117117,
+    "B5 risk-score": 0.7612612612612613,
+    "B7 minimax-lp": 0.6036036036036035,
+    "B7F minimax-lp fixed": 0.5945945945945946
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.7117117117117117,
+    "B5 risk-score": 0.7612612612612613,
+    "B7 minimax-lp": 0.7252252252252251,
+    "B7F minimax-lp fixed": 0.6013513513513514
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.8274774774774775,
+    "B5 risk-score": 0.7720720720720721,
+    "B7 minimax-lp": 0.7252252252252251,
+    "B7F minimax-lp fixed": 0.654954954954955
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.4202702702702705,
+    "B5 risk-score": 0.2108108108108108,
+    "B7 minimax-lp": 15.384234234234231,
+    "B7F minimax-lp fixed": 12.105855855855856
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 1.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.6981981981981982,
+    "B5 risk-score": 0.7432432432432432,
+    "B7 minimax-lp": 0.5765765765765766,
+    "B7F minimax-lp fixed": 0.581081081081081
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.6981981981981982,
+    "B5 risk-score": 0.7432432432432432,
+    "B7 minimax-lp": 0.6981981981981982,
+    "B7F minimax-lp fixed": 0.5878378378378378
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.8130630630630631,
+    "B5 risk-score": 0.7549549549549549,
+    "B7 minimax-lp": 0.6981981981981982,
+    "B7F minimax-lp fixed": 0.6414414414414414
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.562162162162163,
+    "B5 risk-score": 0.4657657657657658,
+    "B7 minimax-lp": 15.384234234234231,
+    "B7F minimax-lp fixed": 12.105855855855856
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 1.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.6711711711711711,
+    "B5 risk-score": 0.7162162162162162,
+    "B7 minimax-lp": 0.5675675675675675,
+    "B7F minimax-lp fixed": 0.5540540540540541
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.6711711711711711,
+    "B5 risk-score": 0.7162162162162162,
+    "B7 minimax-lp": 0.6891891891891891,
+    "B7F minimax-lp fixed": 0.5608108108108109
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.785135135135135,
+    "B5 risk-score": 0.7405405405405405,
+    "B7 minimax-lp": 0.6891891891891891,
+    "B7F minimax-lp fixed": 0.6144144144144145
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 7.784684684684685,
+    "B5 risk-score": 0.9797297297297297,
+    "B7 minimax-lp": 15.402702702702703,
+    "B7F minimax-lp fixed": 12.105855855855856
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 2.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.6261261261261262,
+    "B5 risk-score": 0.6846846846846847,
+    "B7 minimax-lp": 0.545045045045045,
+    "B7F minimax-lp fixed": 0.5315315315315315
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.6261261261261262,
+    "B5 risk-score": 0.6846846846846847,
+    "B7 minimax-lp": 0.6666666666666666,
+    "B7F minimax-lp fixed": 0.5427927927927928
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.7450450450450451,
+    "B5 risk-score": 0.713963963963964,
+    "B7 minimax-lp": 0.6666666666666666,
+    "B7F minimax-lp fixed": 0.595945945945946
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.254054054054055,
+    "B5 risk-score": 1.087837837837838,
+    "B7 minimax-lp": 15.402702702702703,
+    "B7F minimax-lp fixed": 12.084234234234232
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 2.2,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.5630630630630631,
+    "B5 risk-score": 0.6396396396396397,
+    "B7 minimax-lp": 0.5315315315315315,
+    "B7F minimax-lp fixed": 0.490990990990991
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.5630630630630631,
+    "B5 risk-score": 0.6396396396396397,
+    "B7 minimax-lp": 0.6599099099099099,
+    "B7F minimax-lp fixed": 0.5022522522522523
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.6837837837837838,
+    "B5 risk-score": 0.6720720720720721,
+    "B7 minimax-lp": 0.6599099099099099,
+    "B7F minimax-lp fixed": 0.5554054054054054
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.375225225225226,
+    "B5 risk-score": 1.2306306306306305,
+    "B7 minimax-lp": 15.402702702702703,
+    "B7F minimax-lp fixed": 12.061261261261262
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 2.4,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.509009009009009,
+    "B5 risk-score": 0.5990990990990991,
+    "B7 minimax-lp": 0.509009009009009,
+    "B7F minimax-lp fixed": 0.463963963963964
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.509009009009009,
+    "B5 risk-score": 0.5990990990990991,
+    "B7 minimax-lp": 0.6373873873873874,
+    "B7F minimax-lp fixed": 0.47522522522522526
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.6288288288288288,
+    "B5 risk-score": 0.6364864864864864,
+    "B7 minimax-lp": 0.6373873873873874,
+    "B7F minimax-lp fixed": 0.5283783783783784
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.361711711711711,
+    "B5 risk-score": 1.3761261261261262,
+    "B7 minimax-lp": 15.402702702702703,
+    "B7F minimax-lp fixed": 12.061261261261262
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 2.6,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.43243243243243246,
+    "B5 risk-score": 0.5540540540540541,
+    "B7 minimax-lp": 0.4864864864864865,
+    "B7F minimax-lp fixed": 0.463963963963964
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.43243243243243246,
+    "B5 risk-score": 0.5540540540540541,
+    "B7 minimax-lp": 0.6171171171171171,
+    "B7F minimax-lp fixed": 0.47522522522522526
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.5454954954954956,
+    "B5 risk-score": 0.5846846846846847,
+    "B7 minimax-lp": 0.6171171171171171,
+    "B7F minimax-lp fixed": 0.5283783783783784
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.347297297297297,
+    "B5 risk-score": 1.668018018018018,
+    "B7 minimax-lp": 15.384234234234231,
+    "B7F minimax-lp fixed": 12.061261261261262
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 2.8,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.3873873873873874,
+    "B5 risk-score": 0.5,
+    "B7 minimax-lp": 0.4864864864864865,
+    "B7F minimax-lp fixed": 0.4594594594594595
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.3873873873873874,
+    "B5 risk-score": 0.5,
+    "B7 minimax-lp": 0.6171171171171171,
+    "B7F minimax-lp fixed": 0.46621621621621623
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.5036036036036037,
+    "B5 risk-score": 0.5373873873873873,
+    "B7 minimax-lp": 0.6171171171171171,
+    "B7F minimax-lp fixed": 0.5198198198198198
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.640990990990991,
+    "B5 risk-score": 1.8693693693693696,
+    "B7 minimax-lp": 15.384234234234231,
+    "B7F minimax-lp fixed": 12.082882882882883
+   }
+  },
+  {
+   "delta": 4,
+   "d_prime": 3.0,
+   "usable": true,
+   "harm": {
+    "B1 audit-at-commit": 0.7792792792792792,
+    "Sentinel": 0.3603603603603604,
+    "B5 risk-score": 0.45045045045045046,
+    "B7 minimax-lp": 0.4864864864864865,
+    "B7F minimax-lp fixed": 0.4594594594594595
+   },
+   "L0": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.3603603603603604,
+    "B5 risk-score": 0.45045045045045046,
+    "B7 minimax-lp": 0.6171171171171171,
+    "B7F minimax-lp fixed": 0.46621621621621623
+   },
+   "L10": {
+    "B1 audit-at-commit": 0.9076576576576576,
+    "Sentinel": 0.47522522522522526,
+    "B5 risk-score": 0.4900900900900901,
+    "B7 minimax-lp": 0.6171171171171171,
+    "B7F minimax-lp fixed": 0.5198198198198198
+   },
+   "spent": {
+    "B1 audit-at-commit": 16.4,
+    "Sentinel": 8.737837837837839,
+    "B5 risk-score": 2.0063063063063065,
+    "B7 minimax-lp": 15.384234234234231,
+    "B7F minimax-lp fixed": 12.082882882882883
+   }
+  }
+ ]
+}
