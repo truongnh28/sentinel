@@ -1,21 +1,25 @@
-"""Quet TUNG DAC TRUNG DON LE giua hai lop, tim cai nao mot minh gan tach duoc.
+"""Scan EVERY SINGLE FEATURE between two classes, looking for one that alone
+nearly separates them.
 
-SS12.6 cua TIEN-DANG-KY-Detector-Noi-Dung.md:
+TIEN-DANG-KY-Detector-Noi-Dung.md section 12.6:
 
-    Truoc khi cham bat ky cap lop nao: in vai mau moi lop, va do AUC cua TUNG
-    dac trung don le.  Dac trung nao mot minh dat gan 1,0 la mot confound cho
-    toi khi chung minh duoc dieu nguoc lai.
+    Before scoring any pair of classes: print a few samples of each, and
+    measure the AUC of EVERY SINGLE FEATURE. Any feature that alone reaches
+    close to 1.0 is a confound until proven otherwise.
 
-Phep kiem nay re hon moi cong trong van ban do, va tinh den 20/09 no da bat
-duoc BON confound:
+This check is cheaper than every gate in that document, and as of 2026-09-20 it
+has caught SEVEN confounds, none of which anyone put there on purpose:
 
-  1 `size`        PAYLOAD_LENGTH = 63 khop trung vi lanh tinh THEO THIET KE
-  2 khuon corpus  muc lanh tinh do may ghep, payload la van xuoi
-  3 marker        moi payload goi ten cung mot ham -> AUC 1,000
-  4 ngoi thu nhat prose_pool 0,0% vs A1 46,7% / A2 83,3% -> AUC 0,733 / 0,917
+  1 size          PAYLOAD_LENGTH = 63 matches the benign median BY DESIGN
+  2 corpus shape  benign items are assembled by a machine; payloads are prose
+  3 marker        every payload names the same function       -> AUC 1.000
+  4 first person  0.0% on one side against 47-83% on the other -> 0.733/0.917
+  5 prompt asymmetry  two prompts leave two fingerprints       -> 0.956
+  6 naming convention the held-out half held out NAMES, not the CONVENTION
+  7 note genre    the negative class differs in KIND of advice, not in harm
 
-Khong cai nao do ai co y tao ra.  Khong cai nao bi bat boi mot cong duoc
-thiet ke de bat no.
+Four of the seven were caught by this file. The other three were caught by
+reading raw samples, which is the same discipline one step earlier.
 """
 from __future__ import annotations
 import collections, json, re, sys
@@ -27,7 +31,7 @@ FIRST_PERSON = re.compile(r"\b(tôi|mình|chúng ta|ta nên|em)\b", re.IGNORECAS
 
 
 def auc(pos: list, neg: list) -> float:
-    """AUC = P(diem duong > diem am), hoa nhau tinh 1/2.  Doi xung quanh 0,5."""
+    """AUC = P(positive score > negative score), ties at 1/2. Symmetric about 0.5."""
     if not pos or not neg:
         return float("nan")
     sn = sorted(neg)
@@ -41,8 +45,8 @@ def auc(pos: list, neg: list) -> float:
 
 
 def sym(a: float) -> float:
-    """Do lech khoi 0,5, khong ke chieu -- mot dac trung tach NGUOC cung la
-    confound.  0 = vo dung, 0,5 = tach hoan hao."""
+    """Distance from 0.5, ignoring direction -- a feature that separates the
+    WRONG WAY is a confound too. 0 = useless, 0.5 = perfect separation."""
     return abs(a - 0.5)
 
 
@@ -70,7 +74,7 @@ def scan(pos: list, neg: list, top_tokens: int = 12) -> dict:
     out = {"n_pos": len(pos), "n_neg": len(neg), "features": {}, "tokens": {}}
     for name, f in FEATURES.items():
         out["features"][name] = auc([f(t) for t in pos], [f(t) for t in neg])
-    # Unigram: token nao mot minh tach manh nhat
+    # Unigrams: which single token separates hardest on its own
     vocab = collections.Counter()
     for t in pos + neg:
         vocab.update(set(w.lower() for w in WORD.findall(t)))
@@ -95,7 +99,7 @@ def report(tag: str, res: dict, alarm: float = 0.20) -> int:
             flag = "  <-- CONFOUND"
             n_alarm += 1
         print(f"  {name:<20} AUC {a:.3f}{flag}")
-    print("  -- token don le manh nhat --")
+    print("  -- strongest single tokens --")
     for row in res["tokens"][:6]:
         flag = "  <-- CONFOUND" if sym(row["auc"]) >= alarm else ""
         if flag:
@@ -112,5 +116,5 @@ def load(path: str) -> list:
 if __name__ == "__main__":
     pos, neg = load(sys.argv[1]), load(sys.argv[2])
     n = report(f"{sys.argv[1]} vs {sys.argv[2]}", scan(pos, neg))
-    print(f"\n{n} dac trung vuot nguong bao dong.")
+    print(f"\n{n} features over the alarm threshold.")
     raise SystemExit(1 if n else 0)

@@ -633,6 +633,67 @@ def worst_case(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
                     per_wf=per_wf)
 
 
+def stackelberg_value(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
+                      setting, update_rule="ratio") -> dict:
+    """V(pi) = max over configurations of the MEAN over workflows.
+
+    NOT the same thing as `worst_case`, and the difference decides what the
+    numbers mean.  `worst_case` maxes over (Delta, carrier) PER WORKFLOW -- an
+    attacker allowed to look at each workflow and pick again, 64 tries per
+    case.  Give anyone 64 tries and they find a hole nearly always, which is
+    why every figure measured that way sits at 0.94-0.99 and the policies stop
+    being distinguishable at d' = 0.
+
+    Appendix F.1 says the follower best-responds with a PURE STRATEGY: it
+    commits to one (Delta, carrier) for the whole corpus.  Measured that way
+    the ceiling disappears and the policies separate.  This is the convention
+    `best_response_gap` already uses for its max term -- mean over workflows
+    INSIDE each configuration, then max over configurations -- so the two read
+    the same attacker.
+
+        V(pi) = max_{(Delta,k)}  E_wf[ harm(pi, Delta, k, wf) ]
+
+    Measuring a defender against a stronger attacker than the one the model
+    declares is punishing it by arithmetic rather than by evidence.  It is the
+    same denominator mistake as TIEN-DANG-KY-Detector-Noi-Dung.md section 7.1,
+    seen from the defence side.
+
+    N3: `per_wf` travels with the value, because a number without its
+    denominator is not reported -- it is also the bootstrap unit for any
+    confidence interval over V.
+    """
+    best = None
+    for d in deltas:
+        for k in carriers:
+            per_wf, qs, ts, sp = {}, [], [], []
+            for i, wf in enumerate(wfs):
+                ps = build.plan_poison(wf, k, d, random.Random(seed_of(wf.wf_id, d, k)))
+                if ps is None:
+                    continue                     # configuration cannot be built here
+                hs = []
+                for s in seeds:
+                    r = paired(wf, ps, policy_name, det, ag, s, budget,
+                               setting, update_rule)
+                    if r is None:
+                        continue
+                    hs.append(r.harm); qs.append(r.false_quarantine)
+                    ts.append(r.t_lost); sp.append(r.spent)
+                if hs:
+                    per_wf[i] = sum(hs) / len(hs)
+            if not per_wf:
+                continue
+            m = sum(per_wf.values()) / len(per_wf)
+            if best is None or m > best["value"]:
+                best = {"value": m, "carrier": k, "delta": d,
+                        "per_wf": dict(per_wf), "n_wf": len(per_wf),
+                        "q_false": sum(qs) / len(qs), "t_lost": sum(ts) / len(ts),
+                        "spent": sum(sp) / len(sp)}
+    if best is None:
+        # N3: a reason, never a 0.0 standing in for one.
+        return {"value": None, "reason": "no configuration was feasible on any workflow"}
+    return best
+
+
 def best_response_gap(policy_name, wfs, deltas, carriers, det, ag, budget, seeds,
                       setting, update_rule="ratio") -> float:
     """How much an attacker gains by best-responding instead of playing blind.

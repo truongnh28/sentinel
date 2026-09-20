@@ -1,0 +1,74 @@
+{
+ "meta": {
+  "world": "prose",
+  "d_prime_notes_measured": 1.4397577242598325,
+  "d_prime_patch_declared": 1.4397577242598325,
+  "kappa_usd": {
+   "memory": 0.0026433,
+   "skill": 0.0005544,
+   "queue": 0.00076725,
+   "branch": 0.0022275
+  },
+  "budget_usd": 0.01587921107142857,
+  "seeds": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "n_wf": 40,
+  "d_prime_hard_split": {
+   "vs_ordinary": 10.598,
+   "vs_minimal_pair": -0.119,
+   "pooled": 1.4397577242598325
+  }
+ },
+ "policies": {
+  "B1 audit-at-commit": {
+   "harm": 0.7919463087248322,
+   "q_false": 0.0,
+   "t_lost": 0.5100671140939598,
+   "carrier": "skill",
+   "delta": 2,
+   "n": 149,
+   "L10": 0.7919463087248322
+  },
+  "B5 risk-score": {
+   "harm": 0.8074074074074075,
+   "q_false": 0.08148148148148149,
+   "t_lost": 0.0,
+   "carrier": "memory",
+   "delta": 0,
+   "n": 135,
+   "L10": 0.8155555555555556
+  },
+  "Sentinel": {
+   "harm": 0.8074074074074075,
+   "q_false": 1.651851851851852,
+   "t_lost": 0.0,
+   "carrier": "memory",
+   "delta": 0,
+   "n": 135,
+   "L10": 0.9725925925925927
+  },
+  "B7 minimax-lp": {
+   "harm": 0.7132867132867133,
+   "q_false": 0.0,
+   "t_lost": 0.5944055944055944,
+   "carrier": "branch",
+   "delta": 2,
+   "n": 143,
+   "L10": 0.7132867132867133
+  },
+  "SSG-G guarded": {
+   "harm": 0.6616541353383458,
+   "q_false": 0.0,
+   "t_lost": 0.49624060150375937,
+   "carrier": "skill",
+   "delta": 0,
+   "n": 133,
+   "L10": 0.6616541353383458
+  }
+ }
+}
