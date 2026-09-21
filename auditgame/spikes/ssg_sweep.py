@@ -37,7 +37,7 @@ SEEDS = (1, 2, 3, 4, 5)
 N_WF, H, SETTING = 40, 8, "mid"
 
 POLICIES = ("B1 audit-at-commit", "B5 risk-score", "Sentinel",
-            "B7 minimax-lp", "B7U minimax-lp upstream", "SSG-G guarded")
+            "SentinelW window-belief", "B7 minimax-lp", "SSG-G guarded")
 
 #: d' grid for the synthetic worlds. 0.06 and 1.42 are MEASURED from D_llm
 #: (AUC 0.518 covert, 0.843 self-declaring); the rest bracket them.

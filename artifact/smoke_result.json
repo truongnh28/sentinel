@@ -1,0 +1,42 @@
+{
+  "paper": "FSE-2027-15 Sentinel",
+  "hypothesis": "adaptive allocation beats commit-time audit only beyond a delay/heterogeneity threshold; randomize before you adapt; audit-on-insertion is worst",
+  "scope": "finite Stackelberg audit game solved by attacker best-response enumeration",
+  "holds": true,
+  "checks": [
+    {
+      "name": "regime boundary: no gain at zero delay; a clear gain by delay 2 (smaller under heterogeneity, whose crossover is later); gain rises with delay",
+      "passed": true,
+      "detail": "harm reduction vs commit-audit (%): chi=0,d=0: +0, chi=0,d=1: +2, chi=0,d=2: +44, chi=0,d=4: +86, chi=1.34,d=0: +0, chi=1.34,d=1: -4, chi=1.34,d=2: +12, chi=1.34,d=4: +62"
+    },
+    {
+      "name": "randomization matters more than adaptivity: a deterministic schedule is defeated, uniform random recovers most of the minimax gain, and a cost-greedy allocator is exploited under heterogeneity",
+      "passed": true,
+      "detail": "worst-case harm at chi=1.34, delay=2: commit=0.48 deterministic=1.00 cost-greedy=0.74 uniform=0.45 minimax=0.43"
+    },
+    {
+      "name": "heterogeneity direction (informational): does the minimax gain over commit-audit grow or shrink with carrier-cost heterogeneity at delay 4?",
+      "passed": true,
+      "detail": "gain at delay 4: chi=0 -> +86%, chi=1.34 -> +62%  (SHRINKS with heterogeneity: contradicts the manuscript's projected Fig. 3, which shows a larger gain at high chi)"
+    },
+    {
+      "name": "audit-on-insertion is the worst policy: the attacker simply uses an unaudited carrier",
+      "passed": true,
+      "detail": "insertion-audit worst-case harm = 1.00 (attacker picks another carrier)"
+    }
+  ],
+  "elapsed_s": 0.9,
+  "n_checks": 4,
+  "n_passed": 4,
+  "n_informational": 0,
+  "n_skipped": 0,
+  "provenance": {
+    "python": "3.14.6",
+    "platform": "macOS-26.4-arm64-arm-64bit-Mach-O",
+    "argv": [
+      "smoke.py"
+    ],
+    "git_commit": "f5a71721e7bf7bc0141623032684bb9602795563",
+    "numpy": "2.5.3"
+  }
+}

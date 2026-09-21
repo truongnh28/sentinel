@@ -486,6 +486,108 @@ class SSGRecedingUpstream(SSGReceding):
     SEED_TAG = "ssg_receding_up"
 
 
+class SentinelWindow(Policy):
+    """Sentinel as Toan-canh section 5.1 and 5.4 describe it -- belief over WINDOWS.
+
+    WHAT CHANGED FROM `Sentinel`.  That class keeps four floats, one per
+    carrier, moved by an exponential average. It has no time axis, so it cannot
+    express section 5.1's central claim: an alarm at task t raises the
+    posterior on insertions at t' < t whose trigger is still at t'' > t. This
+    one carries `belief.WindowBelief`, a posterior over (carrier, iota, sigma)
+    plus a NULL hypothesis for benign drift, so the claim is representable and
+    the drift rate beta competes for the same evidence (section 5.4) instead of
+    being a separate knob.
+
+    WHAT IT KEEPS.  The action weighting is still mass over cost -- audit where
+    it is both suspicious and cheap -- and the draw is still randomised over a
+    committed distribution (section 5.2). Only the source of "suspicious"
+    moved, from a per-carrier average to the mass of windows LIVE AT t.
+
+    WHY `commit` IS IN ACTIONS, unlike `Sentinel`.  Measured 2026-09-20: with
+    `ACTIONS = frozenset(CARRIERS)` the policy has no move at all when
+    Delta = 0, because insertion and detonation share a task and the commit
+    gate is the only one left. A best-responding attacker then pins it there
+    and every other mechanism it has never runs -- section 9.1.1. Leaving the
+    hole in would measure the hole, not the belief.
+    """
+
+    belief_state: object = None
+
+    ACTIONS = (frozenset(CARRIERS) | {"commit"}
+               | {QUARANTINE_PREFIX + c for c in CARRIERS})
+    READS_SCORES = True
+    RANDOMIZED = True
+
+    #: Attack windows the belief is defined over. The DECLARED attacker class,
+    #: same role as MinimaxLP.DELTAS -- a belief over windows that cannot occur
+    #: would spend its mass on impossibilities.
+    DELTAS = (0, 2, 4)
+    #: Benign drift rate of section 5.4, as the null's prior mass.
+    BETA_DRIFT = 0.25
+    SEED_TAG = "sentinel_window"
+
+    def _belief(self, H: int):
+        if self.belief_state is None:
+            import belief
+            self.belief_state = belief.WindowBelief(
+                list(CARRIERS), H=H, deltas=self.DELTAS, beta=self.BETA_DRIFT)
+        return self.belief_state
+
+    def choose(self, t: int, retrieved_carriers: list, signals: dict) -> str | None:
+        H = len(getattr(self, "v", []) or []) or 8
+        b = self._belief(H)
+        b.update(t, signals)
+        mass = b.carrier_mass(t)
+
+        opts, w = [], []
+        for c in CARRIERS:
+            if self.can(KAPPA[c]):
+                opts.append(c)
+                w.append(mass.get(c, 0.0) / KAPPA[c])
+        # The commit gate is worth the total attack mass, not any one carrier's:
+        # it is the last place a poisoned patch can be stopped whatever carrier
+        # carried it. This is the Delta = 0 path section 9.1.1 measured.
+        if self.can(KAPPA_COMMIT):
+            opts.append("commit")
+            w.append(b.p_attack() / KAPPA_COMMIT)
+
+        # QUARANTINE AS AN ACTION, not as a threshold on an audit's finding.
+        #
+        # ETA_Q_COST's own comment says why it has to be here: "a SEPARATE
+        # ACTION, not only a threshold -- modelling it as a threshold alone
+        # makes the degenerate policy of section A.4 inexpressible, so the test
+        # that rules that policy out cannot be written". Before this, only NC1
+        # could choose it; every real policy quarantined solely as a CONSEQUENCE
+        # of auditing, so eta_Q was never charged against the budget and
+        # quarantine was effectively free -- penalised only through lambda_Q in
+        # the loss, which is a preference, not a constraint.
+        #
+        # What makes the comparison meaningful is that the two now differ in
+        # WHAT THEY BUY, at prices in the same units. An audit of carrier k buys
+        # EVIDENCE: it may remove the payload, and it may find nothing.
+        # Quarantining k removes every item it holds, guilty or not -- certain
+        # removal, certain collateral. So the weight is the mass of live windows
+        # on k (the same numerator as the audit) scaled by how much of the
+        # horizon is still ahead for that harm to land in, over eta_Q. A window
+        # whose remaining life is short is not worth the wholesale price.
+        remaining = max(H - t - 1, 0)
+        if remaining and self.can(ETA_Q_COST):
+            for c in CARRIERS:
+                opts.append(QUARANTINE_PREFIX + c)
+                w.append(mass.get(c, 0.0) * (remaining / H) / ETA_Q_COST)
+
+        tot = sum(w)
+        if not opts or tot <= 0.0:
+            return None
+        r = random.Random(seed_of(self.rng_seed, t, self.SEED_TAG)).random() * tot
+        acc = 0.0
+        for c, wi in zip(opts, w):
+            acc += wi
+            if r <= acc:
+                return c
+        return opts[-1]
+
+
 class SSGRecedingGuarded(MinimaxLP):
     """Giai lai CO SAN va CO CO -- ban thiet ke lai sau chan doan cong 4c.
 
@@ -619,6 +721,7 @@ REGISTRY = {
     "B7U minimax-lp upstream": MinimaxLPUpstream,
     "SSG-full receding":  SSGReceding,
     "SSG-up receding":    SSGRecedingUpstream,
+    "SentinelW window-belief": SentinelWindow,
     "SSG-G guarded":      SSGRecedingGuarded,
     "SSG-GU guarded upstream": SSGGuardedUpstream,
     "Sentinel":           Sentinel,

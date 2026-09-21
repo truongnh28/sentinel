@@ -1,0 +1,73 @@
+# General
+.DS_Store
+
+# Python caches
+__pycache__/
+*.pyc
+.venv/
+
+# JetBrains project files (per-machine, not repo content)
+.idea/
+
+# AuditGame experiment outputs - regenerate with `python3 experiment.py --json`
+auditgame/*.json
+!auditgame/reference/score_table.json
+
+# AuditGame SWE-bench metadata (~54 MB) - reproducible via `swebench_fetch.py`
+auditgame/data/*.jsonl
+
+# AuditGame harness roots (harness.py).  Repo clones, the four carriers, the
+# generated hidden suites and the sealed area are RUN ARTEFACTS: workspace/ holds
+# third-party repos with their own .git, carriers/ is per-run state,
+# hidden_suites/ is the answer key, and carriers-sealed/ is the OTHER answer key
+# -- the per-item `poisoned` labels and the sealed manifests, which Task 19 moved
+# out of carriers/ precisely so the agent cannot read them.  Committing it would
+# publish the ground truth this benchmark exists to infer.  None of the four
+# belongs in this repo.
+auditgame/workspace/
+auditgame/carriers/
+auditgame/carriers-sealed/
+auditgame/hidden_suites/
+# The container ground-truth probe (tests/gate1_integrity/
+# test_ground_truth_out_of_the_carriers.py) makes `probe-XXXXXX/` under the same
+# directory, because the Docker daemon may be a VM whose file-sharing list covers
+# the project and not the system temp dir.  A killed run leaves one behind holding
+# a carrier root, a SEALED AREA WITH LABELS and a git repo -- the same three things
+# the four lines above keep out of the repo.
+auditgame/probe-*/
+
+# `results/` is deliberately NOT ignored, and the asymmetry with the four roots
+# above is the point -- but the trace itself is SPLIT ON THE SAME SEAL LINE, and
+# only its public half is committed.
+#
+# `results/M3-trace.json` is Task 17's named deliverable and the input every
+# offline replay reads; it is never mounted into a container, and the acceptance
+# line it has to meet -- "the trace carries all nine field groups of SPEC-P1b
+# Part 1" -- is a claim a reviewer can only check against a committed file.  That
+# claim is about the trace's SHAPE.  The file used to carry its LABELS too: a
+# `poisoned` flag on every item record, the planted payload's whole record under
+# `injected`, and a `correct` verdict beside every quarantine -- the ground truth
+# for every item plus whether each quarantine was right.  Committing that is the
+# same act this file refuses two paragraphs up, arriving through the deliverable
+# instead of through the store.  So `core.dump_traces` now writes two files and
+# the answer key goes to `results/M3-sealed.json`, which is ignored HERE, beside
+# `carriers-sealed/`, for the same reason and in the same words: publishing it
+# would hand over the labels the benchmark exists to infer.
+#
+# What is committed, and what a reader therefore gets: every task's before/after
+# carrier snapshot, every write's content, provenance and timestamp, every state
+# query and what came back, every raw alarm score, the live count per carrier, the
+# P1..P5 checkpoints, which items were quarantined, the public/hidden verdicts and
+# the measured audit seconds.  What is not: which of those items was planted, which
+# writes inherited from it, and which quarantine was right.
+#
+# `sealed_trace.load` is the reader that puts the two halves together, and it
+# REFUSES when the sealed half is absent rather than returning traces on which
+# nothing is poisoned -- a full grid of Rule N3 fake zeros is the failure mode this
+# split would otherwise buy.
+auditgame/results/*-sealed.json
+
+# Khoá API — .env chứa DEEPSEEK_API_KEY, không bao giờ commit.
+.env
+# Cache của understand-anything, sinh lại được.
+.ua/
