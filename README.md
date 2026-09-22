@@ -167,19 +167,21 @@ Thủ tục chi tiết **không chép lại ở đây**. Bảng dưới trỏ t�
 
 Cột "Kết quả kỳ vọng" ghi tiêu chí đạt của stage, kèm giá trị dự phóng của draft nếu có. Giá trị dự phóng là mục tiêu kiểm chứng, không phải mục tiêu tinh chỉnh.
 
-| Stage | Việc phải làm | Đầu ra | Kết quả kỳ vọng |
-|---|---|---|---|
-| 0 | Viết tuple game; thứ tự cam kết; defender chỉ nhận `CarrierSignal(p, n)` | Đặc tả luật chơi | Cạnh bị cấm vắng mặt trong chữ ký hàm, có test cưỡng chế |
-| 1 | Dựng workflow từ SWE-bench: sort `created_at`, cắt cửa sổ 6–14 task, topic từ gold patch, retrieval Jaccard với $\theta$ chốt trên dev | Danh sách workflow | 100 workflow; $\theta$ chốt trước khi nhìn kết quả; lọc instance flaky |
-| 2 | Hiện thực 4 checkpoint audit; đo CPU-time; tính $\chi$ | $\kappa$, $\chi$ | Bảng $\kappa$ có sai số; draft dự phóng $\chi = 1{,}34$ |
-| 3 | 18 attacker (7 held-out); sinh $(\iota,\sigma)$ theo $\Delta$ có lọc nổ sớm; marker duy nhất mỗi lần chạy; oracle harm; đo $\Delta$ thực | Thư viện attacker, oracle | Oracle validate trên tập con; phân phối $\Delta$ thực cùng thang với crossover |
-| 4 | Corpus lành tính khớp bề mặt; cổng AUC; ước lượng $\beta_k$ | Corpus, AUC, $\beta$ | AUC ≤ 0,56 kèm CI và permutation test; 620 mẫu |
-| 5 | Mô phỏng detector với 3 mức $(\psi,\varphi)$; CarrierSignal lấy mean posterior | Detector, $\gamma$ | Ba mức $\gamma$ = 0,55 / 0,73 / 0,86 |
-| 6 | Belief; thư viện 28 policy; 240 game nhỏ giải chính xác; đo $\rho$; mở rộng thư viện bằng double oracle nếu $\rho$ lớn | Thư viện, $\rho$ | Draft: $\rho = 0{,}07$, cận Mệnh đề 6 = 0,42, regret đo được 0,09 |
-| 7 | Tính tay trên game nhỏ và so với mã | Ví dụ khớp | Minimax 4×4: tất định 1,0, trộn 0,5; Bayes 0,10 → 0,44 → 0,85 |
-| 8 | Đóng băng policy, attacker, hằng số, corpus, workflow bằng hash | `frozen/`, `MANIFEST.sha256`, tag `freeze-v1` | Harness tính lại hash và từ chối chạy nếu không khớp |
-| 9 | Chạy lưới đầy đủ; worst-case trên held-out; exploitability; crossover; CI bootstrap theo cụm repo; hằng $c$ | Bảng kết quả trên lưới $(\Delta,\chi)$ | Draft (Bảng 2, $\Delta > 2$, $\chi = 1{,}34$, held-out): B1 0,412 → Sentinel 0,272 (−34,1%, CI [−42,6%; −25,1%], vượt ngưỡng 15%); held-out 27,6%; exploitability 0,34 → 0,09; cách ly nhầm 3,2% → 5,1%; crossover 2,1; RQ4 21,4%–39,8%, lớn nhất ở detector yếu; quét $\eta_Q$: 34,1% → 44,0% |
-| 10 | Giải game; tuning chỉ trên dev, trước đóng băng | Nghiệm, ranh giới tuning | Khoảng cách dev và held-out báo cáo được (draft: 34,1% so với 27,6%) |
+Cột **"TODO còn lại"** là danh sách việc phải làm, gắn mã: **W…** là workstream ở [§4](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint), **#…** là issue ở [§3.4](#34-issue-cần-xử-lý). Các bước thực hiện chi tiết nằm trong [plan W1–W10](docs/design/plans/2026-09-22-W1-W10-tham-so.md).
+
+| Stage | Việc phải làm | Đầu ra | Kết quả kỳ vọng | TODO còn lại |
+|---|---|---|---|---|
+| 0 | Viết tuple game; thứ tự cam kết; defender chỉ nhận `CarrierSignal(p, n)` | Đặc tả luật chơi | Cạnh bị cấm vắng mặt trong chữ ký hàm, có test cưỡng chế | — |
+| 1 | Dựng workflow từ SWE-bench: sort `created_at`, cắt cửa sổ 6–14 task, topic từ gold patch, retrieval Jaccard với $\theta$ chốt trên dev | Danh sách workflow | 100 workflow; $\theta$ chốt trước khi nhìn kết quả; lọc instance flaky | Lọc instance flaky · nâng lên 100 workflow · biện hộ $H$ và cỡ mẫu (**W10**) |
+| 2 | Hiện thực 4 checkpoint audit; đo CPU-time; tính $\chi$ | $\kappa$, $\chi$ | Bảng $\kappa$ có sai số; draft dự phóng $\chi = 1{,}34$ | **W4** đo $\kappa$ bằng CPU-time · chốt quy ước chuẩn hoá khi quét $\chi$ |
+| 3 | 18 attacker (7 held-out); sinh $(\iota,\sigma)$ theo $\Delta$ có lọc nổ sớm; marker duy nhất mỗi lần chạy; oracle harm; đo $\Delta$ thực | Thư viện attacker, oracle | Oracle validate trên tập con; phân phối $\Delta$ thực cùng thang với crossover | **#3** thêm 6 attacker cho đủ 18 và attacker best-response · **#5** marker `blake2b` · **W8** payload AgentPoison và MINJA · **W5** $\Delta$ thực trên SWE-bench · validate harm trên tập con |
+| 4 | Corpus lành tính khớp bề mặt; cổng AUC; ước lượng $\beta_k$ | Corpus, AUC, $\beta$ | AUC ≤ 0,56 kèm CI và permutation test; 620 mẫu | Chứng nhận ô $\Delta = 4$ (điểm rẽ ngày 6) · **W3** đo $\beta_k$ · permutation test |
+| 5 | Mô phỏng detector với 3 mức $(\psi,\varphi)$; CarrierSignal lấy mean posterior | Detector, $\gamma$ | Ba mức $\gamma$ = 0,55 / 0,73 / 0,86 | Chạy đúng ba mức $(\psi,\varphi)$ như một lưới riêng · **W1** $\pi_0$ suy dẫn và sinh lại bảng $\tau_{\text{sel}}$ |
+| 6 | Belief; thư viện 28 policy; 240 game nhỏ giải chính xác; đo $\rho$; mở rộng thư viện bằng double oracle nếu $\rho$ lớn | Thư viện, $\rho$ | Draft: $\rho = 0{,}07$, cận Mệnh đề 6 = 0,42, regret đo được 0,09 | **#2** dựng thư viện 28 policy · **W2** $\eta_Q$ theo carrier · **W7** 240 game nhỏ và $\rho$ đúng không gian |
+| 7 | Tính tay trên game nhỏ và so với mã | Ví dụ khớp | Minimax 4×4: tất định 1,0, trộn 0,5; Bayes 0,10 → 0,44 → 0,85 | Test hoá ví dụ minimax 4×4 và ví dụ Bayes |
+| 8 | Đóng băng policy, attacker, hằng số, corpus, workflow bằng hash | `frozen/`, `MANIFEST.sha256`, tag `freeze-v1` | Harness tính lại hash và từ chối chạy nếu không khớp | **#4** manifest đóng băng toàn phần và harness từ chối policy chưa đóng băng |
+| 9 | Chạy lưới đầy đủ; worst-case trên held-out; exploitability; crossover; CI bootstrap theo cụm repo; hằng $c$ | Bảng kết quả trên lưới $(\Delta,\chi)$ | Draft (Bảng 2, $\Delta > 2$, $\chi = 1{,}34$, held-out): B1 0,412 → Sentinel 0,272 (−34,1%, CI [−42,6%; −25,1%], vượt ngưỡng 15%); held-out 27,6%; exploitability 0,34 → 0,09; cách ly nhầm 3,2% → 5,1%; crossover 2,1; RQ4 21,4%–39,8%, lớn nhất ở detector yếu; quét $\eta_Q$: 34,1% → 44,0% | Lưới đầy đủ: $\Delta = 8$, trục $\chi$ vào đường chính, $N = 100$ · worst-case trên held-out · exploitability · ablation · **W6** hằng số $c$ |
+| 10 | Giải game; tuning chỉ trên dev, trước đóng băng | Nghiệm, ranh giới tuning | Khoảng cách dev và held-out báo cáo được (draft: 34,1% so với 27,6%) | Double oracle (sau hạn nếu không kịp) |
 
 ---
 
