@@ -86,6 +86,34 @@ Bốn từ dùng xuyên suốt bảng dưới:
 | 12 — 30/09 | **Đóng băng số**; chạy ba cổng lần cuối; artifact ẩn danh | Manifest hash; ba cổng xanh (hoặc đỏ có giải trình) | Sau mốc này không tham số nào được chỉnh |
 | 13–14 — 01–02/10 | Bản cuối, format ACM, **nộp** | Bản nộp | Hạn 02/10 AoE |
 
+### Dự kiến có gì để báo cáo cuối tuần này (27/09)
+
+Còn 5 ngày làm (23–27/09), tức ngày 6–10 của sprint.
+
+**Gần như chắc chắn có** — việc đã có mã, chỉ cần chạy hoặc sửa nhỏ:
+
+| Kết quả | Vì sao chắc |
+|---|---|
+| Quyết định nhánh **A′ hay B**, kèm bảng chứng nhận v2 | Việc của ngày 6, mã đã có |
+| **$\kappa$ đo bằng CPU-time** và **$\chi$ tính lại từ đó** (W4) | `runner.py` đã bấm giờ từng checkpoint; chỉ đổi `perf_counter` → `process_time` rồi chạy ≥ 30 lần |
+| **$\pi_0$ suy dẫn 0,080**, bảng $\tau_{\text{sel}}$ sinh lại, quét $\pi_0$ (W1) | `reference/gen_score_table.py` đã có đường sinh lại và chế độ `--check` |
+| **$\eta_Q$ tách theo từng carrier** (W2) | Phần phục hồi suy từ $n_{\text{live}}$ đã đo sẵn; chỉ còn đo phần gỡ |
+| **Marker `blake2b` theo seed** (issue #5) | Sửa nhỏ, đã có test bảo vệ |
+| **Manifest đóng băng + harness từ chối policy chưa đóng băng** (issue #4) | Gom hash và thêm một cổng kiểm |
+
+**Có, nếu ưu tiên đúng:**
+
+| Kết quả | Điều kiện |
+|---|---|
+| **18 attacker + best-response** → lần đầu có **worst-case trên held-out** và **exploitability**, hai chỉ số chính của Bảng 2 | Làm ngay sau ngày 6, trước khi đụng vào thư viện policy |
+| **Thư viện 28 policy** → lần đầu so đúng đối tượng "Sentinel" của draft với B1 và B5 | Cần thầy duyệt danh sách, nên gửi sớm |
+| **$\beta_k$** (W3) | 10 repo đã clone sẵn trong `auditgame/workspace/`; cần chốt luật ánh xạ commit → carrier |
+| **G4 nhãn mù** | **Ràng buộc nằm ngoài code:** cần người gán tay 38 instance, hạn 26/09 |
+
+**Nhiều khả năng chưa kịp trong tuần:** $\Delta$ thực trên repo SWE-bench (W5), hằng số $c$ (W6), 240 game nhỏ và $\rho$ đúng không gian (W7), lưới đầy đủ $N = 100$ × $\Delta = 8$ × 3 $\chi$ × 3 detector.
+
+**Báo cáo cuối tuần dự kiến gồm:** (1) nhánh đã chọn sau điểm rẽ v2 kèm bảng chứng nhận; (2) bảng "tham số: giá trị gán trước đây → giá trị đo được bây giờ" cho $\kappa$, $\chi$, $\pi_0$, $\eta_Q$, $\beta$; (3) nếu kịp phần attacker thì hai dòng đầu tiên so được với Bảng 2 của draft; (4) bảng phần trăm cập nhật; (5) hai việc còn chờ thầy — duyệt danh sách 28 policy và 18 attacker, và bố trí người gán nhãn G4.
+
 **Thứ tự ưu tiên trong ngày 7–11**, nếu phải chọn việc làm trước: (1) thiết lập draft, vì không có nó thì không có bảng kết quả chính; (2) W1–W6, phần biến "giá trị gán" thành "giá trị đo"; (3) chuỗi bảng $m$ và lưới $N = 100$.
 
 **Ba điều kiện dừng đã khai báo trước:**
