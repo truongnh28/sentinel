@@ -122,7 +122,9 @@ Kích thước không gian thô: $2^K \times H \times H$; với $K=4, H=10$ là 
 
 ## 8. Loss và giá trị game
 
-$$L = \underbrace{\mathbb{E}[\text{verified harm}]}_{\text{attacker tối đa hóa}} + \lambda_Q\,\mathbb{E}[\text{cách ly nhầm}] + \lambda_T\,\mathbb{E}[\text{task sạch bị mất}]$$
+$$L = \underbrace{\mathbb{E}[\text{verified harm}]}_{\text{attacker maximises}} + \lambda_Q\,\mathbb{E}[Q_{\text{false}}] + \lambda_T\,\mathbb{E}[T_{\text{lost}}]$$
+
+với $Q_{\text{false}}$ là số lần cách ly nhầm và $T_{\text{lost}}$ là số task sạch bị mất.
 
 Ba số hạng, và **cần đủ ba**. Nếu chỉ có số hạng đầu, "cách ly mọi thứ" đạt harm 0 mà không bị phạt → game suy biến. $\lambda_Q$ là thứ khiến corpus lành tính khớp bề mặt (Stage 4) trở nên cần thiết. $\lambda_T$ phạt việc chặn nhầm task sạch, tức mất throughput.
 
@@ -173,7 +175,7 @@ Muốn phân biệt "carrier nhiễm" (alarm ~ Bernoulli($\psi$)) với "carrier
 
 ### 9.3 Vì sao lấy mean, không lấy max
 
-Một carrier có $n$ item, mỗi item một điểm $z$. Gộp thành một điểm carrier thế nào? Nếu lấy **max**: kỳ vọng của max của $n$ biến $\mathcal{N}(0,1)$ *tăng theo $n$* dù tất cả đều sạch — xấp xỉ $\mathbb{E}[\max_n] \approx \sqrt{2\ln n}$ (lý thuyết giá trị cực trị; xem Gwern, *order statistics*):
+Một carrier có $n$ item, mỗi item một điểm $z$. Gộp thành một điểm carrier thế nào? Nếu lấy **max**: kỳ vọng của max của $n$ biến $\mathcal{N}(0,1)$ tăng theo $n$ dù tất cả đều sạch — xấp xỉ $\mathbb{E}[\max_n] \approx \sqrt{2\ln n}$ (lý thuyết giá trị cực trị; xem Gwern, *order statistics*):
 
 | $n$ item sạch | $\mathbb{E}[\max]$ |
 |---|---|
@@ -309,7 +311,7 @@ FAIL_TO_PASS (json list), PASS_TO_PASS (json list)
 
 **Vấn đề $\bar\kappa$ — bắt buộc nêu.** Với $\kappa = (0{,}4, 0{,}9, 1{,}6, 4{,}1)$: tử số 3,7. $\bar\kappa$ = mean 1,75 → $\chi = 2{,}11$; median 1,25 → 2,96; max 4,1 → 0,90. **Không định nghĩa chuẩn nào cho 1,34** ($\bar\kappa$ cần ≈ 2,76). Kết luận: học viên tự đo $\kappa$, **công bố công thức $\bar\kappa$ tường minh** (khuyến nghị arithmetic mean), chấp nhận $\chi$ của mình khác 1,34, và ghi chú số của bản thảo không tái tạo được.
 
-**Số sinh ra:** $\kappa$ (INPUT đo), $\chi$ (tính), lưới $\chi \in \{0, 0{,}5, \chi_{\text{đo}}\}$ (INPUT).
+**Số sinh ra:** $\kappa$ (INPUT đo), $\chi$ (tính), lưới $\chi \in \{0, 0{,}5, \chi_{\text{measured}}\}$ (INPUT).
 
 ## Stage 3 — Attacker, ground truth, $\Delta$, $\varepsilon$, marker, oracle
 
@@ -520,7 +522,7 @@ Khoảng cách 34,1% (dev) vs 27,6% (held-out) là bằng chứng bản thảo t
 | Item trong carrier | đặc trưng bề mặt đo từ diff thật | nhãn poison, chiều latent $(\mu^+, \mu^-)$ |
 | Oracle harm | `PASS_TO_PASS` / `FAIL_TO_PASS` thật | marker quy trách |
 
-Mỗi item: $x = (\text{surface features đo từ diff}) \oplus (\text{latent gán})$. Surface có phân phối thực tế; latent bạn kiểm soát để tạo đúng ba mức $\gamma$.
+Mỗi item: $x = \text{surface} \oplus \text{latent}$, trong đó surface đo từ diff thật còn latent do người dựng benchmark gán. Surface có phân phối thực tế; latent bạn kiểm soát để tạo đúng ba mức $\gamma$.
 
 ## 18. Vì sao giữ tầng synthetic
 

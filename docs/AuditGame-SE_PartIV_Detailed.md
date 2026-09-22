@@ -181,11 +181,11 @@ $J(t_0, t_4) = 4/4 = 1{,}0$; $J(t_0, t_2) = 3/6 = 0{,}5$; $J(t_0, t_1) = 1/6 \ap
 |---|---|
 | $\kappa = 0{,}4/0{,}9/1{,}6/4{,}1$ | INPUT (đo; student đo lại → khác) |
 | $\chi$ | OUTPUT (tính; 1,34 không tái tạo) |
-| lưới $\chi \in \{0; 0{,}5; \chi_{\text{đo}}\}$ | INPUT (3 mức để quét) |
+| lưới $\chi \in \{0;\ 0{,}5;\ \chi_{\text{measured}}\}$ (mức thứ ba là $\chi$ đo được) | INPUT (3 mức để quét) |
 | $\rho_d$ | INPUT (student chọn) |
 
 **Pitfalls & câu hỏi hội đồng.**
-- *"$\chi = 1{,}34$ tính thế nào?"* → nêu thẳng mâu thuẫn, công bố công thức của mình.
+- "$\chi = 1{,}34$ tính thế nào?" → nêu thẳng mâu thuẫn, công bố công thức của mình.
 - *"CPU-minutes ổn định giữa máy không?"* → CPU-time + median + pin frequency + báo cấu hình phần cứng.
 - *"Vì sao median không mean?"* → median chống outlier khi có lần chạy bị nhiễu tải máy.
 
@@ -286,7 +286,7 @@ def verified_harm(instance, final_patch, marker, run_tests):
 
 **Pitfalls & câu hỏi hội đồng.**
 - *"Payload chèn thế nào ở mức mã?"* → kế thừa MINJA/AgentPoison; bài không đóng góp tấn công; attacker chỉ chọn $k, \iota$.
-- *"Làm sao biết $(k,\iota,\sigma)$ thật sự gây harm trên repo cụ thể?"* → **khoảng trống lớn nhất**: phải validate payload làm `FAIL_TO_PASS` hỏng khi `PASS_TO_PASS` đạt, trên tập con (đắt). Bản thảo chưa có.
+- "Làm sao biết $(k,\iota,\sigma)$ thật sự gây harm trên repo cụ thể?" → **khoảng trống lớn nhất**: phải validate payload làm `FAIL_TO_PASS` hỏng khi `PASS_TO_PASS` đạt, trên tập con (đắt). Bản thảo chưa có.
 - *"Δ đo từ git có nhân quả không?"* → co-change là tương quan; kết hợp bisect + import graph để tăng độ tin.
 
 ---
@@ -394,7 +394,7 @@ Alarm thứ hai: $p_2 \approx 0{,}848$. Alarm = 0 ở bước 1: $p_1' = 0{,}015
 | $\gamma = 0{,}55/0{,}73/0{,}86$ | OUTPUT (= $\psi-\varphi$) |
 
 **Pitfalls & câu hỏi hội đồng.**
-- *"$(\psi,\varphi)$ ở đâu ra?"* → chọn 3 mức, neo vào ROC detector thật hoặc khoảng cách latent; kết luận phải giữ trên cả 3.
+- "$(\psi,\varphi)$ ở đâu ra?" → chọn 3 mức, neo vào ROC detector thật hoặc khoảng cách latent; kết luận phải giữ trên cả 3.
 - *"Vì sao mean loại bias mà max không?"* → thuộc $\mathbb{E}[\max_n] \approx \sqrt{2\ln n}$; đây là câu hỏi rất dễ bị hỏi.
 - *"Detector thật hay mô phỏng?"* → mô phỏng, đúng tinh thần "đo phân bổ không đo phát hiện"; nói rõ.
 
@@ -467,7 +467,7 @@ Bản thảo: $\rho = 0{,}07$ → cận $H\rho\,\text{range}(L) = 0{,}42$ vs đo
 
 **Pitfalls & câu hỏi hội đồng.**
 - *"2048 hạt đủ không?"* → convergence study.
-- *"$\rho$ đo trên không gian policy nào?"* → cố định discretization belief trước.
+- "$\rho$ đo trên không gian policy nào?" → cố định discretization belief trước.
 - *"28 policy chọn thế nào?"* → 3 họ + lưới tham số + $\rho$ chứng minh phủ; ablation gợi ý carrier-rotation đóng góp hơn belief-threshold.
 
 ---

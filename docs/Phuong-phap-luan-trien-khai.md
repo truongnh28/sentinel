@@ -130,7 +130,9 @@ Kích thước không gian thô: $2^K \times H \times H$; với $K=4, H=10$ là 
 
 ## 8. Loss và giá trị game
 
-$$L = \underbrace{\mathbb{E}[\text{verified harm}]}_{\text{attacker tối đa hóa}} + \lambda_Q\,\mathbb{E}[\text{cách ly nhầm}] + \lambda_T\,\mathbb{E}[\text{task sạch bị mất}]$$
+$$L = \underbrace{\mathbb{E}[\text{verified harm}]}_{\text{attacker maximises}} + \lambda_Q\,\mathbb{E}[Q_{\text{false}}] + \lambda_T\,\mathbb{E}[T_{\text{lost}}]$$
+
+với $Q_{\text{false}}$ là số lần cách ly nhầm và $T_{\text{lost}}$ là số task sạch bị mất.
 
 Ba số hạng, và **cần đủ ba**. Nếu chỉ có số hạng đầu, "cách ly mọi thứ" đạt harm 0 mà không bị phạt → game suy biến. $\lambda_Q$ là thứ khiến corpus lành tính khớp bề mặt (Stage 4) trở nên cần thiết. $\lambda_T$ phạt việc chặn nhầm task sạch, tức mất throughput.
 
@@ -181,7 +183,7 @@ Muốn phân biệt "carrier nhiễm" (alarm ~ Bernoulli($\psi$)) với "carrier
 
 ### 9.3 Vì sao lấy mean, không lấy max
 
-Một carrier có $n$ item, mỗi item một điểm $z$. Gộp thành một điểm carrier thế nào? Nếu lấy **max**: kỳ vọng của max của $n$ biến $\mathcal{N}(0,1)$ *tăng theo $n$* dù tất cả đều sạch, với tốc độ tiệm cận $\sqrt{2\ln n}$ khi $n$ lớn (lý thuyết giá trị cực trị [David & Nagaraja, 2003]). Giá trị chính xác với $n$ nhỏ:
+Một carrier có $n$ item, mỗi item một điểm $z$. Gộp thành một điểm carrier thế nào? Nếu lấy **max**: kỳ vọng của max của $n$ biến $\mathcal{N}(0,1)$ tăng theo $n$ dù tất cả đều sạch, với tốc độ tiệm cận $\sqrt{2\ln n}$ khi $n$ lớn (lý thuyết giá trị cực trị [David & Nagaraja, 2003]). Giá trị chính xác với $n$ nhỏ:
 
 | $n$ item sạch | $\mathbb{E}[\max]$ |
 |---|---|
@@ -452,11 +454,11 @@ $J(t_0, t_4) = 4/4 = 1{,}0$; $J(t_0, t_2) = 3/6 = 0{,}5$; $J(t_0, t_1) = 1/6 \ap
 |---|---|
 | $\kappa = 0{,}4/0{,}9/1{,}6/4{,}1$ | INPUT (đo; giá trị đo lại sẽ khác) |
 | $\chi$ | OUTPUT (tính; 1,34 không tái tạo) |
-| lưới $\chi \in \{0; 0{,}5; \chi_{\text{đo}}\}$ | INPUT (3 mức để quét) |
+| lưới $\chi \in \{0;\ 0{,}5;\ \chi_{\text{measured}}\}$ (mức thứ ba là $\chi$ đo được) | INPUT (3 mức để quét) |
 | $\rho_d$ | INPUT (học viên chọn) |
 
 **Rủi ro và câu hỏi phản biện.**
-- *"$\chi = 1{,}34$ tính thế nào?"* → nêu thẳng mâu thuẫn, công bố công thức của mình.
+- "$\chi = 1{,}34$ tính thế nào?" → nêu thẳng mâu thuẫn, công bố công thức của mình.
 - *"CPU-minutes ổn định giữa máy không?"* → CPU-time + median + pin frequency + báo cấu hình phần cứng.
 - *"Vì sao median không mean?"* → median chống outlier khi có lần chạy bị nhiễu tải máy.
 
@@ -557,7 +559,7 @@ def verified_harm(instance, final_patch, marker, run_tests):
 
 **Rủi ro và câu hỏi phản biện.**
 - *"Payload chèn thế nào ở mức mã?"* → kế thừa MINJA/AgentPoison; bài không đóng góp tấn công; attacker chỉ chọn $k, \iota$.
-- *"Làm sao biết $(k,\iota,\sigma)$ thật sự gây harm trên repo cụ thể?"* → **khoảng trống lớn nhất**: phải validate payload làm `FAIL_TO_PASS` hỏng khi `PASS_TO_PASS` đạt, trên tập con (đắt). Bản thảo chưa có.
+- "Làm sao biết $(k,\iota,\sigma)$ thật sự gây harm trên repo cụ thể?" → **khoảng trống lớn nhất**: phải validate payload làm `FAIL_TO_PASS` hỏng khi `PASS_TO_PASS` đạt, trên tập con (đắt). Bản thảo chưa có.
 - *"Δ đo từ git có nhân quả không?"* → co-change là tương quan; kết hợp bisect + import graph để tăng độ tin.
 
 ---
@@ -665,7 +667,7 @@ Alarm thứ hai: $p_2 \approx 0{,}848$. Alarm = 0 ở bước 1: $p_1' = 0{,}015
 | $\gamma = 0{,}55/0{,}73/0{,}86$ | OUTPUT (= $\psi-\varphi$) |
 
 **Rủi ro và câu hỏi phản biện.**
-- *"$(\psi,\varphi)$ ở đâu ra?"* → chọn 3 mức, neo vào ROC detector thật hoặc khoảng cách latent; kết luận phải giữ trên cả 3.
+- "$(\psi,\varphi)$ ở đâu ra?" → chọn 3 mức, neo vào ROC detector thật hoặc khoảng cách latent; kết luận phải giữ trên cả 3.
 - *"Vì sao mean loại được thiên lệch còn max thì không?"* → $\mathbb{E}[\max_n]$ tăng theo $n$ (tiệm cận $\sqrt{2\ln n}$), còn kỳ vọng của mean không phụ thuộc $n$.
 - *"Detector thật hay mô phỏng?"* → mô phỏng, đúng tinh thần "đo phân bổ không đo phát hiện"; nói rõ.
 
@@ -738,7 +740,7 @@ Bản thảo (dự phóng): $\rho = 0{,}07$ cho cận $H\rho\,\text{range}(L) = 
 
 **Rủi ro và câu hỏi phản biện.**
 - *"2048 hạt đủ không?"* → convergence study.
-- *"$\rho$ đo trên không gian policy nào?"* → cố định discretization belief trước.
+- "$\rho$ đo trên không gian policy nào?" → cố định discretization belief trước.
 - *"28 policy chọn thế nào?"* → 3 họ + lưới tham số + $\rho$ chứng minh phủ; ablation gợi ý carrier-rotation đóng góp hơn belief-threshold.
 
 ---
@@ -931,7 +933,7 @@ git tag -a freeze-v1 -m "$(sha256sum frozen/MANIFEST.sha256)"
 | Item trong carrier | đặc trưng bề mặt đo từ diff thật | nhãn poison, chiều latent $(\mu^+, \mu^-)$ |
 | Oracle harm | `PASS_TO_PASS` / `FAIL_TO_PASS` thật | marker quy trách |
 
-Mỗi item: $x = (\text{surface features đo từ diff}) \oplus (\text{latent gán})$. Surface có phân phối thực tế; latent được kiểm soát để tạo đúng ba mức $\gamma$.
+Mỗi item: $x = \text{surface} \oplus \text{latent}$, trong đó surface đo từ diff thật còn latent do người dựng benchmark gán. Surface có phân phối thực tế; latent được kiểm soát để tạo đúng ba mức $\gamma$.
 
 ## 18. Vì sao giữ tầng synthetic
 

@@ -13,7 +13,7 @@ Mô hình Sentinel phụ thuộc vào khoảng hai mươi tham số — chi phí
 
 Báo cáo này đề xuất một khung phân loại tham số theo **bốn phương thức xác lập** — đo trực tiếp, neo rồi quét, suy dẫn từ thiết kế, và khử tham số bằng cách phát biểu lại kết luận dưới dạng ngưỡng — cùng ba nguyên tắc thực hiện: tiền đăng ký có kiểm chứng được, đóng băng theo nhóm phụ thuộc, và tách vai trò "thế giới" khỏi vai trò "mô hình của defender". Khung này được áp dụng cho toàn bộ tham số của mô hình.
 
-Kết quả gồm hai phần. **Thứ nhất**, tám đại lượng đã được ước lượng; trong đó ngưỡng chọn carrier $\tau_{\text{sel}}$ được nâng từ tham số chọn lên đại lượng đo, và điểm hoà vốn của detector được xác định là $d'^\* = 2{,}85$ tại $\Delta = 2$. **Thứ hai**, với chín tham số chưa xác lập, báo cáo đề xuất thủ tục ước lượng cụ thể; đáng chú ý là tiên nghiệm $\pi_0$ suy dẫn được bằng $0{,}080$ từ dữ liệu sẵn có (giá trị đang dùng là $0{,}10$), và hằng số $c$ của Định lý 4 fit được trực tiếp từ posterior của defender mà không cần giải các trò chơi nhỏ.
+Kết quả gồm hai phần. **Thứ nhất**, tám đại lượng đã được ước lượng; trong đó ngưỡng chọn carrier $\tau_{\text{sel}}$ được nâng từ tham số chọn lên đại lượng đo, và điểm hoà vốn của detector được xác định là $d'^{*} = 2{,}85$ tại $\Delta = 2$. **Thứ hai**, với chín tham số chưa xác lập, báo cáo đề xuất thủ tục ước lượng cụ thể; đáng chú ý là tiên nghiệm $\pi_0$ suy dẫn được bằng $0{,}080$ từ dữ liệu sẵn có (giá trị đang dùng là $0{,}10$), và hằng số $c$ của Định lý 4 fit được trực tiếp từ posterior của defender mà không cần giải các trò chơi nhỏ.
 
 Quá trình ước lượng cũng làm lộ ra ba phát hiện ảnh hưởng tới kết luận của đề tài: (i) dưới detector dựa trên đặc trưng bề mặt, độ phân tách đo được $d' \le 0{,}502$ nằm dưới điểm hoà vốn, tức phân bổ thích nghi không vượt được audit-at-commit; (ii) yêu cầu không-khả-phân-biệt của corpus lành tính và ba mức detector khai báo trong bản thảo loại trừ nhau; (iii) tác động của $\chi$ lên nghiệm minimax phụ thuộc vào một quy ước chuẩn hoá chưa từng được khai báo.
 
@@ -74,9 +74,9 @@ M1 và M2 tương ứng với loại B và loại C trong tài liệu phương p
 
 | Tham số ban đầu | Đại lượng thay thế | Dạng tuyên bố mới |
 |---|---|---|
-| Biên độ nhiễu $\varepsilon$ | $\varepsilon^\* = \max\{\varepsilon : \mathrm{AUC}_{\text{upper}}(\varepsilon) \le 0{,}56\}$ | Kết quả tại ngân sách khả phân biệt lớn nhất mà corpus còn chứng nhận |
-| Trọng số $\lambda_Q$ | $\lambda_Q^\*$ = trọng số nhỏ nhất làm đổi chính sách tối ưu | Chính sách A tốt hơn B khi và chỉ khi $\lambda_Q < \lambda_Q^\*$ |
-| Điểm vận hành $(\psi,\varphi)$ | $d'^\*$ = độ phân tách hoà vốn với audit-at-commit | Phân bổ thích nghi có lợi khi và chỉ khi $d' \ge d'^\*(\Delta)$ |
+| Biên độ nhiễu $\varepsilon$ | $\varepsilon^{*} = \max\{\varepsilon : \mathrm{AUC}_{\text{upper}}(\varepsilon) \le 0{,}56\}$ | Kết quả tại ngân sách khả phân biệt lớn nhất mà corpus còn chứng nhận |
+| Trọng số $\lambda_Q$ | $\lambda_Q^{*}$ = trọng số nhỏ nhất làm đổi chính sách tối ưu | Chính sách A tốt hơn B khi và chỉ khi $\lambda_Q < \lambda_Q^{*}$ |
+| Điểm vận hành $(\psi,\varphi)$ | $d'^{*}$ = độ phân tách hoà vốn với audit-at-commit | Phân bổ thích nghi có lợi khi và chỉ khi $d' \ge d'^{*}(\Delta)$ |
 
 ### 2.2 Mô hình detector và các đại lượng dẫn xuất
 
@@ -100,7 +100,7 @@ Phép gộp trung bình được chọn thay cho phép lấy max vì $\mathbb{E}
 
 Mọi phép ước lượng tuân theo tiền đăng ký [5]: lưới tham số, tiêu chí phán quyết và hướng dự đoán được ghi và commit trước khi chạy, nhằm tránh việc đặt giả thuyết sau khi biết kết quả [6].
 
-Rà soát quá trình thực hiện cho thấy một khuyết tật: trong phép đo $\varepsilon^\*$, lưới tham số và kết quả nằm trong cùng một commit, nên thứ tự "luật trước, số sau" chỉ dựa trên tường thuật mà không kiểm được từ lịch sử phiên bản. Báo cáo đề xuất nâng thành quy tắc:
+Rà soát quá trình thực hiện cho thấy một khuyết tật: trong phép đo $\varepsilon^{*}$, lưới tham số và kết quả nằm trong cùng một commit, nên thứ tự "luật trước, số sau" chỉ dựa trên tường thuật mà không kiểm được từ lịch sử phiên bản. Báo cáo đề xuất nâng thành quy tắc:
 
 > **Quy tắc R1.** Luật phán quyết phải nằm trong một commit riêng, đứng trước và không chứa kết quả. Thứ tự nhân quả khi đó kiểm chứng được bằng `git log`.
 
@@ -143,7 +143,9 @@ Dùng chung một giá trị cho cả hai vai trò tương đương với việc
 
 Tài liệu phương pháp luận xếp $\tau$ vào nhóm tham số chọn có neo. Báo cáo này định nghĩa nó như một phân vị của phân phối null, khiến nó trở thành đại lượng đo được:
 
-$$\tau_{\text{sel}}(n_c, d', K) = Q_{1-\alpha_c(K)}\big(p_c \mid \text{carrier sạch}, n_c\big),\qquad \alpha_c(K) = 1-(1-\alpha_{\text{task}})^{1/K} \tag{5}$$
+$$\tau_{\text{sel}}(n_c, d', K) = Q_{1-\alpha_c(K)}\big(p_c \mid \text{clean}, n_c\big),\qquad \alpha_c(K) = 1-(1-\alpha_{\text{task}})^{1/K} \tag{5}$$
+
+trong đó $\text{clean}$ là điều kiện carrier sạch và $\alpha_{\text{task}}$ là ngân sách báo động giả trên mỗi task.
 
 với $\alpha_{\text{task}} = 0{,}05$, giữ tỉ lệ báo động giả cố định *trên mỗi task* bất kể số carrier được chấm. Bảng tham chiếu được sinh bằng Monte Carlo với 800.000 mẫu mỗi ô, $n_c \in [0; 30]$, seed cố định; thông tin nguồn gốc lưu trong chính tệp kết quả và script sinh từ chối ghi đè.
 
@@ -155,20 +157,20 @@ Corpus lành tính được xây từ các item thật của SWE-bench, ghép c�
 
 Kết quả trên bốn đặc trưng: $\mathrm{AUC}_{\text{upper}} = 0{,}5414$. Tuy nhiên, một quy tắc không tham số dựa trên đặc trưng `topic` — không thuộc cổng — tách được payload với AUC $0{,}9492$ trên cùng corpus. Kết quả của cổng vì vậy chỉ là phát biểu về tập đặc trưng đã khai báo, không phải về tính khó phân biệt nói chung.
 
-### 4.3 Ngân sách khả phân biệt $\varepsilon^\*$ (M4)
+### 4.3 Ngân sách khả phân biệt $\varepsilon^{*}$ (M4)
 
 $\varepsilon$ chỉ đóng vai trò ngân sách khi nó có cả lợi ích (tăng xác suất payload được truy xuất) lẫn chi phí (tăng khả năng bị phát hiện). Với định nghĩa ở Bảng 2 và lưới $\varepsilon$ chốt trước:
 
-- Trên nền lành tính tiêu chuẩn: $\varepsilon^\* = 0$.
+- Trên nền lành tính tiêu chuẩn: $\varepsilon^{*} = 0$.
 - Trên nền lành tính trung thực hơn (item có nội dung tự nhiên): **không tồn tại** $\varepsilon$ nào thoả tiêu chí, với mọi $\Delta$ và mọi phép chia; giá trị tốt nhất là $\mathrm{AUC}_{\text{upper}} = 0{,}7056$.
 
-### 4.4 Điểm hoà vốn của detector $d'^\*$ (M2 và M4)
+### 4.4 Điểm hoà vốn của detector $d'^{*}$ (M2 và M4)
 
 Thay cho ba điểm khai báo, $d'$ được quét liên tục trên $[0;\,3{,}0]$ với bước $0{,}2$, trong khi giữ $\tau_{\det} = z(1-0{,}12)$ cố định. Nhờ đó $\varphi = 0{,}12$ tại mọi điểm và mọi khác biệt được quy cho $\psi$ — khác với ba mức khai báo vốn thay đổi đồng thời cả $\psi$ và $\varphi$. Bảng $\tau_{\text{sel}}$ được sinh lại cho từng giá trị $d'$ để loại bỏ nhiễu do dùng ngưỡng hiệu chỉnh cho một $d'$ khác.
 
-**Bảng 5.** Điểm hoà vốn $d'^\*$ giữa phân bổ thích nghi và audit-at-commit.
+**Bảng 5.** Điểm hoà vốn $d'^{*}$ giữa phân bổ thích nghi và audit-at-commit.
 
-| $\Delta$ | $d'^\*$ (seed chính) | Dải qua 5 seed corpus |
+| $\Delta$ | $d'^{*}$ (seed chính) | Dải qua 5 seed corpus |
 |---|---|---|
 | 0 | không tồn tại | — |
 | 1 | không tồn tại | — |
@@ -183,7 +185,7 @@ Trên corpus ghép cặp (80 sự kiện dương, 320 item lành tính thật), 
 
 **Bảng 6.** Độ phân tách đo được theo $\Delta$ và $\varepsilon$.
 
-| $\Delta$ | $\varepsilon = 0$ | $\varepsilon = 0{,}2$ | $\varepsilon = 0{,}4$ | $\varepsilon = 0{,}7$ | $d'^\*$ |
+| $\Delta$ | $\varepsilon = 0$ | $\varepsilon = 0{,}2$ | $\varepsilon = 0{,}4$ | $\varepsilon = 0{,}7$ | $d'^{*}$ |
 |---|---|---|---|---|---|
 | 0 | 0,000 | 0,000 | 0,000 | 5,26 | — |
 | 2 | 0,155 | 0,084 | 0,000 | 5,26 | 2,85 |
@@ -213,7 +215,7 @@ Phần ngân sách không dùng được là phần dư không đủ mua thêm m
 | $\chi$ | Công thức với $\bar\kappa$ là trung bình cộng, công bố tường minh | 2,114 (bảng bản thảo); 1,349 (bảng đo trên hệ thống) | Hoàn thành công thức; quy ước quét chưa chốt (Mục 5.7) |
 | $\kappa(k)$ | Số item cần chấm mỗi lượt audit × đơn giá một lượt chấm LLM | memory 5,34 · skill 1,12 · queue 1,55 · branch 4,50 item | Một phần (Mục 5.6) |
 | $\Delta$ thực | Khoảng cách commit giữa thay đổi đặc tả và thay đổi mã trong lịch sử phiên bản | $n=29$; trung vị 3; p75 10; p90 23 | Một phần (Mục 5.8) |
-| $\lambda_Q^\*$ | Giao điểm chính xác của các đường $L$ tuyến tính theo $\lambda_Q$ | 0,036 – 0,05 tuỳ cấu hình | Một phần (Mục 5.5) |
+| $\lambda_Q^{*}$ | Giao điểm chính xác của các đường $L$ tuyến tính theo $\lambda_Q$ | 0,036 – 0,05 tuỳ cấu hình | Một phần (Mục 5.5) |
 | $\rho$ | Bán kính phủ trong không gian phân phối chi tiêu | 0,894 (thư viện 10 chính sách tại thời điểm đo) | Một phần (Mục 5.9) |
 
 ---
@@ -247,7 +249,7 @@ Mỗi tiểu mục trình bày: định nghĩa, vai trò trong mô hình, hệ q
 5. *Phân tích độ nhạy với luật ánh xạ.* Lặp lại với ít nhất một luật ánh xạ thay thế. Nếu kết luận định tính thay đổi giữa các luật, $\beta$ không định danh được và phải chuyển sang M2 (quét trên dải đo được).
 6. *Tách vai trò* theo Quy tắc R2.
 
-**Kiểm chứng.** (a) $\hat\beta$ nằm trong dải đã quét; (b) khi $\beta_{\text{thế giới}} \ne \beta_{\text{mô hình}}$, tỉ lệ cách ly nhầm dịch theo hướng dự đoán; (c) $\zeta > 0$ trong cấu hình lệch.
+**Kiểm chứng.** (a) $\hat\beta$ nằm trong dải đã quét; (b) khi $\beta_{\text{world}} \ne \beta_{\text{model}}$, tỉ lệ cách ly nhầm dịch theo hướng dự đoán; (c) $\zeta > 0$ trong cấu hình lệch.
 
 **Giới hạn.** Đồng thay đổi (co-change) là tương quan tiến hoá, không phải quan hệ nhân quả [9]. Luật ánh xạ là một phép tương tự có lập luận, chưa được kiểm chứng trên hành vi agent thật.
 
@@ -261,12 +263,14 @@ Mỗi tiểu mục trình bày: định nghĩa, vai trò trong mô hình, hệ q
 
 **Thủ tục đề xuất.** Phân tách thành hai thành phần có cơ chế khác nhau:
 
-$$\eta_Q(k) = c_{\text{gỡ}}(k) + c_{\text{phục hồi}}(k) \tag{6}$$
+$$\eta_Q(k) = c_{\text{detach}}(k) + c_{\text{restore}}(k) \tag{6}$$
 
-1. *$c_{\text{gỡ}}(k)$ — đo trực tiếp (M1).* Chạy task với carrier $k$ bị che, lấy hiệu thời gian CPU so với chạy bình thường; tối thiểu 30 lần, cố định tần số CPU, lấy trung vị.
-2. *$c_{\text{phục hồi}}(k)$ — suy dẫn (M3).* Cách ly xoá mọi item của carrier, kể cả item sạch; chi phí phục hồi bằng $n_{\text{live}}(k)$ nhân đơn giá ghi một item. Cả hai thừa số đều đã được đo, nên thành phần này tính được ngay.
+trong đó $c_{\text{detach}}$ là chi phí gỡ carrier khỏi vòng lặp và $c_{\text{restore}}$ là chi phí dựng lại nội dung lành tính đã bị xoá theo.
+
+1. $c_{\text{detach}}(k)$ — *đo trực tiếp (M1).* Chạy task với carrier $k$ bị che, lấy hiệu thời gian CPU so với chạy bình thường; tối thiểu 30 lần, cố định tần số CPU, lấy trung vị.
+2. $c_{\text{restore}}(k)$ — *suy dẫn (M3).* Cách ly xoá mọi item của carrier, kể cả item sạch; chi phí phục hồi bằng $n_{\text{live}}(k)$ nhân đơn giá ghi một item. Cả hai thừa số đều đã được đo, nên thành phần này tính được ngay.
 3. *Theo carrier.* Vì $n_{\text{live}}$ chênh 4,8 lần giữa memory và skill, giá trị vô hướng hiện tại là một đơn giản hoá cần được khai báo hoặc thay bằng $\eta_Q(k)$.
-4. *Báo cáo như một trục kết quả (M2).* Chi phí phục hồi thấp hơn làm chính sách tối ưu cách ly mạnh tay hơn; vì vậy báo cáo thêm $\eta_Q^\*$, giá trị tại đó chính sách "cách ly tất cả" không còn thua dưới $L$.
+4. *Báo cáo như một trục kết quả (M2).* Chi phí phục hồi thấp hơn làm chính sách tối ưu cách ly mạnh tay hơn; vì vậy báo cáo thêm $\eta_Q^{*}$, giá trị tại đó chính sách "cách ly tất cả" không còn thua dưới $L$.
 
 **Kiểm chứng.** Bất đẳng thức $\eta_Q(k) > \kappa(k)$ với mọi $k$; chính sách đối chứng "cách ly tất cả" phải thua dưới $L$ trên toàn dải đã quét.
 
@@ -274,7 +278,7 @@ $$\eta_Q(k) = c_{\text{gỡ}}(k) + c_{\text{phục hồi}}(k) \tag{6}$$
 
 ### 5.3 Tiên nghiệm mỗi item $\pi_0$ và belief khởi đầu $b_0$
 
-**Định nghĩa.** $\pi_0 = \Pr[\text{một item sống bất kỳ là payload}]$ trước khi quan sát bằng chứng.
+**Định nghĩa.** $\pi_0 = \Pr[\text{payload}]$ — xác suất một item sống bất kỳ là payload — trước khi quan sát bằng chứng.
 
 **Vai trò.** Theo (4) và (5), $\pi_0$ xác định thang posterior mà mọi chính sách quan sát, xác định toàn bộ bảng $\tau_{\text{sel}}$, và là mẫu số của tỉ số bằng chứng trong belief. Đây là tham số có phạm vi ảnh hưởng rộng nhất trong mô hình.
 
@@ -282,11 +286,13 @@ $$\eta_Q(k) = c_{\text{gỡ}}(k) + c_{\text{phục hồi}}(k) \tag{6}$$
 
 **Thủ tục đề xuất (M3).** $\pi_0$ không phải thuộc tính của thế giới mà là hệ quả của thiết kế episode: mỗi episode gieo đúng một payload giữa $n$ item sống tại thời điểm quyết định. Do đó
 
-$$\pi_0 = \frac{\Pr[\text{có tấn công}]}{\mathbb{E}[n_{\text{tổng}}]} \tag{7}$$
+$$\pi_0 = \frac{\Pr[\text{attack}]}{\mathbb{E}[n_{\text{total}}]} \tag{7}$$
 
-1. $\mathbb{E}[n_{\text{tổng}}] = 5{,}34 + 1{,}12 + 1{,}55 + 4{,}50 = 12{,}51$, đo trên 20 episode có ghi nhận chi tiết.
-2. Trong nhánh bị gieo của thiết kế ghép cặp, $\Pr[\text{có tấn công}] = 1$, suy ra $\pi_0^{\text{thế giới}} = 1/12{,}51 = 0{,}0799$.
-3. Với defender không biết chắc có tấn công ($\pi_{\text{attack}} = 0{,}5$): $\pi_0^{\text{mô hình}} = 0{,}5 \times 0{,}0799 = 0{,}040$. Hai giá trị này ứng với hai vai trò theo Quy tắc R2.
+trong đó $\Pr[\text{attack}]$ là xác suất episode có tấn công và $n_{\text{total}}$ là tổng số item sống tại thời điểm quyết định.
+
+1. $\mathbb{E}[n_{\text{total}}] = 5{,}34 + 1{,}12 + 1{,}55 + 4{,}50 = 12{,}51$, đo trên 20 episode có ghi nhận chi tiết.
+2. Trong nhánh bị gieo của thiết kế ghép cặp, $\Pr[\text{attack}] = 1$, suy ra $\pi_0^{\text{world}} = 1/12{,}51 = 0{,}0799$.
+3. Với defender không biết chắc có tấn công ($\pi_{\text{attack}} = 0{,}5$): $\pi_0^{\text{model}} = 0{,}5 \times 0{,}0799 = 0{,}040$. Hai giá trị này ứng với hai vai trò theo Quy tắc R2.
 4. Sinh lại bảng $\tau_{\text{sel}}$ (nhóm G1) và chạy lại các bảng kết quả.
 5. *Kiểm chứng bằng M2.* Lặp với $\pi_0 \in \{0{,}04;\ 0{,}08;\ 0{,}10;\ 0{,}20\}$; nếu thứ hạng chính sách thay đổi, $\pi_0$ phải được báo cáo như một trục.
 
@@ -309,9 +315,9 @@ Belief khởi đầu $b_0$ hiện chia đều $\pi_{\text{attack}}$ trên các w
 1. *Định nghĩa vế trái.* $B_{\min}$ của một ô thí nghiệm là ngân sách nhỏ nhất sao cho tại thời điểm kích hoạt $\sigma$, posterior của defender đặt khối lượng ít nhất $1-\alpha$ lên window thật $(k, \iota, \sigma)$.
 2. *Kiểm tra tính đơn điệu.* Xác nhận khối lượng posterior trên window thật không giảm theo $B$ — điều kiện cần để tìm kiếm nhị phân có nghĩa.
 3. *Tính $c$ từng ô.* Trên lưới $(\Delta, \chi, \gamma)$, tìm $B_{\min}$ bằng tìm kiếm nhị phân và tính
-   $$c_{\text{ô}} = \frac{B_{\min}\,\gamma^2}{\bar\kappa\,(1+\chi)\,\log(1/\alpha)\,(1 + \Delta K/H)} \tag{8}$$
-4. *Báo cáo.* $c = \max_{\text{ô}} c_{\text{ô}}$ là giá trị nhỏ nhất để cận đúng trên toàn lưới. Phân bố của $c_{\text{ô}}$ cho biết dạng hàm của cận có phù hợp hay không.
-5. *Kiểm tra từng thừa số.* Hồi quy $\log c_{\text{ô}}$ theo $\log(1+\chi)$, $\log(1+\Delta K/H)$ và $\log(1/\gamma^2)$. Nếu dạng hàm của cận đúng, các hệ số hồi quy phải xấp xỉ bằng 0 vì các thừa số tương ứng đã được chia ra; một hệ số khác 0 có ý nghĩa thống kê chỉ ra thừa số bị mô tả sai.
+   $$c_{\text{cell}} = \frac{B_{\min}\,\gamma^2}{\bar\kappa\,(1+\chi)\,\log(1/\alpha)\,(1 + \Delta K/H)} \tag{8}$$
+4. *Báo cáo.* $c_{\text{cell}}$ là giá trị tính cho một ô thí nghiệm, và $c = \max_{\text{cell}} c_{\text{cell}}$ là giá trị nhỏ nhất để cận đúng trên toàn lưới. Phân bố của $c_{\text{cell}}$ cho biết dạng hàm của cận có phù hợp hay không.
+5. *Kiểm tra từng thừa số.* Hồi quy $\log c_{\text{cell}}$ theo $\log(1+\chi)$, $\log(1+\Delta K/H)$ và $\log(1/\gamma^2)$. Nếu dạng hàm của cận đúng, các hệ số hồi quy phải xấp xỉ bằng 0 vì các thừa số tương ứng đã được chia ra; một hệ số khác 0 có ý nghĩa thống kê chỉ ra thừa số bị mô tả sai.
 6. *Kiểm tra tính không thứ nguyên.* $c$ phải không đổi khi đổi đơn vị của $\kappa$; kiểm tra bằng cách chạy trên hai bảng chi phí khác đơn vị.
 
 **Kiểm chứng.** Fit $c$ trên các ô phát triển và kiểm tra cận trên các ô giữ lại.
@@ -322,13 +328,13 @@ Belief khởi đầu $b_0$ hiện chia đều $\pi_{\text{attack}}$ trên các w
 
 **Vai trò.** Cả ba số hạng của (1) đều cần thiết: khi $\lambda_Q = \lambda_T = 0$, chính sách cách ly mọi carrier ở task đầu đạt harm bằng 0 và trở thành tối ưu dù làm hệ thống ngừng hoạt động.
 
-**Hiện trạng.** Giá trị gán $0{,}10$ và $0{,}50$; đã thay bằng $\lambda_Q^\*$ theo M4. Vì chính sách tối ưu không thay đổi đơn điệu theo $\lambda_Q$ (một chính sách có $T_{\text{lost}}$ lớn có thể bị loại ở mọi giá trị), $\lambda_Q^\*$ được tính chính xác từ giao điểm các đường $L$ tuyến tính theo $\lambda_Q$ thay vì bằng tìm kiếm nhị phân.
+**Hiện trạng.** Giá trị gán $0{,}10$ và $0{,}50$; đã thay bằng $\lambda_Q^{*}$ theo M4. Vì chính sách tối ưu không thay đổi đơn điệu theo $\lambda_Q$ (một chính sách có $T_{\text{lost}}$ lớn có thể bị loại ở mọi giá trị), $\lambda_Q^{*}$ được tính chính xác từ giao điểm các đường $L$ tuyến tính theo $\lambda_Q$ thay vì bằng tìm kiếm nhị phân.
 
-**Thủ tục đề xuất.** Giá trị $\lambda_Q^\*$ chỉ trở thành kết luận khi biết dải hợp lý của $\lambda_Q$:
+**Thủ tục đề xuất.** Giá trị $\lambda_Q^{*}$ chỉ trở thành kết luận khi biết dải hợp lý của $\lambda_Q$:
 
 1. $\lambda_T$ được neo vào giá trị một task sạch, xấp xỉ bằng chi phí chạy lại task đó (đo được).
 2. $\lambda_Q$ được neo vào chi phí một lần cách ly nhầm, tức $\eta_Q$ cộng chi phí dựng lại nội dung. Như vậy $\lambda_Q$ và $\eta_Q$ định giá cùng một sự kiện ở hai vị trí khác nhau (hàm mất mát và ràng buộc ngân sách), và cần được ràng buộc nhất quán.
-3. Kết luận được phát biểu dạng so sánh: nếu $\lambda_Q^\*$ nằm dưới dải đo được, thứ hạng chính sách bền vững; nếu nằm trong dải, kết luận phải nêu điều kiện.
+3. Kết luận được phát biểu dạng so sánh: nếu $\lambda_Q^{*}$ nằm dưới dải đo được, thứ hạng chính sách bền vững; nếu nằm trong dải, kết luận phải nêu điều kiện.
 4. Quy về cùng đơn vị: $\lambda$ mang đơn vị "harm trên một sự kiện".
 
 **Giới hạn.** $\lambda$ phản ánh ưu tiên của tổ chức; không tồn tại một giá trị "đúng" duy nhất.
@@ -375,7 +381,7 @@ $$\sum_k \kappa_k \sum_t u[k,t] = \Big(\sum_k \kappa_k\Big)\sum_t U(t) \tag{9}$$
 
 chỉ phụ thuộc tổng chi phí, không phụ thuộc phân bố chi phí giữa các carrier. Như vậy, việc $\chi$ không tác động lên nghiệm minimax dưới quy ước A là hệ quả cấu trúc của mô hình, không phải sai sót đo lường.
 
-**Mâu thuẫn cần giải quyết.** Một phép quét trước đó trên chính sách chạy thực tế ghi nhận $\chi$ làm dịch điểm crossover từ $\Delta^\* = 1{,}67$ lên $2{,}83$, trái với kết quả bất biến của nghiệm LP. Hai phép đo dùng hai đường tính khác nhau.
+**Mâu thuẫn cần giải quyết.** Một phép quét trước đó trên chính sách chạy thực tế ghi nhận $\chi$ làm dịch điểm crossover từ $\Delta^{*} = 1{,}67$ lên $2{,}83$, trái với kết quả bất biến của nghiệm LP. Hai phép đo dùng hai đường tính khác nhau.
 
 **Thủ tục đề xuất.**
 
@@ -395,7 +401,7 @@ chỉ phụ thuộc tổng chi phí, không phụ thuộc phân bố chi phí gi
 
 ### 5.9 Bán kính phủ $\rho$
 
-**Định nghĩa.** $\rho = \max_{\pi^\*}\min_{\pi\in\Pi}\mathrm{TV}(\pi, \pi^\*)$.
+**Định nghĩa.** $\rho = \max_{\pi^{*}}\min_{\pi\in\Pi}\mathrm{TV}(\pi, \pi^{*})$.
 
 **Hiện trạng.** Phép đo hiện tại dùng không gian phân phối chi tiêu trên các hành động, nên hai chính sách có cùng phân phối chi tiêu nhưng khác thời điểm audit không phân biệt được — trong khi thời điểm là nội dung chính của bài toán. Phép đo cũng thực hiện trên tập baseline và biến thể thay vì thư viện chính sách tham số hoá mà Mệnh đề 6 đề cập.
 
@@ -405,7 +411,7 @@ chỉ phụ thuộc tổng chi phí, không phụ thuộc phân bố chi phí gi
   $$\mathrm{TV}(\pi,\pi') = \frac{1}{H}\sum_{t=1}^{H}\frac{1}{2}\sum_a\big|\pi_t(a) - \pi'_t(a)\big| \tag{10}$$
 - *(b) Thu hẹp Mệnh đề 6* về không gian phân phối chi tiêu và nêu rõ giới hạn.
 
-Trong cả hai hướng, việc tính $\rho$ đòi hỏi nghiệm tối ưu $\pi^\*$ trên một lớp trò chơi giải được chính xác. Nghiệm minimax hiện có được tính trên ma trận payoff của chính thư viện, tức là một cận trong thư viện chứ không phải tối ưu của không gian chính sách đầy đủ.
+Trong cả hai hướng, việc tính $\rho$ đòi hỏi nghiệm tối ưu $\pi^{*}$ trên một lớp trò chơi giải được chính xác. Nghiệm minimax hiện có được tính trên ma trận payoff của chính thư viện, tức là một cận trong thư viện chứ không phải tối ưu của không gian chính sách đầy đủ.
 
 ---
 
@@ -413,7 +419,7 @@ Trong cả hai hướng, việc tính $\rho$ đòi hỏi nghiệm tối ưu $\pi
 
 ### 6.1 Detector bề mặt không đạt điểm hoà vốn
 
-So sánh Bảng 5 và Bảng 6: ở vùng attacker ngụy trang thành công ($\varepsilon \le 0{,}4$), độ phân tách đo được $d' \le 0{,}502$, trong khi điểm hoà vốn là $2{,}85$ tại $\Delta = 2$ và $0{,}95$ tại $\Delta = 4$. Do đó, **với detector chỉ dựa trên đặc trưng bề mặt, phân bổ thích nghi không vượt được audit-at-commit**. Để đạt $d'^\*$ cần một detector đọc được ngữ nghĩa nội dung, nhưng loại detector này có chi phí đơn vị cao hơn nhiều, dẫn tới thay đổi $\kappa$ và do đó thay đổi chính bài toán ngân sách. Kết quả này được dự báo trong kế hoạch trước khi đo và là kết quả quan trọng nhất của quá trình ước lượng.
+So sánh Bảng 5 và Bảng 6: ở vùng attacker ngụy trang thành công ($\varepsilon \le 0{,}4$), độ phân tách đo được $d' \le 0{,}502$, trong khi điểm hoà vốn là $2{,}85$ tại $\Delta = 2$ và $0{,}95$ tại $\Delta = 4$. Do đó, **với detector chỉ dựa trên đặc trưng bề mặt, phân bổ thích nghi không vượt được audit-at-commit**. Để đạt $d'^{*}$ cần một detector đọc được ngữ nghĩa nội dung, nhưng loại detector này có chi phí đơn vị cao hơn nhiều, dẫn tới thay đổi $\kappa$ và do đó thay đổi chính bài toán ngân sách. Kết quả này được dự báo trong kế hoạch trước khi đo và là kết quả quan trọng nhất của quá trình ước lượng.
 
 ### 6.2 Mâu thuẫn nội tại giữa corpus lành tính và mức detector
 
@@ -434,7 +440,7 @@ M1 hoàn thành với các đại lượng định nghĩa được như phân v�
 1. **Tính hợp lệ nội tại — hàm harm.** Harm hiện được chấm bằng sự có mặt của marker trong patch. Việc thay bằng test ẩn thật đã được thử: họ test đầu tiên neo được 5/500 instance Verified, còn 1/500 sau khi loại các trường hợp từ chối cả patch chuẩn; trần ước tính cho mọi template đơn là khoảng 11%. Độ lệch giữa marker và test thật đã được đo trên một tập con: khớp 30/30 ở hai chế độ mô phỏng tạo ra được, 0/30 ở hai chế độ không tạo ra được, với hướng sai số được xác định (bỏ sót harm khi agent làm theo payload nhưng đặt tên khác; thổi phồng harm khi tên xuất hiện ở tệp không mang thuộc tính cần giữ). Các kết luận vì vậy mang tính **bán tổng hợp** (semi-synthetic).
 2. **Tính hợp lệ nội tại — marker.** Marker hiện là một chuỗi cố định, chưa duy nhất theo từng lần chạy như thiết kế.
 3. **Tính hợp lệ ngoại tại — quy mô.** Với $H = 8$ trên tập Verified, 14 trong 58 workflow thoả điều kiện tại mọi $\Delta$ được quét, so với 100 workflow theo thiết kế. Lưới $\Delta$ chưa gồm giá trị 8.
-4. **Tính hợp lệ ngoại tại — quần thể.** $\beta$, $\Delta$ thực và $\kappa$ là thuộc tính của một quần thể repository cụ thể; các giá trị suy dẫn ($\pi_0$, $\varepsilon^\*$) là của benchmark, không phải của hệ thống thực.
+4. **Tính hợp lệ ngoại tại — quần thể.** $\beta$, $\Delta$ thực và $\kappa$ là thuộc tính của một quần thể repository cụ thể; các giá trị suy dẫn ($\pi_0$, $\varepsilon^{*}$) là của benchmark, không phải của hệ thống thực.
 5. **Tính hợp lệ cấu trúc.** Thư viện chính sách tham số hoá và lớp trò chơi nhỏ giải chính xác chưa được xây dựng. Ước lượng tham số không khắc phục được hai thiếu hụt này; nếu không thực hiện, Định lý 4 và Mệnh đề 6 nên được trình bày là kết quả lý thuyết chưa có kiểm chứng số.
 6. **Không tái tạo số liệu bản thảo.** Các giá trị $\chi = 1{,}34$ và $\rho = 0{,}07$ của bản thảo không tái tạo được bằng các quy trình trên. Báo cáo trình bày quy trình tái lập được thay vì cố gắng đạt các giá trị đó.
 7. **Trạng thái kiểm thử** (ngày 20/09/2026): cổng 1 đạt 538/551 với 13 bỏ qua do chưa dựng môi trường container; cổng 2 đạt 203/205, hai test không đạt là kết quả khoa học (không giá trị $\varepsilon$ nào đạt trần AUC) chứ không phải lỗi cài đặt; cổng 3 chưa chạy.
@@ -464,7 +470,7 @@ Thứ tự thực hiện được xác định bởi quan hệ phụ thuộc gi�
 
 Báo cáo đề xuất một khung bốn phương thức xác lập tham số và ba nguyên tắc thực hiện, rồi áp dụng cho toàn bộ tham số của mô hình Sentinel. Tám đại lượng đã được ước lượng; chín tham số còn lại có thủ tục ước lượng cụ thể, trong đó hai tham số — $\pi_0$ và thành phần phục hồi của $\eta_Q$ — suy dẫn được từ dữ liệu sẵn có.
 
-Kết quả quan trọng nhất không phải một giá trị tham số mà là một điều kiện: phân bổ thích nghi chỉ có lợi so với audit-at-commit khi detector đạt độ phân tách tối thiểu $d'^\*(\Delta)$, và detector dựa trên đặc trưng bề mặt không đạt điều kiện này trên corpus thoả yêu cầu không-khả-phân-biệt. Phát biểu dưới dạng điều kiện này không phụ thuộc vào giá trị $(\psi,\varphi)$ được chọn — vốn là điểm yếu nhất của bản thảo gốc — và cho phép người thực hành tự kiểm tra trên hệ thống của mình.
+Kết quả quan trọng nhất không phải một giá trị tham số mà là một điều kiện: phân bổ thích nghi chỉ có lợi so với audit-at-commit khi detector đạt độ phân tách tối thiểu $d'^{*}(\Delta)$, và detector dựa trên đặc trưng bề mặt không đạt điều kiện này trên corpus thoả yêu cầu không-khả-phân-biệt. Phát biểu dưới dạng điều kiện này không phụ thuộc vào giá trị $(\psi,\varphi)$ được chọn — vốn là điểm yếu nhất của bản thảo gốc — và cho phép người thực hành tự kiểm tra trên hệ thống của mình.
 
 Hai vấn đề cần được thống nhất với giảng viên hướng dẫn trước khi tiếp tục:
 
@@ -507,15 +513,15 @@ Hai vấn đề cần được thống nhất với giảng viên hướng dẫn
 |---|---|---|---|---|
 | $\tau_{\text{sel}}$ | Ngưỡng chọn carrier | M1 | Hoàn thành | Bảng tham chiếu, 800.000 mẫu/ô |
 | $\mathrm{AUC}_{\text{upper}}$ | Tính không-khả-phân-biệt của payload | M1 | Hoàn thành | 0,5414 (bốn đặc trưng) |
-| $\varepsilon^\*$ | Ngân sách khả phân biệt | M4 | Hoàn thành | 0; không tồn tại trên nền trung thực |
-| $d'^\*$ | Điểm hoà vốn của detector | M2 + M4 | Hoàn thành | 2,85 ($\Delta{=}2$); 0,95 ($\Delta{=}4$) |
+| $\varepsilon^{*}$ | Ngân sách khả phân biệt | M4 | Hoàn thành | 0; không tồn tại trên nền trung thực |
+| $d'^{*}$ | Điểm hoà vốn của detector | M2 + M4 | Hoàn thành | 2,85 ($\Delta{=}2$); 0,95 ($\Delta{=}4$) |
 | $d'$ bề mặt | Độ phân tách thực nghiệm | M1 | Hoàn thành | $\le 0{,}502$ |
 | Chênh lệch ràng buộc | Kỳ vọng so với cứng | M1 | Hoàn thành | $-13{,}29\%$ độ phủ |
 | $\zeta$ | Sai số kernel | M1 | Hoàn thành | 0,000; 0,119 khi $\beta{=}0{,}5$ |
 | $\chi$ | Độ dị tính chi phí | M1 | Một phần | 2,114 / 1,349; quy ước chưa chốt |
 | $\kappa(k)$ | Chi phí audit | M1 | Một phần | Hai bảng song song |
 | $\Delta$ thực | Độ trễ nhân quả | M1 | Một phần | Trung vị 3 ($n{=}29$) |
-| $\lambda_Q, \lambda_T$ | Trọng số mất mát | M4 | Một phần | $\lambda_Q^\* \approx 0{,}036$–$0{,}05$ |
+| $\lambda_Q, \lambda_T$ | Trọng số mất mát | M4 | Một phần | $\lambda_Q^{*} \approx 0{,}036$–$0{,}05$ |
 | $\rho$ | Bán kính phủ | M1 | Một phần | 0,894, không gian proxy |
 | $\eta_Q$ | Chi phí cách ly | M1 + M3 | Chưa thực hiện | Giá trị gán 2,0 |
 | $\beta_k$ | Tốc độ trôi lành tính | M1 | Chưa thực hiện | Giá trị gán 0,25 |
@@ -532,7 +538,7 @@ Mã nguồn: đường dẫn tương đối so với `auditgame/` của repo Sen
 | Detector, phương trình (3) | `detector.py` |
 | Posterior mean-$\Lambda$, phương trình (4); $\pi_0$ | `scoring.py` |
 | Sinh bảng $\tau_{\text{sel}}$, phương trình (5) | `reference/gen_score_table.py`, `reference/score_table.json` |
-| Hàm mất mát (1), $\lambda_Q^\*$, hash cấu hình | `metrics.py` |
+| Hàm mất mát (1), $\lambda_Q^{*}$, hash cấu hình | `metrics.py` |
 | Belief trên window, giả thuyết NULL, $\beta$ | `belief.py` |
 | Chính sách, $\kappa$, $\eta_Q$, công thức $\chi$ | `policies.py` |
 | Bảng chi phí đo được | `costs.py` |
@@ -540,7 +546,7 @@ Mã nguồn: đường dẫn tương đối so với `auditgame/` của repo Sen
 | $\rho$, $\zeta$ | `theory.py` |
 | Cổng AUC, corpus lành tính | `analysis/discriminator.py`, `analysis/benign_corpus.py` |
 | Quét $d'$ | `dprime_sweep.py`; `preregistration/dprime-sweep.md` |
-| $\varepsilon^\*$ | `preregistration/eps-ngan-sach-that.md` |
+| $\varepsilon^{*}$ | `preregistration/eps-ngan-sach-that.md` |
 | $d'$ thực nghiệm | `tools/measure_gamma.py`; `reports/t6-gamma-analysis.md` |
 | Chênh lệch ràng buộc | `reports/t3-budget-analysis.md` |
 | Ba quy ước $\chi$ | `tools/evaluate_chi_variants.py`; `reports/t2-chi-analysis.md` |

@@ -19,7 +19,7 @@
 
 1. **Cách viết Đe doạ 3 (P2, 0/7 tuân thủ).** Giữ tuyên bố với nhãn *"harm dưới mô hình tiếp nhận của MockAgent"*, hay chạy thêm arm model thứ hai (hiện chưa chạy) trước khi đóng băng số ngày 30/09?
 2. **Quy ước chuẩn hoá khi quét $\chi$.** Neo $\bar\kappa$ (hiện hành) làm trục $\chi$ rỗng theo cấu trúc; neo $\kappa_{\min}$ làm $\chi$ có tác dụng. Lựa chọn quyết định trục $\chi$ của ranh giới vùng có nội dung hay không.
-3. **Vai trò của $(\psi,\varphi)$.** Detector bề mặt chỉ đạt $d' \le 0{,}50$, detector nội dung sụp về ngẫu nhiên khi attacker không tự khai báo. Coi $(\psi,\varphi)$ là biến kiểm soát thuần tuý, hay nêu điều kiện "cần detector đạt $d'^\*$" làm kết luận chính?
+3. **Vai trò của $(\psi,\varphi)$.** Detector bề mặt chỉ đạt $d' \le 0{,}50$, detector nội dung sụp về ngẫu nhiên khi attacker không tự khai báo. Coi $(\psi,\varphi)$ là biến kiểm soát thuần tuý, hay nêu điều kiện "cần detector đạt $d'^{*}$" làm kết luận chính?
 
 ---
 
@@ -34,11 +34,11 @@ Khung stage theo `AuditGame-SE_PartIV_Detailed.md`. Trạng thái: **Hoàn thàn
 | 2 | Chi phí audit $\kappa \to \chi$ | Một phần | Công thức $\chi$ công bố ($2{,}11 \ne 1{,}34$ của bản thảo); $\kappa$ đo theo đơn giá chấm LLM | Chưa đo theo CPU-phút; thí nghiệm chính vẫn dùng bảng bản thảo; quy ước quét $\chi$ chưa chốt |
 | 3 | Attacker, ground truth, oracle | Một phần | Sinh $(\iota,\sigma)$ có lọc nổ sớm; 12 attacker kịch bản, 6 held-out chia bằng hash; $\Delta$ thực đo được (trung vị 3) | 18 attacker; attacker best-response đọc $\pi_D$; marker duy nhất mỗi lần chạy; $\Delta = 8$; harm vẫn chấm bằng marker (test ẩn neo được 1/500) |
 | 4 | Corpus lành tính, cổng AUC, $\beta$ | Hoàn thành | Cổng v2 đóng băng 19/09: 5 đặc trưng, tiêu chí cận trên CI, 20 split; corpus từ item SWE-bench thật, ghép theo tuổi | $\beta$ chưa đo; chưa có permutation test |
-| 5 | Detector $\psi/\varphi/\gamma$ | Hoàn thành | $d'$ suy từ $(\psi,\varphi)$; quét $d'$ liên tục → $d'^\* = 2{,}85$ ($\Delta{=}2$), $0{,}95$ ($\Delta{=}4$); detector nội dung đã thử | — |
+| 5 | Detector $\psi/\varphi/\gamma$ | Hoàn thành | $d'$ suy từ $(\psi,\varphi)$; quét $d'$ liên tục → $d'^{*} = 2{,}85$ ($\Delta{=}2$), $0{,}95$ ($\Delta{=}4$); detector nội dung đã thử | — |
 | 6 | Belief, thư viện policy, $\rho$ | Làm theo hướng khác | Belief trên window tính **chính xác** (thay particle filter); minimax LP (B7, B7U, SSG receding/guarded) thay thư viện 28 policy | 240 game nhỏ giải chính xác; $\rho$ đo đúng không gian |
 | 7 | Ví dụ tính tay | Hoàn thành | `trace_one_episode.py` phát lại một episode bằng tay với số thật | — |
 | 8 | Đóng băng bằng hash | Một phần | Hash cấu hình; digest cổng v2; payload đóng băng; 10 tài liệu tiền đăng ký | Manifest phủ toàn bộ policy/attacker/hằng số; harness từ chối policy chưa đóng băng |
-| 9 | Chạy lưới, tính output | Một phần | Lưới $\Delta \in \{0,1,2,4\}$ × 3 detector trên mock, chấm $L$, $\lambda_Q^\*$, bootstrap theo workflow, bảng chi tiêu | $N = 100$; $\Delta = 8$; trục $\chi$ trong đường chính |
+| 9 | Chạy lưới, tính output | Một phần | Lưới $\Delta \in \{0,1,2,4\}$ × 3 detector trên mock, chấm $L$, $\lambda_Q^{*}$, bootstrap theo workflow, bảng chi tiêu | $N = 100$; $\Delta = 8$; trục $\chi$ trong đường chính |
 | 10 | Tối ưu, ranh giới tuning | Một phần | LP Stackelberg (Conitzer–Sandholm); ranh giới tuning thực thi qua tiền đăng ký | Double oracle |
 
 **Tóm lại:** 4 stage hoàn thành, 1 làm theo hướng khác, 6 một phần, không stage nào chưa bắt đầu.
@@ -95,13 +95,13 @@ Chi tiết phương pháp: [Parameter Estimation Report](AuditGame-SE_Parameter_
 
 | Phát hiện | Số liệu | Vào bài ở đâu |
 |---|---|---|
-| Detector bề mặt không đạt hoà vốn | $d' \le 0{,}50$ so với $d'^\* = 2{,}85$ ($\Delta{=}2$) | Kết quả chính (dạng điều kiện) |
+| Detector bề mặt không đạt hoà vốn | $d' \le 0{,}50$ so với $d'^{*} = 2{,}85$ ($\Delta{=}2$) | Kết quả chính (dạng điều kiện) |
 | Detector nội dung sụp khi attacker không tự khai báo | AUC 0,479 ($D_{\text{lex}}$) và 0,518 ($D_{\text{llm}}$) khi tên hàm trung tính | Kết quả; đe doạ |
 | Agent thật không làm theo payload | 0/7 tuân thủ (P2) | Đe doạ 3 — nặng nhất |
 | Sentinel thắng B1 nhờ số hạng $T_{\text{lost}}$ | Dẫn B1 ở 64/64 ô khi $\lambda_T{=}0{,}5$, chỉ 22/64 khi $\lambda_T{=}0$ | Điều kiện của tuyên bố chính |
 | $\chi$ không tác động lên nghiệm minimax | Độ lợi 39,7% ở mọi $\chi$ (quy ước neo trung bình) | Cần thầy quyết (mục 2) |
 | Ngân sách kỳ vọng lạc quan hơn thực thi | Độ phủ $-13{,}29\%$ | Chú thích mọi bảng độ lợi |
-| Không có điểm hoà vốn ở $\Delta \le 1$ | $d'^\*$ không tồn tại | Khớp Hệ quả 5 |
+| Không có điểm hoà vốn ở $\Delta \le 1$ | $d'^{*}$ không tồn tại | Khớp Hệ quả 5 |
 
 ---
 
@@ -116,4 +116,4 @@ Chi tiết phương pháp: [Parameter Estimation Report](AuditGame-SE_Parameter_
 
 ## Nguồn
 
-Kế hoạch nước rút: `HCMUT/261-Master-Proposal-Analysis/PLAN-VIEC-CON-LAI.md` (vault) · Khung stage: `docs/AuditGame-SE_PartIV_Detailed.md` · P2: `docs/reports/p2-three-arms.md` · Detector nội dung: `docs/reports/content-detector.md` · $d'^\*$: `docs/preregistration/dprime-sweep.md` · Ước lượng tham số: `docs/AuditGame-SE_Parameter_Estimation_Report.md`.
+Kế hoạch nước rút: `HCMUT/261-Master-Proposal-Analysis/PLAN-VIEC-CON-LAI.md` (vault) · Khung stage: `docs/AuditGame-SE_PartIV_Detailed.md` · P2: `docs/reports/p2-three-arms.md` · Detector nội dung: `docs/reports/content-detector.md` · $d'^{*}$: `docs/preregistration/dprime-sweep.md` · Ước lượng tham số: `docs/AuditGame-SE_Parameter_Estimation_Report.md`.

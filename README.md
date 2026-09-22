@@ -245,7 +245,7 @@ Các hạng mục dưới đây trước đây xếp "sau hạn 02/10". Nay đư
 | # | Hạng mục | Việc cụ thể | Phụ thuộc | Ước lượng | Trạng thái |
 |---|---|---|---|---|---|
 | W1 | $\pi_0$, $b_0$ suy dẫn | Thay giá trị gán 0,10 bằng $\pi_0 = 1/12{,}51 = 0{,}080$ (thế giới) và 0,040 (mô hình); sinh lại `reference/score_table.json`; quét $\pi_0 \in \{0{,}04;0{,}08;0{,}10;0{,}20\}$ để xem thứ hạng có đổi không | — | 1 ngày | ⏳ Chưa bắt đầu |
-| W2 | $\eta_Q$ | $\eta_Q(k) = c_{\text{gỡ}}(k) + c_{\text{phục hồi}}(k)$: đo phần gỡ bằng hiệu CPU-time khi che carrier; phần phục hồi tính từ $n_{\text{live}}(k)$ đã đo (`costs.ITEMS_PER_AUDIT`); kiểm $\eta_Q(k) > \kappa(k)$ | — | 0,5 ngày | ⏳ Chưa bắt đầu |
+| W2 | $\eta_Q$ | $\eta_Q(k) = c_{\text{detach}}(k) + c_{\text{restore}}(k)$: đo phần gỡ bằng hiệu CPU-time khi che carrier; phần phục hồi tính từ $n_{\text{live}}(k)$ đã đo (`costs.ITEMS_PER_AUDIT`); kiểm $\eta_Q(k) > \kappa(k)$ | — | 0,5 ngày | ⏳ Chưa bắt đầu |
 | W3 | $\beta_k$ | Khai báo luật ánh xạ commit → carrier; đếm trên cửa sổ commit giữa hai task của 10 repo đã clone trong `auditgame/workspace/`; báo trung vị và dải theo repo; phân tích độ nhạy với một luật thay thế | — | 1 ngày | ⏳ Chưa bắt đầu |
 | W4 | $\kappa$ theo CPU-time | Đổi phép đo trong `runner.py` từ `perf_counter` sang `process_time` (user+sys); chạy mỗi checkpoint ≥ 30 lần, lấy trung vị, báo phương sai; đối chiếu với hai bảng $\kappa$ hiện có | — | 0,5 ngày | ⏳ Chưa bắt đầu |
 | W5 | $\Delta$ thực trên SWE-bench | Co-change (support, confidence) + lọc bằng đồ thị import trên 10 repo đã clone. **Đề xuất thay `git bisect` bằng SZZ** (`git blame` trên dòng mà gold patch sửa): bisect cần môi trường chạy được test ở mọi commit, tốn Docker cho từng repo | — | 1,5 ngày | ⏳ Chưa bắt đầu |
