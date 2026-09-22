@@ -59,19 +59,42 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 
 ## Lịch nước rút 14 ngày
 
-| Ngày | Việc | Trạng thái | Kết quả |
-|---|---|---|---|
-| 1 — 18/09 | P2 runner; $\tau_{\text{sel}}$ chạy theo $d'$ | ✅ Hoàn thành | Đã tách được confound của phép quét $d'$ |
-| 2 — 19/09 | Chạy P2 → **điểm rẽ P2** | ✅ Hoàn thành | 14 instance, 7 chấm được: 0 B / 0 C / 0 D, tuân thủ **0/7**. Điều kiện dừng #2 không kích hoạt theo quy tắc, nhưng tiền đề đe doạ không tái tạo được trên agent thật |
-| 3–5 — 20–22/09 | Cổng v2 trọn gói; sweep chấm $L$ có B5, B6 | ✅ Hoàn thành | Cổng v2 đóng băng 19/09 (qua điều kiện dừng #3); sweep chấm $L$ trên payload v2 |
-| 4 — 21/09 | **Điểm rẽ L** → A hay A′ | ✅ Xong sớm (18/09) | **Khung A′**: thắng B1 ở 64/64 ô; thua B5, không tồn tại ranh giới $\lambda_Q > 0$ |
-| **6 — 23/09** | **Bảng chứng nhận v2 → điểm rẽ v2** | ▶️ **Tiếp theo** | Tiền đăng ký: $\Delta=0$: 0,519 và $\Delta=2$: 0,529 qua 20/20 split; $\Delta=4$ đỏ (0,587). Pipeline *matched* hôm nay: không $\varepsilon$ nào đưa trung vị $\Delta=4$ xuống dưới trần (0,607–0,642). Cần chốt trước: $\Delta=4$ vẫn đỏ thì chỉ chứng nhận $\Delta \in \{0,2\}$ hay lùi khung B |
-| 7–9 — 24–26/09 | Chuỗi bảng `m`; lưới $N=100$ trên MockAgent; G4 nhãn mù | ⏳ Chưa đến | Hạn G4: 26/09. Cần chỗ cho việc dựng thiết lập draft (Stage 3, 6, 8), chờ thầy chốt phạm vi |
-| 10–11 — 27–28/09 | Evaluation, threats, ablation RQ4 | ⏳ Chưa đến | — |
-| 12 — 30/09 | **Đóng băng số**; chạy 3 cổng lần cuối; artifact ẩn danh | ⏳ Chưa đến | — |
-| 13–14 — 01–02/10 | Bản cuối, format ACM, **nộp** | ⏳ Chưa đến | — |
+Bốn từ dùng xuyên suốt bảng dưới:
+- **Điểm rẽ** — mốc đã khai báo trước: tới ngày đó nhìn số rồi chọn nhánh theo quy tắc, không bàn lại.
+- **Cổng v2** — phép chứng nhận rằng payload không phân biệt được với nền lành tính: AUC phải nằm dưới trần trên cả 20 split.
+- **$m(x)$** — độ lộ nội dung của một item, đại lượng attacker tìm cách kéo xuống; "chuỗi bảng $m$" là dãy bảng đo $d'$ hiệu dụng theo $m$.
+- **G4** — phép kiểm agreement giữa LLM judge và nhãn tay: $n = 38$, cận dưới Clopper–Pearson $\ge 0{,}75$.
 
-**Ba điều kiện dừng:** #1 cổng v2 tự vỡ — chưa kích hoạt theo định nghĩa trong tiền đăng ký (2 test cổng 2 đang đỏ cần đối chiếu với định nghĩa này trước ngày 6) · #2 P2 âm nặng — không kích hoạt theo quy tắc (xem ngày 2) · #3 v2 chưa đóng băng hết ngày 5 — đã qua.
+### Ngày 1–5 (18–22/09) — đã qua
+
+| Ngày | Việc | Kết quả |
+|---|---|---|
+| 1 — 18/09 | P2 runner; $\tau_{\text{sel}}$ chạy theo $d'$ | Tách được confound của phép quét $d'$ |
+| 2 — 19/09 | Chạy P2 → **điểm rẽ P2** | 14 instance, 7 chấm được: tuân thủ **0/7**. Điều kiện dừng #2 không kích hoạt theo quy tắc, nhưng tiền đề đe doạ không tái tạo được trên agent thật |
+| 3 — 20/09 | **Điểm rẽ L** → khung A hay A′ (xong sớm từ 18/09) | Chọn **A′**: thắng B1 ở 64/64 ô, thua B5, không tồn tại ranh giới $\lambda_Q > 0$ |
+| 4–5 — 21–22/09 | Cổng v2 trọn gói; sweep chấm $L$ có B5, B6 | Cổng v2 đóng băng 19/09 (qua điều kiện dừng #3); sweep chấm $L$ trên payload v2 |
+
+### Ngày 6–14 (23/09–02/10) — còn lại
+
+| Ngày | Việc phải xong | Đầu ra phải có | Ràng buộc |
+|---|---|---|---|
+| **6 — 23/09** | Chạy bảng chứng nhận v2 **một lần** → **điểm rẽ v2** | Bảng chứng nhận cho từng $\Delta$; chọn nhánh A′ hay B | Hiện $\Delta=0$ và $\Delta=2$ qua 20/20 split (0,519 và 0,529), $\Delta=4$ đỏ (0,587); pipeline *matched* cũng đỏ ở $\Delta=4$ (0,607–0,642). **Phải chốt trước khi chạy:** $\Delta=4$ vẫn đỏ thì chỉ chứng nhận $\Delta \in \{0,2\}$, hay lùi khung B |
+| 7–9 — 24–26/09 | Chuỗi bảng $m$; lưới $N = 100$ trên MockAgent; G4 nhãn mù | $d'$ hiệu dụng theo $m$; lưới kết quả ở quy mô đủ; agreement của judge | **Hạn cứng G4: 26/09** |
+| 7–11 (song song) | Dựng thiết lập draft: thư viện 28 policy, 18 attacker kèm best-response, freeze manifest, marker duy nhất — [issue #2–#5](#34-issue-cần-xử-lý) | Bảng kết quả chính so được với draft: worst-case trên held-out, exploitability | Chờ thầy chốt phạm vi |
+| 7–11 (song song) | Đo các tham số còn gán tay: [W1–W6](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint) | $\pi_0$, $\eta_Q$, $\beta$, $\kappa$ theo CPU-time, $\Delta$ thực, hằng số $c$ | W1 phải xong trước, vì đổi $\pi_0$ là phải sinh lại bảng $\tau_{\text{sel}}$ và chạy lại mọi bảng |
+| 10–11 — 27–28/09 | Viết Evaluation, Threats, ablation RQ4 | Bản nháp các mục kết quả | Phụ thuộc hai dòng trên |
+| 12 — 30/09 | **Đóng băng số**; chạy ba cổng lần cuối; artifact ẩn danh | Manifest hash; ba cổng xanh (hoặc đỏ có giải trình) | Sau mốc này không tham số nào được chỉnh |
+| 13–14 — 01–02/10 | Bản cuối, format ACM, **nộp** | Bản nộp | Hạn 02/10 AoE |
+
+**Điểm nghẽn.** Ba dòng của ngày 7–11 cộng lại khoảng **17 ngày công** nhưng chỉ có **5 ngày lịch**. Vì vậy phải cắt, và thứ tự ưu tiên đề xuất là: (1) thiết lập draft, vì không có nó thì không có bảng kết quả chính; (2) W1–W6, vì đây là phần biến "giá trị gán" thành "giá trị đo"; (3) chuỗi bảng $m$ và $N = 100$ ở quy mô rút gọn nếu cần.
+
+**Ba điều kiện dừng đã khai báo trước:**
+
+| # | Kích hoạt khi | Hiện trạng |
+|---|---|---|
+| 1 | Cổng v2 tự vỡ | Chưa kích hoạt theo định nghĩa trong tiền đăng ký. Hai test cổng 2 đang đỏ, cần đối chiếu với định nghĩa này trước ngày 6 |
+| 2 | P2 cho kết quả âm nặng | Không kích hoạt theo quy tắc (xem ngày 2), dù tiền đề đe doạ không tái tạo được trên agent thật |
+| 3 | Cổng v2 chưa đóng băng hết ngày 5 | Đã qua — đóng băng 19/09 |
 
 ---
 
