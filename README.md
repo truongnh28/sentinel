@@ -303,7 +303,7 @@ Các hạng mục dưới đây trước đây xếp "sau hạn 02/10". Nay đư
 | W9 | Nền lành tính thật, $N = 500$, 3 attacker LLM | Chạy trên toàn bộ 500 instance SWE-bench Verified với nền lành tính thật và attacker LLM | W8; ngân sách LLM | ⏳ Chưa bắt đầu |
 | W10 | Biện hộ các tham số thiết kế | Sinh bằng chứng cho những số mà draft nêu nhưng không có nguồn: ablation $K = 2, 3$; phân phối độ dài workflow để chọn $H$; phân tích lực để chọn $N$ và số seed; $\rho$ bão hoà để biện hộ con số 28; ngưỡng AUC suy từ CI thay vì lấy 0,56 | W7 (cho $\rho$) | ⏳ Chưa bắt đầu |
 
-Kế hoạch triển khai chi tiết theo từng bước sẽ được viết riêng trong `docs/design/plans/`.
+Kế hoạch triển khai chi tiết theo từng bước: [docs/design/plans/2026-09-22-W1-W10-tham-so.md](docs/design/plans/2026-09-22-W1-W10-tham-so.md).
 
 ---
 
