@@ -22,9 +22,9 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 |---|---|
 | **Đang làm** | Nước rút nộp **FSE 2027 Research Papers**, hạn **02/10/2026 AoE** (trưa 03/10 giờ Việt Nam). Hôm nay là **ngày 5/14**, còn **10 ngày**. |
 | **Khung bài đã chốt** | **A′ — "bản đồ chế độ"** (chốt 18/09 tại điểm rẽ ngày 4). Trên thiết lập hiện tại, Sentinel thắng audit-at-commit (B1) trên hàm mất mát $L$ nhưng **thua B5 risk-score**. Bài phát biểu về *ranh giới chế độ*, không về Sentinel. |
-| **Đang ở bước** | Stage 4 (chứng nhận cổng v2, ngày 6) và chuẩn bị Stage 8 (đóng băng). Stage 6 và 9 mới chạy trên thiết lập rút gọn, chưa đúng thiết lập draft (xem [§3.1](#31-tổng-quan-theo-stage)). |
+| **Đang ở bước** | Stage 4 (chứng nhận cổng v2, ngày 6) và chuẩn bị Stage 8 (đóng băng, 29/09). Stage 6 và 9 mới chạy trên thiết lập rút gọn, chưa đúng thiết lập draft (xem [§3.1](#31-tổng-quan-theo-stage)). |
 | **Mốc kế tiếp** | **Ngày 6 (23/09):** chạy bảng chứng nhận cổng v2 một lần. Có attacker hợp lệ qua cổng thì giữ A′, không có thì lùi về **khung B** (benchmark tự phản biện). |
-| **Rủi ro lớn nhất** | (1) Ô $\Delta = 4$ của cổng v2 vẫn đỏ. (2) Thiết lập draft (thư viện 28 policy, 18 attacker, attacker best-response, freeze) chưa dựng, trong khi mốc đóng băng số là 30/09. (3) Agent thật làm theo payload **0/7**, nên mọi số harm hiện có là harm dưới mô hình tiếp nhận của MockAgent. |
+| **Rủi ro lớn nhất** | (1) Ô $\Delta = 4$ của cổng v2 vẫn đỏ. (2) Thiết lập draft (thư viện 28 policy, 18 attacker, attacker best-response, freeze) chưa dựng, trong khi mốc đóng băng số đã dời lên 29/09 để chừa ngày 01/10 cho việc đọc lại toàn bài. (3) Agent thật làm theo payload **0/7**, nên mọi số harm hiện có là harm dưới mô hình tiếp nhận của MockAgent. |
 | **Kiểm thử** | `tests/run_all.py --all` ngày 22/09: **756 đạt · 2 không đạt · 13 bỏ qua**. Cổng 1 *UNKNOWN* (13 test cần Docker chưa chạy), cổng 2 đỏ 203/205, cổng 3 xanh 15/15 (chi tiết ở [§3.5](#35-kiểm-thử)). |
 
 ## Được bao nhiêu phần trăm
@@ -57,7 +57,7 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 
 ---
 
-## Lịch nước rút 14 ngày
+## Lịch nước rút
 
 Bốn từ dùng xuyên suốt bảng dưới:
 - **Điểm rẽ** — mốc đã khai báo trước: tới ngày đó nhìn số rồi chọn nhánh theo quy tắc, không bàn lại.
@@ -74,47 +74,40 @@ Bốn từ dùng xuyên suốt bảng dưới:
 | 3 — 20/09 | **Điểm rẽ L** → khung A hay A′ (xong sớm từ 18/09) | Chọn **A′**: thắng B1 ở 64/64 ô, thua B5, không tồn tại ranh giới $\lambda_Q > 0$ |
 | 4–5 — 21–22/09 | Cổng v2 trọn gói; sweep chấm $L$ có B5, B6 | Cổng v2 đóng băng 19/09 (qua điều kiện dừng #3); sweep chấm $L$ trên payload v2 |
 
-### Ngày 6–14 (23/09–02/10) — còn lại
+### Ngày 6–13 (23–30/09) — còn lại, dồn xong trước 01/10
 
-| Ngày | Việc phải xong | Đầu ra phải có | Ràng buộc |
+Mọi việc đo và chạy phải khép lại trong tháng 9, để hai ngày 01–02/10 chỉ còn đọc lại toàn bài, sửa và nộp. Vì vậy các mạch chạy song song thay vì nối đuôi.
+
+| Ngày | Mạch đo và dựng | Mạch bài và kiểm | Đầu ra phải có |
 |---|---|---|---|
-| **6 — 23/09** | Chạy bảng chứng nhận v2 **một lần** → **điểm rẽ v2** | Bảng chứng nhận cho từng $\Delta$; chọn nhánh A′ hay B | Hiện $\Delta=0$ và $\Delta=2$ qua 20/20 split (0,519 và 0,529), $\Delta=4$ đỏ (0,587); pipeline *matched* cũng đỏ ở $\Delta=4$ (0,607–0,642). **Phải chốt trước khi chạy:** $\Delta=4$ vẫn đỏ thì chỉ chứng nhận $\Delta \in \{0,2\}$, hay lùi khung B |
-| 7–9 — 24–26/09 | Chuỗi bảng $m$; lưới $N = 100$ trên MockAgent; G4 nhãn mù | $d'$ hiệu dụng theo $m$; lưới kết quả ở quy mô đủ; agreement của judge | **Hạn cứng G4: 26/09** |
-| 7–11 (song song) | Dựng thiết lập draft: thư viện 28 policy, 18 attacker kèm best-response, freeze manifest, marker duy nhất — [issue #2–#5](#34-issue-cần-xử-lý) | Bảng kết quả chính so được với draft: worst-case trên held-out, exploitability | Chờ thầy chốt phạm vi |
-| 7–11 (song song) | Đo các tham số còn gán tay: [W1–W6](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint) | $\pi_0$, $\eta_Q$, $\beta$, $\kappa$ theo CPU-time, $\Delta$ thực, hằng số $c$ | W1 phải xong trước, vì đổi $\pi_0$ là phải sinh lại bảng $\tau_{\text{sel}}$ và chạy lại mọi bảng |
-| 10–11 — 27–28/09 | Viết Evaluation, Threats, ablation RQ4 | Bản nháp các mục kết quả | Phụ thuộc hai dòng trên |
-| 12 — 30/09 | **Đóng băng số**; chạy ba cổng lần cuối; artifact ẩn danh | Manifest hash; ba cổng xanh (hoặc đỏ có giải trình) | Sau mốc này không tham số nào được chỉnh |
-| 13–14 — 01–02/10 | Bản cuối, format ACM, **nộp** | Bản nộp | Hạn 02/10 AoE |
+| **6 — T4 23/09** | Chạy bảng chứng nhận v2 một lần → **điểm rẽ v2**. Song song: W4 ($\kappa$ theo CPU-time), marker `blake2b` | — | Nhánh A′ hay B đã chốt; bảng $\kappa$ đo được và $\chi$ tính lại |
+| **7 — T5 24/09** | W1 ($\pi_0$ suy dẫn, sinh lại $\tau_{\text{sel}}$, quét $\pi_0$); W2 ($\eta_Q$ theo carrier) | Gửi thầy danh sách 28 policy và 18 attacker để duyệt | Bốn tham số chuyển từ "gán tay" sang "đo hoặc suy dẫn" |
+| **8 — T6 25/09** | Thêm 6 attacker cho đủ 18, chia lại held-out 7; attacker best-response | W3 ($\beta_k$ từ lịch sử commit) | **Exploitability** và **worst-case trên held-out** lần đầu có số |
+| **9 — T7 26/09** | Thư viện 28 policy, chạy được như một hệ thống | G4 nhãn mù — **hạn cứng**, cần người gán tay 38 instance | "Sentinel-28" so được với B1 và B5 |
+| **10 — CN 27/09** | Chạy lưới chính: $N = 100$ × $\Delta \in \{0,1,2,4,8\}$ × 3 $\chi$ × 3 detector × 3 seed | Chuỗi bảng $m$ | Bảng kết quả chính; ablation; CI bootstrap theo cụm |
+| **11 — T2 28/09** | W5 ($\Delta$ thực trên SWE-bench), W6 (hằng số $c$), W7 (240 game nhỏ và $\rho$), W10 (ablation $K$, phân tích lực) | — | Phần lý thuyết có số kiểm chứng: Định lý 4 và Mệnh đề 6 |
+| **12 — T3 29/09** | **Đóng băng số**: manifest hash, harness từ chối policy chưa đóng băng; chạy lại lưới trên cấu hình đã đóng băng | Chạy ba cổng, bật Docker cho 13 test của cổng 1 | Ba cổng xanh, hoặc đỏ có giải trình; số cuối cùng |
+| **13 — T4 30/09** | — | Viết Evaluation, Threats, ablation RQ4; dựng artifact ẩn danh | Bản nháp đủ mục, số đã khớp bảng |
+| **14 — T5 01/10** | — | **Đọc lại toàn bài**, sửa, format ACM | Bản gần cuối |
+| **15 — T6 02/10** | — | Nộp sớm trong ngày | Bản nộp (hạn AoE) |
+
+**Ba thay đổi so với lịch cũ:** đóng băng số dời lên **29/09** thay vì 30/09; toàn bộ phần đo khép lại trong tháng 9; ngày 01/10 dành riêng cho việc đọc lại và sửa, không còn chồng lấn với việc chạy.
+
+**Nếu phải cắt**, cắt theo thứ tự ngược: W7 và W6 (ngày 11) bỏ trước, rồi rút quy mô lưới ngày 10 xuống $N$ nhỏ hơn. Không cắt ngày 8 và 9, vì không có 18 attacker và thư viện 28 policy thì không có bảng kết quả chính.
 
 ### Dự kiến có gì để báo cáo cuối tuần này (27/09)
 
-Còn 5 ngày làm (23–27/09), tức ngày 6–10 của sprint.
+Tính tới hết Chủ nhật 27/09, tức sau ngày 10 của sprint, dự kiến đã có:
 
-**Gần như chắc chắn có** — việc đã có mã, chỉ cần chạy hoặc sửa nhỏ:
-
-| Kết quả | Vì sao chắc |
+| Nhóm | Kết quả |
 |---|---|
-| Quyết định nhánh **A′ hay B**, kèm bảng chứng nhận v2 | Việc của ngày 6, mã đã có |
-| **$\kappa$ đo bằng CPU-time** và **$\chi$ tính lại từ đó** (W4) | `runner.py` đã bấm giờ từng checkpoint; chỉ đổi `perf_counter` → `process_time` rồi chạy ≥ 30 lần |
-| **$\pi_0$ suy dẫn 0,080**, bảng $\tau_{\text{sel}}$ sinh lại, quét $\pi_0$ (W1) | `reference/gen_score_table.py` đã có đường sinh lại và chế độ `--check` |
-| **$\eta_Q$ tách theo từng carrier** (W2) | Phần phục hồi suy từ $n_{\text{live}}$ đã đo sẵn; chỉ còn đo phần gỡ |
-| **Marker `blake2b` theo seed** (issue #5) | Sửa nhỏ, đã có test bảo vệ |
-| **Manifest đóng băng + harness từ chối policy chưa đóng băng** (issue #4) | Gom hash và thêm một cổng kiểm |
+| **Quyết định** | Nhánh A′ hay B, kèm bảng chứng nhận v2 theo từng $\Delta$ |
+| **Tham số chuyển từ gán tay sang đo** | $\kappa$ theo CPU-time, $\chi$ tính lại, $\pi_0 = 0{,}080$ kèm bảng $\tau_{\text{sel}}$ mới, $\eta_Q$ theo carrier, $\beta_k$ |
+| **Thiết lập draft** | 18 attacker với 7 held-out, attacker best-response, thư viện 28 policy, marker duy nhất mỗi lần chạy |
+| **Số so được với Bảng 2 của draft** | Worst-case trên held-out, exploitability, và bảng kết quả trên lưới đầy đủ |
+| **Còn nợ** | $\Delta$ thực trên SWE-bench, hằng số $c$, 240 game nhỏ và $\rho$ — nằm ở ngày 11 |
 
-**Có, nếu ưu tiên đúng:**
-
-| Kết quả | Điều kiện |
-|---|---|
-| **18 attacker + best-response** → lần đầu có **worst-case trên held-out** và **exploitability**, hai chỉ số chính của Bảng 2 | Làm ngay sau ngày 6, trước khi đụng vào thư viện policy |
-| **Thư viện 28 policy** → lần đầu so đúng đối tượng "Sentinel" của draft với B1 và B5 | Cần thầy duyệt danh sách, nên gửi sớm |
-| **$\beta_k$** (W3) | 10 repo đã clone sẵn trong `auditgame/workspace/`; cần chốt luật ánh xạ commit → carrier |
-| **G4 nhãn mù** | **Ràng buộc nằm ngoài code:** cần người gán tay 38 instance, hạn 26/09 |
-
-**Nhiều khả năng chưa kịp trong tuần:** $\Delta$ thực trên repo SWE-bench (W5), hằng số $c$ (W6), 240 game nhỏ và $\rho$ đúng không gian (W7), lưới đầy đủ $N = 100$ × $\Delta = 8$ × 3 $\chi$ × 3 detector.
-
-**Báo cáo cuối tuần dự kiến gồm:** (1) nhánh đã chọn sau điểm rẽ v2 kèm bảng chứng nhận; (2) bảng "tham số: giá trị gán trước đây → giá trị đo được bây giờ" cho $\kappa$, $\chi$, $\pi_0$, $\eta_Q$, $\beta$; (3) nếu kịp phần attacker thì hai dòng đầu tiên so được với Bảng 2 của draft; (4) bảng phần trăm cập nhật; (5) hai việc còn chờ thầy — duyệt danh sách 28 policy và 18 attacker, và bố trí người gán nhãn G4.
-
-**Thứ tự ưu tiên trong ngày 7–11**, nếu phải chọn việc làm trước: (1) thiết lập draft, vì không có nó thì không có bảng kết quả chính; (2) W1–W6, phần biến "giá trị gán" thành "giá trị đo"; (3) chuỗi bảng $m$ và lưới $N = 100$.
+Hai việc **không phụ thuộc vào code**, cần thầy và cần bố trí người: duyệt danh sách 28 policy và 18 attacker (gửi ngày 7), và gán tay 38 instance cho G4 (hạn ngày 9).
 
 **Ba điều kiện dừng đã khai báo trước:**
 
