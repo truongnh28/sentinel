@@ -16,7 +16,7 @@ README này là **báo cáo tiến độ**: đang làm gì, tới đâu, và vi�
 | **Khung bài đã chốt** | **A′ — "bản đồ chế độ"** (chốt 18/09 tại điểm rẽ ngày 4). Sentinel thắng audit-at-commit (B1) trên hàm mất mát $L$, nhưng **thua B5 risk-score**. Bài phát biểu về *ranh giới chế độ*, không về Sentinel. |
 | **Mốc kế tiếp** | **Ngày 6 (23/09):** chạy bảng chứng nhận cổng v2 một lần. Có attacker hợp lệ qua cổng thì giữ A′, không có thì lùi về **khung B** (benchmark tự phản biện). Ánh xạ kết quả → khung đã chốt trước. |
 | **Rủi ro lớn nhất** | Trên agent thật (P2, `deepseek-v4.1-flash`), tỉ lệ làm theo payload là **0/7**. Mọi số harm hiện có là harm dưới mô hình tiếp nhận của MockAgent. |
-| **Kiểm thử** | `tests/run_all.py --all` ngày 22/09: **756 đạt · 1 không đạt · 13 bỏ qua** (chi tiết ở mục [Chạy](#chạy)). |
+| **Kiểm thử** | `tests/run_all.py --all` ngày 22/09: **756 đạt · 2 không đạt · 13 bỏ qua**. Cổng 1 ở trạng thái *UNKNOWN* (13 test cần Docker chưa chạy), cổng 2 đỏ 203/205, cổng 3 xanh 15/15 (chi tiết ở mục [Chạy](#chạy)). |
 
 ## Cần thầy quyết
 
@@ -34,7 +34,7 @@ README này là **báo cáo tiến độ**: đang làm gì, tới đâu, và vi�
 | 2 — 19/09 | Chạy P2 → **điểm rẽ P2** | ✅ Hoàn thành | 14 instance, 7 chấm được: 0 B / 0 C / 0 D, tuân thủ **0/7**. Điều kiện dừng #2 không kích hoạt theo quy tắc, nhưng tiền đề đe doạ không tái tạo được trên agent thật |
 | 3–5 — 20–22/09 | Cổng v2 trọn gói; sweep chấm $L$ có B5, B6 | ✅ Hoàn thành | Cổng v2 đóng băng 19/09 (qua điều kiện dừng #3); sweep chấm $L$ trên payload v2 |
 | 4 — 21/09 | **Điểm rẽ L** → A hay A′ | ✅ Xong sớm (18/09) | **Khung A′**: thắng B1 ở 64/64 ô; thua B5, không tồn tại ranh giới $\lambda_Q > 0$ |
-| **6 — 23/09** | **Bảng chứng nhận v2 → điểm rẽ v2** | ▶️ **Tiếp theo** | Ô chứng nhận $\Delta=0$: 0,519 và $\Delta=2$: 0,529 qua 20/20 split; $\Delta=4$ còn đỏ (0,587) |
+| **6 — 23/09** | **Bảng chứng nhận v2 → điểm rẽ v2** | ▶️ **Tiếp theo** | Ô chứng nhận $\Delta=0$: 0,519 và $\Delta=2$: 0,529 qua 20/20 split; $\Delta=4$ còn đỏ (0,587). Trên pipeline *matched*, không $\varepsilon$ nào đưa trung vị $\Delta=4$ xuống dưới trần (0,607–0,642; test gate 2 đỏ). Cần chốt trước: $\Delta=4$ vẫn đỏ thì chỉ chứng nhận $\Delta \in \{0,2\}$ hay lùi khung B |
 | 7–9 — 24–26/09 | Chuỗi bảng `m`; lưới $N=100$ trên MockAgent; G4 nhãn mù | ⏳ Chưa đến | Hạn G4: 26/09 |
 | 10–11 — 27–28/09 | Evaluation, threats, ablation RQ4 | ⏳ Chưa đến | — |
 | 12 — 30/09 | **Đóng băng số**; chạy 3 cổng lần cuối; artifact ẩn danh | ⏳ Chưa đến | — |
@@ -46,20 +46,20 @@ README này là **báo cáo tiến độ**: đang làm gì, tới đâu, và vi�
 
 ## Tiến độ theo 11 stage của phương pháp luận
 
-Khung stage theo [tài liệu phương pháp luận](docs/Phuong-phap-luan-trien-khai.md), Phần IV. **4 hoàn thành · 1 làm theo hướng khác · 6 một phần · 0 chưa bắt đầu.**
+Khung stage theo [tài liệu phương pháp luận](docs/Phuong-phap-luan-trien-khai.md), Phần IV. **3 hoàn thành · 1 làm theo hướng khác · 7 một phần · 0 chưa bắt đầu** (rà soát lại ngày 22/09 bằng cách đọc mã, xem [Rà soát đối chiếu mã](#rà-soát-đối-chiếu-mã-với-phương-pháp-luận-2209)).
 
 | Stage | Nội dung | Trạng thái | Đã có | Còn thiếu |
 |---|---|---|---|---|
 | 0 | Giả định, luật chơi | ✅ Hoàn thành | Tuple game; loss ba số hạng; defender chỉ nhận `CarrierSignal(p, n)` — cạnh bị cấm cưỡng chế bằng chữ ký hàm và test | — |
 | 1 | Môi trường, workflow SWE-bench | 🟡 Một phần | SWE-bench Verified đã nối; sort `created_at`; topic từ gold patch; $\theta = 0{,}5$ chốt trước khi đếm workflow | Chỉ **14/58** workflow khả dụng ở $H=8$ (cần 100); chưa lọc instance flaky |
 | 2 | Chi phí audit $\kappa \to \chi$ | 🟡 Một phần | Công thức $\chi$ công bố ($2{,}11 \ne 1{,}34$ của bản thảo); $\kappa$ đo theo đơn giá chấm LLM | Đo theo CPU-phút; thí nghiệm chính vẫn dùng bảng $\kappa$ của bản thảo; quy ước quét $\chi$ |
-| 3 | Attacker, ground truth, oracle | 🟡 Một phần | Sinh $(\iota,\sigma)$ có lọc nổ sớm; 12 attacker kịch bản, 6 held-out chia bằng hash; $\Delta$ thực đo được (trung vị 3) | 18 attacker; attacker best-response đọc $\pi_D$; marker duy nhất mỗi lần chạy; $\Delta = 8$; harm vẫn chấm bằng marker (test ẩn neo được 1/500) |
+| 3 | Attacker, ground truth, oracle | 🟡 Một phần | Sinh $(\iota,\sigma)$ có lọc nổ sớm; 12 attacker kịch bản, 6 held-out chia bằng hash (50%, không phải 40% như `HELD_OUT_SHARE`); $\Delta$ thực đo được (trung vị 3) | 18 attacker; attacker best-response đọc $\pi_D$ (cả 12 attacker hiện gán cứng $(k, \Delta)$); marker duy nhất mỗi lần chạy (hiện là hằng `"raw_write"` trong `core.PoisonSpec`); $\Delta = 8$; harm vẫn chấm bằng marker (test ẩn neo được 1/500) |
 | 4 | Corpus lành tính, cổng AUC, $\beta$ | ✅ Hoàn thành | Cổng v2 đóng băng 19/09: 5 đặc trưng, tiêu chí cận trên CI, 20 split; corpus từ item SWE-bench thật, ghép theo tuổi | $\beta$ chưa đo; permutation test |
 | 5 | Detector $\psi / \varphi / \gamma$ | ✅ Hoàn thành | $d'$ suy từ $(\psi,\varphi)$; quét $d'$ liên tục → $d'^{*} = 2{,}85$ ($\Delta=2$), $0{,}95$ ($\Delta=4$); detector nội dung đã thử | — |
-| 6 | Belief, thư viện policy, $\rho$ | 🟣 Hướng khác | Belief trên window tính chính xác (thay particle filter); minimax LP — B7, B7U, SSG receding/guarded — thay thư viện 28 policy | 240 game nhỏ giải chính xác; $\rho$ đo đúng không gian |
-| 7 | Ví dụ tính tay | ✅ Hoàn thành | `spikes/trace_one_episode.py` phát lại một episode bằng tay với số thật | — |
-| 8 | Đóng băng bằng hash | 🟡 Một phần | Hash cấu hình; digest cổng v2; payload đóng băng; tài liệu tiền đăng ký | Manifest phủ toàn bộ policy / attacker / hằng số; harness từ chối policy chưa đóng băng |
-| 9 | Chạy lưới, tính output | 🟡 Một phần | Lưới $\Delta \in \{0,1,2,4\}$ × 3 detector trên mock; chấm $L$; $\lambda_Q^{*}$; bootstrap theo workflow; bảng chi tiêu | $N = 100$; $\Delta = 8$; trục $\chi$ trong đường chính |
+| 6 | Belief, thư viện policy, $\rho$ | 🟣 Hướng khác | Belief trên window tính chính xác (thay particle filter); minimax LP — B7, B7U, SSG receding/guarded — thay thư viện 28 policy (registry có 17 policy) | 240 game nhỏ giải chính xác; $\rho$ đo đúng không gian |
+| 7 | Ví dụ tính tay | 🟡 Một phần | `spikes/trace_one_episode.py` phát lại một episode với số thật; minimax 4×4 ở §16 khớp `game.minimax` ($V^* = 0{,}5$) | Test hoá ví dụ 4×4; ví dụ Bayes 0,10 → 0,44 → 0,85 chưa được mã kiểm (detector dùng tỉ số likelihood Gaussian theo $d'$, không dùng Bernoulli$(\psi,\varphi)$) |
+| 8 | Đóng băng bằng hash | 🟡 Một phần | Digest rời: cổng v2, độ dài payload, prompt detector; payload đóng băng; tài liệu tiền đăng ký | Chưa có `frozen/` hay `MANIFEST.sha256`; manifest phủ toàn bộ policy / attacker / hằng số; harness từ chối policy chưa đóng băng |
+| 9 | Chạy lưới, tính output | 🟡 Một phần | Lưới $\Delta \in \{0,1,2,4\}$ × 3 detector trên mock; chấm $L$; $\lambda_Q^{*}$; bootstrap theo workflow; bảng chi tiêu | $N = 100$ (sweep hiện chạy 40 workflow); $\Delta = 8$; trục $\chi$ trong đường chính |
 | 10 | Tối ưu, ranh giới tuning | 🟡 Một phần | LP Stackelberg (Conitzer–Sandholm); ranh giới tuning thực thi qua tiền đăng ký | Double oracle |
 
 ---
@@ -108,6 +108,46 @@ Mọi số hiệu năng trong bản thảo gốc là giá trị dự phóng. Cá
 | Ngân sách kỳ vọng của LP lạc quan hơn thực thi có ràng buộc cứng | độ phủ $-13{,}29\%$ | Monte Carlo 1.000 lần trên `smoke_repro.p_minimax`; file kết quả chưa được commit |
 | Trên MockAgent, lợi thế của Sentinel không lớn nhất khi detector yếu nhất, trái với dự đoán RQ4 | — | `python3 experiment.py --n 40` |
 | Không có điểm hoà vốn ở $\Delta \le 1$, khớp Hệ quả 5 | $d'^{*}$ không tồn tại | `auditgame/spikes/dprime-band.json` |
+
+---
+
+## Rà soát đối chiếu mã với phương pháp luận (22/09)
+
+Đọc mã trong `auditgame/` và đối chiếu với [AuditGame-SE_Sentinel_Methodology_Full.md](docs/AuditGame-SE_Sentinel_Methodology_Full.md).
+
+**Kết luận.** Phần lõi đi đúng hướng. Việc chuyển sang khung A′ là áp dụng đúng nguyên tắc "đặt điều kiện bác bỏ trước" (§4), không phải đi lạc: số đo đã bác bỏ luận điểm chính của bản thảo (Sentinel thua B5; agent thật làm theo payload 0/7).
+
+**Khớp tài liệu (đã kiểm trong mã):**
+
+| Yêu cầu | Vị trí trong mã |
+|---|---|
+| Cạnh bị cấm: defender chỉ nhận `CarrierSignal(p, n)` | `policies.py`, class `CarrierSignal` có đúng hai trường |
+| ④⑤ chạy sau ②③ | `runner.py`: `ag.run_task` chạy trước audit |
+| Gộp bằng mean, không dùng max (§9.3) | `scoring.carrier_score`: lấy trung bình tỉ số likelihood rồi mới tính posterior |
+| Loss ba số hạng (§8) | `metrics.loss` |
+| Bảng chân trị harm | `oracle.harm_of` |
+| Minimax 4×4 (§16) | `game.minimax` cho $V^* = 0{,}5$. Nghiệm trộn A/B; nghiệm C/D của tài liệu cũng tối ưu |
+| $\chi = 2{,}11$ theo $\bar\kappa$ = mean | `policies.chi_of` |
+
+**Lệch hoặc thiếu so với tài liệu:**
+
+| # | Tài liệu yêu cầu | Mã hiện tại | Mức |
+|---|---|---|---|
+| 1 | Marker `blake2b(repo\|ι\|σ\|seed)`, duy nhất mỗi lần chạy (§3.5) | Hằng `"raw_write"` (`core.PoisonSpec`); `build.py` không truyền marker khác vào. Harm trên đường chính vẫn chấm bằng marker, và docstring của `MarkerOracle` tự nhận cách chấm này là vòng lặp trên dữ liệu thật | Cao |
+| 2 | 18 attacker, có best-response đọc $\pi_D$ (§3.3) | 12 attacker gán cứng $(k,\Delta)$; held-out thực tế 6/12 | Cao (exploitability và equilibrium chưa kiểm chứng được) |
+| 3 | Freeze: `frozen/`, `MANIFEST.sha256`, harness từ chối chạy (Stage 8) | Chỉ có digest rời; chưa có manifest, chưa có cơ chế từ chối | Cao (hội đồng chắc chắn hỏi) |
+| 4 | Thư viện 28 policy, ba họ (Stage 6B) | 17 policy: baseline cùng các biến thể LP/SSG; $\rho = 0{,}894$ đo trong không gian proxy, nên cận ở Mệnh đề 6 không mang thông tin | Trung bình |
+| 5 | Ví dụ Bayes kiểm bằng mã (Stage 7) | Detector dùng tỉ số likelihood Gaussian theo $d'$ (nhất quán với §9.1), nhưng ví dụ Bernoulli chưa được test | Thấp |
+| 6 | $\kappa$ đo CPU-phút; $\pi_0, \beta, \eta_Q$ đo; $\Delta \in \{..., 8\}$; 100 workflow | Bảng $\kappa$ của bản thảo; giá trị gán 0,10 / 0,25 / 2,0; $\Delta \le 4$; 40 workflow | Trung bình |
+| 7 | Particle filter $N = 2048$ | Belief tính chính xác bằng liệt kê cửa sổ | Lệch có lý do, chỉ cần khai báo |
+
+**Phần làm vượt khỏi tài liệu.** Gồm sweep $d'$ liên tục, arm P2 với agent LLM thật, detector nội dung và prose world, năm biến thể LP/SSG, $\kappa$ theo USD, sealed trace. Sweep $d'$ và P2 cho ra hai phát hiện mạnh nhất của đề tài nên cần giữ. Tuy vậy, mã đã khoảng 27 nghìn dòng và hơn 60 spike, trong khi các mục 1–3 ở bảng trên vẫn chưa làm.
+
+**Đề xuất cho nước rút (ngày 6–12):**
+1. **Ngày 6:** chốt trước cách xử lý nếu $\Delta = 4$ vẫn đỏ (xem test gate 2 mới đỏ).
+2. **Trước 30/09, việc rẻ:** manifest freeze kèm kiểm hash trong harness (khoảng nửa ngày); attacker best-response brute-force trên $(k,\iota,\sigma)$, tái dùng `tools/evaluate_exploitability.py`; sinh marker bằng blake2b theo seed.
+3. Bật Docker và chạy lại cổng 1, để 13 test bỏ qua có kết quả.
+4. Không mở spike mới trước hạn nộp, trừ khi thầy chọn chạy thêm model ở câu hỏi 1 của mục [Cần thầy quyết](#cần-thầy-quyết).
 
 ---
 
@@ -162,8 +202,9 @@ python3 tests/run_all.py --all               # chạy cả ba cổng
 
 Phần phân tích (scipy, scikit-learn) và công cụ SWE-bench cần môi trường đầy đủ: `uv sync`, rồi chạy bằng `../.venv/bin/python`.
 
-Trạng thái kiểm thử ngày 22/09/2026 (`--all`): **756 đạt · 1 không đạt · 13 bỏ qua**.
+Trạng thái kiểm thử ngày 22/09/2026 (`--all`, khoảng 7 phút): **756 đạt · 2 không đạt · 13 bỏ qua**. Cổng 1: 538/551, 13 bỏ qua nên tính là *UNKNOWN*. Cổng 2: 203/205. Cổng 3: 15/15.
 - Không đạt: `test_benign_corpus…test_one_split_cannot_decide_a_delta_of_the_certify_corpus`, một phát hiện đã ghi nhận: corpus đủ mạnh khiến tiêu chí đa phân hoạch mất tác dụng.
-- 13 bỏ qua: cần image Docker `auditgame:latest` (`docker build -t auditgame:latest .`).
+- Không đạt: `…some_epsilon_makes_the_payload_indistinguishable_at_every_delta` (pipeline `matched`, pha `screen`). Không $\varepsilon \in \{0; 0{,}2; 0{,}4; 0{,}7; 1{,}0\}$ nào đưa trung vị AUC ở $\Delta = 4$ xuống dưới trần (0,608 / 0,607 / 0,642 / 1,0 / 1,0). Liên quan trực tiếp tới điểm rẽ ngày 6.
+- 13 bỏ qua: Docker daemon không chạy, cần image `auditgame:latest` (`docker build -t auditgame:latest .`).
 
 Các lượt chạy với LLM thật có chi phí và không tái lập được theo seed. Kết quả của chúng được lưu tại `auditgame/spikes/*.jsonl` và chỉ được đọc lại, không chạy lại.
