@@ -29,16 +29,26 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 
 ## Được bao nhiêu phần trăm
 
-Quy ước tính: **hoàn thành = 1 · một phần hoặc làm theo hướng khác = 0,5 · chưa làm = 0**.
+Đếm theo **hạng mục bàn giao được**: 51 hạng mục, chia tám nhóm. Quy ước: **✅ xong = 1 · 🟡 một phần = 0,5 · ❌ chưa làm = 0**.
 
-| Trục | Tiến độ | Cách tính | Nghĩa |
-|---|---|---|---|
-| **Phương pháp (11 stage)** | **59%** | (2 + 9 × 0,5) / 11 | Đường đi của benchmark đã chạy được đầu-tới-cuối; phần thiếu nằm ở quy mô và ở khâu đóng băng |
-| **Tham số (17 đại lượng)** | **50%** | (7 + 3 × 0,5) / 17 | 7 đại lượng đã đo xong; 7 vẫn là giá trị gán tay |
-| **Thiết lập của draft** | **~20%** | 10 thành phần, xem [§3.1](#31-tổng-quan-theo-stage) | Thiếu ba khối lớn: thư viện 28 policy, 18 attacker kèm best-response, freeze manifest |
-| **Kết quả đối chiếu được với Bảng 2 của draft** | **~15%** | 13 chỉ số ở [§3.3](#33-so-với-giá-trị-dự-phóng-của-draft) | Mới so được crossover và hướng của độ lợi; worst-case trên held-out, exploitability, $\rho$ đều chưa đo |
+**Tổng: 31,5 / 51 = 62%.**
 
-**Đọc con số này thế nào.** Phần *hạ tầng đo* gần xong: benchmark chạy được, có oracle niêm phong, có ba cổng kiểm thử, có tiền đăng ký. Phần *tái lập thiết lập draft* mới ở giai đoạn đầu, nên hầu hết số trong Bảng 2 của draft chưa có số đối chiếu. Ba việc quyết định con số 20% và 15% kia là: thư viện 28 policy, lớp 18 attacker có best-response, và đóng băng bằng manifest — đều nằm trong [§3.4](#34-issue-cần-xử-lý) và [§4](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint).
+| Nhóm | Tiến độ | Hạng mục |
+|---|---|---|
+| **A. Hạ tầng benchmark** | **89%** (8/9) | ✅ CarrierStore bốn carrier · ✅ Workflow từ SWE-bench Verified · ✅ Retrieval Jaccard với $\theta$ · ✅ MockAgent · ✅ Agent LLM thật (P2) · ✅ Oracle marker · 🟡 Oracle test ẩn (neo được 1/500) · ✅ Replay và sealed trace · 🟡 Harness Docker (13 test chưa chạy) |
+| **B. Tấn công và ground truth** | **43%** (3/7) | ✅ Sinh $(\iota,\sigma)$ có lọc nổ sớm · ✅ Payload đóng băng và bộ sinh · 🟡 Thư viện attacker kịch bản (12/18) · ❌ Attacker best-response đọc $\pi_D$ · ❌ Marker duy nhất mỗi lần chạy · 🟡 Đo $\Delta$ thực (mới trên repo đề tài) · ❌ Validate harm trên tập con |
+| **C. Corpus lành tính và cổng** | **50%** (2,5/5) | ✅ Corpus từ item SWE-bench thật · ✅ Ghép theo 5 đặc trưng bề mặt · 🟡 Cổng AUC v2, 20 split ($\Delta = 4$ còn đỏ) · ❌ Permutation test · ❌ $\beta_k$ |
+| **D. Detector và tín hiệu** | **90%** (4,5/5) | ✅ Detector mô phỏng theo $d'$ · 🟡 Ba mức $(\psi,\varphi)$ của draft chạy như lưới riêng · ✅ CarrierSignal mean và bảng $\tau_{\text{sel}}$ · ✅ Sweep $d'$ liên tục, ra $d'^{*}$ · ✅ Detector nội dung $D_{\text{lex}}$, $D_{\text{llm}}$ |
+| **E. Chính sách và lý thuyết** | **69%** (5,5/8) | ✅ B1–B6 · ✅ Minimax LP · ✅ Các biến thể SSG · ✅ Belief tính chính xác · ❌ Thư viện 28 policy · ❌ 240 game nhỏ giải chính xác · 🟡 $\rho$ (đang đo trong không gian proxy) · ✅ $\zeta$ |
+| **F. Đo lường và kết quả** | **31%** (2,5/8) | ✅ Lưới $\Delta$ × detector trên MockAgent · ❌ Trục $\chi$ trong đường chính · ❌ $\Delta = 8$ · 🟡 100 workflow (hiện 40) · ❌ Worst-case trên held-out · ❌ Exploitability · ❌ Ablation đầy đủ · ✅ CI bootstrap theo cụm |
+| **G. Tính toàn vẹn** | **50%** (2,5/5) | ✅ Ba cổng kiểm thử, 771 test · ✅ Tài liệu tiền đăng ký · 🟡 Digest rời (cổng v2, payload, prompt) · ❌ Manifest đóng băng toàn phần · ❌ Harness từ chối policy chưa đóng băng |
+| **H. Tài liệu** | **75%** (3/4) | ✅ Phương pháp luận · ✅ Parameter Estimation Report · ✅ Reports và báo cáo tiến độ · ❌ Bản thảo ACM |
+
+**Đọc các con số này thế nào.**
+1. **Nhóm A và D gần xong, nhóm F mới 31%.** Cỗ máy đo đã chạy được, nhưng phần lớn *số để đưa vào bài* thì chưa có. Câu trả lời cho "bài viết được bao nhiêu" là **15–20%**, không phải 62%.
+2. **Ba hạng mục kéo tụt cả ba nhóm B, E, G:** thư viện 28 policy, attacker best-response, manifest đóng băng. Làm xong ba thứ này thì nhóm F mở khoá theo, vì worst-case trên held-out và exploitability đều phụ thuộc chúng. Cả ba nằm trong [§3.4](#34-issue-cần-xử-lý) và [§4](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint).
+3. **Khối lượng còn lại tới bản nộp ước tính 17 ngày công**, trong khi còn 8 ngày lịch tới mốc đóng băng 30/09.
+4. **Một phần công đã bỏ ra không nằm trong 51 hạng mục này:** hơn 60 spike, arm P2, detector nội dung, năm biến thể SSG. Chúng cho ra bốn phát hiện dưới đây, nhưng trong bản nộp nhiều thứ chỉ còn một dòng ở mục Threats.
 
 **Bốn phát hiện đã có, không phụ thuộc phần còn thiếu:**
 1. Detector bề mặt chỉ đạt $d' \le 0{,}50$, trong khi điểm hoà vốn so với audit-at-commit là $d'^{*} = 2{,}85$ ở $\Delta = 2$.
