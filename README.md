@@ -47,8 +47,7 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 **Đọc các con số này thế nào.**
 1. **Nhóm A và D gần xong, nhóm F mới 31%.** Cỗ máy đo đã chạy được, nhưng phần lớn *số để đưa vào bài* thì chưa có. Câu trả lời cho "bài viết được bao nhiêu" là **15–20%**, không phải 62%.
 2. **Ba hạng mục kéo tụt cả ba nhóm B, E, G:** thư viện 28 policy, attacker best-response, manifest đóng băng. Làm xong ba thứ này thì nhóm F mở khoá theo, vì worst-case trên held-out và exploitability đều phụ thuộc chúng. Cả ba nằm trong [§3.4](#34-issue-cần-xử-lý) và [§4](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint).
-3. **Khối lượng còn lại tới bản nộp ước tính 17 ngày công**, trong khi còn 8 ngày lịch tới mốc đóng băng 30/09.
-4. **Một phần công đã bỏ ra không nằm trong 51 hạng mục này:** hơn 60 spike, arm P2, detector nội dung, năm biến thể SSG. Chúng cho ra bốn phát hiện dưới đây, nhưng trong bản nộp nhiều thứ chỉ còn một dòng ở mục Threats.
+3. **Một phần công đã bỏ ra không nằm trong 51 hạng mục này:** hơn 60 spike, arm P2, detector nội dung, năm biến thể SSG. Chúng cho ra bốn phát hiện dưới đây, nhưng trong bản nộp nhiều thứ chỉ còn một dòng ở mục Threats.
 
 **Bốn phát hiện đã có, không phụ thuộc phần còn thiếu:**
 1. Detector bề mặt chỉ đạt $d' \le 0{,}50$, trong khi điểm hoà vốn so với audit-at-commit là $d'^{*} = 2{,}85$ ở $\Delta = 2$.
