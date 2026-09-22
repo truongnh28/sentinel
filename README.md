@@ -244,12 +244,6 @@ Các hạng mục dưới đây trước đây xếp "sau hạn 02/10". Nay đư
 | W8 | Payload đã công bố | Port khuôn payload AgentPoison (trigger tối ưu hoá) và MINJA (bridging step + indication prompt) thành 2 attacker kịch bản, tính vào lớp 18 attacker | Issue #3 | 1 ngày | ⏳ Chưa bắt đầu |
 | W9 | Nền lành tính thật, $N = 500$, 3 attacker LLM | Chạy trên toàn bộ 500 instance SWE-bench Verified với nền lành tính thật và attacker LLM | W8; ngân sách LLM | 3+ ngày | ⏳ Chưa bắt đầu |
 
-**Tổng ước lượng:** W1–W8 khoảng **8,5 ngày công**, cộng với việc dựng thiết lập draft (issue #2, #3, #4: thư viện 28 policy, 18 attacker, freeze manifest) khoảng **5–7 ngày công**. Quỹ thời gian còn lại tới mốc đóng băng 30/09 là **8 ngày**. Vì vậy cần cắt phạm vi; đề xuất:
-
-- **Vào trước 30/09:** W1, W2, W3, W4, W5, W6. Đây là các phép đo độc lập, chạy song song được, và là phần biến "giá trị gán" thành "giá trị đo" — chỗ hội đồng hỏi nhiều nhất.
-- **Chỉ làm nếu thư viện 28 policy kịp:** W7.
-- **Sau hạn 02/10:** W9, và W7 nếu không kịp.
-
 Kế hoạch triển khai chi tiết theo từng bước sẽ được viết riêng trong `docs/design/plans/`.
 
 ---
