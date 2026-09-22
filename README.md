@@ -139,14 +139,3 @@ Trạng thái kiểm thử ngày 22/09/2026 (`--all`): **756 đạt · 1 không 
 - 13 bỏ qua: cần image Docker `auditgame:latest` (`docker build -t auditgame:latest .`).
 
 Các lượt chạy với LLM thật có chi phí và không tái lập được theo seed. Kết quả của chúng được lưu tại `auditgame/spikes/*.jsonl` và chỉ được đọc lại, không chạy lại.
-
-## Những gì không có trong repo
-
-| Không đưa vào | Lý do | Cách tạo lại |
-|---|---|---|
-| `auditgame/data/*.jsonl` (~54 MB) | metadata SWE-bench | `python3 swebench_fetch.py` |
-| `auditgame/workspace/` | bản clone các repo bên thứ ba | harness tự clone |
-| `auditgame/carriers-sealed/`, `hidden_suites/`, `results/*-sealed.json` | **đáp án** (nhãn `poisoned`) mà benchmark cần suy ra | sinh lại khi chạy |
-| `.env` | khoá API | tự tạo |
-
-Lý do chi tiết nằm trong [`.gitignore`](.gitignore).
