@@ -531,7 +531,7 @@ Ba yêu cầu: duy nhất mỗi run (harm ván này không lẫn ván khác); t�
 ### 3.7 Đo $\Delta$ thật từ git history (để crossover ≈ 2 thuyết phục)
 
 1. **git bisect:** `git bisect run <test>` tự tìm commit gây hỏng test → xác định $\sigma$.
-2. **Co-change / logical coupling:** trên toàn history, $\text{support}(A,B)$ = #commit chứa cả A,B; $\text{confidence}(A{\to}B) = \text{support}/\#\text{commit chứa }A$.
+2. **Co-change / logical coupling:** trên toàn history, $\text{support}(A,B)$ = số commit chứa cả A và B; $\text{confidence}(A{\to}B) = \text{support}(A,B)\,/\,n_A$, với $n_A$ là số commit chứa A.
 3. **Δ commit-distance:** với cặp (A,B) coupling cao, đếm số commit giữa "A đổi" và "B gãy" → phân phối $\Delta$ thực.
 4. **Import graph** để lọc coupling thật vs trùng hợp. Cảnh báo: co-change là tương quan tiến hóa, không hẳn nhân quả.
 
