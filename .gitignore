@@ -71,3 +71,11 @@ auditgame/results/*-sealed.json
 .env
 # Cache của understand-anything, sinh lại được.
 .ua/
+
+# Tài liệu gửi GVHD: chỉ gồm phương pháp luận chuẩn và mục lục. Các ghi chú
+# làm việc khác trong docs/ (báo cáo spike, tiền đăng ký, hướng dẫn cũ, bản
+# thảo nguồn, PDF tham khảo) vẫn giữ trên máy nhưng không đưa vào repo.
+docs/*
+!docs/README.md
+!docs/Phuong-phap-luan-trien-khai.md
+!docs/Khao-sat-nguon-phuong-phap-luan.md
