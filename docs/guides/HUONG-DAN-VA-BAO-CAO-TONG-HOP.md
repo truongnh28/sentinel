@@ -232,7 +232,7 @@ Module `fdetect_g4.py` cài đặt hàm tính khoảng tin cậy tỷ lệ nhị
 
 ## 5. Quy Trình Truy Vết & Tái Lập Số Liệu Bài Báo (LaTeX Law II.4)
 
-Mọi con số xuất hiện trong bản thảo [HCMUT/paper/](file:///Users/truong.nh/Me/obsidian/HCMUT/paper) đều phải tuân thủ nghiêm ngặt **Luật II.4 (Zero Un-reproduced Numbers)**:
+Mọi con số xuất hiện trong bản thảo `HCMUT/paper/` đều phải tuân thủ nghiêm ngặt **Luật II.4 (Zero Un-reproduced Numbers)**:
 - **Cú pháp tái lập:**
   ```latex
   \repro{path/to/record.json}{anchor.json.path}
@@ -242,7 +242,7 @@ Mọi con số xuất hiện trong bản thảo [HCMUT/paper/](file:///Users/tru
   Nếu một con số chưa có kết quả thực nghiệm để neo vào, bắt buộc phải dùng thẻ `\PENDING{Lý do}`. Khi bật chế độ `\PendingStrictOn`, trình biên dịch sẽ báo lỗi cứng nếu phát hiện ô số liệu trống mà không được khai báo.
 - **Lệnh biên dịch bài báo PDF:**
   ```bash
-  cd /Users/truong.nh/Me/obsidian/HCMUT/paper
+  cd /path/to/obsidian/HCMUT/paper
   PATH="/Library/TeX/texbin:$PATH" latexmk -pdf -interaction=nonstopmode main.tex
   ```
 

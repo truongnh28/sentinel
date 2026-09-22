@@ -73,7 +73,7 @@
     "repo": "pytest-dev/pytest",
     "cloned": false,
     "seconds": 0.0,
-    "path": "/Users/truong.nh/Me/obsidian/HCMUT/code/Sentinel/auditgame/workspace/pytest-dev/pytest",
+    "path": "auditgame/workspace/pytest-dev/pytest",
     "why": "--no-clone"
   },
   "resets": [

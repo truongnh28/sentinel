@@ -3,7 +3,7 @@
 **Ngày thực hiện:** 19/09/2026  
 **Công cụ đo:** `auditgame/tools/measure_delta.py`  
 **Dữ liệu xuất:** `auditgame/spikes/delta-empirical.json`  
-**Đối tượng khảo sát (Dogfood):** Kho lưu trữ thực tế `/Users/truong.nh/Me/obsidian` (toàn bộ commit lịch sử dự án).  
+**Đối tượng khảo sát (Dogfood):** Kho Obsidian cục bộ của dự án (toàn bộ commit lịch sử).  
 **Cơ sở lý luận:** Đề cương §1.3 (Bước 2), `docs/thesis/eval/PLAN-Sau-Buoc-1.3.md` (Task T5).
 
 ---

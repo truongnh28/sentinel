@@ -613,7 +613,7 @@ Trong `metrics.report_header`, thêm tham số `lock_sha: str` và một dòng `
 - [ ] **Bước 0.7: Commit**
 
 ```bash
-cd /Users/truong.nh/Me/obsidian
+cd /path/to/obsidian
 git add requirements.txt requirements.lock \
         auditgame/tests/gate1_integrity/test_environment.py \
         auditgame/metrics.py HCMUT/.gitignore
@@ -744,7 +744,7 @@ code/Sentinel/auditgame/data/*.jsonl
 - [ ] **Bước 1.5: Commit**
 
 ```bash
-cd /Users/truong.nh/Me/obsidian
+cd /path/to/obsidian
 git add auditgame/swebench_fetch.py HCMUT/.gitignore
 git commit -m "feat(a1): tải metadata SWE-bench về JSONL, stdlib thuần"
 ```

@@ -67,6 +67,10 @@ auditgame/workspace/
 # split would otherwise buy.
 # auditgame/results/*-sealed.json
 
+# Generated pointer to the local checkout used by FSCarrierStore.  Its absolute
+# value is machine-specific and must never be published.
+auditgame/carriers/repo.path
+
 # Khoá API — .env chứa DEEPSEEK_API_KEY, không bao giờ commit.
 .env
 # Cache của understand-anything, sinh lại được.
@@ -80,3 +84,7 @@ auditgame/workspace/
 !docs/Phuong-phap-luan-trien-khai.md
 !docs/Khao-sat-nguon-phuong-phap-luan.md
 !docs/AuditGame-SE_Parameter_Estimation_Report.md
+
+# Research PDFs stay in the author's local library.  The public repository uses
+# docs/paper/Paper-List-and-Code.md as its link-first bibliography instead.
+docs/paper/*.pdf
