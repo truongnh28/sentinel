@@ -4,7 +4,7 @@
 
 Repo này chứa mã nguồn và tài liệu của đề tài Sentinel. Đề tài mô hình hoá việc phân bổ audit như một trò chơi Stackelberg giữa bên phòng thủ và kẻ tấn công. Kẻ tấn công đầu độc các *carrier* dai dẳng của một coding agent (`memory · skill · queue · branch`), và thiệt hại chỉ lộ ra sau độ trễ $\Delta$ task. Benchmark **AuditGame-SE** dựng workflow từ SWE-bench, tiêm payload, chạy agent (mock hoặc LLM thật), chấm harm bằng oracle niêm phong, rồi so sánh các chính sách audit B1–B7 với Sentinel.
 
-Đề tài hiện thực **draft của thầy** (*Where to Look: Audit-Allocation Games against Adaptive Persistent Poisoning in Software Workflows*). Các con số hiệu năng trong draft là **giá trị dự phóng**, tức giả thuyết cần kiểm chứng. Hướng tái lập đã chốt: **dựng đúng thiết lập của draft, rồi đo xem số ra bao nhiêu**. Tham số draft chưa ghi giá trị được chọn trên tập dev và đóng băng trước khi đánh giá; không tham số nào được chỉnh theo kết quả.
+Đề tài hiện thực draft *Where to Look: Audit-Allocation Games against Adaptive Persistent Poisoning in Software Workflows*. Các con số hiệu năng trong draft là **giá trị dự phóng**, tức giả thuyết cần kiểm chứng. Hướng tái lập đã chốt: **dựng đúng thiết lập của draft, rồi đo xem số ra bao nhiêu**. Tham số draft chưa ghi giá trị được chọn trên tập dev và đóng băng trước khi đánh giá; không tham số nào được chỉnh theo kết quả.
 
 README này là **báo cáo tiến độ**. Đọc [Status](#status) và [Được bao nhiêu phần trăm](#được-bao-nhiêu-phần-trăm) là nắm được toàn cảnh; bốn phần sau đi vào chi tiết:
 1. [Cách tái lập tham số](#1-cách-tái-lập-tham-số) — bảng tra, trỏ sang tài liệu gốc thay vì chép lại thủ tục
