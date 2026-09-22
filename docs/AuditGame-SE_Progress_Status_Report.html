@@ -1,0 +1,300 @@
+<title>Sentinel Progress Status</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']] }, svg: { fontCache: 'global' }, options: { enableMenu: false } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js" defer></script>
+<style>
+:root{
+  --ground:#F6F7F9; --paper:#FFFFFF; --ink:#18202D; --ink-2:#4A5467; --muted:#6B7486;
+  --rule:#DCE1E8; --rule-2:#EDF0F4; --accent:#1D5A78; --accent-soft:#E6EFF4;
+  --done:#256B45; --done-bg:#E3F1E8; --part:#8A5A00; --part-bg:#FBF0DC;
+  --alt:#5B4A9E; --alt-bg:#ECE8F7; --none:#A33427; --none-bg:#FBE6E3;
+  --future:#EEF1F5; --code-bg:#EEF1F5;
+  --serif:"Source Serif 4","Source Serif Pro",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#11151C; --paper:#171C25; --ink:#E4E8EF; --ink-2:#B4BCCA; --muted:#8C95A6;
+    --rule:#2C3442; --rule-2:#222935; --accent:#7FB6D3; --accent-soft:#1D2B36;
+    --done:#7CC99A; --done-bg:#16291F; --part:#E4B45C; --part-bg:#2E2413;
+    --alt:#B7A8F0; --alt-bg:#251F3A; --none:#EE8E80; --none-bg:#33201D;
+    --future:#202733; --code-bg:#212835;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#11151C; --paper:#171C25; --ink:#E4E8EF; --ink-2:#B4BCCA; --muted:#8C95A6;
+  --rule:#2C3442; --rule-2:#222935; --accent:#7FB6D3; --accent-soft:#1D2B36;
+  --done:#7CC99A; --done-bg:#16291F; --part:#E4B45C; --part-bg:#2E2413;
+  --alt:#B7A8F0; --alt-bg:#251F3A; --none:#EE8E80; --none-bg:#33201D;
+  --future:#202733; --code-bg:#212835;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;
+  padding-inline:16px;padding-block:28px 64px}
+.page{max-width:1080px;margin:0 auto;display:grid;gap:20px}
+section.panel{background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:24px clamp(16px,3.5vw,32px)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,3.4vw,34px);line-height:1.2;margin:0 0 14px;text-wrap:balance}
+h2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin:0 0 16px}
+.kind{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 10px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 22px;color:var(--ink-2);font-size:14px;margin:0}
+.meta b{font-weight:600;color:var(--ink)}
+code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:.05em .35em;border-radius:3px}
+p{margin:0}
+/* key tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px}
+.tile{border:1px solid var(--rule);border-radius:4px;padding:14px 16px;display:grid;gap:4px;align-content:start}
+.tile .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.tile .val{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile .sub{font-size:13px;color:var(--ink-2)}
+.tile.next{border-color:var(--accent);background:var(--accent-soft)}
+.tile.next .val{color:var(--accent)}
+/* 30s rows */
+dl.glance{display:grid;grid-template-columns:170px minmax(0,1fr);margin:0;border-top:1px solid var(--rule-2)}
+dl.glance dt,dl.glance dd{padding:12px 0;border-bottom:1px solid var(--rule-2);margin:0}
+dl.glance dt{font-weight:600;color:var(--ink-2);padding-right:16px}
+dl.glance dd{font-family:var(--serif);font-size:16px;line-height:1.55}
+dl.glance dd strong{font-weight:600}
+dd.risk{color:var(--none)}
+dd.risk strong{color:var(--none)}
+/* decisions */
+ol.decide{margin:0;padding:0;list-style:none;display:grid;gap:12px;counter-reset:d}
+ol.decide li{counter-increment:d;display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:start}
+ol.decide li::before{content:counter(d);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;
+  background:var(--accent);color:var(--paper);font-weight:600;font-size:14px}
+ol.decide .q{font-weight:600;margin-bottom:3px}
+ol.decide .ctx{font-family:var(--serif);color:var(--ink-2);font-size:15px}
+/* sprint strip */
+.strip-wrap{overflow-x:auto;padding-bottom:4px}
+.strip{display:grid;grid-template-columns:repeat(14,minmax(52px,1fr));gap:4px;min-width:760px}
+.day{border-radius:3px;padding:8px 6px 7px;font-size:12px;line-height:1.25;display:grid;gap:2px;min-height:62px;align-content:start}
+.day .n{font-weight:600;font-variant-numeric:tabular-nums}
+.day .d{color:inherit;opacity:.8;font-variant-numeric:tabular-nums}
+.day.done{background:var(--done-bg);color:var(--done)}
+.day.today{background:var(--accent);color:var(--paper);box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--accent)}
+.day.future{background:var(--future);color:var(--ink-2)}
+.day.key{outline:2px dashed var(--accent);outline-offset:-2px}
+.day.submit{background:var(--none-bg);color:var(--none)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12px;color:var(--muted);margin-top:12px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:-2px;margin-right:6px}
+.milestones{margin-top:18px;display:grid;gap:0;border-top:1px solid var(--rule-2)}
+.ms{display:grid;grid-template-columns:120px 150px minmax(0,1fr);gap:14px;padding:11px 0;border-bottom:1px solid var(--rule-2);align-items:start}
+.ms .when{font-weight:600;font-variant-numeric:tabular-nums}
+.ms .what{font-family:var(--serif);color:var(--ink-2)}
+.ms .what strong{color:var(--ink);font-weight:600}
+.stops{margin-top:14px;font-size:13px;color:var(--ink-2)}
+.stops b{color:var(--ink)}
+/* chips */
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.c-done{color:var(--done);background:var(--done-bg)}
+.c-part{color:var(--part);background:var(--part-bg)}
+.c-alt{color:var(--alt);background:var(--alt-bg)}
+.c-none{color:var(--none);background:var(--none-bg)}
+.c-next{color:var(--paper);background:var(--accent)}
+.c-future{color:var(--ink-2);background:var(--future)}
+/* stage summary bar */
+.sumbar{display:flex;height:10px;border-radius:999px;overflow:hidden;margin:4px 0 10px}
+.sumbar span{display:block}
+.sumkey{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink-2);margin-bottom:18px}
+/* stage list */
+.stages{display:grid;border-top:1px solid var(--rule)}
+.stage{display:grid;grid-template-columns:40px minmax(0,190px) 150px minmax(0,1fr) minmax(0,1fr);gap:14px;padding:14px 0;border-bottom:1px solid var(--rule-2);align-items:start}
+.stage .num{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--muted);line-height:1;font-variant-numeric:tabular-nums}
+.stage .name{font-weight:600}
+.stage .has,.stage .miss{font-family:var(--serif);font-size:14.5px;line-height:1.5;color:var(--ink-2)}
+.stage .miss{color:var(--ink)}
+.stage .tag{display:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:2px;font-family:var(--sans)}
+.stage-head{display:grid;grid-template-columns:40px minmax(0,190px) 150px minmax(0,1fr) minmax(0,1fr);gap:14px;padding:0 0 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+/* findings */
+.tbl{overflow-x:auto;border:1px solid var(--rule);border-radius:3px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th{text-align:left;font-weight:600;background:var(--rule-2);padding:9px 12px;border-bottom:1px solid var(--rule)}
+td{padding:10px 12px;border-bottom:1px solid var(--rule-2);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.fig{font-family:var(--serif);white-space:nowrap}
+ul.later{margin:0;padding-left:1.2em;font-family:var(--serif);font-size:15.5px;display:grid;gap:6px;max-width:75ch}
+.src{font-size:13px;color:var(--muted);line-height:1.7}
+@media (max-width:860px){
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  dl.glance{grid-template-columns:minmax(0,1fr)}
+  dl.glance dt{border-bottom:0;padding-bottom:0}
+  .stage-head{display:none}
+  .stage{grid-template-columns:34px minmax(0,1fr);row-gap:6px}
+  .stage .chipcell{grid-column:2}
+  .stage .has,.stage .miss{grid-column:2}
+  .stage .tag{display:block}
+  .ms{grid-template-columns:minmax(0,1fr);gap:4px}
+}
+mjx-container{color:inherit}
+.tile .val mjx-container{font-size:.8em}
+@media print{body{background:#fff} section.panel{break-inside:avoid}}
+</style>
+
+<div class="page">
+
+<section class="panel">
+  <p class="kind">Báo cáo tiến độ · gửi GVHD</p>
+  <h1>Sentinel / AuditGame-SE: Implementation Phases and Current Status</h1>
+  <p class="meta"><span><b>Đề tài</b> FSE-2027-15</span><span><b>Học viên</b> Nguyễn Hữu Trưởng</span><span><b>GVHD</b> TS. Lê Xuân Bách</span><span><b>Ngày</b> 22/09/2026</span><span><b>Mốc code</b> <code>efb951e</code></span></p>
+
+  <div class="tiles">
+    <div class="tile"><span class="lbl">Nước rút FSE 2027</span><span class="val">Ngày 5/14</span><span class="sub">bắt đầu 18/09</span></div>
+    <div class="tile"><span class="lbl">Hạn nộp</span><span class="val">10 ngày</span><span class="sub">02/10 AoE · trưa 03/10 giờ VN</span></div>
+    <div class="tile"><span class="lbl">Khung bài đã chốt</span><span class="val">A′</span><span class="sub">bản đồ chế độ · chốt 18/09</span></div>
+    <div class="tile next"><span class="lbl">Mốc kế tiếp</span><span class="val">23/09</span><span class="sub">điểm rẽ v2 — giữ A′ hay lùi về B</span></div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Tình hình trong 30 giây</h2>
+  <dl class="glance">
+    <dt>Đang làm</dt>
+    <dd>Nước rút nộp <strong>FSE 2027 Research Papers</strong>. Bài chứng minh khi nào phân bổ kiểm toán thích nghi vượt được kiểm toán tại commit, trên benchmark AuditGame-SE xây từ SWE-bench.</dd>
+    <dt>Khung bài</dt>
+    <dd><strong>A′ — bản đồ chế độ.</strong> Sentinel thắng audit-at-commit (B1) trên hàm mất mát \(L\) ở 64/64 ô, nhưng <strong>thua B5 risk-score</strong> ở mọi \(\lambda_Q > 0\). Bài phát biểu về ranh giới chế độ, không về Sentinel.</dd>
+    <dt>Việc kế tiếp</dt>
+    <dd><strong>23/09:</strong> chạy bảng chứng nhận cổng v2 một lần. Có attacker hợp lệ qua cổng thì giữ A′; không có thì lùi về <strong>khung B</strong> (benchmark tự phản biện). Ánh xạ kết quả → khung đã chốt trước.</dd>
+    <dt>Rủi ro lớn nhất</dt>
+    <dd class="risk">Trên agent thật (P2, deepseek-v4.1-flash), tỉ lệ làm theo payload là <strong>0/7</strong>. Mọi số harm hiện có là harm dưới mô hình tiếp nhận của MockAgent.</dd>
+    <dt>Kiểm thử</dt>
+    <dd><code>tests/run_all.py --all</code> ngày 22/09: <strong>756 đạt · 1 không đạt · 13 bỏ qua</strong>. Test không đạt là một phát hiện đã ghi nhận (corpus đủ mạnh khiến tiêu chí đa phân hoạch mất tác dụng); 13 bỏ qua do chưa dựng image Docker.</dd>
+  </dl>
+</section>
+
+<section class="panel">
+  <h2>Cần thầy quyết</h2>
+  <ol class="decide">
+    <li><div><p class="q">Cách viết Đe doạ 3 — agent thật không làm theo payload (0/7).</p><p class="ctx">Giữ tuyên bố với nhãn “harm dưới mô hình tiếp nhận của MockAgent”, hay chạy thêm arm model thứ hai (chưa chạy) trước khi đóng băng số ngày 30/09?</p></div></li>
+    <li><div><p class="q">Quy ước chuẩn hoá khi quét \(\chi\).</p><p class="ctx">Neo \(\bar\kappa\) (hiện hành) làm trục \(\chi\) rỗng theo cấu trúc: độ lợi 39,7% ở mọi \(\chi\). Neo \(\kappa_{\min}\) thì \(\chi\) có tác dụng (39,7% → 36,1%). Lựa chọn này quyết định trục \(\chi\) của ranh giới vùng có nội dung hay không.</p></div></li>
+    <li><div><p class="q">Vai trò của \((\psi, \varphi)\).</p><p class="ctx">Detector bề mặt chỉ đạt \(d' \le 0{,}50\); detector nội dung sụp về ngẫu nhiên khi attacker không tự khai báo. Coi \((\psi, \varphi)\) là biến kiểm soát thuần tuý, hay đưa điều kiện “detector phải đạt \(d'^*\)” thành kết luận chính?</p></div></li>
+  </ol>
+</section>
+
+<section class="panel">
+  <h2>Lịch nước rút 14 ngày</h2>
+  <div class="strip-wrap">
+    <div class="strip" role="list" aria-label="Lịch 14 ngày">
+      <div class="day done" role="listitem"><span class="n">N1</span><span class="d">18/09</span></div>
+      <div class="day done" role="listitem"><span class="n">N2</span><span class="d">19/09</span></div>
+      <div class="day done" role="listitem"><span class="n">N3</span><span class="d">20/09</span></div>
+      <div class="day done" role="listitem"><span class="n">N4</span><span class="d">21/09</span></div>
+      <div class="day today" role="listitem"><span class="n">N5</span><span class="d">22/09</span><span class="d">hôm nay</span></div>
+      <div class="day future key" role="listitem"><span class="n">N6</span><span class="d">23/09</span><span class="d">điểm rẽ</span></div>
+      <div class="day future" role="listitem"><span class="n">N7</span><span class="d">24/09</span></div>
+      <div class="day future" role="listitem"><span class="n">N8</span><span class="d">25/09</span></div>
+      <div class="day future" role="listitem"><span class="n">N9</span><span class="d">26/09</span></div>
+      <div class="day future" role="listitem"><span class="n">N10</span><span class="d">27/09</span></div>
+      <div class="day future" role="listitem"><span class="n">N11</span><span class="d">28/09</span></div>
+      <div class="day future key" role="listitem"><span class="n">N12</span><span class="d">30/09</span><span class="d">đóng băng</span></div>
+      <div class="day future" role="listitem"><span class="n">N13</span><span class="d">01/10</span></div>
+      <div class="day submit" role="listitem"><span class="n">N14</span><span class="d">02/10</span><span class="d">nộp</span></div>
+    </div>
+  </div>
+  <div class="legend"><span><i style="background:var(--done-bg);outline:1px solid var(--done)"></i>đã xong</span><span><i style="background:var(--accent)"></i>hôm nay</span><span><i style="background:var(--future);outline:2px dashed var(--accent);outline-offset:-2px"></i>điểm rẽ / mốc cứng</span><span><i style="background:var(--none-bg);outline:1px solid var(--none)"></i>hạn nộp</span></div>
+
+  <div class="milestones">
+    <div class="ms"><span class="when">N1 · 18/09</span><span><span class="chip c-done">Hoàn thành</span></span><p class="what">P2 runner; \(\tau_{\text{sel}}\) chạy theo \(d'\) — đã tách được confound của phép quét \(d'\).</p></div>
+    <div class="ms"><span class="when">N2 · 19/09</span><span><span class="chip c-done">Hoàn thành</span></span><p class="what"><strong>Điểm rẽ P2.</strong> 14 instance, 7 chấm được: 0 B / 0 C / 0 D, tuân thủ <strong>0/7</strong>. Điều kiện dừng #2 không kích hoạt theo quy tắc, nhưng tiền đề đe doạ không tái tạo được trên agent thật.</p></div>
+    <div class="ms"><span class="when">N3–5 · 20–22/09</span><span><span class="chip c-done">Hoàn thành</span></span><p class="what">Cổng v2 đóng băng 19/09 (qua điều kiện dừng #3). Sweep chấm \(L\) trên payload v2, có B5 và B6.</p></div>
+    <div class="ms"><span class="when">N4 · 21/09</span><span><span class="chip c-done">Xong sớm 18/09</span></span><p class="what"><strong>Điểm rẽ \(L\) → khung A′.</strong> Thắng B1 ở 64/64 ô; thua B5 — không tồn tại ranh giới \(\lambda_Q > 0\).</p></div>
+    <div class="ms"><span class="when">N6 · 23/09</span><span><span class="chip c-next">Tiếp theo</span></span><p class="what"><strong>Bảng chứng nhận v2 → điểm rẽ v2.</strong> Ô chứng nhận \(\Delta=0\): 0,519 và \(\Delta=2\): 0,529 đều qua 20/20 split; \(\Delta=4\) còn đỏ (0,587).</p></div>
+    <div class="ms"><span class="when">N7–9 · 24–26/09</span><span><span class="chip c-future">Chưa đến</span></span><p class="what">Chuỗi bảng <code>m</code>; lưới \(N=100\) trên MockAgent; G4 nhãn mù (hạn 26/09).</p></div>
+    <div class="ms"><span class="when">N10–11 · 27–28/09</span><span><span class="chip c-future">Chưa đến</span></span><p class="what">Evaluation, threats, ablation RQ4.</p></div>
+    <div class="ms"><span class="when">N12 · 30/09</span><span><span class="chip c-future">Chưa đến</span></span><p class="what"><strong>Đóng băng số</strong>; chạy 3 cổng lần cuối; artifact ẩn danh.</p></div>
+    <div class="ms"><span class="when">N13–14 · 01–02/10</span><span><span class="chip c-future">Chưa đến</span></span><p class="what">Bản cuối, format ACM, <strong>nộp</strong>.</p></div>
+  </div>
+  <p class="stops"><b>Ba điều kiện dừng:</b> #1 cổng v2 tự vỡ — chưa kích hoạt · #2 P2 âm nặng — không kích hoạt theo quy tắc · #3 v2 chưa đóng băng hết ngày 5 — đã qua.</p>
+</section>
+
+<section class="panel">
+  <h2>Tiến độ theo 11 stage của phương pháp luận</h2>
+  <div class="sumbar" aria-hidden="true">
+    <span style="flex:4;background:var(--done)"></span>
+    <span style="flex:1;background:var(--alt)"></span>
+    <span style="flex:6;background:var(--part)"></span>
+  </div>
+  <div class="sumkey"><span><span class="chip c-done">Hoàn thành</span> 4 stage</span><span><span class="chip c-alt">Làm theo hướng khác</span> 1 stage</span><span><span class="chip c-part">Một phần</span> 6 stage</span><span><span class="chip c-none">Chưa bắt đầu</span> 0 stage</span></div>
+
+  <div class="stage-head"><span></span><span>Stage</span><span>Trạng thái</span><span>Đã có</span><span>Còn thiếu</span></div>
+  <div class="stages">
+    <div class="stage"><span class="num">0</span><span class="name">Giả định, luật chơi</span><span class="chipcell"><span class="chip c-done">Hoàn thành</span></span><p class="has"><span class="tag">Đã có</span>Tuple game; loss ba số hạng; defender chỉ nhận <code>CarrierSignal(p, n)</code> — cạnh bị cấm cưỡng chế bằng chữ ký hàm và test.</p><p class="miss"><span class="tag">Còn thiếu</span>—</p></div>
+    <div class="stage"><span class="num">1</span><span class="name">Môi trường, workflow SWE-bench</span><span class="chipcell"><span class="chip c-part">Một phần</span></span><p class="has"><span class="tag">Đã có</span>SWE-bench Verified đã nối; sort <code>created_at</code>; topic từ gold patch; \(\theta = 0{,}5\) chốt trước khi đếm workflow.</p><p class="miss"><span class="tag">Còn thiếu</span>Chỉ 14/58 workflow khả dụng ở \(H=8\) (cần 100); chưa lọc instance flaky.</p></div>
+    <div class="stage"><span class="num">2</span><span class="name">Chi phí audit \(\kappa \to \chi\)</span><span class="chipcell"><span class="chip c-part">Một phần</span></span><p class="has"><span class="tag">Đã có</span>Công thức \(\chi\) công bố (\(2{,}11 \ne 1{,}34\) của bản thảo); \(\kappa\) đo theo đơn giá chấm LLM.</p><p class="miss"><span class="tag">Còn thiếu</span>Đo theo CPU-phút; thí nghiệm chính vẫn dùng bảng \(\kappa\) của bản thảo; quy ước quét \(\chi\).</p></div>
+    <div class="stage"><span class="num">3</span><span class="name">Attacker, ground truth, oracle</span><span class="chipcell"><span class="chip c-part">Một phần</span></span><p class="has"><span class="tag">Đã có</span>Sinh \((\iota, \sigma)\) có lọc nổ sớm; 12 attacker kịch bản, 6 held-out chia bằng hash; \(\Delta\) thực đo được (trung vị 3).</p><p class="miss"><span class="tag">Còn thiếu</span>18 attacker; attacker best-response đọc \(\pi_D\); marker duy nhất mỗi lần chạy; \(\Delta = 8\); harm vẫn chấm bằng marker (test ẩn neo được 1/500).</p></div>
+    <div class="stage"><span class="num">4</span><span class="name">Corpus lành tính, cổng AUC, \(\beta\)</span><span class="chipcell"><span class="chip c-done">Hoàn thành</span></span><p class="has"><span class="tag">Đã có</span>Cổng v2 đóng băng 19/09: 5 đặc trưng, tiêu chí cận trên CI, 20 split; corpus từ item SWE-bench thật, ghép theo tuổi.</p><p class="miss"><span class="tag">Còn thiếu</span>\(\beta\) chưa đo; permutation test.</p></div>
+    <div class="stage"><span class="num">5</span><span class="name">Detector \(\psi / \varphi / \gamma\)</span><span class="chipcell"><span class="chip c-done">Hoàn thành</span></span><p class="has"><span class="tag">Đã có</span>\(d'\) suy từ \((\psi, \varphi)\); quét \(d'\) liên tục → \(d'^* = 2{,}85\) (\(\Delta=2\)), \(0{,}95\) (\(\Delta=4\)); detector nội dung đã thử.</p><p class="miss"><span class="tag">Còn thiếu</span>—</p></div>
+    <div class="stage"><span class="num">6</span><span class="name">Belief, thư viện policy, \(\rho\)</span><span class="chipcell"><span class="chip c-alt">Hướng khác</span></span><p class="has"><span class="tag">Đã có</span>Belief trên window tính chính xác (thay particle filter); minimax LP — B7, B7U, SSG receding/guarded — thay thư viện 28 policy.</p><p class="miss"><span class="tag">Còn thiếu</span>240 game nhỏ giải chính xác; \(\rho\) đo đúng không gian.</p></div>
+    <div class="stage"><span class="num">7</span><span class="name">Ví dụ tính tay</span><span class="chipcell"><span class="chip c-done">Hoàn thành</span></span><p class="has"><span class="tag">Đã có</span><code>trace_one_episode.py</code> phát lại một episode bằng tay với số thật.</p><p class="miss"><span class="tag">Còn thiếu</span>—</p></div>
+    <div class="stage"><span class="num">8</span><span class="name">Đóng băng bằng hash</span><span class="chipcell"><span class="chip c-part">Một phần</span></span><p class="has"><span class="tag">Đã có</span>Hash cấu hình; digest cổng v2; payload đóng băng; 10 tài liệu tiền đăng ký.</p><p class="miss"><span class="tag">Còn thiếu</span>Manifest phủ toàn bộ policy / attacker / hằng số; harness từ chối policy chưa đóng băng.</p></div>
+    <div class="stage"><span class="num">9</span><span class="name">Chạy lưới, tính output</span><span class="chipcell"><span class="chip c-part">Một phần</span></span><p class="has"><span class="tag">Đã có</span>Lưới \(\Delta \in \{0,1,2,4\}\) × 3 detector trên mock; chấm \(L\); \(\lambda_Q^*\); bootstrap theo workflow; bảng chi tiêu.</p><p class="miss"><span class="tag">Còn thiếu</span>\(N = 100\); \(\Delta = 8\); trục \(\chi\) trong đường chính.</p></div>
+    <div class="stage"><span class="num">10</span><span class="name">Tối ưu, ranh giới tuning</span><span class="chipcell"><span class="chip c-part">Một phần</span></span><p class="has"><span class="tag">Đã có</span>LP Stackelberg (Conitzer–Sandholm); ranh giới tuning thực thi qua tiền đăng ký.</p><p class="miss"><span class="tag">Còn thiếu</span>Double oracle.</p></div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Trạng thái ước lượng tham số</h2>
+  <div class="sumbar" aria-hidden="true">
+    <span style="flex:7;background:var(--done)"></span>
+    <span style="flex:5;background:var(--part)"></span>
+    <span style="flex:5;background:var(--none)"></span>
+  </div>
+  <div class="sumkey"><span><span class="chip c-done">Hoàn thành</span> 7 tham số</span><span><span class="chip c-part">Một phần</span> 5 tham số</span><span><span class="chip c-none">Chưa thực hiện</span> 5 tham số</span></div>
+  <p class="src" style="margin-bottom:14px">Phương thức: <b>M1</b> đo trực tiếp · <b>M2</b> neo rồi quét · <b>M3</b> suy dẫn từ thiết kế thí nghiệm · <b>M4</b> khử tham số (phát biểu kết luận dưới dạng ngưỡng). Chi tiết trong báo cáo ước lượng tham số.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Tham số</th><th>Ý nghĩa</th><th>Phương thức</th><th>Trạng thái</th><th>Giá trị / kết quả</th><th>Việc còn lại</th></tr></thead>
+    <tbody><tr><td>\(\tau_{\text{sel}}\)</td><td>Ngưỡng chọn carrier trên posterior</td><td>M1</td><td><span class="chip c-done">Hoàn thành</span></td><td>Bảng tham chiếu, 800.000 mẫu/ô</td><td>Sinh lại khi \(\pi_0\) đổi</td></tr>
+<tr><td>\(\mathrm{AUC}_{\text{upper}}\)</td><td>Payload có tầm thường phân biệt được không</td><td>M1</td><td><span class="chip c-done">Hoàn thành</span></td><td>0,5414 (bốn đặc trưng)</td><td>Permutation test</td></tr>
+<tr><td>\(\varepsilon^{*}\)</td><td>Ngân sách khả phân biệt lớn nhất còn chứng nhận được</td><td>M4</td><td><span class="chip c-done">Hoàn thành</span></td><td>0; không tồn tại trên nền lành tính trung thực</td><td>—</td></tr>
+<tr><td>\(d'^{*}\)</td><td>Điểm hoà vốn của detector so với audit-at-commit</td><td>M2 + M4</td><td><span class="chip c-done">Hoàn thành</span></td><td>2,85 (\(\Delta=2\)); 0,95 (\(\Delta=4\)); không tồn tại ở \(\Delta \le 1\)</td><td>—</td></tr>
+<tr><td>\(d'\) bề mặt</td><td>Độ phân tách thực nghiệm của detector bề mặt</td><td>M1</td><td><span class="chip c-done">Hoàn thành</span></td><td>\(\le 0{,}50\)</td><td>—</td></tr>
+<tr><td>Chênh lệch ràng buộc</td><td>Ngân sách kỳ vọng (LP) so với ràng buộc cứng</td><td>M1</td><td><span class="chip c-done">Hoàn thành</span></td><td>Độ phủ \(-13{,}29\%\)</td><td>Commit file kết quả</td></tr>
+<tr><td>\(\zeta\)</td><td>Sai số kernel, vế phải cận Định lý 3</td><td>M1</td><td><span class="chip c-done">Hoàn thành</span></td><td>0,000 (mock); 0,119 khi \(\beta = 0{,}5\)</td><td>Tách vai thế giới / mô hình để \(\zeta\) có tác dụng</td></tr>
+<tr><td>\(\chi\)</td><td>Độ dị tính chi phí giữa các carrier</td><td>M1</td><td><span class="chip c-part">Một phần</span></td><td>2,114 (bảng bản thảo); 1,349 (bảng đo)</td><td>Chốt quy ước chuẩn hoá khi quét</td></tr>
+<tr><td>\(\kappa(k)\)</td><td>Chi phí audit mỗi carrier</td><td>M1</td><td><span class="chip c-part">Một phần</span></td><td>Hai bảng song song; đường chính dùng bảng bản thảo</td><td>Đo CPU-phút; chốt một bảng</td></tr>
+<tr><td>\(\Delta\) thực</td><td>Độ trễ nhân quả trong workflow thật</td><td>M1</td><td><span class="chip c-part">Một phần</span></td><td>Trung vị 3, p75 10 (\(n = 29\), lịch sử repo đề tài)</td><td>Co-change + <code>git bisect</code> trên repo SWE-bench</td></tr>
+<tr><td>\(\lambda_Q, \lambda_T\)</td><td>Trọng số cách ly nhầm / mất task sạch</td><td>M4</td><td><span class="chip c-part">Một phần</span></td><td>\(\lambda_Q^{*} \approx 0{,}036\)–\(0{,}05\)</td><td>Neo dải hợp lý; ràng buộc nhất quán với \(\eta_Q\)</td></tr>
+<tr><td>\(\rho\)</td><td>Bán kính phủ của thư viện policy</td><td>M1</td><td><span class="chip c-part">Một phần</span></td><td>0,894, đo trong không gian proxy</td><td>Đo TV theo từng task, hoặc thu hẹp Mệnh đề 6</td></tr>
+<tr><td>\(\eta_Q\)</td><td>Chi phí cách ly</td><td>M1 + M3</td><td><span class="chip c-none">Chưa thực hiện</span></td><td>Giá trị gán 2,0</td><td>Đo phần gỡ; tính phần phục hồi từ dữ liệu có sẵn</td></tr>
+<tr><td>\(\beta_k\)</td><td>Tốc độ trôi lành tính theo carrier</td><td>M1</td><td><span class="chip c-none">Chưa thực hiện</span></td><td>Giá trị gán 0,25</td><td>Luật ánh xạ commit → carrier, đếm commit, độ nhạy</td></tr>
+<tr><td>\(\pi_0, b_0\)</td><td>Tiên nghiệm mỗi item, belief khởi đầu</td><td>M3</td><td><span class="chip c-none">Chưa thực hiện</span></td><td>Giá trị gán 0,10</td><td>Thay bằng giá trị suy dẫn \(1/12{,}51 = 0{,}080\); sinh lại bảng \(\tau_{\text{sel}}\)</td></tr>
+<tr><td>\(c\)</td><td>Hằng số của Định lý 4</td><td>M1</td><td><span class="chip c-none">Chưa thực hiện</span></td><td>—</td><td>Tìm \(B_{\min}\) từ posterior, hồi quy kiểm tra từng thừa số</td></tr>
+<tr><td>Quy ước quét \(\chi\)</td><td>Giữ đại lượng nào cố định khi quét \(\chi\)</td><td>Thiết kế</td><td><span class="chip c-none">Chưa khai báo</span></td><td>Đề xuất neo \(\kappa_{\min}\)</td><td>Khai báo trước khi chạy; báo cả ba quy ước</td></tr></tbody>
+  </table></div>
+</section>
+
+<section class="panel">
+  <h2>Phát hiện đã có — ảnh hưởng tới nội dung bài</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Phát hiện</th><th>Số liệu</th><th>Vào bài ở đâu</th></tr></thead>
+    <tbody>
+      <tr><td>Detector bề mặt không đạt điểm hoà vốn</td><td class="fig">\(d' \le 0{,}50\) so với \(d'^* = 2{,}85\) (\(\Delta=2\))</td><td>Kết quả chính, phát biểu dạng điều kiện</td></tr>
+      <tr><td>Detector nội dung sụp khi attacker không tự khai báo</td><td class="fig">AUC 0,479 (\(D_{\text{lex}}\)) · 0,518 (\(D_{\text{llm}}\))</td><td>Kết quả; đe doạ</td></tr>
+      <tr><td>Agent thật không làm theo payload</td><td class="fig">0/7 tuân thủ (P2)</td><td>Đe doạ 3 — nặng nhất</td></tr>
+      <tr><td>Sentinel thắng B1 nhờ số hạng \(T_{\text{lost}}\)</td><td class="fig">64/64 ô khi \(\lambda_T = 0{,}5\) · 22/64 khi \(\lambda_T = 0\)</td><td>Điều kiện của tuyên bố chính</td></tr>
+      <tr><td>\(\chi\) không tác động lên nghiệm minimax</td><td class="fig">độ lợi 39,7% ở mọi \(\chi\)</td><td>Cần thầy quyết (mục 2)</td></tr>
+      <tr><td>Ngân sách kỳ vọng lạc quan hơn thực thi</td><td class="fig">độ phủ −13,29%</td><td>Chú thích mọi bảng độ lợi</td></tr>
+      <tr><td>Không có điểm hoà vốn ở \(\Delta \le 1\)</td><td class="fig">\(d'^*\) không tồn tại</td><td>Khớp Hệ quả 5</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="panel">
+  <h2>Sau hạn 02/10 — cho luận văn và major revision</h2>
+  <ul class="later">
+    <li>Đo các tham số còn thiếu: \(\beta\), \(\eta_Q\), suy dẫn \(\pi_0 = 0{,}080\), hằng số \(c\) của Định lý 4 — chi tiết trong báo cáo ước lượng tham số.</li>
+    <li>Nền lành tính thật, \(N = 500\), 3 attacker LLM, payload đã công bố (AgentPoison, MINJA).</li>
+    <li>Thư viện policy tham số hoá và lớp game nhỏ giải chính xác — điều kiện để kiểm chứng số cho Mệnh đề 6.</li>
+    <li>Manifest đóng băng toàn phần, có cưỡng chế trong harness.</li>
+  </ul>
+</section>
+
+<section class="panel">
+  <h2>Nguồn</h2>
+  <p class="src">Kế hoạch nước rút: <code>PLAN-VIEC-CON-LAI.md</code> · Khung stage: <code>docs/AuditGame-SE_PartIV_Detailed.md</code> · P2: <code>docs/reports/p2-three-arms.md</code> · Detector nội dung: <code>docs/reports/content-detector.md</code> · \(d'^*\): <code>docs/preregistration/dprime-sweep.md</code> · Ước lượng tham số: <code>BAO-CAO-Uoc-luong-tham-so-Sentinel.md</code></p>
+</section>
+
+</div>

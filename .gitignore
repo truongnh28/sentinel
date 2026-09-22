@@ -10,11 +10,11 @@ __pycache__/
 .idea/
 
 # AuditGame experiment outputs - regenerate with `python3 experiment.py --json`
-auditgame/*.json
-!auditgame/reference/score_table.json
+# auditgame/*.json
+# !auditgame/reference/score_table.json
 
 # AuditGame SWE-bench metadata (~54 MB) - reproducible via `swebench_fetch.py`
-auditgame/data/*.jsonl
+# auditgame/data/*.jsonl
 
 # AuditGame harness roots (harness.py).  Repo clones, the four carriers, the
 # generated hidden suites and the sealed area are RUN ARTEFACTS: workspace/ holds
@@ -25,16 +25,16 @@ auditgame/data/*.jsonl
 # publish the ground truth this benchmark exists to infer.  None of the four
 # belongs in this repo.
 auditgame/workspace/
-auditgame/carriers/
-auditgame/carriers-sealed/
-auditgame/hidden_suites/
+# auditgame/carriers/
+# auditgame/carriers-sealed/
+# auditgame/hidden_suites/
 # The container ground-truth probe (tests/gate1_integrity/
 # test_ground_truth_out_of_the_carriers.py) makes `probe-XXXXXX/` under the same
 # directory, because the Docker daemon may be a VM whose file-sharing list covers
 # the project and not the system temp dir.  A killed run leaves one behind holding
 # a carrier root, a SEALED AREA WITH LABELS and a git repo -- the same three things
 # the four lines above keep out of the repo.
-auditgame/probe-*/
+# auditgame/probe-*/
 
 # `results/` is deliberately NOT ignored, and the asymmetry with the four roots
 # above is the point -- but the trace itself is SPLIT ON THE SAME SEAL LINE, and
@@ -65,7 +65,7 @@ auditgame/probe-*/
 # REFUSES when the sealed half is absent rather than returning traces on which
 # nothing is poisoned -- a full grid of Rule N3 fake zeros is the failure mode this
 # split would otherwise buy.
-auditgame/results/*-sealed.json
+# auditgame/results/*-sealed.json
 
 # Khoá API — .env chứa DEEPSEEK_API_KEY, không bao giờ commit.
 .env
@@ -75,7 +75,7 @@ auditgame/results/*-sealed.json
 # Tài liệu gửi GVHD: chỉ gồm phương pháp luận chuẩn và mục lục. Các ghi chú
 # làm việc khác trong docs/ (báo cáo spike, tiền đăng ký, hướng dẫn cũ, bản
 # thảo nguồn, PDF tham khảo) vẫn giữ trên máy nhưng không đưa vào repo.
-docs/*
+# docs/*
 !docs/README.md
 !docs/Phuong-phap-luan-trien-khai.md
 !docs/Khao-sat-nguon-phuong-phap-luan.md

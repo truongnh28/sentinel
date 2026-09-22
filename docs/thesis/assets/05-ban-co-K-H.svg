@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400"
+     role="img" aria-labelledby="banco-title banco-desc">
+  <title id="banco-title">Bàn cờ K × H và vùng Δ × K mà defender phải phủ</title>
+  <desc id="banco-desc">Lưới bốn hàng carrier nhân tám cột task. Hàng memory và hàng skill mang thanh ngang chạy từ thời điểm chèn iota tới thời điểm kích hoạt sigma. Hàng branch mang tám dấu audit-at-commit, mỗi task một ô, luôn trên cùng một hàng. Một khung nét đứt bao quanh vùng bảy cột nhân bốn hàng — vùng mà defender phải rải ngân sách vì không biết attacker chọn ô nào.</desc>
+
+  <rect width="960" height="400" fill="#f5f5f5"/>
+
+  <!-- ─────────── header ─────────── -->
+  <text x="20" y="30" fill="#7a8399" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace"
+        font-weight="500" letter-spacing="0.18em">LƯỚI K × H · MỤC 4.1</text>
+  <text x="20" y="58" fill="#2d3142" font-size="21" font-family="Georgia, 'Times New Roman', serif">Attacker cần một ô. Defender phải phủ cả một vùng.</text>
+
+  <!-- ─────────── vùng Δ × K (focal 1) ─────────── -->
+  <rect x="245" y="98" width="630" height="160" rx="6"
+        fill="rgba(235,108,54,0.05)" stroke="#eb6c36" stroke-width="0.9" stroke-dasharray="5,4"/>
+
+  <!-- ─────────── lưới ─────────── -->
+  <line x1="200" y1="94" x2="920" y2="94" stroke="rgba(45,49,66,0.16)" stroke-width="0.8"/>
+  <line x1="200" y1="258" x2="920" y2="258" stroke="rgba(45,49,66,0.16)" stroke-width="0.8"/>
+  <line x1="200" y1="138" x2="920" y2="138" stroke="rgba(45,49,66,0.07)" stroke-width="0.8"/>
+  <line x1="200" y1="178" x2="920" y2="178" stroke="rgba(45,49,66,0.07)" stroke-width="0.8"/>
+  <line x1="200" y1="218" x2="920" y2="218" stroke="rgba(45,49,66,0.07)" stroke-width="0.8"/>
+
+  <line x1="200" y1="94" x2="200" y2="258" stroke="rgba(45,49,66,0.16)" stroke-width="0.8"/>
+  <line x1="290" y1="94" x2="290" y2="258" stroke="rgba(45,49,66,0.07)" stroke-width="0.8"/>
+  <line x1="380" y1="94" x2="380" y2="258" stroke="rgba(45,49,66,0.07)" stroke-width="0.8"/>
+  <line x1="470" y1="94" x2="470" y2="258" stroke="rgba(45,49,66,0.07)" stroke-width="0.8"/>
+  <line x1="560" y1="94" x2="560" y2="258" stroke="rgba(45,49,66,0.07)" stroke-width="0.8"/>
+  <line x1="650" y1="94" x2="650" y2="258" stroke="rgba(45,49,66,0.07)" stroke-width="0.8"/>
+  <line x1="740" y1="94" x2="740" y2="258" stroke="rgba(45,49,66,0.07)" stroke-width="0.8"/>
+  <line x1="830" y1="94" x2="830" y2="258" stroke="rgba(45,49,66,0.07)" stroke-width="0.8"/>
+  <line x1="920" y1="94" x2="920" y2="258" stroke="rgba(45,49,66,0.16)" stroke-width="0.8"/>
+
+  <!-- trục thời gian -->
+  <text x="245" y="88" fill="#4f5d75" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.06em">t₁</text>
+  <text x="335" y="88" fill="#4f5d75" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.06em">t₂</text>
+  <text x="425" y="88" fill="#4f5d75" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.06em">t₃</text>
+  <text x="515" y="88" fill="#4f5d75" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.06em">t₄</text>
+  <text x="605" y="88" fill="#4f5d75" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.06em">t₅</text>
+  <text x="695" y="88" fill="#4f5d75" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.06em">t₆</text>
+  <text x="785" y="88" fill="#4f5d75" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.06em">t₇</text>
+  <text x="875" y="88" fill="#4f5d75" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing="0.06em">t₈</text>
+  <text x="920" y="72" fill="#7a8399" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end" letter-spacing="0.18em">H = 8 TASK</text>
+
+  <!-- ─────────── nhãn hàng ─────────── -->
+  <text x="20" y="122" fill="#7a8399" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace">k = 1</text>
+  <text x="20" y="162" fill="#7a8399" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace">k = 2</text>
+  <text x="20" y="202" fill="#7a8399" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace">k = 3</text>
+  <text x="20" y="242" fill="#7a8399" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace">k = 4</text>
+
+  <text x="188" y="122" fill="#2d3142" font-size="12" font-weight="600" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" text-anchor="end">memory</text>
+  <text x="188" y="162" fill="#2d3142" font-size="12" font-weight="600" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" text-anchor="end">skill</text>
+  <text x="188" y="202" fill="#2d3142" font-size="12" font-weight="600" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" text-anchor="end">queue</text>
+  <text x="188" y="242" fill="#2d3142" font-size="12" font-weight="600" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" text-anchor="end">branch</text>
+  <text x="188" y="78" fill="#7a8399" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end" letter-spacing="0.18em">K = 4 CARRIER</text>
+
+  <!-- ─────────── hàng 1: memory (focal 2) ─────────── -->
+  <rect x="245" y="106" width="606" height="24" rx="4" fill="rgba(235,108,54,0.12)" stroke="#eb6c36" stroke-width="1"/>
+  <polygon points="851,110 875,118 851,126" fill="#eb6c36"/>
+  <circle cx="245" cy="118" r="4.5" fill="#eb6c36"/>
+  <text x="261" y="122" fill="#eb6c36" font-size="10" font-weight="600" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">payload nằm im — không tự biến mất</text>
+
+  <!-- ─────────── hàng 2: skill ─────────── -->
+  <rect x="335" y="146" width="516" height="24" rx="4" fill="rgba(79,93,117,0.15)" stroke="#4f5d75" stroke-width="1"/>
+  <polygon points="851,150 875,158 851,166" fill="#4f5d75"/>
+  <circle cx="335" cy="158" r="4.5" fill="#4f5d75"/>
+  <text x="351" y="162" fill="#2d3142" font-size="10" font-weight="600" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">carrier thứ hai, gieo lệch thời điểm</text>
+
+  <!-- ─────────── hàng 3: queue ─────────── -->
+  <line x1="208" y1="200" x2="912" y2="200" stroke="rgba(45,49,66,0.14)" stroke-width="1" stroke-dasharray="4,3"/>
+  <rect x="244" y="188" width="196" height="12" fill="#f5f5f5"/>
+  <text x="252" y="197" fill="#7a8399" font-size="9" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">hàng này không bị gieo trong ví dụ</text>
+
+  <!-- ─────────── hàng 4: branch — audit-at-commit ─────────── -->
+  <g stroke="#4f5d75" stroke-width="1" fill="#f5f5f5">
+    <circle cx="245" cy="238" r="6"/><circle cx="335" cy="238" r="6"/><circle cx="425" cy="238" r="6"/><circle cx="515" cy="238" r="6"/>
+    <circle cx="605" cy="238" r="6"/><circle cx="695" cy="238" r="6"/><circle cx="785" cy="238" r="6"/><circle cx="875" cy="238" r="6"/>
+  </g>
+  <g stroke="#4f5d75" stroke-width="1">
+    <path d="M241 234 l8 8 M249 234 l-8 8"/><path d="M331 234 l8 8 M339 234 l-8 8"/>
+    <path d="M421 234 l8 8 M429 234 l-8 8"/><path d="M511 234 l8 8 M519 234 l-8 8"/>
+    <path d="M601 234 l8 8 M609 234 l-8 8"/><path d="M691 234 l8 8 M699 234 l-8 8"/>
+    <path d="M781 234 l8 8 M789 234 l-8 8"/><path d="M871 234 l8 8 M879 234 l-8 8"/>
+  </g>
+
+  <!-- ─────────── dấu ι, σ và nhịp Δ ─────────── -->
+  <line x1="245" y1="258" x2="245" y2="278" stroke="#4f5d75" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <line x1="875" y1="258" x2="875" y2="278" stroke="#4f5d75" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <path d="M245 278 v8 M875 278 v8 M245 282 H875" stroke="#4f5d75" stroke-width="1" fill="none"/>
+
+  <text x="245" y="302" fill="#4f5d75" font-size="10" font-family="Georgia, 'Times New Roman', serif" text-anchor="middle" font-style="italic">ι = t₁ · chèn</text>
+  <text x="875" y="302" fill="#4f5d75" font-size="10" font-family="Georgia, 'Times New Roman', serif" text-anchor="middle" font-style="italic">σ = t₈ · kích hoạt</text>
+  <rect x="418" y="290" width="288" height="15" fill="#f5f5f5"/>
+  <text x="562" y="302" fill="#2d3142" font-size="11" font-weight="600" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" text-anchor="middle">Δ = 7 → vùng Δ × K = 28 ô</text>
+
+  <!-- ─────────── callout ─────────── -->
+  <text x="480" y="328" fill="#4f5d75" font-size="13" font-family="Georgia, 'Times New Roman', serif" font-style="italic" text-anchor="middle">Attacker chỉ cần đúng một ô trong vùng. Defender không biết ô nào, nên phải rải ngân sách khắp vùng.</text>
+
+  <!-- ─────────── legend ─────────── -->
+  <line x1="20" y1="354" x2="940" y2="354" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+  <text x="20" y="374" fill="#7a8399" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" letter-spacing="0.14em">CHÚ GIẢI</text>
+
+  <rect x="92" y="366" width="16" height="9" rx="2" fill="rgba(235,108,54,0.12)" stroke="#eb6c36" stroke-width="1"/>
+  <text x="114" y="374" fill="#4f5d75" font-size="9" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">cửa sổ sống ι → σ</text>
+
+  <rect x="238" y="366" width="16" height="9" rx="2" fill="rgba(79,93,117,0.15)" stroke="#4f5d75" stroke-width="1"/>
+  <text x="260" y="374" fill="#4f5d75" font-size="9" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">carrier thứ hai bị gieo</text>
+
+  <circle cx="404" cy="370.5" r="5.5" fill="#f5f5f5" stroke="#4f5d75" stroke-width="1"/>
+  <path d="M400.5 367 l7 7 M407.5 367 l-7 7" stroke="#4f5d75" stroke-width="1"/>
+  <text x="416" y="374" fill="#4f5d75" font-size="9" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">audit-at-commit: một ô mỗi task, luôn hàng branch</text>
+
+  <rect x="704" y="366" width="16" height="9" rx="2" fill="rgba(235,108,54,0.05)" stroke="#eb6c36" stroke-width="0.9" stroke-dasharray="3,2"/>
+  <text x="726" y="374" fill="#4f5d75" font-size="9" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">vùng Δ × K defender phải phủ</text>
+</svg>

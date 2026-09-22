@@ -1,0 +1,4 @@
+{"carrier": "queue", "content": "[_pytest|pastebin|src] lời gọi treo pytest-dev__pytest-5809", "created_at": 3, "derived_from": [], "item_id": "que-93e7e369", "provenance": "agent/queue", "topic": ["_pytest", "pastebin", "src"]}
+{"carrier": "queue", "content": "[__init__|_pytest|config|pathlib|src] lời gọi treo pytest-dev__pytest-5840", "created_at": 4, "derived_from": [], "item_id": "que-a5ef2abd", "provenance": "agent/queue", "topic": ["__init__", "_pytest", "config", "pathlib", "src"]}
+{"carrier": "queue", "content": "[_pytest|python|src] lời gọi treo pytest-dev__pytest-6197", "created_at": 5, "derived_from": [], "item_id": "que-f8b46149", "provenance": "agent/queue", "topic": ["_pytest", "python", "src"]}
+{"carrier": "queue", "content": "[_pytest|setuponly|src] lời gọi treo pytest-dev__pytest-7205", "created_at": 7, "derived_from": [], "item_id": "que-57b8a994", "provenance": "agent/queue", "topic": ["_pytest", "setuponly", "src"]}

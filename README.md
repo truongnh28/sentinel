@@ -8,7 +8,7 @@ README này là **báo cáo tiến độ**: đang làm gì, tới đâu, và vi�
 
 ---
 
-## Tình hình trong 30 giây
+## Status
 
 | | |
 |---|---|
@@ -61,6 +61,34 @@ Khung stage theo [tài liệu phương pháp luận](docs/Phuong-phap-luan-trien
 | 8 | Đóng băng bằng hash | 🟡 Một phần | Hash cấu hình; digest cổng v2; payload đóng băng; tài liệu tiền đăng ký | Manifest phủ toàn bộ policy / attacker / hằng số; harness từ chối policy chưa đóng băng |
 | 9 | Chạy lưới, tính output | 🟡 Một phần | Lưới $\Delta \in \{0,1,2,4\}$ × 3 detector trên mock; chấm $L$; $\lambda_Q^{*}$; bootstrap theo workflow; bảng chi tiêu | $N = 100$; $\Delta = 8$; trục $\chi$ trong đường chính |
 | 10 | Tối ưu, ranh giới tuning | 🟡 Một phần | LP Stackelberg (Conitzer–Sandholm); ranh giới tuning thực thi qua tiền đăng ký | Double oracle |
+
+---
+
+## Trạng thái ước lượng tham số
+
+Chi tiết phương pháp: [Parameter Estimation Report](docs/AuditGame-SE_Parameter_Estimation_Report.md). Bốn phương thức xác lập: **M1** đo trực tiếp · **M2** neo rồi quét · **M3** suy dẫn từ thiết kế thí nghiệm · **M4** khử tham số (phát biểu kết luận dưới dạng ngưỡng).
+
+**7 hoàn thành · 5 một phần · 5 chưa thực hiện.**
+
+| Tham số | Ý nghĩa | Phương thức | Trạng thái | Giá trị / kết quả | Việc còn lại |
+|---|---|---|---|---|---|
+| $\tau_{\text{sel}}$ | Ngưỡng chọn carrier trên posterior | M1 | ✅ Hoàn thành | Bảng tham chiếu, 800.000 mẫu/ô | Sinh lại khi $\pi_0$ đổi |
+| $\mathrm{AUC}_{\text{upper}}$ | Payload có tầm thường phân biệt được không | M1 | ✅ Hoàn thành | 0,5414 (bốn đặc trưng) | Permutation test |
+| $\varepsilon^{*}$ | Ngân sách khả phân biệt lớn nhất còn chứng nhận được | M4 | ✅ Hoàn thành | 0; không tồn tại trên nền lành tính trung thực | — |
+| $d'^{*}$ | Điểm hoà vốn của detector so với audit-at-commit | M2 + M4 | ✅ Hoàn thành | 2,85 ($\Delta=2$); 0,95 ($\Delta=4$); không tồn tại ở $\Delta \le 1$ | — |
+| $d'$ bề mặt | Độ phân tách thực nghiệm của detector bề mặt | M1 | ✅ Hoàn thành | $\le 0{,}50$ | — |
+| Chênh lệch ràng buộc | Ngân sách kỳ vọng (LP) so với ràng buộc cứng | M1 | ✅ Hoàn thành | Độ phủ $-13{,}29\%$ | Commit file kết quả |
+| $\zeta$ | Sai số kernel, vế phải cận Định lý 3 | M1 | ✅ Hoàn thành | 0,000 (mock); 0,119 khi $\beta = 0{,}5$ | Tách vai thế giới / mô hình để $\zeta$ có tác dụng |
+| $\chi$ | Độ dị tính chi phí giữa các carrier | M1 | 🟡 Một phần | 2,114 (bảng bản thảo); 1,349 (bảng đo) | Chốt quy ước chuẩn hoá khi quét |
+| $\kappa(k)$ | Chi phí audit mỗi carrier | M1 | 🟡 Một phần | Hai bảng song song; đường chính dùng bảng bản thảo | Đo CPU-phút; chốt một bảng |
+| $\Delta$ thực | Độ trễ nhân quả trong workflow thật | M1 | 🟡 Một phần | Trung vị 3, p75 10 ($n = 29$, lịch sử repo đề tài) | Co-change + `git bisect` trên repo SWE-bench |
+| $\lambda_Q, \lambda_T$ | Trọng số cách ly nhầm / mất task sạch | M4 | 🟡 Một phần | $\lambda_Q^{*} \approx 0{,}036$–$0{,}05$ | Neo dải hợp lý; ràng buộc nhất quán với $\eta_Q$ |
+| $\rho$ | Bán kính phủ của thư viện policy | M1 | 🟡 Một phần | 0,894, đo trong không gian proxy | Đo TV theo từng task, hoặc thu hẹp Mệnh đề 6 |
+| $\eta_Q$ | Chi phí cách ly | M1 + M3 | ❌ Chưa thực hiện | Giá trị gán 2,0 | Đo phần gỡ; tính phần phục hồi từ dữ liệu có sẵn |
+| $\beta_k$ | Tốc độ trôi lành tính theo carrier | M1 | ❌ Chưa thực hiện | Giá trị gán 0,25 | Luật ánh xạ commit → carrier, đếm commit, độ nhạy |
+| $\pi_0, b_0$ | Tiên nghiệm mỗi item, belief khởi đầu | M3 | ❌ Chưa thực hiện | Giá trị gán 0,10 | Thay bằng giá trị suy dẫn $1/12{,}51 = 0{,}080$; sinh lại bảng $\tau_{\text{sel}}$ |
+| $c$ | Hằng số của Định lý 4 | M1 | ❌ Chưa thực hiện | — | Tìm $B_{\min}$ từ posterior, hồi quy kiểm tra từng thừa số |
+| Quy ước quét $\chi$ | Giữ đại lượng nào cố định khi quét $\chi$ | Thiết kế | ❌ Chưa khai báo | Đề xuất neo $\kappa_{\min}$ | Khai báo trước khi chạy; báo cả ba quy ước |
 
 ---
 

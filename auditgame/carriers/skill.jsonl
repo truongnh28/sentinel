@@ -1,0 +1,4 @@
+{"carrier": "skill", "content": "[_pytest|pastebin|src] quy trình rút từ pytest-dev__pytest-5809", "created_at": 3, "derived_from": [], "item_id": "ski-4073211e", "provenance": "agent/skills", "topic": ["_pytest", "pastebin", "src"]}
+{"carrier": "skill", "content": "[_pytest|python|src] quy trình rút từ pytest-dev__pytest-6197", "created_at": 5, "derived_from": [], "item_id": "ski-041d63da", "provenance": "agent/skills", "topic": ["_pytest", "python", "src"]}
+{"carrier": "skill", "content": "[_pytest|python|src] quy trình rút từ pytest-dev__pytest-6202", "created_at": 6, "derived_from": [], "item_id": "ski-acd69221", "provenance": "agent/skills", "topic": ["_pytest", "python", "src"]}
+{"carrier": "skill", "content": "[_pytest|setuponly|src] quy trình rút từ pytest-dev__pytest-7205", "created_at": 7, "derived_from": ["mem-6dc90951"], "item_id": "ski-a4e565c2", "provenance": "agent/skills", "topic": ["_pytest", "setuponly", "src"]}
