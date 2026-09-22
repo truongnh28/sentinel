@@ -4,7 +4,7 @@
 
 Repo này chứa mã nguồn và tài liệu của đề tài Sentinel. Đề tài mô hình hoá việc phân bổ audit như một trò chơi Stackelberg giữa bên phòng thủ và kẻ tấn công. Kẻ tấn công đầu độc các *carrier* dai dẳng của một coding agent (`memory · skill · queue · branch`), và thiệt hại chỉ lộ ra sau độ trễ $\Delta$ task. Benchmark **AuditGame-SE** dựng workflow từ SWE-bench, tiêm payload, chạy agent (mock hoặc LLM thật), chấm harm bằng oracle niêm phong, rồi so sánh các chính sách audit B1–B7 với Sentinel.
 
-Đề tài hiện thực draft *Where to Look: Audit-Allocation Games against Adaptive Persistent Poisoning in Software Workflows*. Các con số hiệu năng trong draft là **giá trị dự phóng**, tức giả thuyết cần kiểm chứng. Hướng tái lập đã chốt: **dựng đúng thiết lập của draft, rồi đo xem số ra bao nhiêu**. Tham số draft chưa ghi giá trị được chọn trên tập dev và đóng băng trước khi đánh giá; không tham số nào được chỉnh theo kết quả.
+Đề tài hiện thực draft *Where to Look: Audit-Allocation Games against Adaptive Persistent Poisoning in Software Workflows*. Các con số hiệu năng trong draft là **giá trị dự phóng**, tức giả thuyết cần kiểm chứng. Hướng tái lập đã chốt: **dựng đúng thiết lập của draft, rồi đo xem số ra bao nhiêu**. Mỗi tham số phải tự có nguồn gốc — đo, suy dẫn, hoặc biện hộ kèm kiểm chứng — để trả lời được câu hỏi "vì sao là số này"; giá trị trong draft chỉ là mốc đối chiếu. Mọi tham số chốt trên tập dev và đóng băng trước khi đánh giá; không tham số nào được chỉnh theo kết quả.
 
 README này là **báo cáo tiến độ**. Đọc [Status](#status) và [Được bao nhiêu phần trăm](#được-bao-nhiêu-phần-trăm) là nắm được toàn cảnh; bốn phần sau đi vào chi tiết:
 1. [Cách tái lập tham số](#1-cách-tái-lập-tham-số) — bảng tra, trỏ sang tài liệu gốc thay vì chép lại thủ tục
@@ -79,10 +79,11 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 ## 1. Cách tái lập tham số
 
 **Nguyên tắc.**
-1. Tham số draft **đã ghi giá trị** thì dùng đúng giá trị đó.
-2. Tham số draft **chưa ghi giá trị** thì xác lập bằng một trong bốn phương thức dưới đây, trên tập dev, **trước khi đóng băng**.
+1. **Không tham số nào được dùng chỉ vì draft ghi như vậy.** Mọi số dự phóng trong draft đều chưa có nguồn gốc, nên mỗi tham số phải trả lời được câu hỏi của hội đồng: *"vì sao là số này?"* Giá trị của draft chỉ đóng vai **mốc đối chiếu**, không phải nguồn.
+2. Mỗi tham số vì vậy phải có **một phương thức xác lập** (M1–M4 dưới đây), làm trên tập dev và đóng băng **trước khi đánh giá**. Tham số thiết kế (không đo được) thì phải có **lập luận biện hộ + một kiểm chứng**, ví dụ $K = 4$ biện hộ bằng bốn họ carrier của HarnessSafe và kiểm bằng ablation $K = 2, 3$.
 3. Sau đóng băng, không tham số nào được chỉnh theo kết quả held-out (ranh giới tuning ở Stage 10).
-4. Tham số xác lập bằng giả định có tác động mạnh thì phải quét và báo cáo như một trục.
+4. Tham số dựa vào giả định mạnh thì phải quét và báo cáo như một trục, thay vì chốt một giá trị.
+5. Nếu giá trị đo được **khác** giá trị của draft (ví dụ $\chi$: 2,11 so với 1,34), báo cáo giá trị đo được và nêu rõ chênh lệch; không sửa công thức để ra số của draft.
 
 **Bốn phương thức xác lập** (chi tiết: [Parameter Estimation Report](docs/AuditGame-SE_Parameter_Estimation_Report.md), mục 5):
 - **M1 — đo trực tiếp:** có quy trình đo và sai số.
@@ -96,12 +97,16 @@ Thủ tục chi tiết **không chép lại ở đây**. Bảng dưới trỏ t�
 
 | Tham số | Giá trị trong draft | Phương thức | Tóm tắt cách xác lập | Thủ tục chi tiết |
 |---|---|---|---|---|
-| $K$, $H$, lưới $\Delta$, lưới $\chi$, harm nhị phân, quy mô lưới | $K=4$; $H$ 6–14; $\Delta \in \{0,1,2,4,8\}$; $\chi \in \{0;0{,}5;1{,}34\}$; 100 workflow × 8 hệ thống × 3 seed | Thiết kế | Dùng nguyên giá trị của draft | [PPL] Phần VI loại A; Stage 9 |
-| 3 mức $(\psi,\varphi)$ | (0,75; 0,20) · (0,85; 0,12) · (0,92; 0,06) | Chọn có neo | Ánh xạ sang $d$ = 1,52 / 2,21 / 2,96; chạy đúng ba mức, quét $d'$ liên tục là phân tích bổ sung | [PPL] §9.1, Stage 5 |
-| Thư viện 28 policy | 28, ba họ, không có danh sách | Thiết kế | Sinh theo lưới 8 + 12 + 8, gửi thầy duyệt trước khi đóng băng | [PPL] Stage 6B |
-| 18 attacker, 7 held-out | 18/7, không có danh sách | Thiết kế | Các quy tắc cost-max/min, delay-max, uniform, ingress, best-response; chia held-out bằng hash của tên | [PPL] Stage 3.3 |
-| $\kappa(k)$ | 0,4 / 0,9 / 1,6 / 4,1 | M1 | Dùng bảng draft cho đường chính; đo song song theo CPU-time, ≥ 30 lần mỗi checkpoint | [PPL] Stage 2 · [PER] 5.6 |
-| $\chi$ | 1,34 | M1 | Công bố công thức $\bar\kappa$; khai báo trước đại lượng giữ cố định khi quét | [PPL] Stage 2 · [PER] 5.7 |
+| $K = 4$ | 4 carrier | Thiết kế, có kiểm chứng | Biện hộ bằng bốn họ state dai dẳng của HarnessSafe; kiểm bằng ablation $K = 2, 3$ | [PPL] Phần VI loại A |
+| $H$ | 6–14 | Suy từ dữ liệu | Chọn từ phân phối độ dài chuỗi instance liên tiếp dựng được; báo số workflow khả dụng theo từng $H$ | [PPL] Stage 1 |
+| Lưới $\Delta$ | $\{0,1,2,4,8\}$ | Suy từ dữ liệu | Neo vào phân phối $\Delta$ thực đo được (trung vị 3, p75 10), phủ hai bên crossover dự đoán | [PPL] Stage 3.7 · [PER] 5.8 |
+| Lưới $\chi$ | $\{0;\ 0{,}5;\ 1{,}34\}$ | Suy từ $\kappa$ đo được | Hai mốc đầu là đồng nhất và trung gian; mốc thứ ba là **$\chi$ đo được của mình**, không phải 1,34 của draft | [PPL] Stage 2 · [PER] 5.7 |
+| Quy mô lưới, số seed | 100 workflow × 8 hệ thống × 3 seed | Suy từ phân tích lực | Chọn $N$ từ độ rộng CI cần thiết để phát biểu ngưỡng 15% (cổng 3 hiện có test cho việc này) | [PPL] Stage 9 |
+| 3 mức $(\psi,\varphi)$ | (0,75; 0,20) · (0,85; 0,12) · (0,92; 0,06) | M2 | Neo vào ROC của detector thật rồi chọn ba điểm vận hành; ánh xạ sang $d$ = 1,52 / 2,21 / 2,96. Hiện detector thật chỉ đạt $d' \le 0{,}50$, nên phải nêu rõ ba mức là **biến kiểm soát**, không phải detector đo được | [PPL] §9.1, Stage 5 |
+| Thư viện 28 policy | 28, ba họ, không có danh sách | Thiết kế, có kiểm chứng | Sinh theo lưới 8 + 12 + 8; con số 28 biện hộ bằng $\rho$ bão hoà (thêm policy không giảm $\rho$ nữa), không phải vì draft ghi 28 | [PPL] Stage 6B, 6D |
+| 18 attacker, 7 held-out | 18/7, không có danh sách | Thiết kế, có kiểm chứng | Mỗi attacker là một *giả thuyết* về chỗ yếu của defender (cost-max/min, delay-max, uniform, ingress, best-response); held-out chia bằng hash của tên để không chọn được tập dễ | [PPL] Stage 3.3 |
+| $\kappa(k)$ | 0,4 / 0,9 / 1,6 / 4,1 | M1 | **Tự đo** theo CPU-time: 4 checkpoint × ≥ 30 lần, user+sys, cố định tần số CPU, lấy trung vị. Bảng của draft chỉ là mốc đối chiếu | [PPL] Stage 2 · [PER] 5.6 |
+| $\chi$ | 1,34 | M1 | Tính từ $\kappa$ mình đo, với công thức $\bar\kappa$ công bố trước. Hiện ra 2,11 (bảng draft) và 1,349 (bảng đo) — chênh lệch này phải báo cáo, không được chỉnh công thức để ra 1,34 | [PPL] Stage 2 · [PER] 5.7 |
 | $\beta_k$ | chưa có | M1 (dự phòng M2) | Luật ánh xạ commit → carrier, đếm trên cửa sổ commit giữa hai task | [PPL] Stage 4 bước 5 · [PER] 5.1 |
 | $\varepsilon$ | trung vị `edit_size` benign | M1 | Percentile của phân phối diff-size benign | [PPL] Stage 3.4 |
 | $\Delta$ thực | chưa có | M1 | Co-change + lọc bằng đồ thị import; quy về khoảng cách task | [PPL] Stage 3.7 · [PER] 5.8 |
@@ -253,6 +258,7 @@ Các hạng mục dưới đây trước đây xếp "sau hạn 02/10". Nay đư
 | W7 | 240 game nhỏ + $\rho$ | Sinh lớp game nhỏ ($K \cdot H \le 40$), giải chính xác bằng LP hiện có; đo $\rho$ bằng TV trên vector xác suất hành động **theo từng task**, thay cho không gian proxy hiện tại; so với cận $H\rho\,\text{range}(L)$ của Mệnh đề 6 | Thư viện 28 policy (issue #2) | 2 ngày | ⏳ Chưa bắt đầu |
 | W8 | Payload đã công bố | Port khuôn payload AgentPoison (trigger tối ưu hoá) và MINJA (bridging step + indication prompt) thành 2 attacker kịch bản, tính vào lớp 18 attacker | Issue #3 | 1 ngày | ⏳ Chưa bắt đầu |
 | W9 | Nền lành tính thật, $N = 500$, 3 attacker LLM | Chạy trên toàn bộ 500 instance SWE-bench Verified với nền lành tính thật và attacker LLM | W8; ngân sách LLM | 3+ ngày | ⏳ Chưa bắt đầu |
+| W10 | Biện hộ các tham số thiết kế | Sinh bằng chứng cho những số mà draft nêu nhưng không có nguồn: ablation $K = 2, 3$; phân phối độ dài workflow để chọn $H$; phân tích lực để chọn $N$ và số seed; $\rho$ bão hoà để biện hộ con số 28; ngưỡng AUC suy từ CI thay vì lấy 0,56 | W7 (cho $\rho$) | 1,5 ngày | ⏳ Chưa bắt đầu |
 
 Kế hoạch triển khai chi tiết theo từng bước sẽ được viết riêng trong `docs/design/plans/`.
 
