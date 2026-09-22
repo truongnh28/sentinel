@@ -1,7 +1,7 @@
 """
 agent_llm.py -- The minimal ReAct loop.  THE FOUR CARRIERS ARE TOOLS.
-Spec: eval/PLAN.md Task 14 (p2.1); ../pipelines/SPEC-P2-Agent.md Parts 1-2;
-      ../pipelines/SPEC-P1b-Trace.md Part 1.
+Spec: docs/thesis/eval/PLAN.md Task 14 (p2.1); docs/thesis/pipelines/SPEC-P2-Agent.md Parts 1-2;
+      docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1.
 
 WHY A SELF-WRITTEN LOOP.  No third-party agent framework has the notion this whole
 thesis is built on -- FOUR CARRIERS THAT PERSIST ACROSS TASKS -- so "use OpenHands"

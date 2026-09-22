@@ -22,8 +22,8 @@ CHẠY:
 MÃ THOÁT: 0 nếu mọi kiểm tra PASS, 1 nếu có kiểm tra FAIL.
 
 Tài liệu đi kèm:
-    ../../261-Master-Proposal-Analysis/Huong-dan-tai-lap-test-va-baseline-FSE-2027-15.md
-    ../../261-Master-Proposal-Analysis/Toan-canh-de-tai-FSE-2027-15-Sentinel.md
+    docs/guides/Huong-dan-tai-lap-test-va-baseline-FSE-2027-15.md
+    docs/thesis/Toan-canh-de-tai-FSE-2027-15-Sentinel.md
 """
 from __future__ import annotations
 import argparse, json, sys

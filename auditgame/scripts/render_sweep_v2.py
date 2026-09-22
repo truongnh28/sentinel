@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-render_sweep_v2.py -- Generate spikes/sweep-loss-v2.md from sweep-v2 JSON files and log.
+render_sweep_v2.py -- Generate docs/reports/sweep-loss-v2.md from sweep-v2 JSON files and log.
 """
 import json
+import pathlib
 import dprime_sweep as ds
 
 def load_cells(json_path):
@@ -62,7 +63,7 @@ def main():
     md.append("")
     md.append("**Ngày đo:** 19/09/2026 · **Module:** `dprime_sweep.py`")
     md.append("**Dữ liệu:** `spikes/sweep-v2-following.json` (bản chính) và `spikes/sweep-v2-pinned.json` (đối chứng ghim)")
-    md.append("**Thay thế:** Phán quyết v1 tại `spikes/sweep-loss-b5-b6.md` theo nguyên tắc tiền-đăng-ký.")
+    md.append("**Thay thế:** Phán quyết v1 tại `docs/reports/sweep-loss-b5-b6.md` theo nguyên tắc tiền-đăng-ký.")
     md.append("")
     md.append("> **ĐỌC BA DÒNG NÀY TRƯỚC.**")
     md.append("> 1. **Số v2 THAY số v1, KHÔNG CHỌN.** Sau khi sửa bug `MatchedAttack` ở Task A1a, kết quả đo lường v2 hoàn toàn thay thế v1.")
@@ -268,9 +269,9 @@ def main():
     md.append("   - Sự phân tầng rõ ràng giữa 4 policy cung cấp cơ sở phương pháp luận cho việc lựa chọn cơ chế phòng thủ dựa trên hàm chi phí thực tế của tổ chức.")
 
     content = "\n".join(md) + "\n"
-    with open("spikes/sweep-loss-v2.md", "w") as f:
-        f.write(content)
-    print("Wrote spikes/sweep-loss-v2.md successfully!")
+    out = pathlib.Path(__file__).resolve().parents[2] / "docs" / "reports" / "sweep-loss-v2.md"
+    out.write_text(content)
+    print(f"Wrote {out} successfully!")
 
 if __name__ == "__main__":
     main()

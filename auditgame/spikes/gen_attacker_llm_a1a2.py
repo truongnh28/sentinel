@@ -4,7 +4,7 @@ gen_attacker_llm_a1a2.py -- OFFLINE, ONE-TIME generator for task 4
 (A1 `llm-informed`, A2 `llm-hybrid`).
 
 Brief: .superpowers/sdd/2026-09-20-ssg-gate4c/task-4-brief.md
-Tien-dang-ky: HCMUT/261-Master-Proposal-Analysis/TIEN-DANG-KY-Attacker-LLM.md
+Tien-dang-ky: docs/preregistration/TIEN-DANG-KY-Attacker-LLM.md
 
 CHAY DUNG MOT LAN, THAT TIEN.  Giong het tinh than payloads/generate.py va
 spikes/p2_run.py: goi API O DAY, ghi ket qua ra file JSON/JSONL, COMMIT file
@@ -41,7 +41,7 @@ BAY DA DO DUOC, TRANH LAP LAI:
     khong dat thi RETRY (toi da 3 lan, backoff), va NEU VAN khong dat thi ghi
     LY DO vao "refusals", KHONG lang le bo qua (N3).
 
-CHI PHI.  Bang gia da do (spikes/p2-cost-report.md, 2026-09-19): Peak
+CHI PHI.  Bang gia da do (docs/reports/p2-cost-report.md, 2026-09-19): Peak
 $0.3/1M in (miss) / $0.006/1M in (hit) / $1.2/1M out; Off-peak = nua gia. O
 day dung gia PEAK, cache-MISS cho CA input lan output (can tren, khong gia
 dinh duoc cache) de tinh chi_phi_uoc_tinh_usd -- mot UOC LUONG THAN TRONG, ghi

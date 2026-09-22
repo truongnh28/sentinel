@@ -1,6 +1,6 @@
 """
 GATE 1 -- the carriers live OUTSIDE the repo, on a real filesystem.
-Spec: eval/PLAN.md Task 13; ../pipelines/SPEC-P1a-Harness.md Part 3.
+Spec: docs/thesis/eval/PLAN.md Task 13; docs/thesis/pipelines/SPEC-P1a-Harness.md Part 3.
 
 The whole trick of the thesis is one sentence: the repo is reset to every task's
 `base_commit`, and the agent's state is NOT.  `core.CarrierStore` cannot show

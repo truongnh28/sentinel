@@ -1,6 +1,6 @@
 """
 attacks.py -- The AttackPipeline PORT.
-Spec: pipelines/SPEC-Framework-Benchmark.md Part 2.1.
+Spec: docs/thesis/pipelines/SPEC-Framework-Benchmark.md Part 2.1.
 
 Why this port was extracted FIRST of the four: it is the one demonstrated to be
 the most dangerous.  `experiment.py` once contained a single line
@@ -202,7 +202,7 @@ class GradedAttack:
 
 
 # --------------------------------------------------------------------------
-# 4. epsilon = DISTANCE FROM THE AGENT'S OWN DISTRIBUTION  (QUYET-DINH.md, Q1)
+# 4. epsilon = DISTANCE FROM THE AGENT'S OWN DISTRIBUTION  (docs/thesis/QUYET-DINH.md, Q1)
 # --------------------------------------------------------------------------
 
 class MatchedAttack:
@@ -243,7 +243,7 @@ class MatchedAttack:
     builds its own content and does not pass through `build.payload_content`, so
     `build.PAYLOAD_LENGTH` never constrained the corpus) and by `depth` from
     eps >= 0.7, where it separates perfectly at 1.0000.  Full tables:
-    spikes/cong-v2.md SS3.5b and SS4.1.
+    docs/preregistration/cong-v2.md SS3.5b and SS4.1.
 
     Why this exists.  Measured on 60 workflows, 936 live items at sigma, a logistic
     regression on F_match separated poisoned from clean with held-out AUC = 1.0000,
@@ -296,7 +296,7 @@ class MatchedAttack:
     The payload now carries `retrieval.payload_topic_like(task.topic, eps)`, a
     subset of size k = max(1, ceil(eps*m)), so sim = k/m and, at the frozen
     THETA = 0.5, retrieval is a STEP FUNCTION OF THE TOPIC SIZE.  Measured on the
-    full pool (spikes/eps-ngan-sach-that.md), fraction of feasible events whose
+    full pool (docs/reports/eps-ngan-sach-that.md), fraction of feasible events whose
     payload fires at sigma / MEAN CI upper bound over discriminator.SPLIT_SEEDS,
     at Delta = 0:
 
@@ -375,7 +375,7 @@ class MatchedAttack:
     honest sentence is that THIS PIPELINE, the only one in REGISTRY, WOULD NOT
     CLEAR 0.56 IF GATE 2 CERTIFIED ON THE NATURAL BACKGROUND.  Which background
     certification should use is a decision nothing in this repository has taken,
-    and it is not taken here.  Full tables: spikes/eps-ngan-sach-that.md SS5b.
+    and it is not taken here.  Full tables: docs/reports/eps-ngan-sach-that.md SS5b.
 
     ---- WHAT THE GATE-2 CERTIFICATE DOES NOT COVER ----
 
@@ -417,7 +417,7 @@ class MatchedAttack:
     CRITERION, not a result about the attacker.  Pinned by
     tests/gate2_validity/test_matched_epsilon_budget.py::
     TheTopicAxisIsOutsideTheMeasuredFeatureSpace, and written up as limit 6 of
-    spikes/eps-ngan-sach-that.md SS9.
+    docs/reports/eps-ngan-sach-that.md SS9.
 
     `requires_graded_retrieval` STAYS FALSE, and the reasoning is not "so the
     mock keeps working".  The flag means MEANINGLESS on an exact dataset
@@ -484,7 +484,7 @@ class MatchedAttack:
     #: MatchedAttack AUCs the `dist-matched` PENDING entry publishes (0.6239 /
     #: 0.6533 / 0.6566 at Delta 0/2/4, primary holdout corpus): those three cells
     #: carry a 4-character offset of unknown sign and are NOT upper bounds the way
-    #: the memory cells are.  Every AUC in spikes/eps-ngan-sach-that.md is a
+    #: the memory cells are.  Every AUC in docs/reports/eps-ngan-sach-that.md is a
     #: carrier="memory" number, where the offset is zero, and
     #: TheSizeIsTheAgentNoteItImitates exercises memory only, which is the scope
     #: of what it proves.  Making it exact for all four means reading the
@@ -759,7 +759,7 @@ def benign_estimate(carrier: str = "memory", parity: int = ESTIMATION_PARITY,
 #: not. Direction conservative (the pooled marginal is wider than any one repo's,
 #: so the payload it produces is if anything easier to tell apart), magnitude
 #: under 2%, and now recorded instead of inferred.  Full table:
-#: spikes/ho-tan-cong-mo-rong.md SS3.3.
+#: docs/preregistration/ho-tan-cong-mo-rong.md SS3.3.
 _POOLED_SUBSTITUTIONS: dict = {}
 
 
@@ -837,7 +837,7 @@ class DistributionMatchedAttack:
     Delta, no corpus and no statistic in this repository yields it, and it is
     WITHDRAWN rather than restated -- the same defect class, and the same remedy,
     as the withdrawn 0.5427 / 0.5873 / 0.5728 in the PENDING entry below.  The
-    Delta=2 row above is the one already published at spikes/b5-benign-enrich.md
+    Delta=2 row above is the one already published at docs/reports/b5-benign-enrich.md
     SS4; the other two rows are re-derived there in the same table.
 
     THE ADAPTIVE-ATTACKER ASSUMPTION, DECLARED.  This pipeline reads an estimate
@@ -906,7 +906,7 @@ class DistributionMatchedAttack:
 
     THE HOLDOUT CELL IS THE PRIMARY REPORTED NUMBER.  A number that is not
     leakage-free is not reportable, so the default-corpus figure is kept beside
-    it as the comparison it is and labelled as such (spikes/ho-tan-cong-mo-rong.md
+    it as the comparison it is and labelled as such (docs/preregistration/ho-tan-cong-mo-rong.md
     SS4 and SS6).  The holdout costs POWER, and that cost is named rather than
     read as stealth: `n_pos` roughly halves at Delta 2 and 4, so a wider
     Hanley-McNeil interval there is SAMPLE SIZE, not the payload becoming harder
@@ -1182,7 +1182,7 @@ class DistributionMatchedAttack:
         # all -- the tag shrinks and the deterministic filler pads the difference
         # back to the identical `target` -- so epsilon gets its upside here for
         # free, with no size argument to weigh against it.  Measured consequence
-        # in spikes/ho-tan-cong-mo-rong.md SS4 (`fires` column) and SS5.
+        # in docs/preregistration/ho-tan-cong-mo-rong.md SS4 (`fires` column) and SS5.
         #
         # payload_topic_like, not payload_topic: the latter returns a plain
         # frozenset, whose str() walks a hash table laid out by PYTHONHASHSEED --
@@ -1398,7 +1398,7 @@ PENDING: dict = {
                      "the answer moves with Delta; the attribution, the "
                      "seed=1 drift-window artefact behind the Delta=2 `depth` "
                      "residual, and the pooled-fallback share are all in "
-                     "spikes/ho-tan-cong-mo-rong.md, re-measured on the primary "
+                     "docs/preregistration/ho-tan-cong-mo-rong.md, re-measured on the primary "
                      "corpus.",
                      frozenset({BLOCKER_GATE2_AUC})),
     "frozen-payload": (FrozenPayloadAttack(),

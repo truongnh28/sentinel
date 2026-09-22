@@ -1,5 +1,5 @@
 """
-topics.py -- gold patch -> module token set.  Spec: SPEC-P1a-Harness.md Part 2.
+topics.py -- gold patch -> module token set.  Spec: docs/thesis/pipelines/SPEC-P1a-Harness.md Part 2.
 
 No model, no embedding, just string splitting -- so it is deterministic and replays.
 """

@@ -1,5 +1,5 @@
 """
-GATE 1 -- the sealed manifest.  Spec: SPEC-AuditGame-SE.md.
+GATE 1 -- the sealed manifest.  Spec: docs/thesis/eval/SPEC-AuditGame-SE.md.
 
 The manifest is what the EVALUATOR knows and the SYSTEM does not.  A missing field
 is not cosmetic: each one closes a specific "how do we know that" question, and

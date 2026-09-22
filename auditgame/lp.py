@@ -134,7 +134,7 @@ def solve_remaining_lp(K: int, H: int, t: int, B_rem: float, kap: list[float],
                        done: dict | None = None):
     """Minimax coverage for the windows STILL OPEN at task t.
 
-    Spec: TIEN-DANG-KY-Sentinel-SSG.md SS4 ("hieu ung duoi").
+    Spec: docs/preregistration/TIEN-DANG-KY-Sentinel-SSG.md SS4 ("hieu ung duoi").
 
     WHY NOT JUST RE-SOLVE A FRESH GAME OF LENGTH H-t.  A fresh game only knows
     windows that both start and end inside [t, H).  Measured with deltas=(2,4):

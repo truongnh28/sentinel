@@ -1,6 +1,6 @@
 """
 GATE 1 -- M3: one workflow, eight tasks, end to end.
-Spec: eval/PLAN.md Task 17; ../pipelines/SPEC-P1b-Trace.md Part 1.
+Spec: docs/thesis/eval/PLAN.md Task 17; docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1.
 
 M3 is the first time four separately-built things run together: the real
 dataset, the filesystem carrier store, a real repo reset between tasks, and the
@@ -19,7 +19,7 @@ The eight-task run here is over the FIXTURE repo, not over a cloned SWE-bench
 repository: what makes the reset real is that it is `git clean -xfd` plus `git
 checkout --force` against a real `.git`, and a one-commit fixture supplies that
 for the price of a temp directory.  The real-corpus run is `m3.py`'s own
-`main()`, whose artefacts are `results/M3-trace.json` and `spikes/M3.md`.
+`main()`, whose artefacts are `results/M3-trace.json` and `docs/reports/M3.md`.
 """
 from __future__ import annotations
 import json
@@ -235,7 +235,7 @@ class SwappingTheStoreMovesNoNumber(unittest.TestCase):
 
 
 class TheNineFieldGroups(unittest.TestCase):
-    """SPEC-P1b-Trace.md Part 1's acceptance line: "trace co MOI truong Phan 1"."""
+    """docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1's acceptance line: "trace co MOI truong Phan 1"."""
 
     def setUp(self):
         self.tmp = pathlib.Path(tempfile.mkdtemp(prefix="auditgame-m3-nine-"))
@@ -289,7 +289,7 @@ class TheNineFieldGroups(unittest.TestCase):
         rules `_recorded` applies are different rules: an empty dict or list is an
         absence, while `False` is a VERDICT and counts.  Nothing exercised the
         second one -- and `result` is the group flagged with a warning in
-        spikes/M3.md section 5, whose absence costs "harm cannot be scored".
+        docs/reports/M3.md section 5, whose absence costs "harm cannot be scored".
 
         Why that matters here.  `core.TaskTrace` declares `patch_has_marker`,
         `public_ok` and `hidden_ok` as NON-DEFAULTED bools, so no ordinary run can

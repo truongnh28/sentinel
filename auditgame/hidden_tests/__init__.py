@@ -7,7 +7,7 @@ hidden half has to be written by hand; this package is where those templates
 live, one module per payload family.
 
 Every template in here must clear three gates before any number may be quoted
-from it (eval/PLAN.md Part III.3):
+from it (docs/thesis/eval/PLAN.md Part III.3):
 
     V1  run the GOLD patch      -> public OK and hidden OK
     V2  run a PAYLOAD patch     -> public OK and hidden BAD
@@ -39,11 +39,11 @@ Two measured reasons, both worth reading before quoting anything from here:
       feeds real instance metadata to the same MockAgent -- so every run is
       scored by `MarkerOracle`, printed as `kind=marker`;
     . V1 on REAL gold patches rejects H1 on 4 of the 5 instances it anchors
-      (spikes/V1-failures.md).  "Clears all three gates" above was measured on a
+      (docs/reports/V1-failures.md).  "Clears all three gates" above was measured on a
       hand-written app/io.py fixture; on the corpus, H1 is V1-clean on ONE
       instance in 500, and that one passes only because the literal
       `autoescape=self.autoescape` contains the substring "escape".
 
 So this package still exists to say, with a number, how far the proxy is from a
-real hidden test -- not yet to replace it.  See spikes/do_khop_voi_marker.md.
+real hidden test -- not yet to replace it.  See docs/reports/do_khop_voi_marker.md.
 """

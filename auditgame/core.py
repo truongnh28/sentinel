@@ -68,7 +68,7 @@ def _topic_code_canonical(topic) -> float:
 
 def _topic_code_mean(topic) -> float:
     """Mean of code8 over the tokens.  The feature SHIPPED at gate 2 v2, kept as a
-    named candidate so the sensitivity table in spikes/cong-v2.md SS3.7 can be
+    named candidate so the sensitivity table in docs/preregistration/cong-v2.md SS3.7 can be
     reproduced rather than taken on trust."""
     toks = sorted(str(t) for t in retrieval.as_topic(topic))
     return sum(_code8(t) for t in toks) / len(toks) if toks else 0.0
@@ -124,7 +124,7 @@ TOPIC_CODE_CANDIDATES = {
 #:     sum        -1.4219   (   0 up, 2248 down           -- one-sided)
 #:     mean       -0.0002   (1091 up, 1157 down           -- BALANCED)
 #:
-#: spikes/cong-v2.md SS0bis.4b is the amended pre-registration, its own commit,
+#: docs/preregistration/cong-v2.md SS0bis.4b is the amended pre-registration, its own commit,
 #: and it discloses in its first line that the AUC table had already been seen
 #: when the amendment was written.  SS3.7 publishes all four AUCs.
 TOPIC_CODE_CHOICE = "mean"
@@ -159,7 +159,7 @@ def topic_code(topic) -> float:
     20 splits clearing to 0.5407 with 15 of 20.  Both statements are true.  They
     differ because of SAMPLE SIZE (80 against 449) and CRITERION (a median point
     estimate against a mean interval upper bound): a residue of ~0.05 is not
-    resolvable on an 80-event fold.  See spikes/cong-v2.md SS4.1.
+    resolvable on an 80-event fold.  See docs/preregistration/cong-v2.md SS4.1.
 
     SO THE FIFTH AXIS WAS ADDED TO CLOSE A CHANNEL MUCH SMALLER THAN THE ONE
     CLAIMED -- 0.5484 at one Delta on the thinnest corpus, not the 0.88 the v2
@@ -167,7 +167,7 @@ def topic_code(topic) -> float:
     -- a new digest and a review -- and is deliberately not decided here.  The
     evidence, the case for keeping it (it does see the Delta=4 residue, and it
     would see an attacker who DID select tokens by an alphabet-correlated rule) and
-    the case against are in spikes/cong-v2.md SS3.5b, SS3.5c and SS4.1.
+    the case against are in docs/preregistration/cong-v2.md SS3.5b, SS3.5c and SS4.1.
 
     THE CHOICE, AND THE GROUND IT RESTS ON.  The code is the MEAN, over the
     topic's tokens, of the token's first TOPIC_CODE_BYTES UTF-8 bytes read as a
@@ -187,7 +187,7 @@ def topic_code(topic) -> float:
     three rejected candidates do in a new disguise.
 
     WHAT WAS REJECTED, and it is kept runnable rather than described.
-    `TOPIC_CODE_CANDIDATES` holds all four, so spikes/cong-v2.md SS3.7's
+    `TOPIC_CODE_CANDIDATES` holds all four, so docs/preregistration/cong-v2.md SS3.7's
     sensitivity table can be reproduced instead of taken on trust:
 
       `canonical` -- code8 of `"|".join(sorted(tokens))`.  Review II ruling 2
@@ -208,7 +208,7 @@ def topic_code(topic) -> float:
     SAID PLAINLY, BECAUSE THE ALTERNATIVE IS A COMFORTABLE SILENCE: the chosen
     feature is also the one under which the certification cell passes, and the
     choice was NOT made blind -- the four-candidate table had been measured when
-    the pre-registration was amended (spikes/cong-v2.md SS0bis.4b says so in its
+    the pre-registration was amended (docs/preregistration/cong-v2.md SS0bis.4b says so in its
     first line).  What can honestly be claimed is narrower: the disqualifying
     criterion was declared BEFORE anything was measured (SS0bis.1, commit
     c85a936), the reason this candidate survives it is checkable with no AUC at
@@ -341,7 +341,7 @@ class CarrierStore:
     def retrieve(self, topic, theta: Optional[float] = None):
         """Retrieval = every live item whose topic MATCHES the current task's,
         where "matches" is Jaccard over module tokens at the frozen
-        `retrieval.THETA` (SPEC-R-Truy-xuat.md Part 2.2).
+        `retrieval.THETA` (docs/thesis/pipelines/SPEC-R-Truy-xuat.md Part 2.2).
 
         This used to be `it.topic == topic`, i.e. theta = 1.0, and that single
         `==` was the bottleneck under advisor question 3:
@@ -422,7 +422,7 @@ class TaskTrace:
     """Everything needed for offline replay -- record too little and the LLM has
     to be re-run from scratch.
 
-    The nine rows of SPEC-P1b-Trace.md Part 1, and the field each one lands in:
+    The nine rows of docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1, and the field each one lands in:
 
         state        4 carriers before and after      before / after
         writes       content . provenance . timestamp writes (+ injected)

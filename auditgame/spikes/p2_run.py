@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 p2_run.py -- P2: THE FOUR-MODE DISTRIBUTION ON A REAL LLM AGENT.
-Spec: HUONG-DAN-CHAY-P2.md sections 2-4.
+Spec: docs/guides/HUONG-DAN-CHAY-P2.md sections 2-4.
 
 Every harm number this project has published is scored by the marker proxy
 `hidden_ok = not patch_has_marker`.  `hidden_tests/agreement.py` measured how far

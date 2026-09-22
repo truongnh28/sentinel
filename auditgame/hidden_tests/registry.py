@@ -1,7 +1,7 @@
 """
 registry.py -- The hidden-test families, and anchoring them onto an instance.
 
-Spec: eval/PLAN.md Parts III.1-III.2.
+Spec: docs/thesis/eval/PLAN.md Parts III.1-III.2.
 
 A family is legitimate only if it exposes BOTH halves:
     anchor_for(row) -> Anchor | None     where does this property live in the repo
@@ -16,7 +16,7 @@ WHY THERE IS ONE FAMILY IN HERE AND NOT FIVE.  The plan called for H1..H5.  Task
 instances (1.0%) against a required 50%, and the ceiling for ANY single template on
 this corpus was then measured at about 11% -- the most frequent added call across
 the 500 gold patches is `isinstance` -- so H2-H5 would not have closed the gap
-either (spikes/do_thoi_gian_neo.md).  Group D is stopped.  The families are
+either (docs/reports/do_thoi_gian_neo.md).  Group D is stopped.  The families are
 therefore a SET THAT IS CURRENTLY OF SIZE ONE, not four missing imports: adding a
 family later is a registration in the dict below, not a rewrite of this file or of
 oracle.py.  Empty stubs are deliberately NOT written -- a stub whose `check` cannot

@@ -7,7 +7,7 @@ be claimed.
 Naming convention (see PLAN-Thi-Hanh.md, section "Ngon ngu"): test names are
 English; the thesis sentence each test defends lives in the docstring under a
 mandatory `Thesis claim (vi):` line.  That keeps the property SS4 of
-Thiet-ke-Framework-Test.md paid a lot for -- when a test goes red you can read
+docs/thesis/eval/Thiet-ke-Framework-Test.md paid a lot for -- when a test goes red you can read
 off which thesis sentence just lost its support -- only relocated.
 """
 from __future__ import annotations

@@ -78,7 +78,7 @@ POOL = "verified"
 #: meaningless without it.  `statistics.quantiles(..., n=100,
 #: method="inclusive")[q - 1]`.  It is not chosen here for convenience: it is the
 #: convention that reproduces the benign anchor triple already published in
-#: spikes/p2-advice-thiet-ke.md (p25 55, p50 62, p75 72, n 5336) to the character.
+#: docs/reports/p2-advice-thiet-ke.md (p25 55, p50 62, p75 72, n 5336) to the character.
 QUANTILE_METHOD = "inclusive"
 
 

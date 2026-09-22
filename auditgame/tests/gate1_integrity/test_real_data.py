@@ -1,5 +1,5 @@
 """
-GATE 1 -- real SWE-bench data.  Spec: ../pipelines/SPEC-P1a-Harness.md Part 2.
+GATE 1 -- real SWE-bench data.  Spec: docs/thesis/pipelines/SPEC-P1a-Harness.md Part 2.
 
 These tests NEVER touch the network: they use one embedded sample row.
 """
@@ -319,7 +319,7 @@ class WorkflowGrouping(unittest.TestCase):
           * core.CarrierStore.retrieve now goes through retrieval.retrieved(),
             so "related" is sim >= theta rather than set equality;
           * theta is retrieval.THETA = 0.5, derived from the measured |topic|
-            distribution in spikes/chot_theta.md and COMMITTED BEFORE these
+            distribution in docs/reports/chot_theta.md and COMMITTED BEFORE these
             counts were looked at. The old note here said "theta moves when
             retrieval moves"; retrieval moved.
 
@@ -341,7 +341,7 @@ class WorkflowGrouping(unittest.TestCase):
             "the filter no longer describes the retrieval it filters for")
         self.assertEqual(retrieval.THETA, 0.5,
                          "theta moved away from the value derived in "
-                         "spikes/chot_theta.md -- re-derive it from the |topic| "
+                         "docs/reports/chot_theta.md -- re-derive it from the |topic| "
                          "distribution before touching this test")
         rep = swebench_dataset.SWEBenchDataset().grouping_report(H=8)
         self.assertEqual(rep["grouped"], 58)

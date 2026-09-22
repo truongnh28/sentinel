@@ -1,6 +1,6 @@
 """
 GATE 2 -- the remaining declared quantities, and numerical checks of the theory.
-Spec: Danh-sach-diem-can-them.md B4, B5, B6, C4.
+Spec: docs/thesis/Danh-sach-diem-can-them.md B4, B5, B6, C4.
 
 gamma, rho, zeta and V* are all in the notation table, and none of the three
 theoretical results had a numerical check of any kind. A proof with no executable

@@ -2,7 +2,7 @@
 """
 gen_score_table.py -- Generates the CARRIER SCORE REFERENCE TABLE for AuditGame-SE.
 
-This is B0.5's first artifact (see eval/SPEC-Tang-Do-va-Test.md SS2.5-2.6).
+This is B0.5's first artifact (see docs/thesis/eval/SPEC-Tang-Do-va-Test.md SS2.5-2.6).
 ONE table serves THREE consumers, which is why it must freeze as a single block:
 
   1. tau_sel(n_c, d', K)   -> B5/B6's carrier-selection threshold; FP = 5% PER TASK
@@ -225,7 +225,7 @@ def main() -> int:
     doc = {
         "provenance": {
             "generated_by": "auditgame/reference/gen_score_table.py",
-            "spec": "eval/SPEC-Tang-Do-va-Test.md §2.5-2.6",
+            "spec": "docs/thesis/eval/SPEC-Tang-Do-va-Test.md §2.5-2.6",
             "measured_at": datetime.date.today().isoformat(),
             "status": "MEASURED",
             "seed": SEED,

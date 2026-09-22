@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 m3.py -- M3: ONE workflow, EIGHT tasks, end to end.
-Spec: eval/PLAN.md Task 17 (a5); ../pipelines/SPEC-P1b-Trace.md Part 1.
+Spec: docs/thesis/eval/PLAN.md Task 17 (a5); docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1.
 
 This is the first time four separately-built things run in the same process:
 
@@ -127,7 +127,7 @@ PENDING_KEY = "pending_measurement"
 #: results/M3-run.json publishes `"outcome": {"harm": 1.0, "solved": true, ...}`
 #: and reports the `result` field group present with public_ok recorded on 8 of 8
 #: tasks -- while `solved` is `random.Random(seed_of(seed, t, "solve"))`, a coin
-#: MockAgent flips.  `agent_is_mock: true` and spikes/M3.md section 4 say so in
+#: MockAgent flips.  `agent_is_mock: true` and docs/reports/M3.md section 4 say so in
 #: prose; the machine-readable "what this run did not measure" list did not, and
 #: that list is the one a reader greps.
 #:
@@ -157,7 +157,7 @@ UNMEASURED_BY_M3 = (
 MANIFEST_PENDING = {
     "auc_match_ci": (
         "F_match AUC with its CI95 is measured by analysis/benign_corpus.py "
-        "against a matched benign corpus, per (epsilon, Delta) -- spikes/b5-auc.md "
+        "against a matched benign corpus, per (epsilon, Delta) -- docs/reports/b5-auc.md "
         "records it for the screening grid. It has NOT been measured for THIS "
         "workflow's payload: the corpus is harvested per poisoning event and the "
         "b5 figures are for pool=full, carrier=memory at the screened epsilons, so "
@@ -179,7 +179,7 @@ MANIFEST_PENDING = {
         "Assigning one here is exactly the hand-assignment I5 is red about."),
 }
 
-#: The nine rows of SPEC-P1b-Trace.md Part 1, and the TaskTrace fields each one
+#: The nine rows of docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1, and the TaskTrace fields each one
 #: lands in.  The names are the spec's, in the spec's order, so that a reader with
 #: the table open can check them off; `core.TaskTrace`'s own docstring lists the
 #: same mapping from the other side.
@@ -511,7 +511,7 @@ class TaskDriver:
         container probe finding it absent has observed "the reset removed the file
         the driver planted 0.2 seconds ago".  It has NOT observed "the PREVIOUS
         task's scratch file is gone", which is what the probe's own message and
-        spikes/M3.md section 8 used to say: the previous task's file was already
+        docs/reports/M3.md section 8 used to say: the previous task's file was already
         removed by the previous task's reset, so nothing carries across.
 
         The check is right and worth keeping -- it is the positive control that
@@ -695,7 +695,7 @@ def main(argv=None) -> int:
     sealed_run = sealed_trace.sealed_path(out.parent / "M3-run.json")
     wall = time.perf_counter() - wall0
 
-    # The EVIDENCE BEHIND spikes/M3.md, beside the trace rather than in a
+    # The EVIDENCE BEHIND docs/reports/M3.md, beside the trace rather than in a
     # paragraph: the eight resets with their controls, the eight container probes
     # with what the agent could and could not see, the timings, and the list of
     # quantities this run did not measure. A spike doc quoting numbers nobody can
@@ -764,7 +764,7 @@ def main(argv=None) -> int:
     print(f"record    : {out.parent / 'M3-run.json'}")
     print(f"wall      : {wall / 60:.2f} min")
 
-    print("\nnine field groups (SPEC-P1b-Trace.md Part 1):")
+    print("\nnine field groups (docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1):")
     for g, v in field_groups(run.result.traces).items():
         print(f"  {'OK ' if v['present'] else 'EMPTY'} {g:12s} {v['fields']}"
               + (f"   -- {v['note']}" if "note" in v else ""))

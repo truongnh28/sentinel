@@ -1,10 +1,10 @@
 """
 GATE 2 -- the DISTRIBUTION-MATCHED attacker, and the F_match axes it claims.
 (F_match gained a fifth axis, `topic`, at gate 2 v2; this pipeline predates it
-and matches four. That is a declared scope, measured in spikes/cong-v2.md SS3.2.)
+and matches four. That is a declared scope, measured in docs/preregistration/cong-v2.md SS3.2.)
 
-Spec: eval/SPEC-AuditGame-SE.md Part 0; QUYET-DINH.md question 1; advisor item
-(iii).  Companion measurement: spikes/ho-tan-cong-mo-rong.md.
+Spec: docs/thesis/eval/SPEC-AuditGame-SE.md Part 0; docs/thesis/QUYET-DINH.md question 1; advisor item
+(iii).  Companion measurement: docs/preregistration/ho-tan-cong-mo-rong.md.
 
 WHY A SEPARATE FILE FROM test_benign_corpus.py.  That file asks the REGISTRY
 question -- "does some epsilon put every registered pipeline under the ceiling" --
@@ -44,7 +44,7 @@ the hosting workflow's own live age-matched items first.  A leak read off the po
 alone is a lower bound over the wrong denominator, so `matched_corpus`'s
 `control_ids` sink is used to read the scored class itself.
 
-The holdout cell is the PRIMARY reported number (spikes/ho-tan-cong-mo-rong.md
+The holdout cell is the PRIMARY reported number (docs/preregistration/ho-tan-cong-mo-rong.md
 §4 and §6); the default one is kept beside it, labelled, as the comparison.
 """
 from __future__ import annotations
@@ -200,7 +200,7 @@ class TheAttackerEstimateIsHeldOut(unittest.TestCase):
             f"estimate {len(a_ids)}, pool {len(p_ids)}, shared "
             f"{len(a_ids & p_ids)} (was 1618 / 3349 / 1168 = 72.2% of the "
             f"estimate and 34.9% of the pool). Re-derive "
-            f"spikes/ho-tan-cong-mo-rong.md §4 and §6 before quoting either "
+            f"docs/preregistration/ho-tan-cong-mo-rong.md §4 and §6 before quoting either "
             f"table.")
 
         # RE-DERIVED AT GATE 2 v2 (2026-09-18).  The pool figures above did not
@@ -368,7 +368,7 @@ class PayloadFollowsTheBenignShape(unittest.TestCase):
         The qualitative reading CHANGES and is restated rather than carried over:
         on the five-column space `topic` is now the driving axis (-0.23 at
         Delta=0), `depth` is second (-0.04), and `size` still moves nothing
-        (-0.001).  Reproduce with the command in spikes/cong-v2.md SS3.  The
+        (-0.001).  Reproduce with the command in docs/preregistration/cong-v2.md SS3.  The
         earlier wording quoted "from 0.78 to 0.71", a pair that reproduces at NO
         Delta, on NO corpus, under NO statistic in this repository; it stays
         withdrawn.

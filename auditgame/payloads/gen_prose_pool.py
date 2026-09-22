@@ -4,7 +4,7 @@ gen_prose_pool.py -- OFFLINE, ONE-TIME generator for `prose_pool`, step 1 of
 the detector measurement plan.
 
 Brief:        .superpowers/sdd/2026-09-20-detector/step-1-brief.md
-Spec:         HCMUT/261-Master-Proposal-Analysis/TIEN-DANG-KY-Detector-Noi-Dung.md
+Spec:         docs/preregistration/TIEN-DANG-KY-Detector-Noi-Dung.md
               SS3, SS3.1, SS3.2, SS9 (FROZEN 20/09/2026 -- do not edit that text).
 
 WHY THIS EXISTS.  SS2 of the spec shows the current benign corpus
@@ -368,7 +368,7 @@ def main() -> int:
         "date": "2026-09-20",
         "prose_pool_sha256": prose_pool_sha256,
         "python": sys.version.split()[0],
-        "spec": "TIEN-DANG-KY-Detector-Noi-Dung.md SS3",
+        "spec": "docs/preregistration/TIEN-DANG-KY-Detector-Noi-Dung.md SS3",
         "warning": "Do NOT edit by hand -- item_id is hashed from content.",
         "complete": have_enough,
         "stopped_reason": stopped_reason,

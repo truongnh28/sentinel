@@ -1,6 +1,6 @@
 """
 GATE 2 -- the scripted attacker library, and the held-out split.
-Spec: Danh-sach-diem-can-them.md C2, C3.
+Spec: docs/thesis/Danh-sach-diem-can-them.md C2, C3.
 
 The manuscript reports 27.6% against held-out adaptive attackers. There was no
 attacker library, no split, and therefore nothing behind that number -- an

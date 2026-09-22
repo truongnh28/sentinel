@@ -10,7 +10,7 @@ A SKIPPED test is reported separately from a green one, and a gate holding one i
 never called green.  A skip is a claim with no evidence in this run; folding it
 into the pass count makes the suite loudest exactly where it knows least.
 
-    cd HCMUT/code/Sentinel/auditgame
+    cd auditgame
     python3 tests/run_all.py
     python3 tests/run_all.py --all      # run everything, do not stop (for the full picture)
 """

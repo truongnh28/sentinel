@@ -1,5 +1,5 @@
 """
-retrieval.py -- GRADED RETRIEVAL (R).  Spec: pipelines/SPEC-R-Truy-xuat.md
+retrieval.py -- GRADED RETRIEVAL (R).  Spec: docs/thesis/pipelines/SPEC-R-Truy-xuat.md
 
 Problem: `CarrierStore.retrieve` matches topic strings EXACTLY, so the retrieval
 function takes only two values {0, 1}.  AgentPoison attacks by optimising a
@@ -57,7 +57,7 @@ class Topic(frozenset):
     __repr__ = __str__
 
 #: THE FROZEN RETRIEVAL THRESHOLD.  Derived from the measured |topic|
-#: distribution in spikes/chot_theta.md, WRITTEN AND COMMITTED BEFORE the
+#: distribution in docs/reports/chot_theta.md, WRITTEN AND COMMITTED BEFORE the
 #: resulting workflow count was looked at.  The short form of that argument:
 #:
 #:   * theta only distinguishes values that sit ON the attainable-sim grid; at
@@ -162,7 +162,7 @@ def canonical_topic_string(topic) -> str:
 #: NOTHING IN THE ATTACK MODEL PREFERS ONE STRING.  The model asks for a subset
 #: drawn independently of the alphabet; every salt gives one, and each gives a
 #: DIFFERENT one.  Measured over a 17-salt family (this literal plus
-#: "payload_topic#1" .. "#16", spikes/cong-v2.md SS3.9), the certify cells move
+#: "payload_topic#1" .. "#16", docs/preregistration/cong-v2.md SS3.9), the certify cells move
 #: far enough that cell verdicts change in both directions -- so the salt is not
 #: an implementation detail, it is a parameter of the measurement, and it belongs
 #: in the hash cell beside theta and the ceiling.  It was fixed in the
@@ -257,7 +257,7 @@ def subset_priority(target: Topic, token: str, _key: str | None = None) -> int:
     order stays defined in exactly ONE place.
 
     THE SALT IS READ AT CALL TIME, from the module global, so that the salt
-    sensitivity table in spikes/cong-v2.md SS3.9 can be REPRODUCED rather than
+    sensitivity table in docs/preregistration/cong-v2.md SS3.9 can be REPRODUCED rather than
     taken on trust -- the same idiom `core.TOPIC_CODE_CHOICE` uses for the
     four-feature table.  It is a frozen field of `analysis.gate2_v2.record()`:
     changing it moves the digest.
@@ -285,7 +285,7 @@ def payload_topic(target: Topic, eps: float) -> Topic:
     them -- so the payload scored below the benign note it was cut from BY
     CONSTRUCTION, and the gate's red cell was measuring `sorted()` rather than any
     property of the attacker.  Review II ruling 1; the pre-registration is
-    spikes/cong-v2.md SS0bis, committed before the re-measurement.
+    docs/preregistration/cong-v2.md SS0bis, committed before the re-measurement.
 
     The attack model never asked for the alphabet.  It asks for a SUBSET, and only
     for a subset: adding tokens OUTSIDE the target inflates the Jaccard
@@ -312,7 +312,7 @@ def payload_topic(target: Topic, eps: float) -> Topic:
     the seed, and a pass or a fail decided at a margin of ~0.03 around the 0.56
     ceiling is not presently resolvable by this benchmark.  `SUBSET_SALT` is
     therefore a frozen field of `analysis.gate2_v2.record()`.
-    spikes/cong-v2.md SS3.9.
+    docs/preregistration/cong-v2.md SS3.9.
 
     Two opposing directions, and that is what makes it a budget:
         small eps -> few tokens -> low sim, may NOT clear theta -> attack fails

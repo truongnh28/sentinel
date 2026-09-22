@@ -1,7 +1,7 @@
 """
 game.py -- The minimax value V*, and the payoff matrix it is computed from.
 
-Spec: Toan-canh SS3 (V* = min_pi max_pi_A L); Danh-sach-diem-can-them.md B7.
+Spec: Toan-canh SS3 (V* = min_pi max_pi_A L); docs/thesis/Danh-sach-diem-can-them.md B7.
 
 The docs call baseline B7 "the CEILING, not a competitor". It did not exist, so
 there was no reference point and "how far from optimal is this policy" had no

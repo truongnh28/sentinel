@@ -30,7 +30,7 @@ import re
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent.parent
-PLAN = HERE.parent.parent.parent / "261-Master-Proposal-Analysis" / "eval" / "PLAN.md"
+PLAN = HERE.parent / "docs" / "thesis" / "eval" / "PLAN.md"
 DOCS = PLAN.parent.parent
 
 #: Bare-name imports that are stdlib, packages, or otherwise not task-produced.

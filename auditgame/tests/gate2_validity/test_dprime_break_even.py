@@ -1045,7 +1045,7 @@ class ThePublishedHarmBreakEvenIsPinnedToItsOwnInterval(unittest.TestCase):
               0.28378378378378377), (3.0, 0.32432432432432434)]
     }
 
-    #: spikes/dprime-sweep.md SS5, quoted in three other documents.
+    #: docs/reports/dprime-sweep.md SS5, quoted in three other documents.
     PUBLISHED_D_STAR = {0: None, 1: None, 2: 2.55, 4: 0.60}
 
     def _cells(self, delta):

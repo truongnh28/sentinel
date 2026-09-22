@@ -1,6 +1,6 @@
 """
 GATE 2 -- the benign corpus, and the operational half (a) of F_match separation.
-Spec: QUYET-DINH.md questions 1 and 8; eval/SPEC-AuditGame-SE.md Part 0.
+Spec: docs/thesis/QUYET-DINH.md questions 1 and 8; docs/thesis/eval/SPEC-AuditGame-SE.md Part 0.
 
 Without this the game DEGENERATES: if a payload is trivially separable from benign
 items on surface features, then a wrong quarantine costs nothing, the defender
@@ -241,7 +241,7 @@ class BenignCorpus(unittest.TestCase):
             # right reason this time. The argument for the median over the max
             # does NOT rest on any of these digits: an 80-event fold's maximum
             # still converges to the supremum rather than to a population
-            # quantity. Reproduce: spikes/cong-v2.md SS3.5.
+            # quantity. Reproduce: docs/preregistration/cong-v2.md SS3.5.
             screen = {}
             for eps in EPSILONS:
                 # THE STATISTIC IS READ OFF THE FROZEN RECORD, not spelled

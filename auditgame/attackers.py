@@ -1,7 +1,7 @@
 """
 attackers.py -- The scripted attacker LIBRARY, and the held-out split.
 
-Spec: Danh-sach-diem-can-them.md C2; SPEC-Framework-Benchmark.md Part 2.1.
+Spec: docs/thesis/Danh-sach-diem-can-them.md C2; docs/thesis/pipelines/SPEC-Framework-Benchmark.md Part 2.1.
 
 The manuscript reports 27.6% against held-out adaptive attackers. Nothing stood
 behind that number: what existed was an enumeration of (Delta, carrier)

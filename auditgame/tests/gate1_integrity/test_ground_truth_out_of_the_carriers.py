@@ -1,6 +1,6 @@
 """
-GATE 1 -- the ground-truth label never reaches the agent.  Spec: SPEC-AuditGame-SE.md;
-eval/PLAN.md Task 13 (its open question), Task 19, Task 21 (the sealed manifest).
+GATE 1 -- the ground-truth label never reaches the agent.  Spec: docs/thesis/eval/SPEC-AuditGame-SE.md;
+docs/thesis/eval/PLAN.md Task 13 (its open question), Task 19, Task 21 (the sealed manifest).
 
 `core.Item.poisoned` is the label the whole experiment exists to INFER.  Task 13
 persisted it: `core.item_record` includes `poisoned`, `FSCarrierStore` wrote that

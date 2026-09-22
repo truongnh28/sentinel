@@ -1,6 +1,6 @@
 """
 GATE 1 -- the R1 subset and the marker proxy's measured fidelity.  Spec: this
-file plus spikes/do_khop_voi_marker.md; retreat R1 of eval/PLAN.md Part III.6.
+file plus docs/reports/do_khop_voi_marker.md; retreat R1 of docs/thesis/eval/PLAN.md Part III.6.
 
 Every harm number the project has published rests on
 `oracle.hidden_ok = not patch_has_marker`.  Task 10 failed to replace that proxy
@@ -62,7 +62,7 @@ EXPECTED = {
 
 _RE_DERIVE = (
     "The R1 agreement figure moved. That means the subset or the hidden-test "
-    "templates changed, and spikes/do_khop_voi_marker.md's limitation sentence "
+    "templates changed, and docs/reports/do_khop_voi_marker.md's limitation sentence "
     "must be RE-DERIVED from the new subset. Do NOT edit the expected number "
     "here to make this pass: the number is the claim.")
 

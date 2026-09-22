@@ -3,8 +3,8 @@ per_instance.py -- THE R1 HALF: one hand-written hidden test per instance.
 
 Task 10 measured H1's coverage on SWE-bench Verified and the decision gate went
 red: one template anchors on 5 of 500 instances, and the measured ceiling for any
-single template on this corpus is about 11% (spikes/do_thoi_gian_neo.md).  The
-retreat taken here is eval/PLAN.md III.6's R1 -- give up on ONE template that
+single template on this corpus is about 11% (docs/reports/do_thoi_gian_neo.md).  The
+retreat taken here is docs/thesis/eval/PLAN.md III.6's R1 -- give up on ONE template that
 generalises and hand-write a SEPARATE property per instance -- used not as a
 replacement for the marker proxy but as the yardstick the proxy is measured
 against.

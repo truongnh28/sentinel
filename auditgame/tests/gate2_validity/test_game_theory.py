@@ -1,6 +1,6 @@
 """
 GATE 2 -- the game-theoretic quantities the model is built on.
-Spec: Danh-sach-diem-can-them.md B7, C1, C3.
+Spec: docs/thesis/Danh-sach-diem-can-them.md B7, C1, C3.
 
 Three claims rest on these and none of them had a measurement:
 
@@ -91,7 +91,7 @@ class BestResponseGap(unittest.TestCase):
             f"randomisation now LOWERS the best-response gap "
             f"({gaps['Sentinel']:.4f} vs {gaps['C8 deterministic sentinel']:.4f}). "
             f"That would support RQ3 -- re-measure and rewrite this test and the "
-            f"finding in Danh-sach-diem-can-them.md C5.")
+            f"finding in docs/thesis/Danh-sach-diem-can-them.md C5.")
 
 
 class MinimaxCeiling(unittest.TestCase):

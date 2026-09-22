@@ -1,6 +1,6 @@
 """
 GATE 2 -- the composite loss L, and the degeneracy test it exists to pass.
-Spec: Toan-canh SSA.4; Danh-sach-diem-can-them.md A1.
+Spec: Toan-canh SSA.4; docs/thesis/Danh-sach-diem-can-them.md A1.
 
     L = E[harm] + lambda_Q * E[Q_false] + lambda_T * E[T_lost]
 

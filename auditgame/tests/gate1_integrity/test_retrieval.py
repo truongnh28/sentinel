@@ -1,6 +1,6 @@
 """
 GATE 1 -- graded retrieval (R).
-Spec: pipelines/SPEC-R-Truy-xuat.md
+Spec: docs/thesis/pipelines/SPEC-R-Truy-xuat.md
 
 A test's NAME states the claim it defends; the Vietnamese wording of that claim
 lives in the docstring under `Thesis claim (vi):`.
@@ -273,7 +273,7 @@ class EpsilonHasASurface(unittest.TestCase):
         five epsilons produced 15 distinct sizes with exactly ONE collision, i.e.
         `size` very nearly determined k.
 
-        Under the three-dimensional model (MO-HINH-EPSILON-BA-CHIEU.md SS3) the
+        Under the three-dimensional model (docs/thesis/MO-HINH-EPSILON-BA-CHIEU.md SS3) the
         content is built to a FROZEN total length, so the tag and the advice share
         ONE budget: `size` is constant and the price of a wider tag is ADVICE
         CHARACTERS, i.e. harm (SS4a's shape parameters), not detectability.  The

@@ -1,6 +1,6 @@
 """
 test_fdetect_g4.py -- Gate 2 validity tests for G4 judge-human agreement evaluation.
-Spec: 261-Master-Proposal-Analysis/TIEN-DANG-KY-m-x-va-F-detect-v2.md Section 6.
+Spec: docs/preregistration/TIEN-DANG-KY-m-x-va-F-detect-v2.md Section 6.
 """
 import inspect
 import unittest

@@ -1,6 +1,6 @@
 """Sinh A0/A1/A2 o quy mo 660 ban ghi moi muc, voi MARKER DA DANG.
 
-VI SAO 660.  Cau (ii) cua TIEN-DANG-KY-Detector-Noi-Dung.md SS8 hoi ba muc co
+VI SAO 660.  Cau (ii) cua docs/preregistration/TIEN-DANG-KY-Detector-Noi-Dung.md SS8 hoi ba muc co
 khac nhau ve kha nang bi phat hien khong, va tra loi bang CI chong nhau hay
 roi.  O n_eff = 30 be rong CI95 la 0,210 (Hanley-McNeil tai AUC 0,5 voi
 n_neg = 2294) -- gap hon bon lan delta = 0,05, nen CI CHAC CHAN chong nhau du
@@ -11,7 +11,7 @@ VI SAO MARKER DA DANG.  Moi payload cu deu chua `raw_write`; khong ban ghi nao
 trong prose_pool chua no.  AUC chi bang dac trung "co chua raw_write" = 1,000
 -- detector dat diem tuyet doi bang grep, va con so do khong noi gi ve viec
 van ban doc do LLM viet co phat hien duoc hay khong.  Xem SS12 cua van ban
-detector va SS8 cua TIEN-DANG-KY-Attacker-LLM.md.
+detector va SS8 cua docs/preregistration/TIEN-DANG-KY-Attacker-LLM.md.
 
 PHAM VI -- DOC KY.  Da dang hoa CHI ap cho truc noi dung (cac file JSONL nay).
 core.py:413 ghi `marker: str = "raw_write"` va mo ta no la "machine-checkable
@@ -204,8 +204,8 @@ def main() -> int:
         print(f"  -> ghi {OUT[level].name}: {len(recs)} ban ghi", flush=True)
     prov = {
         "generated_by": "auditgame/payloads/gen_payload_scale.py",
-        "spec": "TIEN-DANG-KY-Detector-Noi-Dung.md SS12.4(a); "
-                "TIEN-DANG-KY-Attacker-LLM.md SS8.5",
+        "spec": "docs/preregistration/TIEN-DANG-KY-Detector-Noi-Dung.md SS12.4(a); "
+                "docs/preregistration/TIEN-DANG-KY-Attacker-LLM.md SS8.5",
         "marker_pool": list(MARKER_POOL),
         "marker_draw": "blake2b(level:batch_ix) mod len(pool) -- tat dinh",
         "scope_warning": "Da dang hoa CHI o truc noi dung. build.payload_content "

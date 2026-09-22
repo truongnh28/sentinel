@@ -1,6 +1,6 @@
 """
 datasets.py -- The DatasetPipeline PORT.
-Spec: pipelines/SPEC-Framework-Benchmark.md Part 2.3.
+Spec: docs/thesis/pipelines/SPEC-Framework-Benchmark.md Part 2.3.
 
 Swap this port to answer: *do the results depend on the repo or the language?*
 
@@ -38,7 +38,7 @@ class DatasetScope:
     topic_kind: str            # "exact" | "graded"
     has_hidden_tests: bool
     is_mock: bool
-    #: WHICH instance pool the workflows were cut from -- SPEC-P1a-Harness.md
+    #: WHICH instance pool the workflows were cut from -- docs/thesis/pipelines/SPEC-P1a-Harness.md
     #: Part 5 marks this "MOI, bat buoc" and requires it in the results header.
     #: Without it a swebench result cannot be attributed to the Verified pool or
     #: the full one, and the two differ by 4.6x in instances and by a factor of
@@ -116,7 +116,7 @@ def _register_swebench() -> None:
             f"N3 at dataset level: a workflow the attack cannot be built on "
             f"leaves the DENOMINATOR, it does not enter it with harm 0. theta "
             f"is retrieval.THETA, derived from the measured |topic| "
-            f"distribution (spikes/chot_theta.md) and shared with the retrieval "
+            f"distribution (docs/reports/chot_theta.md) and shared with the retrieval "
             f"the runner performs -- so the fix for this refusal is a pool whose "
             f"workflows contain genuinely related tasks, NOT a smaller theta."))
     else:

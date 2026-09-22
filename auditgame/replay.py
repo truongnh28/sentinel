@@ -1,6 +1,6 @@
 """
 replay.py -- Re-derive a grid cell from a TRACE, without running the agent.
-Spec: SPEC-P1b-Trace.md Part 1.
+Spec: docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1.
 
 WHAT THE CLAIM ACTUALLY IS.  Not "the harm we recorded equals the harm we
 recorded" -- that is an identity, and the previous version of rescore() was one:

@@ -26,7 +26,7 @@ justification instead of cutting the payload off inside its own marker.  Every
 dependent number moves with it -- item_id, the detector scores seeded on item_id,
 and the two end-to-end experiment md5s -- and they were re-derived rather than
 tuned back.  See `_ADVICE_INSTRUCTION` for the reason the order changed and
-spikes/cong-v2.md for the before/after of every number.
+docs/preregistration/cong-v2.md for the before/after of every number.
 """
 from __future__ import annotations
 import prose_world as _PW   # bien the song song, mac dinh TAT
@@ -43,7 +43,7 @@ TOPICS = ["auth", "orm", "migration", "serializer", "cache", "routing"]
 #: theta -- moving it moves the digest, which is the point of freezing it.
 #:
 #: WHERE 63 COMES FROM, and it was written down BEFORE any v2 AUC was looked at
-#: (spikes/cong-v2.md SS0, which carries the command).  It is the MEDIAN of
+#: (docs/preregistration/cong-v2.md SS0, which carries the command).  It is the MEDIAN of
 #: `len(content)` over the 2294 benign `memory` items of `benign_pool()` -- pool
 #: `full`, `natural=False`, seed 20260916, i.e. exactly the population the
 #: negative class of the gate-2 certify corpus is drawn from.  Distribution:
@@ -86,7 +86,7 @@ PAYLOAD_LENGTH_RULE = (
 #: -- 70 characters of advice with the marker starting at offset 50.  Truncating
 #: THAT to the corpus's median budget (L = 63 minus a median tag of 10 = 53) cuts
 #: the payload off inside `raw_write`, so the typical payload would name a
-#: function that does not exist.  MO-HINH-EPSILON-BA-CHIEU.md SS4a asks harm to
+#: function that does not exist.  docs/thesis/MO-HINH-EPSILON-BA-CHIEU.md SS4a asks harm to
 #: DEGRADE as L_advice shrinks, through the shape parameters (L_min, L_sat,
 #: H_max); a construction that destroys the instruction first would make harm a
 #: cliff at an artefact of word order instead.  So the instruction is written
@@ -113,7 +113,7 @@ def payload_tag(topic) -> str:
 def payload_advice_chars(topic) -> int:
     """L_advice = L - L_topic(k), the third dimension of the epsilon model.
 
-    The quantity `harm` is supposed to read (MO-HINH-EPSILON-BA-CHIEU.md SS3): at a
+    The quantity `harm` is supposed to read (docs/thesis/MO-HINH-EPSILON-BA-CHIEU.md SS3): at a
     frozen total length the topic tokens and the advice share ONE budget, so a
     wider tag leaves less room for the advice.  It is exported rather than kept
     inline because the model's shape parameters (L_min, L_sat, H_max) are
@@ -131,7 +131,7 @@ def payload_length_reason(topic) -> str | None:
     Rule N3 at the payload: a cell that cannot be built records a reason, never a
     silent drop and never a number that quietly stopped meaning what it says.  A
     topic wide enough that `[{topic}] ` alone reaches L leaves L_advice = 0, and
-    MO-HINH-EPSILON-BA-CHIEU.md SS4a names that case: the advice falls under L_min
+    docs/thesis/MO-HINH-EPSILON-BA-CHIEU.md SS4a names that case: the advice falls under L_min
     and harm collapses to 0 rather than tapering.  The payload is still built --
     dropping it would change the DENOMINATOR of every rate measured over events --
     but it is built as the tag alone, so its `size` exceeds L and the fixed-length
@@ -293,7 +293,7 @@ def inject(store: CarrierStore, wf: Workflow = None, ps: PoisonSpec = None,
     # so `size`, a feature the gate ALREADY scored, was carrying the retrieval
     # knob.  Closing that by construction is what lets the `topic` column of
     # F_match v2 guard the part of the leak that is genuinely about WHICH tokens.
-    # See `payload_content`, and spikes/cong-v2.md for the L derivation.
+    # See `payload_content`, and docs/preregistration/cong-v2.md for the L derivation.
     topic = retrieval.payload_topic_like(wf.tasks[ps.sigma].topic, ps.epsilon)
     it = Item(
         carrier=ps.carrier,

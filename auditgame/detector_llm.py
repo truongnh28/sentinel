@@ -22,7 +22,7 @@ judge separates them by counting words -- the second confound of 2026-09-20,
 intact.  This class is only meaningful on a PROSE world whose negative class
 also carries the payloads' MINIMAL-PAIR TWINS; without them the judge scores
 note GENRE (d' = +10.6 against ordinary advice, -0.12 against the twins).
-See TIEN-DANG-KY-Detector-Noi-Dung.md section 3.3 and `prose_world`.
+See docs/preregistration/TIEN-DANG-KY-Detector-Noi-Dung.md section 3.3 and `prose_world`.
 """
 from __future__ import annotations
 import re

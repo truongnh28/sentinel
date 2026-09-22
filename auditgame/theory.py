@@ -1,7 +1,7 @@
 """
 theory.py -- The declared theoretical quantities: rho, zeta, and the checks on them.
 
-Spec: Toan-canh SS3 notation table; Danh-sach-diem-can-them.md B5, B6, C4.
+Spec: Toan-canh SS3 notation table; docs/thesis/Danh-sach-diem-can-them.md B5, B6, C4.
 
 rho and zeta are in the notation table and appear in two of the three theoretical
 results, and neither had any code. A proof with no executable consequence cannot be

@@ -26,7 +26,7 @@ REPLACED by two gates that each declare their scope.  `OracleScope` is the singl
 source of the line the table prints; reading a harm number without knowing which
 oracle produced it is reading a number that means two different things.
 
-HOW FAR APART THE TWO ARE IS MEASURED, not assumed (spikes/do_khop_voi_marker.md):
+HOW FAR APART THE TWO ARE IS MEASURED, not assumed (docs/reports/do_khop_voi_marker.md):
 on a 15-instance hand-written subset the marker proxy agreed with a real hidden
 test PERFECTLY (30/30) on the two modes the simulation can generate -- clean patch,
 and payload copied verbatim -- and 0/30 on the two it cannot: when the agent

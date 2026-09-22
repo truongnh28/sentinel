@@ -5,7 +5,7 @@ This is a methodological constraint, not an implementation detail: if each syste
 had its own detector we would be measuring DETECTION QUALITY, while the variable
 under study is ALLOCATION.
 
-N1 (spec: eval/SPEC-Tang-Do-va-Test.md SS2.1-2.2) -- the old version had two
+N1 (spec: docs/thesis/eval/SPEC-Tang-Do-va-Test.md SS2.1-2.2) -- the old version had two
 fatal defects:
 
     fires(score, item_is_poisoned)  ->  score > 1 - (psi if poisoned else phi)

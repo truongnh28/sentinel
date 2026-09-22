@@ -1,7 +1,7 @@
 """
 scoring.py -- The SCORE INTERFACE that POLICIES see.  (B0.5)
 
-Spec: eval/SPEC-Tang-Do-va-Test.md SS2.5-2.6.
+Spec: docs/thesis/eval/SPEC-Tang-Do-va-Test.md SS2.5-2.6.
 
 This module exists because N1 changed the score scale, and all three consumers
 of a score hard-coded the assumption that it lives in [0,1]:

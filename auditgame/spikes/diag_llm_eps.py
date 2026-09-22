@@ -32,7 +32,7 @@ trong payloads/generate.py).
 EPS TRUYEN VAO matched_corpus. Pipeline khong doc eps (giong FrozenPayloadAttack,
 epsilon_effective=False), nhung `matched_corpus(pipe, delta, eps, ...)` van dung
 eps de quyet dinh sigma nao "dormant" (feasible_sigmas). Dung tien le da co trong
-spikes/b5-benign-enrich.md: FrozenPayloadAttack cung duoc do qua
+docs/reports/b5-benign-enrich.md: FrozenPayloadAttack cung duoc do qua
 `matched_corpus(pipe, D, eps=0.0, 900, natural=...)` -- eps=0.0 la quy uoc dong
 bo cho MOI pipeline duoc do qua matched_corpus, khong rieng gi MatchedAttack.
 Script nay dung eps=0.0 vi ly do do, KHONG phai vi gia dinh LLM "khong ton chi

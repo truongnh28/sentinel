@@ -1,7 +1,7 @@
 """
 GATE 2 -- the v2 DEFINITION of the gate, and the three holes it closes at once.
 
-Spec: 261-Master-Proposal-Analysis/MO-HINH-EPSILON-BA-CHIEU.md (the epsilon model
+Spec: docs/thesis/MO-HINH-EPSILON-BA-CHIEU.md (the epsilon model
 this payload construction implements); review II.3 (close all three holes AT ONCE,
 freeze the definition, then run the table once).
 
@@ -137,7 +137,7 @@ class TopicJoinsTheMeasuredFeatureSpace(unittest.TestCase):
         gave: DETERMINISM.  Composed with a lexicographic topic code, that made
         `code(subset) <= code(whole)` a THEOREM rather than a measurement, so the
         gate's certification cell was reading `sorted()` and not the attacker.
-        Review II ruling 1; pre-registered in spikes/cong-v2.md SS0bis.
+        Review II ruling 1; pre-registered in docs/preregistration/cong-v2.md SS0bis.
 
         A deterministic pseudorandom k-subset keeps every property the attack
         model asks for and drops the one it never asked for.  On a topic whose
@@ -357,7 +357,7 @@ class TopicJoinsTheMeasuredFeatureSpace(unittest.TestCase):
 
     def test_the_topic_feature_is_the_one_the_frozen_record_NAMES(self):
         """Four defensible lexicographic codes of a token set span AUC 0.45 to
-        1.00 on this corpus (spikes/cong-v2.md SS3.7), so `features` containing
+        1.00 on this corpus (docs/preregistration/cong-v2.md SS3.7), so `features` containing
         the string "topic" does not pin the feature.  `topic_feature` does, and
         `core.topic_code` has to BE the candidate it names -- not agree with it by
         hand.

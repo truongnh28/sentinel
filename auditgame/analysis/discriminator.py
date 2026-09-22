@@ -1,7 +1,7 @@
 """
 discriminator.py -- Is a poisoning event distinguishable from a benign change?
 
-Spec: eval/SPEC-AuditGame-SE.md Part 0; QUYET-DINH.md question 1.
+Spec: docs/thesis/eval/SPEC-AuditGame-SE.md Part 0; docs/thesis/QUYET-DINH.md question 1.
 
 STDLIB ONLY, deliberately.  The plan once placed this in an "analysis tier" that
 may use sklearn, but gate 2 imports it, and gate tests are part of the measurement

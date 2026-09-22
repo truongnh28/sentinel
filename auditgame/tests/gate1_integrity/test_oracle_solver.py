@@ -1,6 +1,6 @@
 """
 GATE 1 -- the oracle solver, and the DECLARED SCOPE of the oracle (ABC T.9).
-Spec: eval/PLAN.md Part III.3 (Task 18).
+Spec: docs/thesis/eval/PLAN.md Part III.3 (Task 18).
 
 V1 is the gate that separates "the agent failed" from "the hidden test is wrong".
 A gold patch is by construction a correct fix, so if it fails the hidden test then
@@ -31,8 +31,8 @@ DATA = pathlib.Path(__file__).resolve().parents[2] / "data" / "swebench_verified
 #: the family that anchored it -- measured, not asserted into existence.  Four of
 #: the five instances H1 anchors are in here: H1 requires every added outbound
 #: write in the anchored file to pass its argument through a sanitiser, which is
-#: simply not a property of these repos.  See spikes/V1-failures.md.  The number
-#: IS the claim (spikes/do_khop_voi_marker.md SS8): if this list moves, H1 or the
+#: simply not a property of these repos.  See docs/reports/V1-failures.md.  The number
+#: IS the claim (docs/reports/do_khop_voi_marker.md SS8): if this list moves, H1 or the
 #: corpus moved, and what the real oracle can score has to be re-derived.
 V1_FAILURES = [
     ("astropy__astropy-14182", "H1"),

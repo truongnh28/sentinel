@@ -4,7 +4,7 @@ GATE 2 -- VALIDITY for the B-lite detector model: "what is that number about?"
 Red here => `m`, `tau` or `d'_eff` is a real number about something OTHER than the
 quantity the pre-registration defines.
 
-The binding text is `261-Master-Proposal-Analysis/TIEN-DANG-KY-m-x-va-F-detect-v2.md`,
+The binding text is `docs/preregistration/TIEN-DANG-KY-m-x-va-F-detect-v2.md`,
 frozen 18/09/2026 before the first line of this code.  Four of its choices each
 REPLACED an earlier one that was wrong, and each replacement has a recorded reason;
 these tests exist so that reverting any of them goes red rather than quiet:

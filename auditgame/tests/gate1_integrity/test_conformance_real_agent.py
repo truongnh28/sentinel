@@ -1,6 +1,6 @@
 """
 GATE 1 -- the three Outcome fields, MEASURED rather than declared.
-Spec: eval/PLAN.md Task 16 (p2.3-2.5); ../pipelines/SPEC-P2-Agent.md Parts 1-3.
+Spec: docs/thesis/eval/PLAN.md Task 16 (p2.3-2.5); docs/thesis/pipelines/SPEC-P2-Agent.md Parts 1-3.
 
 A1-A3 already run against everything in `agents.REGISTRY`, so what those contracts
 cannot see is whether the three fields came from a MEASUREMENT or from a mock's

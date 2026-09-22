@@ -1,6 +1,6 @@
 """GATE 1 -- prose_pool co dung tinh chat da tuyen bo khong.
 
-Spec: TIEN-DANG-KY-Detector-Noi-Dung.md §3, §3.1.
+Spec: docs/preregistration/TIEN-DANG-KY-Detector-Noi-Dung.md §3, §3.1.
 Claim: corpus nay la VAN XUOI, cung the loai voi payload, khong mang khuon cu.
 """
 from __future__ import annotations

@@ -655,7 +655,7 @@ def stackelberg_value(policy_name, wfs, deltas, carriers, det, ag, budget, seeds
 
     Measuring a defender against a stronger attacker than the one the model
     declares is punishing it by arithmetic rather than by evidence.  It is the
-    same denominator mistake as TIEN-DANG-KY-Detector-Noi-Dung.md section 7.1,
+    same denominator mistake as docs/preregistration/TIEN-DANG-KY-Detector-Noi-Dung.md section 7.1,
     seen from the defence side.
 
     N3: `per_wf` travels with the value, because a number without its
@@ -740,7 +740,7 @@ def best_response_gap(policy_name, wfs, deltas, carriers, det, ag, budget, seeds
 def bootstrap_paired(a_per_wf, b_per_wf, n_boot=10000, seed=2026):
     """CI95 of Delta-harm, RESAMPLED BY WORKFLOW -- not by case.
 
-    SPEC-AuditGame-SE.md SS15 says "resample N cases"; that is the error.  Cases
+    docs/thesis/eval/SPEC-AuditGame-SE.md SS15 says "resample N cases"; that is the error.  Cases
     from the same workflow share a task chain and share the same clean-run
     outcome, so they are not independent, and resampling by case gives FALSELY
     NARROW CIs.

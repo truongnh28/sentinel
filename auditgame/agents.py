@@ -1,6 +1,6 @@
 """
 agents.py -- The AgentPipeline PORT.
-Spec: pipelines/SPEC-Framework-Benchmark.md Part 2.2.
+Spec: docs/thesis/pipelines/SPEC-Framework-Benchmark.md Part 2.2.
 
 Swap this port to answer: *do the results depend on the agent backend?*
 
@@ -83,5 +83,5 @@ PENDING: dict = {
         "OpenHands is NOT present in code/ (only AgentPoison, MINJA, Sentinel are), "
         "and running it for real costs money. cost_usd_per_task > 0 also forces a "
         "declared budget before it may enter the grid. See "
-        "pipelines/SPEC-Phan-ra-Pipeline.md P2."),
+        "docs/thesis/pipelines/SPEC-Phan-ra-Pipeline.md P2."),
 }

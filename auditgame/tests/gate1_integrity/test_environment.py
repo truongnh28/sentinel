@@ -1,9 +1,9 @@
 """
-GATE 1 -- the environment.  Spec: eval/PLAN.md, Part II "Ranh gioi phu thuoc".
+GATE 1 -- the environment.  Spec: docs/thesis/eval/PLAN.md, Part II "Ranh gioi phu thuoc".
 
 Loosening dependencies for the ANALYSIS tier is a win.  But if that leak reaches
 the MEASUREMENT CORE, the benchmark stops being clone-and-run -- the property
-Thiet-ke-Framework-Test.md SS4 gives up a lot to keep.
+docs/thesis/eval/Thiet-ke-Framework-Test.md SS4 gives up a lot to keep.
 """
 from __future__ import annotations
 import pathlib, subprocess, sys, unittest

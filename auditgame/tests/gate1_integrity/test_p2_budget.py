@@ -126,7 +126,7 @@ class TheTierTargetsArePerInstanceAndDerived(unittest.TestCase):
             p2_budget.tier_band("mid", "django__django-14672")[0],
             p2_budget.tier_band("low", "pytest-dev__pytest-7490")[1],
             "the bands stopped interleaving -- update the disclosure in "
-            "spikes/p2-ngan-sach-loi-khuyen.md, do not delete this test")
+            "docs/preregistration/p2-ngan-sach-loi-khuyen.md, do not delete this test")
 
     def test_the_ceiling_band_is_far_outside_every_feasible_band(self):
         """The ceiling arm exists to ask what happens OUTSIDE the budget; a band

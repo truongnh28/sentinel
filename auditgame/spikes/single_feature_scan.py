@@ -1,7 +1,7 @@
 """Scan EVERY SINGLE FEATURE between two classes, looking for one that alone
 nearly separates them.
 
-TIEN-DANG-KY-Detector-Noi-Dung.md section 12.6:
+docs/preregistration/TIEN-DANG-KY-Detector-Noi-Dung.md section 12.6:
 
     Before scoring any pair of classes: print a few samples of each, and
     measure the AUC of EVERY SINGLE FEATURE. Any feature that alone reaches

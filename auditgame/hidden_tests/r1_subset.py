@@ -1,7 +1,7 @@
 """
 r1_subset.py -- WHICH instances the hand-written hidden tests cover, and WHY those.
 
-eval/PLAN.md III.6 offers two retreats from the coverage gate Task 10 failed:
+docs/thesis/eval/PLAN.md III.6 offers two retreats from the coverage gate Task 10 failed:
 R1 (hand-write real hidden tests for a subset) and R2 (keep the marker proxy and
 declare it a limitation).  This module is the R1 half of the hybrid: it fixes,
 BY A SEEDED RULE RATHER THAN BY EYE, the list of instances a hand-written hidden
@@ -23,7 +23,7 @@ from __future__ import annotations
 import random
 
 #: Instances H1 anchors on, measured over SWE-bench Verified in
-#: spikes/do_thoi_gian_neo.md (5 of 500).  Sorted, so the seat order is not the
+#: docs/reports/do_thoi_gian_neo.md (5 of 500).  Sorted, so the seat order is not the
 #: corpus's file order.  These are seeds, not passes: four of the five FAIL H1's
 #: own V1 -- H1's generic property does not hold on their gold patches -- so they
 #: need a per-instance test like every other candidate.

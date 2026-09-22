@@ -1,7 +1,7 @@
 """
 GATE 2 -- epsilon is a BUDGET for MatchedAttack, not a pure cost.
-Spec: eval/SPEC-AuditGame-SE.md Part 0; QUYET-DINH.md question 1; advisor item
-(ii) number 5.  Companion measurement: spikes/eps-ngan-sach-that.md.
+Spec: docs/thesis/eval/SPEC-AuditGame-SE.md Part 0; docs/thesis/QUYET-DINH.md question 1; advisor item
+(ii) number 5.  Companion measurement: docs/reports/eps-ngan-sach-that.md.
 
 WHAT WAS WRONG, AND WHY IT IS A GATE-2 QUESTION.  `MatchedAttack.payload` stamped
 the payload with sigma's WHOLE topic:
@@ -46,7 +46,7 @@ from analysis import benign_corpus as B
 from core import PoisonSpec, Task, Workflow
 
 #: The epsilon grid these tests read the budget on.  Declared here, and the same
-#: grid the write-up declares before its run (spikes/eps-ngan-sach-that.md).
+#: grid the write-up declares before its run (docs/reports/eps-ngan-sach-that.md).
 GRID = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0)
 
 
@@ -103,7 +103,7 @@ class EpsilonBuysRetrieval(unittest.TestCase):
 
     def test_a_small_budget_does_not_clear_theta_and_a_full_one_does(self):
         """Both ENDS of the budget, at the frozen THETA -- 0.5, which is not moved
-        here and must not be moved to make this pass (spikes/chot_theta.md).
+        here and must not be moved to make this pass (docs/reports/chot_theta.md).
 
         At |topic| = 4 the attainable subset grid is {0.25, 0.5, 0.75, 1.0}, so
         eps <= 0.25 buys one token and MISSES, and eps >= 0.26 buys two and hits.
@@ -326,7 +326,7 @@ class TheTopicAxisIsInsideNowAndTheRESIDUEIsWhatStaysOutside(unittest.TestCase):
     hope.
 
     NO VERDICT ABOUT ANY ATTACKER IS DRAWN HERE.  Measured cost of the channel is
-    in spikes/eps-ngan-sach-that.md SS9 limit 6 and spikes/cong-v2.md SS3.
+    in docs/reports/eps-ngan-sach-that.md SS9 limit 6 and docs/preregistration/cong-v2.md SS3.
     """
 
     #: The topics these tests read the property on.  A 4-token topic (the
@@ -393,7 +393,7 @@ class TheTopicAxisIsInsideNowAndTheRESIDUEIsWhatStaysOutside(unittest.TestCase):
     def test_at_eps_star_the_payload_tag_is_a_STRICT_subset_of_the_task_topic(self):
         """THE CHANNEL, at the epsilon the published result is read off.
 
-        `eps* = 0.0` is where spikes/eps-ngan-sach-that.md SS5 reported
+        `eps* = 0.0` is where docs/reports/eps-ngan-sach-that.md SS5 reported
         AUC_upper = 0.5414 under the v1 gate and declared the attacker
         non-distinguishable.  At that same epsilon the payload's tag is
         k = max(1, ceil(0 * m)) = 1 token of an m-token topic, while every benign
@@ -430,14 +430,14 @@ class TheTopicAxisIsInsideNowAndTheRESIDUEIsWhatStaysOutside(unittest.TestCase):
         9 failing -- the ceiling sits inside the induced range at Delta 2 and 4 and
         inside the per-split spread at Delta=0.  So "fails only at Delta=4" is a
         statement about THIS salt, not about the attacker: the benchmark cannot
-        presently resolve a pass from a fail at this margin.  spikes/cong-v2.md
+        presently resolve a pass from a fail at this margin.  docs/preregistration/cong-v2.md
         SS3.9.
 
         The channel this class of test exists to keep visible is REAL as a
         relational rule (below, 0.9492) and is NOT what the `topic` column of
         F_match reads.  Whether an attacker clears the v2.1 definition is the
         certification question and is NOT answered here.  Reproduce:
-        spikes/cong-v2.md SS3.1, SS3.5b, SS3.9.
+        docs/preregistration/cong-v2.md SS3.1, SS3.5b, SS3.9.
 
         Note the scope of the claim, which is narrower than "every eps < 1":
         the tag is strict exactly when ceil(eps*m) < m.  At eps = 0.7, m = 3 it is
@@ -493,7 +493,7 @@ class TheTopicAxisIsInsideNowAndTheRESIDUEIsWhatStaysOutside(unittest.TestCase):
         happens to nest inside another task's in the same workflow, which is why
         the measured number is 0.949 and NOT the 1.0 the rule looks like it should
         give.  Full table, and the eps=1.0 control where the channel closes, in
-        spikes/eps-ngan-sach-that.md SS9 limit 6.
+        docs/reports/eps-ngan-sach-that.md SS9 limit 6.
 
         BOTH CASES ARE ASSERTED, because the assertion used to cover only one and
         the docstring described both.  The old fixture's two task topics are

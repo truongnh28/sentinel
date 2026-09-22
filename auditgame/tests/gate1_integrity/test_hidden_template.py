@@ -1,5 +1,5 @@
 """
-GATE 1 -- hidden-test templates.  Spec: eval/PLAN.md Part III.
+GATE 1 -- hidden-test templates.  Spec: docs/thesis/eval/PLAN.md Part III.
 
 V3 is the gate this whole plan exists to protect: if the hidden test only probes
 the MARKER then

@@ -49,7 +49,7 @@ the refinement points either, since which bracket gets refined is not known unti
 the coarse grid has been measured.  d'* under --tau-follows-dprime is therefore
 read at the resolution of the coarse grid, 0.2.
 
-WHAT THE TWO MODES ACTUALLY MEASURED (spikes/tau-sel-follows-dprime.md).  The two
+WHAT THE TWO MODES ACTUALLY MEASURED (docs/reports/tau-sel-follows-dprime.md).  The two
 curves are IDENTICAL, cell for cell, at every (d', Delta) of the grid.  The reason
 is STRUCTURAL rather than statistical: scoring.tau_sel is reached only through
 policies.Policy.tau, and only B5 risk-score and B6 two-stage call it.  Neither

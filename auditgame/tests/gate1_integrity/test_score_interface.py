@@ -1,5 +1,5 @@
 """
-GATE 1 -- the score interface (B0.5).  Spec: SPEC-Tang-Do-va-Test.md SS2.5-2.6.
+GATE 1 -- the score interface (B0.5).  Spec: docs/thesis/eval/SPEC-Tang-Do-va-Test.md SS2.5-2.6.
 
 A test's NAME states the claim it defends; the Vietnamese wording of that claim
 lives in the docstring under `Thesis claim (vi):`.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 measure_band_vs_n.py -- Measure the noise band width vs n curve across salts.
-Generates data for spikes/dai-theo-n.md.
+Generates data for docs/reports/dai-theo-n.md.
 """
 import json
 import time

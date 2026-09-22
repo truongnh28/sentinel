@@ -1,6 +1,6 @@
 """
 GATE 1 -- CONFORMANCE CONTRACT for AttackPipeline (K1-K6).
-Spec: pipelines/SPEC-Framework-Benchmark.md Part 2.1 and Part 4.
+Spec: docs/thesis/pipelines/SPEC-Framework-Benchmark.md Part 2.1 and Part 4.
 
 This suite runs against EVERY pipeline in `attacks.REGISTRY`.  A new pipeline does
 not enter the results table until it passes all of them.

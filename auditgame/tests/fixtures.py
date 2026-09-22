@@ -1,7 +1,7 @@
 """
 fixtures.py -- A DETERMINISTIC tiny world for the test suite.
 
-Why it exists (SPEC-Tang-Do-va-Test.md SS7.1): a test over 40 random workflows at
+Why it exists (docs/thesis/eval/SPEC-Tang-Do-va-Test.md SS7.1): a test over 40 random workflows at
 B=17.95 CANNOT be checked by hand.  It goes "green" without convincing anyone,
 including ourselves.  A test that copies the previous run's output is a test that
 LOCKS IN THE BUG, not one that defends a claim.

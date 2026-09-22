@@ -1,7 +1,7 @@
 """
 swebench_dataset.py -- A DatasetPipeline over REAL SWE-bench metadata.
 
-Spec: SPEC-P1a-Harness.md Part 4.  Sits ALONGSIDE MockDataset, does not replace it
+Spec: docs/thesis/pipelines/SPEC-P1a-Harness.md Part 4.  Sits ALONGSIDE MockDataset, does not replace it
 -- the mock is still needed so measurement-layer tests stay fast and file-free.
 
 Sorting by `created_at` is the most important step here: it makes a workflow follow
@@ -64,12 +64,12 @@ SWEEP_DELTAS = (0, 1, 2, 4)
 #: the previous note here allowed: "theta moves when retrieval moves."
 #: core.CarrierStore.retrieve now goes through retrieval.retrieved() instead of
 #: `==`, and theta was fixed from the measured |topic| distribution
-#: (spikes/chot_theta.md), written down and committed BEFORE the surviving
+#: (docs/reports/chot_theta.md), written down and committed BEFORE the surviving
 #: workflow count was looked at.
 #:
 #: DO NOT MOVE THIS TO KEEP THE WORKFLOW COUNT UP.  The count is a consequence of
 #: theta; theta is not a consequence of the count.  If it ever needs to change,
-#: the derivation in spikes/chot_theta.md is what changes first, from data.
+#: the derivation in docs/reports/chot_theta.md is what changes first, from data.
 THETA = retrieval.THETA
 
 
@@ -229,7 +229,7 @@ class SWEBenchDataset:
         #   1. core.CarrierStore.retrieve goes through
         #      retrieval.retrieved(item.topic, task.topic, theta) instead of `==`;
         #   2. theta was FIXED FROM THE MEASURED |topic| distribution
-        #      (spikes/chot_theta.md, derived and committed before the surviving
+        #      (docs/reports/chot_theta.md, derived and committed before the surviving
         #      workflow count was looked at), not guessed.
         #
         # Neither of those is asserted here, and the declaration is not what makes
@@ -259,7 +259,7 @@ class SWEBenchDataset:
                 f"cannot be built leaves the denominator, it does not enter it "
                 f"with harm 0. Do NOT lower theta to make this pass: theta is "
                 f"retrieval.THETA, derived from the measured |topic| "
-                f"distribution in spikes/chot_theta.md and shared with the "
+                f"distribution in docs/reports/chot_theta.md and shared with the "
                 f"retrieval the runner performs, so lowering it here would "
                 f"admit workflows that retrieval then cannot act on. The fix "
                 f"for an empty corpus is a pool whose workflows contain "

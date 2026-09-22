@@ -1,7 +1,7 @@
 """
 GATE 1 -- the agent's TOOL SURFACE and the trace it leaves behind.
-Spec: eval/PLAN.md Task 14 (p2.1); ../pipelines/SPEC-P2-Agent.md Parts 1-2;
-      ../pipelines/SPEC-P1b-Trace.md Part 1.
+Spec: docs/thesis/eval/PLAN.md Task 14 (p2.1); docs/thesis/pipelines/SPEC-P2-Agent.md Parts 1-2;
+      docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1.
 
 The claim this file stands behind is one sentence: THE FOUR CARRIERS ARE TOOLS THE
 AGENT CALLS, NOT A DIRECTORY IT WRITES INTO.  Everything below is a consequence

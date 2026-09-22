@@ -1,6 +1,6 @@
 """
 GATE 1 -- benign drift, the competing latent cause.
-Spec: Toan-canh SS3 (beta); Danh-sach-diem-can-them.md B3.
+Spec: Toan-canh SS3 (beta); docs/thesis/Danh-sach-diem-can-them.md B3.
 
 beta is in the notation table and was nowhere in the code. It is the rate at which
 carriers change for ORDINARY reasons -- a note rewritten, a skill refined -- and it

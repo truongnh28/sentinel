@@ -1,7 +1,7 @@
 """
 llms.py -- The LLMPipeline PORT, and the budget gate L1-L4.
-Spec: pipelines/SPEC-Framework-Benchmark.md Parts 1.1 and 2.5;
-      pipelines/SPEC-P2-Agent.md Parts 1b-2; eval/PLAN.md Task 15 (p2.2).
+Spec: docs/thesis/pipelines/SPEC-Framework-Benchmark.md Parts 1.1 and 2.5;
+      docs/thesis/pipelines/SPEC-P2-Agent.md Parts 1b-2; docs/thesis/eval/PLAN.md Task 15 (p2.2).
 
 WHY A FIFTH PORT.  `AgentScope` carried `deterministic` and `cost_usd_per_task`.
 Both are properties of the MODEL: change the scaffold and they do not move, change

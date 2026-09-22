@@ -1,6 +1,6 @@
 """
 fdetect_g4.py -- Gate 4: Judge-human agreement verification under pre-registered protocol.
-Spec: 261-Master-Proposal-Analysis/TIEN-DANG-KY-m-x-va-F-detect-v2.md Section 6.
+Spec: docs/preregistration/TIEN-DANG-KY-m-x-va-F-detect-v2.md Section 6.
 
 G4 Protocol:
 1. Minimum sample size: n_G4 = 38, derived from requirement that Clopper-Pearson 95%

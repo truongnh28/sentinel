@@ -1,6 +1,6 @@
 """
 fdetect.py -- B-lite detector model: content violation scoring and threshold calibration.
-Spec: 261-Master-Proposal-Analysis/TIEN-DANG-KY-m-x-va-F-detect-v2.md (frozen 2026-09-18).
+Spec: docs/preregistration/TIEN-DANG-KY-m-x-va-F-detect-v2.md (frozen 2026-09-18).
 
 Design principles enforced here:
 1. m(x) = v1(x) ALONE. v1 is the only component retaining signal after attacker best-response.

@@ -1,7 +1,7 @@
 """
 benign_corpus.py -- The BENIGN CORPUS, harvested from REAL SWE-bench instances.
 
-Spec: SPEC-P1b-Trace.md Part 3; eval/SPEC-AuditGame-SE.md Part 0; QUYET-DINH.md
+Spec: docs/thesis/pipelines/SPEC-P1b-Trace.md Part 3; docs/thesis/eval/SPEC-AuditGame-SE.md Part 0; docs/thesis/QUYET-DINH.md
 question 1 / question 8.
 
 WHY THIS FILE EXISTS.  The central claim of Part 0 is that a planted item is not
@@ -22,17 +22,17 @@ carries the live one) put `topic` into F_match, and on the certify corpus the
 cells below move from 0.5414 / 0.5394 / 0.5411 to 0.5190 / 0.5292 / 0.5870 at
 Delta 0 / 2 / 4 -- under the subset salt "payload_topic".  That last clause is
 not decoration: the same protocol under other salts puts the Delta=4 cell
-anywhere from 0.5244 to 0.6426 (spikes/cong-v2.md SS3.9), so any cell quoted from
+anywhere from 0.5244 to 0.6426 (docs/preregistration/cong-v2.md SS3.9), so any cell quoted from
 this corpus has to name the salt the way it names the seed.  (An intermediate restatement of those three as
 0.8805 / 0.9073 / 0.9373 is WITHDRAWN -- it was measured while
 `retrieval.payload_topic` still returned the alphabetical prefix, which composed
 with a lexicographic topic code into a theorem rather than a measurement; review
-II ruling 1, spikes/cong-v2.md SS3.1.)  They are NOT restated here as v2 numbers because each
+II ruling 1, docs/preregistration/cong-v2.md SS3.1.)  They are NOT restated here as v2 numbers because each
 one is quoted to support a claim about the CORPUS -- which pool, which carrier,
 which source of controls -- and those claims are unaffected: with the `topic`
 column neutralised the v1 digits reproduce EXACTLY, to four decimals, which is the
 cross-check that this file's own arguments still stand.  The v2 table, both
-columns, is spikes/cong-v2.md SS3.1.
+columns, is docs/preregistration/cong-v2.md SS3.1.
 
 --------------------------------------------------------------------------
 THE HARVESTING RULE, in one paragraph
@@ -134,7 +134,7 @@ Delta = 4, while Delta = 0 (2248) and every eps = 1.0 count are UNCHANGED, which
 is the cross-check: at Delta = 0 there is no window for the predicate to fire in,
 and at eps = 1.0 the subset is the whole topic under either rule.  The supply is a
 MEASURED quantity, not a constant, and the shift is downward -- one more way the
-old rule flattered the corpus.  Full grid: spikes/cong-v2.md SS3.8.
+old rule flattered the corpus.  Full grid: docs/preregistration/cong-v2.md SS3.8.
 
 The margin at Delta = 0 is worth reading with the same care.  At the 900-event cap
 the mean upper bound is 0.5414 and 19 of 20 splits clear; lifting the cap to the
@@ -194,7 +194,7 @@ H = 8
 #:                         one task against an EMPTY store, so there is never one
 #:
 #: The two refusals are the point of threading the carrier through.  The queue and
-#: branch rows published in spikes/b5-auc.md were produced with the contract
+#: branch rows published in docs/reports/b5-auc.md were produced with the contract
 #: asking about `memory`, so the queue row in particular stood on exactly the
 #: duplicated controls the contract exists to forbid.  It is WITHDRAWN rather than
 #: restated.
@@ -574,7 +574,7 @@ def benign_pool(n_per_event: int = 4, pool: str = POOL, seed: int = SEED,
     asking for a `queue` corpus got the contract checked against `memory`, so the
     one guard standing between that corpus and duplicated controls was asking
     about a different carrier.  That is how the queue and branch rows of
-    spikes/b5-auc.md came to be produced without it.  With the argument threaded,
+    docs/reports/b5-auc.md came to be produced without it.  With the argument threaded,
     `queue` and `skill` now REFUSE on the full pool -- pallets/flask supplies
     fewer than four queue items -- which is the contract doing the job it was
     written for, and a refusal is the honest answer where a corpus quietly built

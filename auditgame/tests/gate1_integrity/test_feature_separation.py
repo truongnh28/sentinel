@@ -1,6 +1,6 @@
 """
 GATE 1 -- the operational form of F_match / F_detect separation.
-Spec: QUYET-DINH.md, question 1.
+Spec: docs/thesis/QUYET-DINH.md, question 1.
 
 The declared constraint used to be a set intersection,
     F_match n F_detect = {}

@@ -1,6 +1,6 @@
 """
 GATE 1 -- the TWO-CONDITION quarantine rule.
-Spec: math-foundation.md SS8.2 (Algorithm 1, line 8); Danh-sach-diem-can-them.md A2.
+Spec: docs/thesis/math-foundation.md SS8.2 (Algorithm 1, line 8); docs/thesis/Danh-sach-diem-can-them.md A2.
 
 The manuscript quarantines only when BOTH hold:
 

@@ -1,6 +1,6 @@
 """
 GATE 1 -- hidden tests stay out of the agent's reach.  Both tiers.
-Spec: eval/PLAN.md Task 13 and Task 19; ../pipelines/SPEC-P1a-Harness.md Part 3.
+Spec: docs/thesis/eval/PLAN.md Task 13 and Task 19; docs/thesis/pipelines/SPEC-P1a-Harness.md Part 3.
 
 The SWE-Lancer failure mode: the agent reads the grading tests and writes code
 that satisfies them.  Here it is worse than a leaderboard artifact -- the hidden
@@ -133,7 +133,7 @@ class HiddenTestIsolation(unittest.TestCase):
                              f"(task={task and task.task_id})")
 
     def test_the_carrier_root_reaches_the_container_read_only_on_the_built_argv(self):
-        """eval/PLAN.md Task 14 states the contract: "the four carriers are TOOLS the
+        """docs/thesis/eval/PLAN.md Task 14 states the contract: "the four carriers are TOOLS the
         agent calls, not a directory it writes into", because "a tool call is
         OBSERVABLE and attributable, while a directory diff resolves neither `write
         then delete` nor `which carrier` nor the ordering of writes against

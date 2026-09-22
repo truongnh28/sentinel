@@ -1,6 +1,6 @@
 """
 GATE 1 -- CONFORMANCE CONTRACTS for the other three ports: Dataset - Agent - Defense.
-Spec: pipelines/SPEC-Framework-Benchmark.md Parts 2.2-2.4 and Part 4.
+Spec: docs/thesis/pipelines/SPEC-Framework-Benchmark.md Parts 2.2-2.4 and Part 4.
 
 Same principle as AttackPipeline's K1-K6: a port that does not declare its scope
 is not a port -- it is a hidden constant.  And once declared, the scope must be

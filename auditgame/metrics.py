@@ -1,7 +1,7 @@
 """
 metrics.py -- The three-tier metric stack.  (B5)
 
-Spec: eval/SPEC-Tang-Do-va-Test.md, Parts 4-5, SS6.4, SS8.3.
+Spec: docs/thesis/eval/SPEC-Tang-Do-va-Test.md, Parts 4-5, SS6.4, SS8.3.
 
 Three jobs, each closing a hole that was actually measured:
 

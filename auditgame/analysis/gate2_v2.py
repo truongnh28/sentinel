@@ -1,7 +1,7 @@
 """
 gate2_v2.py -- THE FROZEN DEFINITION of gate 2, version 2.
 
-Spec: eval/SPEC-AuditGame-SE.md Part 0; QUYET-DINH.md question 8; review II.3
+Spec: docs/thesis/eval/SPEC-AuditGame-SE.md Part 0; docs/thesis/QUYET-DINH.md question 8; review II.3
 ("close all three holes AT ONCE, freeze the definition with a date and an md5,
 then run the certification table ONCE").
 
@@ -62,7 +62,7 @@ FROZEN_MD5_SINGLE_SALT = "9682c1958d40d28874ab4088dcbafce0"
 #: and the test that pins it will tell you the new digest.
 FROZEN_MD5 = "bcaf62d45507bc07d87f00e1e13cc0e6"
 
-#: THE SALT FAMILY (spikes/cong-v2-chot.md Section 2).
+#: THE SALT FAMILY (docs/preregistration/cong-v2-chot.md Section 2).
 #: The unit of replication is the SALT, not the split: splits overlap on a small
 #: corpus, so 20/20 splits on one salt is not 20 independent confirmations.
 SALT_FAMILY = ("payload_topic",) + tuple(f"payload_topic#{i}" for i in range(1, 17))
@@ -163,7 +163,7 @@ def record(**overrides) -> dict:
         #: green (28 of 29; the 29th errors only because the extracted tree has
         #: no data/), and the Delta=4 certify cell moves as far as 1/20 -> 19/20
         #: splits clearing across a 17-salt family -- verdicts moving in BOTH
-        #: directions at Delta 2 and 4 (spikes/cong-v2.md SS3.9).  The salt is a
+        #: directions at Delta 2 and 4 (docs/preregistration/cong-v2.md SS3.9).  The salt is a
         #: parameter of the measurement, not an implementation detail.
         #:
         #: `fingerprint` is what makes the pin BITE.  `mechanism` is prose and

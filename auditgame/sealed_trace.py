@@ -1,7 +1,7 @@
 """
 sealed_trace.py -- THE SEAL LINE, applied to a written-out trace.
 
-Spec: SPEC-P1b-Trace.md Part 1; Task 19's split of `carriers/` from
+Spec: docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1; Task 19's split of `carriers/` from
 `carriers-sealed/`, one level up.
 
 WHY THIS FILE EXISTS.  `results/M3-trace.json` is Task 17's named deliverable and

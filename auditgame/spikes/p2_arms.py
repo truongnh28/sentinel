@@ -58,7 +58,7 @@ from spikes import p2_budget, p2_run
 DEFAULT_PILOT = HERE / "p2-pilot.jsonl"
 DEFAULT_CONTROL_OUT = HERE / "p2-control.jsonl"
 DEFAULT_CEILING_OUT = HERE / "p2-ceiling-raw.jsonl"
-DEFAULT_REPORT_OUT = HERE / "p2-three-arms.md"
+DEFAULT_REPORT_OUT = AUDITGAME_DIR.parent / "docs" / "reports" / "p2-three-arms.md"
 
 # The control is paired to the completed main pilot, not to whatever defaults
 # happen to be current when this file is run.  The pilot on disk used one draw

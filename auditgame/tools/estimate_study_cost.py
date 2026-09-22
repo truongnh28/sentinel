@@ -114,7 +114,7 @@ def analyze_costs():
     report.append("   - Dự phòng $19,000 USD còn lại giữ nguyên cho nhánh fallback Pro hoặc mở rộng mô hình thứ hai.")
 
     report_text = "\n".join(report)
-    out_file = AUDITGAME_DIR / "spikes" / "p2-cost-report.md"
+    out_file = AUDITGAME_DIR.parent / "docs" / "reports" / "p2-cost-report.md"
     out_file.write_text(report_text, encoding="utf-8")
     print(f"Report written to {out_file}")
     print(report_text)

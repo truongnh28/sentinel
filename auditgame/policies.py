@@ -83,7 +83,7 @@ class CarrierSignal:
 
 @dataclass(frozen=True)
 class DefenseScope:
-    """A policy's SCOPE.  Spec: SPEC-Framework-Benchmark.md SS2.4.
+    """A policy's SCOPE.  Spec: docs/thesis/pipelines/SPEC-Framework-Benchmark.md SS2.4.
 
     `reads_scores` and `randomized` are NOT decoration -- they are two
     declarations the F3/F4 contracts can enforce, and both were born from bugs
@@ -388,7 +388,7 @@ class MinimaxLP(Policy):
 class MinimaxLPUpstream(MinimaxLP):
     """B7U -- B7 with the UPSTREAM attacker class declared instead of the default.
 
-    Spec: TIEN-DANG-KY-Sentinel-SSG.md SS4 (two registered variants).
+    Spec: docs/preregistration/TIEN-DANG-KY-Sentinel-SSG.md SS4 (two registered variants).
 
     NOT a tuning variant: the declared class Pi_A DECIDES the solution, and the two
     classes are two different problems.  Measured: (0,2,4) puts sum(u) = 0.00 and
@@ -410,7 +410,7 @@ class MinimaxLPUpstream(MinimaxLP):
 class SSGReceding(MinimaxLP):
     """Re-solve the minimax coverage every task, over the windows STILL OPEN.
 
-    Spec: TIEN-DANG-KY-Sentinel-SSG.md SS4, step 3.
+    Spec: docs/preregistration/TIEN-DANG-KY-Sentinel-SSG.md SS4, step 3.
 
     WHY.  The static LP is solved once at construction against the NOMINAL budget
     and never learns what it has spent, while `Policy.can` enforces the cap online.
@@ -591,7 +591,7 @@ class SentinelWindow(Policy):
 class SSGRecedingGuarded(MinimaxLP):
     """Giai lai CO SAN va CO CO -- ban thiet ke lai sau chan doan cong 4c.
 
-    Spec: TIEN-DANG-KY-Sentinel-SSG.md SS10.
+    Spec: docs/preregistration/TIEN-DANG-KY-Sentinel-SSG.md SS10.
 
     CAI DA DO O 4b.  `SSGReceding` giai lai MOI buoc thoi gian va HOI QUY tren
     lop upstream: harm 0,5721 so voi 0,4505 cua control tinh B7U, lech +0,1216.

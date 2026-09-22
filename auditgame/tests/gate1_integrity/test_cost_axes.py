@@ -1,6 +1,6 @@
 """
 GATE 1 -- the two cost axes the model declares and the code did not have.
-Spec: Danh-sach-diem-can-them.md A3, B1, B2.
+Spec: docs/thesis/Danh-sach-diem-can-them.md A3, B1, B2.
 
     chi   = max_{k,k'} |kappa(k) - kappa(k')| / kappa_bar      carrier heterogeneity
     a_t   = {none} U {(audit, k, DEPTH)},  cost kappa(k, depth)

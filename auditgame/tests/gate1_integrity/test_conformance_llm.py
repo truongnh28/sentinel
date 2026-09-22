@@ -1,7 +1,7 @@
 """
 GATE 1 -- CONFORMANCE CONTRACTS for the fifth port: LLMPipeline (L1-L4).
-Spec: pipelines/SPEC-Framework-Benchmark.md Parts 1.1 and 2.5; SPEC-P2-Agent.md
-      Parts 1b-2 and eval/PLAN.md Task 15 (p2.2).
+Spec: docs/thesis/pipelines/SPEC-Framework-Benchmark.md Parts 1.1 and 2.5; docs/thesis/pipelines/SPEC-P2-Agent.md
+      Parts 1b-2 and docs/thesis/eval/PLAN.md Task 15 (p2.2).
 
 WHY A FIFTH PORT AT ALL.  `AgentScope` used to carry `deterministic` and
 `cost_usd_per_task`.  Both are properties of the MODEL, not of the scaffold: swap

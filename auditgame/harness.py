@@ -25,7 +25,7 @@ read it back at t+1 -- the persistence this thesis studies, turned against the
 oracle.
 
 THE CARRIER MOUNT IS READ-ONLY, and the write path is a TOOL CALL.  This is
-eval/PLAN.md Task 14 ("Vong agent toi thieu, bon carrier la TOOL") stated in the
+docs/thesis/eval/PLAN.md Task 14 ("Vong agent toi thieu, bon carrier la TOOL") stated in the
 argv: the four carriers are tools the agent calls, not a directory it writes into,
 "because a tool call is OBSERVABLE and attributable, while a directory diff
 resolves neither `write then delete` nor `which carrier` nor the ordering of

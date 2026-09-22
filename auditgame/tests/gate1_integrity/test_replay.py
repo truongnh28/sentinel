@@ -1,5 +1,5 @@
 """
-GATE 1 -- trace and replay (I9).  Spec: ../pipelines/SPEC-P1b-Trace.md Part 1.
+GATE 1 -- trace and replay (I9).  Spec: docs/thesis/pipelines/SPEC-P1b-Trace.md Part 1.
 
 I9 is not "the harm we recorded equals the harm we recorded".  That comparison is
 an IDENTITY -- run_once fixes harm = harm_of(o.solved, o.patch_has_marker) and the

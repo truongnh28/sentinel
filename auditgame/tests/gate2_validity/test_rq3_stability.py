@@ -1,6 +1,6 @@
 """
 GATE 2 -- RQ3 is a statement about an UPDATE RULE, not about statefulness.
-Spec: Danh-sach-diem-can-them.md C5.
+Spec: docs/thesis/Danh-sach-diem-can-them.md C5.
 
 "Randomisation is the strongest lever" gave three different answers across three
 implementations of the same benchmark:
