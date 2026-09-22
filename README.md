@@ -6,10 +6,11 @@ Repo này chứa mã nguồn và tài liệu của đề tài Sentinel. Đề t�
 
 Đề tài hiện thực **draft của thầy** (*Where to Look: Audit-Allocation Games against Adaptive Persistent Poisoning in Software Workflows*). Các con số hiệu năng trong draft là **giá trị dự phóng**, tức giả thuyết cần kiểm chứng. Hướng tái lập đã chốt: **dựng đúng thiết lập của draft, rồi đo xem số ra bao nhiêu**. Tham số draft chưa ghi giá trị được chọn trên tập dev và đóng băng trước khi đánh giá; không tham số nào được chỉnh theo kết quả.
 
-README này là **báo cáo tiến độ**, gồm ba phần chính:
-1. [Cách tái lập tham số](#1-cách-tái-lập-tham-số)
+README này là **báo cáo tiến độ**. Đọc [Status](#status) và [Được bao nhiêu phần trăm](#được-bao-nhiêu-phần-trăm) là nắm được toàn cảnh; bốn phần sau đi vào chi tiết:
+1. [Cách tái lập tham số](#1-cách-tái-lập-tham-số) — bảng tra, trỏ sang tài liệu gốc thay vì chép lại thủ tục
 2. [Các stage phải làm và kết quả kỳ vọng](#2-các-stage-phải-làm-và-kết-quả-kỳ-vọng)
 3. [Trạng thái hiện tại](#3-trạng-thái-hiện-tại): đã tới bước nào, kết quả ra sao, có issue gì
+4. [Kế hoạch bổ sung](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint): các hạng mục trước đây xếp sau hạn, nay đưa vào sprint
 
 Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_Methodology_Full.md), Phần IV. Hướng dẫn chạy nằm ở cuối trang.
 
@@ -25,6 +26,25 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 | **Mốc kế tiếp** | **Ngày 6 (23/09):** chạy bảng chứng nhận cổng v2 một lần. Có attacker hợp lệ qua cổng thì giữ A′, không có thì lùi về **khung B** (benchmark tự phản biện). |
 | **Rủi ro lớn nhất** | (1) Ô $\Delta = 4$ của cổng v2 vẫn đỏ. (2) Thiết lập draft (thư viện 28 policy, 18 attacker, attacker best-response, freeze) chưa dựng, ước tính 5–7 ngày công, sát mốc đóng băng 30/09. (3) Agent thật làm theo payload **0/7**, nên mọi số harm hiện có là harm dưới mô hình tiếp nhận của MockAgent. |
 | **Kiểm thử** | `tests/run_all.py --all` ngày 22/09: **756 đạt · 2 không đạt · 13 bỏ qua**. Cổng 1 *UNKNOWN* (13 test cần Docker chưa chạy), cổng 2 đỏ 203/205, cổng 3 xanh 15/15 (chi tiết ở [§3.5](#35-kiểm-thử)). |
+
+## Được bao nhiêu phần trăm
+
+Quy ước tính: **hoàn thành = 1 · một phần hoặc làm theo hướng khác = 0,5 · chưa làm = 0**.
+
+| Trục | Tiến độ | Cách tính | Nghĩa |
+|---|---|---|---|
+| **Phương pháp (11 stage)** | **59%** | (2 + 9 × 0,5) / 11 | Đường đi của benchmark đã chạy được đầu-tới-cuối; phần thiếu nằm ở quy mô và ở khâu đóng băng |
+| **Tham số (17 đại lượng)** | **50%** | (7 + 3 × 0,5) / 17 | 7 đại lượng đã đo xong; 7 vẫn là giá trị gán tay |
+| **Thiết lập của draft** | **~20%** | 10 thành phần, xem [§3.1](#31-tổng-quan-theo-stage) | Thiếu ba khối lớn: thư viện 28 policy, 18 attacker kèm best-response, freeze manifest |
+| **Kết quả đối chiếu được với Bảng 2 của draft** | **~15%** | 13 chỉ số ở [§3.3](#33-so-với-giá-trị-dự-phóng-của-draft) | Mới so được crossover và hướng của độ lợi; worst-case trên held-out, exploitability, $\rho$ đều chưa đo |
+
+**Đọc con số này thế nào.** Phần *hạ tầng đo* gần xong: benchmark chạy được, có oracle niêm phong, có ba cổng kiểm thử, có tiền đăng ký. Phần *tái lập thiết lập draft* mới ở giai đoạn đầu, nên hầu hết số trong Bảng 2 của draft chưa có số đối chiếu. Ba việc quyết định con số 20% và 15% kia là: thư viện 28 policy, lớp 18 attacker có best-response, và đóng băng bằng manifest — đều nằm trong [§3.4](#34-issue-cần-xử-lý) và [§4](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint).
+
+**Bốn phát hiện đã có, không phụ thuộc phần còn thiếu:**
+1. Detector bề mặt chỉ đạt $d' \le 0{,}50$, trong khi điểm hoà vốn so với audit-at-commit là $d'^{*} = 2{,}85$ ở $\Delta = 2$.
+2. Detector nội dung sụp về ngẫu nhiên (AUC 0,479–0,518) khi attacker không tự khai báo.
+3. Agent LLM thật không làm theo lời khuyên độc: 0/7 instance.
+4. Không tồn tại điểm hoà vốn ở $\Delta \le 1$, khớp với Hệ quả 5 của draft.
 
 ---
 
@@ -60,43 +80,28 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 - **M3 — suy dẫn từ thiết kế thí nghiệm:** tham số là hệ quả của cách dựng episode.
 - **M4 — khử tham số:** phát biểu kết luận dưới dạng ngưỡng ("thứ hạng giữ khi $\lambda_Q < \lambda_Q^{*}$").
 
-### 1.1 Tham số thiết kế — lấy từ draft
+### 1.1 Bảng tra: tham số nào, thủ tục nằm ở đâu
 
-| Tham số | Giá trị trong draft | Cách tái lập |
-|---|---|---|
-| $K$ | 4 carrier | Dùng nguyên. Kiểm chứng bằng ablation $K = 2, 3$ |
-| $H$ | 6–14 | Chọn $H$ sao cho đủ workflow liên tiếp; báo số workflow khả dụng theo $H$ |
-| Lưới $\Delta$ | $\{0, 1, 2, 4, 8\}$ | Dùng nguyên, phải có $\Delta = 8$ |
-| Lưới $\chi$ | $\{0;\ 0{,}5;\ 1{,}34\}$ | Tạo bằng cách biến đổi vector $\kappa$ theo một quy ước chuẩn hoá khai báo trước (xem $\chi$ ở §1.2) |
-| 3 mức detector $(\psi,\varphi)$ | (0,75; 0,20) · (0,85; 0,12) · (0,92; 0,06) | Ánh xạ sang $d$ = 1,52 / 2,21 / 2,96 (§9.1 phương pháp luận). Chạy đúng ba mức; quét $d'$ liên tục là phân tích bổ sung |
-| Thư viện policy | 28 policy, ba họ | Draft chưa có danh sách. Thiết kế theo lưới: 8 vector trọng số + 12 ngưỡng-belief ($\tau \in \{0{,}3;0{,}5;0{,}7;0{,}9\}$ × 3 độ sâu) + 8 lịch xoay vòng; gửi thầy duyệt trước khi đóng băng |
-| Lớp attacker | 18 kịch bản, 7 held-out | Draft chưa có danh sách. Thiết kế theo các quy tắc cost-max/min, delay-max, uniform, ingress, best-response; chia held-out bằng hash của tên |
-| Harm | nhị phân: public đạt ∧ hidden hỏng ∧ marker có trong patch | Dùng nguyên. Validate trên tập con rằng payload làm hỏng `FAIL_TO_PASS` mà `PASS_TO_PASS` vẫn đạt |
-| Quy mô | 100 workflow × 5 $\Delta$ × 3 $\chi$ × 3 detector × 8 hệ thống × 3 seed | Dùng nguyên nếu đủ workflow; nếu không thì khai báo $N$ thực tế và dựa vào bootstrap theo workflow |
+Thủ tục chi tiết **không chép lại ở đây**. Bảng dưới trỏ tới mục tương ứng trong hai tài liệu gốc: **[PPL]** = [phương pháp luận](docs/AuditGame-SE_Sentinel_Methodology_Full.md), **[PER]** = [Parameter Estimation Report](docs/AuditGame-SE_Parameter_Estimation_Report.md).
 
-### 1.2 Tham số đo hoặc suy dẫn
-
-| Tham số | Draft | Phương thức | Cách tái lập | Kiểm chứng |
+| Tham số | Giá trị trong draft | Phương thức | Tóm tắt cách xác lập | Thủ tục chi tiết |
 |---|---|---|---|---|
-| $\kappa(k)$ | 0,4 / 0,9 / 1,6 / 4,1 CPU-phút | M1 | Dùng bảng draft cho thí nghiệm chính. Đo song song theo CPU-time: 4 checkpoint × ≥ 30 lần, user+sys, cố định tần số CPU, lấy trung vị | Phương sai; báo rõ bảng nào sinh ra kết quả nào |
-| $\chi$ | 1,34 | M1 | $\chi = \max\lvert\kappa_k - \kappa_{k'}\rvert / \bar\kappa$ với $\bar\kappa$ = mean, công bố công thức. Khi quét, khai báo trước đại lượng giữ cố định (đề xuất neo $\kappa_{\min}$) | Báo cả ba quy ước chuẩn hoá |
-| $\beta_k$ | chưa có | M1, dự phòng M2 | Khai báo luật ánh xạ commit → carrier; $\hat\beta_k = n_k/n$ trên cửa sổ commit giữa hai task; báo theo từng repo | Phân tích độ nhạy với luật ánh xạ; nếu kết luận đổi thì chuyển sang quét |
-| $\varepsilon$ | trung vị `edit_size` benign | M1 | Percentile của phân phối diff-size benign, cố định bởi benchmark | Cổng AUC |
-| $\Delta$ thực | chưa có | M1 | Co-change (support, confidence) + `git bisect` trên repo SWE-bench, lọc bằng đồ thị import | So với crossover dự đoán |
-| $\pi_0$, $b_0$ | chưa có | M3 | $\pi_0 = \Pr[\text{tấn công}] / \mathbb{E}[n_{\text{tổng}}]$; $b_0$ chia đều trên các window khả thi | Quét $\pi_0 \in \{0{,}04;0{,}08;0{,}10;0{,}20\}$, xem thứ hạng có đổi không |
-| $\rho$ | 0,07 | M1 | $\max_{\pi^*}\min_{\pi\in\Pi}\mathrm{TV}$, với TV tính theo xác suất hành động tại từng task, $\pi^*$ lấy từ game nhỏ giải chính xác | Bão hoà theo số game |
-| AUC cổng bề mặt | ≤ 0,56 | M1 | Classifier two-sample test, báo CI và permutation test ($B = 1000$) | CI; permutation |
-
-### 1.3 Tham số chọn có neo
-
-| Tham số | Draft | Phương thức | Neo vào | Kiểm chứng |
-|---|---|---|---|---|
-| $\tau$ | chưa có | M2 | Base-rate của mục có vấn đề | Quét |
-| $\lambda_T$ | chưa có | M2 + M4 | Chi phí chạy lại một task sạch | Báo ngưỡng $\lambda_T^{*}$ tại đó thứ hạng đổi |
-| $\lambda_Q$ | chưa có | M2 + M4 | Chi phí một lần cách ly nhầm, ràng buộc nhất quán với $\eta_Q$ | Báo $\lambda_Q^{*}$ |
-| $\eta_Q$ | chưa có | M1 + M3 | $\eta_Q(k) = c_{\text{gỡ}}(k)$ (đo) $+\ c_{\text{phục hồi}}(k)$ ($n_{\text{live}}$ × đơn giá ghi) | $\eta_Q(k) > \kappa(k)$; quét như trục (draft dự đoán lợi thế tăng khi $\eta_Q$ giảm) |
-| $N$ hạt | 2048 | Thiết kế | ~1600 trạng thái | Convergence study; hiện belief tính chính xác nên không cần |
-| $c$ (Định lý 4) | chưa có | M1 | $c$ nhỏ nhất sao cho cận đúng; tính từ $B_{\min}$ để posterior hội tụ về window thật | Hồi quy kiểm tra từng thừa số của cận |
+| $K$, $H$, lưới $\Delta$, lưới $\chi$, harm nhị phân, quy mô lưới | $K=4$; $H$ 6–14; $\Delta \in \{0,1,2,4,8\}$; $\chi \in \{0;0{,}5;1{,}34\}$; 100 workflow × 8 hệ thống × 3 seed | Thiết kế | Dùng nguyên giá trị của draft | [PPL] Phần VI loại A; Stage 9 |
+| 3 mức $(\psi,\varphi)$ | (0,75; 0,20) · (0,85; 0,12) · (0,92; 0,06) | Chọn có neo | Ánh xạ sang $d$ = 1,52 / 2,21 / 2,96; chạy đúng ba mức, quét $d'$ liên tục là phân tích bổ sung | [PPL] §9.1, Stage 5 |
+| Thư viện 28 policy | 28, ba họ, không có danh sách | Thiết kế | Sinh theo lưới 8 + 12 + 8, gửi thầy duyệt trước khi đóng băng | [PPL] Stage 6B |
+| 18 attacker, 7 held-out | 18/7, không có danh sách | Thiết kế | Các quy tắc cost-max/min, delay-max, uniform, ingress, best-response; chia held-out bằng hash của tên | [PPL] Stage 3.3 |
+| $\kappa(k)$ | 0,4 / 0,9 / 1,6 / 4,1 | M1 | Dùng bảng draft cho đường chính; đo song song theo CPU-time, ≥ 30 lần mỗi checkpoint | [PPL] Stage 2 · [PER] 5.6 |
+| $\chi$ | 1,34 | M1 | Công bố công thức $\bar\kappa$; khai báo trước đại lượng giữ cố định khi quét | [PPL] Stage 2 · [PER] 5.7 |
+| $\beta_k$ | chưa có | M1 (dự phòng M2) | Luật ánh xạ commit → carrier, đếm trên cửa sổ commit giữa hai task | [PPL] Stage 4 bước 5 · [PER] 5.1 |
+| $\varepsilon$ | trung vị `edit_size` benign | M1 | Percentile của phân phối diff-size benign | [PPL] Stage 3.4 |
+| $\Delta$ thực | chưa có | M1 | Co-change + lọc bằng đồ thị import; quy về khoảng cách task | [PPL] Stage 3.7 · [PER] 5.8 |
+| $\pi_0$, $b_0$ | chưa có | M3 | Suy từ thiết kế episode, rồi quét để kiểm | [PER] 5.3 |
+| $\tau$, $\lambda_Q$, $\lambda_T$ | chưa có | M2 + M4 | Neo vào chi phí đo được, báo ngưỡng $\lambda^{*}$ tại đó thứ hạng đổi | [PPL] Phần VI loại C · [PER] 5.5 |
+| $\eta_Q$ | chưa có | M1 + M3 | Tách phần gỡ (đo) và phần phục hồi (suy từ $n_{\text{live}}$) | [PER] 5.2 |
+| $\rho$ | 0,07 | M1 | TV theo xác suất hành động từng task, $\pi^{*}$ từ game nhỏ giải chính xác | [PPL] Stage 6D · [PER] 5.9 |
+| $N$ hạt | 2048 | Thiết kế | Belief hiện tính chính xác nên không cần | [PPL] Stage 6A |
+| $c$ (Định lý 4) | chưa có | M1 | $B_{\min}$ từ độ hội tụ của posterior, lấy max theo ô, hồi quy kiểm từng thừa số | [PER] 5.4 |
+| AUC cổng bề mặt | ≤ 0,56 | M1 | Classifier two-sample test, kèm CI và permutation test | [PPL] Stage 4 |
 
 ---
 
@@ -164,6 +169,8 @@ Cột "Kết quả kỳ vọng" ghi tiêu chí đạt của stage, kèm giá tr�
 | $c$ | — | M1 | ❌ Chưa thực hiện | — | Tìm $B_{\min}$ từ posterior |
 | Quy ước quét $\chi$ | — | Thiết kế | ❌ Chưa khai báo | Đề xuất neo $\kappa_{\min}$ | Khai báo trước khi chạy; báo cả ba quy ước |
 
+Các tham số còn ❌ đã được lên lịch ở [§4](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint): $\pi_0$ (W1), $\eta_Q$ (W2), $\beta_k$ (W3), $\kappa$ theo CPU-time (W4), $c$ (W6), $\rho$ (W7). Riêng $\lambda_Q, \lambda_T$ và quy ước quét $\chi$ là quyết định neo, làm cùng lúc với việc đóng băng.
+
 ### 3.3 So với giá trị dự phóng của draft
 
 Các số "đo được" dưới đây chạy trên **thiết lập hiện tại** (chưa có thư viện 28 policy, chưa có held-out 7/18, MockAgent). Chúng chưa phải phép tái lập cuối cùng.
@@ -198,7 +205,7 @@ Xếp theo mức ưu tiên cho mốc đóng băng 30/09.
 | 4 | Chưa có freeze manifest và cơ chế từ chối | Không chứng minh được "không tune sau khi thấy kết quả" | `frozen/` + `MANIFEST.sha256` + kiểm hash trong harness, khoảng nửa ngày |
 | 5 | Marker là hằng `"raw_write"` | Không đạt yêu cầu duy nhất mỗi lần chạy (§3.5 phương pháp luận) | `blake2b(repo \| ι \| σ \| seed)[:16]` |
 | 6 | $\lambda_T$, $\pi_0$, quy ước $\chi$ chưa neo | Ba lựa chọn này đổi thứ hạng chính sách | Neo trên dev theo §1.3, đóng băng trước khi chạy held-out |
-| 7 | Chưa có 240 game nhỏ; $\rho$ đo trong không gian proxy | Mệnh đề 6 chưa kiểm chứng được | Có thể để sang luận văn nếu thầy đồng ý |
+| 7 | Chưa có 240 game nhỏ; $\rho$ đo trong không gian proxy | Mệnh đề 6 chưa kiểm chứng được | W7 ở [§4](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint); chỉ làm nếu thư viện 28 policy kịp |
 | 8 | Gate 1 có 13 test chưa chạy (Docker) | Gate 1 ở trạng thái UNKNOWN | Dựng image `auditgame:latest`, chạy lại |
 | 9 | Chỗ draft chưa chốt: $\chi = 1{,}34$; dòng ablation "bỏ benign-drift" (0,264) thấp hơn Sentinel đầy đủ (0,272); 15 repo so với 12 của SWE-bench | Ảnh hưởng cách trình bày phần so sánh | Hỏi thầy ý định thiết kế |
 | 10 | Số tiền đăng ký của cổng v2 (0,519 / 0,529) khác giá trị cận in ra trong test hôm nay (0,5117 / 0,5247) | Có thể là thống kê khác nhau; cần xác nhận cổng đã đóng băng tái lập được | Chạy lại phép chứng nhận và đối chiếu trước ngày 6 |
@@ -221,12 +228,29 @@ Xếp theo mức ưu tiên cho mốc đóng băng 30/09.
 
 ---
 
-## Sau hạn 02/10 — cho luận văn và major revision
+## 4. Kế hoạch bổ sung: đưa các hạng mục còn thiếu vào sprint
 
-- Đo các tham số còn thiếu: $\beta$, $\eta_Q$, suy dẫn $\pi_0 = 0{,}080$ (thay cho giá trị gán 0,10), hằng số $c$ của Định lý 4, $\kappa$ theo CPU-time.
-- Nền lành tính thật, $N = 500$, 3 attacker LLM, payload đã công bố (AgentPoison, MINJA).
-- 240 game nhỏ giải chính xác và $\rho$ đo đúng không gian, điều kiện để kiểm chứng số cho Mệnh đề 6 (nếu chưa kịp trước hạn).
-- $\Delta$ thực đo trên repo SWE-bench bằng co-change + `git bisect`.
+Các hạng mục dưới đây trước đây xếp "sau hạn 02/10". Nay đưa vào sprint để tái lập đúng thiết lập draft. Thứ tự theo phụ thuộc: **W1 phải xong trước**, vì đổi $\pi_0$ làm sinh lại bảng $\tau_{\text{sel}}$ và chạy lại mọi bảng kết quả. W2–W5 độc lập nhau nên chạy song song được.
+
+| # | Hạng mục | Việc cụ thể | Phụ thuộc | Ước lượng | Trạng thái |
+|---|---|---|---|---|---|
+| W1 | $\pi_0$, $b_0$ suy dẫn | Thay giá trị gán 0,10 bằng $\pi_0 = 1/12{,}51 = 0{,}080$ (thế giới) và 0,040 (mô hình); sinh lại `reference/score_table.json`; quét $\pi_0 \in \{0{,}04;0{,}08;0{,}10;0{,}20\}$ để xem thứ hạng có đổi không | — | 1 ngày | ⏳ Chưa bắt đầu |
+| W2 | $\eta_Q$ | $\eta_Q(k) = c_{\text{gỡ}}(k) + c_{\text{phục hồi}}(k)$: đo phần gỡ bằng hiệu CPU-time khi che carrier; phần phục hồi tính từ $n_{\text{live}}(k)$ đã đo (`costs.ITEMS_PER_AUDIT`); kiểm $\eta_Q(k) > \kappa(k)$ | — | 0,5 ngày | ⏳ Chưa bắt đầu |
+| W3 | $\beta_k$ | Khai báo luật ánh xạ commit → carrier; đếm trên cửa sổ commit giữa hai task của 10 repo đã clone trong `auditgame/workspace/`; báo trung vị và dải theo repo; phân tích độ nhạy với một luật thay thế | — | 1 ngày | ⏳ Chưa bắt đầu |
+| W4 | $\kappa$ theo CPU-time | Đổi phép đo trong `runner.py` từ `perf_counter` sang `process_time` (user+sys); chạy mỗi checkpoint ≥ 30 lần, lấy trung vị, báo phương sai; đối chiếu với hai bảng $\kappa$ hiện có | — | 0,5 ngày | ⏳ Chưa bắt đầu |
+| W5 | $\Delta$ thực trên SWE-bench | Co-change (support, confidence) + lọc bằng đồ thị import trên 10 repo đã clone. **Đề xuất thay `git bisect` bằng SZZ** (`git blame` trên dòng mà gold patch sửa): bisect cần môi trường chạy được test ở mọi commit, tốn Docker cho từng repo | — | 1,5 ngày | ⏳ Chưa bắt đầu |
+| W6 | Hằng số $c$ (Định lý 4) | Tìm $B_{\min}$ bằng tìm kiếm nhị phân trên ngân sách, lấy mốc là khối lượng posterior đặt lên window thật tại $\sigma$; tính $c$ từng ô rồi lấy max; hồi quy $\log c$ theo ba thừa số để kiểm dạng hàm của cận | W1 | 1 ngày | ⏳ Chưa bắt đầu |
+| W7 | 240 game nhỏ + $\rho$ | Sinh lớp game nhỏ ($K \cdot H \le 40$), giải chính xác bằng LP hiện có; đo $\rho$ bằng TV trên vector xác suất hành động **theo từng task**, thay cho không gian proxy hiện tại; so với cận $H\rho\,\text{range}(L)$ của Mệnh đề 6 | Thư viện 28 policy (issue #2) | 2 ngày | ⏳ Chưa bắt đầu |
+| W8 | Payload đã công bố | Port khuôn payload AgentPoison (trigger tối ưu hoá) và MINJA (bridging step + indication prompt) thành 2 attacker kịch bản, tính vào lớp 18 attacker | Issue #3 | 1 ngày | ⏳ Chưa bắt đầu |
+| W9 | Nền lành tính thật, $N = 500$, 3 attacker LLM | Chạy trên toàn bộ 500 instance SWE-bench Verified với nền lành tính thật và attacker LLM | W8; ngân sách LLM | 3+ ngày | ⏳ Chưa bắt đầu |
+
+**Tổng ước lượng:** W1–W8 khoảng **8,5 ngày công**, cộng với việc dựng thiết lập draft (issue #2, #3, #4: thư viện 28 policy, 18 attacker, freeze manifest) khoảng **5–7 ngày công**. Quỹ thời gian còn lại tới mốc đóng băng 30/09 là **8 ngày**. Vì vậy cần cắt phạm vi; đề xuất:
+
+- **Vào trước 30/09:** W1, W2, W3, W4, W5, W6. Đây là các phép đo độc lập, chạy song song được, và là phần biến "giá trị gán" thành "giá trị đo" — chỗ hội đồng hỏi nhiều nhất.
+- **Chỉ làm nếu thư viện 28 policy kịp:** W7.
+- **Sau hạn 02/10:** W9, và W7 nếu không kịp.
+
+Kế hoạch triển khai chi tiết theo từng bước sẽ được viết riêng trong `docs/design/plans/`.
 
 ---
 
