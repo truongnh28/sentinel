@@ -24,7 +24,7 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 | **Khung bài đã chốt** | **A′ — "bản đồ chế độ"** (chốt 18/09 tại điểm rẽ ngày 4). Trên thiết lập hiện tại, Sentinel thắng audit-at-commit (B1) trên hàm mất mát $L$ nhưng **thua B5 risk-score**. Bài phát biểu về *ranh giới chế độ*, không về Sentinel. |
 | **Đang ở bước** | Stage 4 (chứng nhận cổng v2, ngày 6) và chuẩn bị Stage 8 (đóng băng). Stage 6 và 9 mới chạy trên thiết lập rút gọn, chưa đúng thiết lập draft (xem [§3.1](#31-tổng-quan-theo-stage)). |
 | **Mốc kế tiếp** | **Ngày 6 (23/09):** chạy bảng chứng nhận cổng v2 một lần. Có attacker hợp lệ qua cổng thì giữ A′, không có thì lùi về **khung B** (benchmark tự phản biện). |
-| **Rủi ro lớn nhất** | (1) Ô $\Delta = 4$ của cổng v2 vẫn đỏ. (2) Thiết lập draft (thư viện 28 policy, 18 attacker, attacker best-response, freeze) chưa dựng, ước tính 5–7 ngày công, sát mốc đóng băng 30/09. (3) Agent thật làm theo payload **0/7**, nên mọi số harm hiện có là harm dưới mô hình tiếp nhận của MockAgent. |
+| **Rủi ro lớn nhất** | (1) Ô $\Delta = 4$ của cổng v2 vẫn đỏ. (2) Thiết lập draft (thư viện 28 policy, 18 attacker, attacker best-response, freeze) chưa dựng, trong khi mốc đóng băng số là 30/09. (3) Agent thật làm theo payload **0/7**, nên mọi số harm hiện có là harm dưới mô hình tiếp nhận của MockAgent. |
 | **Kiểm thử** | `tests/run_all.py --all` ngày 22/09: **756 đạt · 2 không đạt · 13 bỏ qua**. Cổng 1 *UNKNOWN* (13 test cần Docker chưa chạy), cổng 2 đỏ 203/205, cổng 3 xanh 15/15 (chi tiết ở [§3.5](#35-kiểm-thử)). |
 
 ## Được bao nhiêu phần trăm
@@ -86,7 +86,7 @@ Bốn từ dùng xuyên suốt bảng dưới:
 | 12 — 30/09 | **Đóng băng số**; chạy ba cổng lần cuối; artifact ẩn danh | Manifest hash; ba cổng xanh (hoặc đỏ có giải trình) | Sau mốc này không tham số nào được chỉnh |
 | 13–14 — 01–02/10 | Bản cuối, format ACM, **nộp** | Bản nộp | Hạn 02/10 AoE |
 
-**Điểm nghẽn.** Ba dòng của ngày 7–11 cộng lại khoảng **17 ngày công** nhưng chỉ có **5 ngày lịch**. Vì vậy phải cắt, và thứ tự ưu tiên đề xuất là: (1) thiết lập draft, vì không có nó thì không có bảng kết quả chính; (2) W1–W6, vì đây là phần biến "giá trị gán" thành "giá trị đo"; (3) chuỗi bảng $m$ và $N = 100$ ở quy mô rút gọn nếu cần.
+**Thứ tự ưu tiên trong ngày 7–11**, nếu phải chọn việc làm trước: (1) thiết lập draft, vì không có nó thì không có bảng kết quả chính; (2) W1–W6, phần biến "giá trị gán" thành "giá trị đo"; (3) chuỗi bảng $m$ và lưới $N = 100$.
 
 **Ba điều kiện dừng đã khai báo trước:**
 
@@ -269,18 +269,18 @@ Xếp theo mức ưu tiên cho mốc đóng băng 30/09.
 
 Các hạng mục dưới đây trước đây xếp "sau hạn 02/10". Nay đưa vào sprint để tái lập đúng thiết lập draft. Thứ tự theo phụ thuộc: **W1 phải xong trước**, vì đổi $\pi_0$ làm sinh lại bảng $\tau_{\text{sel}}$ và chạy lại mọi bảng kết quả. W2–W5 độc lập nhau nên chạy song song được.
 
-| # | Hạng mục | Việc cụ thể | Phụ thuộc | Ước lượng | Trạng thái |
-|---|---|---|---|---|---|
-| W1 | $\pi_0$, $b_0$ suy dẫn | Thay giá trị gán 0,10 bằng $\pi_0 = 1/12{,}51 = 0{,}080$ (thế giới) và 0,040 (mô hình); sinh lại `reference/score_table.json`; quét $\pi_0 \in \{0{,}04;0{,}08;0{,}10;0{,}20\}$ để xem thứ hạng có đổi không | — | 1 ngày | ⏳ Chưa bắt đầu |
-| W2 | $\eta_Q$ | $\eta_Q(k) = c_{\text{detach}}(k) + c_{\text{restore}}(k)$: đo phần gỡ bằng hiệu CPU-time khi che carrier; phần phục hồi tính từ $n_{\text{live}}(k)$ đã đo (`costs.ITEMS_PER_AUDIT`); kiểm $\eta_Q(k) > \kappa(k)$ | — | 0,5 ngày | ⏳ Chưa bắt đầu |
-| W3 | $\beta_k$ | Khai báo luật ánh xạ commit → carrier; đếm trên cửa sổ commit giữa hai task của 10 repo đã clone trong `auditgame/workspace/`; báo trung vị và dải theo repo; phân tích độ nhạy với một luật thay thế | — | 1 ngày | ⏳ Chưa bắt đầu |
-| W4 | $\kappa$ theo CPU-time | Đổi phép đo trong `runner.py` từ `perf_counter` sang `process_time` (user+sys); chạy mỗi checkpoint ≥ 30 lần, lấy trung vị, báo phương sai; đối chiếu với hai bảng $\kappa$ hiện có | — | 0,5 ngày | ⏳ Chưa bắt đầu |
-| W5 | $\Delta$ thực trên SWE-bench | Co-change (support, confidence) + lọc bằng đồ thị import trên 10 repo đã clone. **Đề xuất thay `git bisect` bằng SZZ** (`git blame` trên dòng mà gold patch sửa): bisect cần môi trường chạy được test ở mọi commit, tốn Docker cho từng repo | — | 1,5 ngày | ⏳ Chưa bắt đầu |
-| W6 | Hằng số $c$ (Định lý 4) | Tìm $B_{\min}$ bằng tìm kiếm nhị phân trên ngân sách, lấy mốc là khối lượng posterior đặt lên window thật tại $\sigma$; tính $c$ từng ô rồi lấy max; hồi quy $\log c$ theo ba thừa số để kiểm dạng hàm của cận | W1 | 1 ngày | ⏳ Chưa bắt đầu |
-| W7 | 240 game nhỏ + $\rho$ | Sinh lớp game nhỏ ($K \cdot H \le 40$), giải chính xác bằng LP hiện có; đo $\rho$ bằng TV trên vector xác suất hành động **theo từng task**, thay cho không gian proxy hiện tại; so với cận $H\rho\,\text{range}(L)$ của Mệnh đề 6 | Thư viện 28 policy (issue #2) | 2 ngày | ⏳ Chưa bắt đầu |
-| W8 | Payload đã công bố | Port khuôn payload AgentPoison (trigger tối ưu hoá) và MINJA (bridging step + indication prompt) thành 2 attacker kịch bản, tính vào lớp 18 attacker | Issue #3 | 1 ngày | ⏳ Chưa bắt đầu |
-| W9 | Nền lành tính thật, $N = 500$, 3 attacker LLM | Chạy trên toàn bộ 500 instance SWE-bench Verified với nền lành tính thật và attacker LLM | W8; ngân sách LLM | 3+ ngày | ⏳ Chưa bắt đầu |
-| W10 | Biện hộ các tham số thiết kế | Sinh bằng chứng cho những số mà draft nêu nhưng không có nguồn: ablation $K = 2, 3$; phân phối độ dài workflow để chọn $H$; phân tích lực để chọn $N$ và số seed; $\rho$ bão hoà để biện hộ con số 28; ngưỡng AUC suy từ CI thay vì lấy 0,56 | W7 (cho $\rho$) | 1,5 ngày | ⏳ Chưa bắt đầu |
+| # | Hạng mục | Việc cụ thể | Phụ thuộc | Trạng thái |
+|---|---|---|---|---|
+| W1 | $\pi_0$, $b_0$ suy dẫn | Thay giá trị gán 0,10 bằng $\pi_0 = 1/12{,}51 = 0{,}080$ (thế giới) và 0,040 (mô hình); sinh lại `reference/score_table.json`; quét $\pi_0 \in \{0{,}04;0{,}08;0{,}10;0{,}20\}$ để xem thứ hạng có đổi không | — | ⏳ Chưa bắt đầu |
+| W2 | $\eta_Q$ | $\eta_Q(k) = c_{\text{detach}}(k) + c_{\text{restore}}(k)$: đo phần gỡ bằng hiệu CPU-time khi che carrier; phần phục hồi tính từ $n_{\text{live}}(k)$ đã đo (`costs.ITEMS_PER_AUDIT`); kiểm $\eta_Q(k) > \kappa(k)$ | — | ⏳ Chưa bắt đầu |
+| W3 | $\beta_k$ | Khai báo luật ánh xạ commit → carrier; đếm trên cửa sổ commit giữa hai task của 10 repo đã clone trong `auditgame/workspace/`; báo trung vị và dải theo repo; phân tích độ nhạy với một luật thay thế | — | ⏳ Chưa bắt đầu |
+| W4 | $\kappa$ theo CPU-time | Đổi phép đo trong `runner.py` từ `perf_counter` sang `process_time` (user+sys); chạy mỗi checkpoint ≥ 30 lần, lấy trung vị, báo phương sai; đối chiếu với hai bảng $\kappa$ hiện có | — | ⏳ Chưa bắt đầu |
+| W5 | $\Delta$ thực trên SWE-bench | Co-change (support, confidence) + lọc bằng đồ thị import trên 10 repo đã clone. **Đề xuất thay `git bisect` bằng SZZ** (`git blame` trên dòng mà gold patch sửa): bisect cần môi trường chạy được test ở mọi commit, tốn Docker cho từng repo | — | ⏳ Chưa bắt đầu |
+| W6 | Hằng số $c$ (Định lý 4) | Tìm $B_{\min}$ bằng tìm kiếm nhị phân trên ngân sách, lấy mốc là khối lượng posterior đặt lên window thật tại $\sigma$; tính $c$ từng ô rồi lấy max; hồi quy $\log c$ theo ba thừa số để kiểm dạng hàm của cận | W1 | ⏳ Chưa bắt đầu |
+| W7 | 240 game nhỏ + $\rho$ | Sinh lớp game nhỏ ($K \cdot H \le 40$), giải chính xác bằng LP hiện có; đo $\rho$ bằng TV trên vector xác suất hành động **theo từng task**, thay cho không gian proxy hiện tại; so với cận $H\rho\,\text{range}(L)$ của Mệnh đề 6 | Thư viện 28 policy (issue #2) | ⏳ Chưa bắt đầu |
+| W8 | Payload đã công bố | Port khuôn payload AgentPoison (trigger tối ưu hoá) và MINJA (bridging step + indication prompt) thành 2 attacker kịch bản, tính vào lớp 18 attacker | Issue #3 | ⏳ Chưa bắt đầu |
+| W9 | Nền lành tính thật, $N = 500$, 3 attacker LLM | Chạy trên toàn bộ 500 instance SWE-bench Verified với nền lành tính thật và attacker LLM | W8; ngân sách LLM | ⏳ Chưa bắt đầu |
+| W10 | Biện hộ các tham số thiết kế | Sinh bằng chứng cho những số mà draft nêu nhưng không có nguồn: ablation $K = 2, 3$; phân phối độ dài workflow để chọn $H$; phân tích lực để chọn $N$ và số seed; $\rho$ bão hoà để biện hộ con số 28; ngưỡng AUC suy từ CI thay vì lấy 0,56 | W7 (cho $\rho$) | ⏳ Chưa bắt đầu |
 
 Kế hoạch triển khai chi tiết theo từng bước sẽ được viết riêng trong `docs/design/plans/`.
 
