@@ -127,7 +127,19 @@ class Policy:
     update_rule: str = "ratio"
 
     def can(self, cost: float) -> bool:
-        return self.spent + cost <= self.budget + 1e-9
+        """Affordability, with slack RELATIVE to the budget.
+
+        The slack used to be a flat 1e-9, which is a quantity in the same unit as
+        kappa -- so it meant something different on every cost table.  The game
+        is otherwise invariant under rescaling (kappa, kappa_commit, eta_Q, B) by
+        a common factor: every use of a cost is either a ratio to another cost or
+        a comparison against the budget.  A flat slack was the one thing that
+        broke that invariance, and it broke it silently: rescaling the USD table
+        by 1e-6 moved SentinelW's L from 0.855 to 0.8625, because 1e-9 had grown
+        into 6% of the budget.  Relative slack makes the unit of kappa what it
+        should be -- free.
+        """
+        return self.spent + cost <= self.budget * (1.0 + 1e-9)
 
     def charge(self, cost: float):
         self.spent += cost
