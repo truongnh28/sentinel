@@ -258,7 +258,7 @@ Các số "đo được" dưới đây chạy trên **thiết lập hiện tại
 | Ngẫu nhiên hoá > thích nghi | Bỏ randomization tốn 0,184 harm | Ví dụ 4×4 khớp | Ablation đầy đủ chưa chạy |
 | Exploitability | 0,34 → 0,09 (Sentinel **giảm** regret) | **Đo rồi, và ngược dấu:** regret Sentinel 0,155–0,333 so với B1 0,039–0,104; hỗn hợp minimax đặt **76–83%** khối lượng lên B1 | Đo trên lớp 12 attacker, chưa phải 18; `spikes/exploitability-full.json` |
 | Worst-case trên held-out | 27,6% | **Đảo dấu:** Sentinel +2,7% (dev) → **−2,7%** (held-out). Chỉ hai chính sách **mang belief** xuống cấp (Sentinel +0,05, SentinelW +0,10 harm); mọi chính sách không trạng thái đều phẳng hoặc tốt hơn | 6/12 luật, chưa phải 7/18. SentinelW vẫn dẫn trên held-out (0,875 so với B1 0,925) ⇒ kết luận là *belief bị khớp quá mức*, không phải *belief vô dụng* |
-| $\rho$; regret | 0,07; 0,09 | $\rho = 0{,}894$ (proxy) | Chưa so được |
+| $\rho$; cận Mệnh đề 6 | 0,07 ⇒ cận 0,42, regret đo 0,09 | $\rho = \mathbf{0{,}5078}$ ⇒ cận $H\rho\,\mathrm{range}(L) = \mathbf{4{,}06}$ | Cận **rỗng**: nó lớn hơn toàn bộ miền giá trị của $L$. Đo trên phân phối hành động theo từng task (không gian đúng); bản gộp cả episode cho 1,108 |
 | Cách ly nhầm | 3,2% → 5,1% | Chưa đo trên điểm cuối chính | — |
 | Detector bề mặt | — | $d' \le 0{,}50$, dưới $d'^{*} = 2{,}85$ | Phát hiện mới |
 | Detector nội dung | — | AUC 0,479 ($D_{\text{lex}}$) · 0,518 ($D_{\text{llm}}$) khi attacker không tự khai báo | Phát hiện mới |
