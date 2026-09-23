@@ -153,6 +153,13 @@ def budget_for_cpu(H: int = 8) -> float:
     return budget_for_table(KAPPA_CPU, H)
 
 
+#: USD per CPU second for running a repository's test suite.  DELIBERATELY
+#: UNSET: the machine price is an input this project does not own.  Everything
+#: that needs it is reported as a function of it, and
+#: tools/measure_kappa_commit.py solves for the value at which the answer to
+#: RQ1 changes sign instead of picking one.
+USD_PER_CPU_SECOND = None
+
 #: BENIGN DRIFT RATE, counted on the real history of the ten SWE-bench repos
 #: (tools/measure_beta.py, spikes/beta-k.json).  Median across repositories under
 #: mapping rule A; the range across repos is in the JSON and is wide.

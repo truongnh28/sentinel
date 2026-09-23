@@ -584,8 +584,15 @@ class TheSweepIsScoredWithTheDeclaredLossNotHarmAlone(unittest.TestCase):
         lambda_Q = 0 va 0.10 la MINH HOA, khong bao gio la dong tit" -- mot bang
         chi co mot cot lambda_Q lai tro thanh mot phat bieu ve dung trong so do.
 
-        0.10 is read off metrics.LAMBDA_Q rather than pasted, so the column cannot
-        drift away from the weight metrics.py declares.
+        The default column is read off metrics.LAMBDA_Q rather than pasted, so it
+        cannot drift away from the weight metrics.py declares.
+
+        THE ASSERTION USED TO CONTRADICT THAT SENTENCE: it checked the label
+        contained the literal "0.1", which pins the very value the docstring says
+        is not pinned.  It went red the day lambda_Q stopped being 0.10 -- which
+        happened for a reason (it is now DERIVED from the measured
+        lambda_Q/lambda_T ratio, and 0.10 was 5.5x too cheap).  The property is
+        "the label names the declared weight"; that is what is checked now.
         """
         rows = [cell(dp, 2, -9.0, curves=four(
                     b1=curve(0.80, 0.00, 0.00, 16.40),
@@ -597,7 +604,8 @@ class TheSweepIsScoredWithTheDeclaredLossNotHarmAlone(unittest.TestCase):
         self.assertEqual(list(cols), [S.LQ_ZERO, S.LQ_BAR, S.LQ_DEFAULT],
                          "the three declared lambda_Q columns are not the ones "
                          "reported, or they are not in the declared order")
-        self.assertIn("0.1", S.LQ_DEFAULT)
+        self.assertIn(str(metrics.LAMBDA_Q), S.LQ_DEFAULT,
+                      "the default column's label does not name metrics.LAMBDA_Q")
         self.assertEqual(cols[S.LQ_ZERO], S.break_even_loss(rows, 0.0))
         self.assertEqual(cols[S.LQ_DEFAULT],
                          S.break_even_loss(rows, metrics.LAMBDA_Q))

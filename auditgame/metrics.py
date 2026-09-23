@@ -17,13 +17,30 @@ from __future__ import annotations
 # Below this the ratio stops meaning anything -- report ABSOLUTE Delta-harm.
 GAIN_FLOOR = 0.05
 
-#: Default weights of the composite loss.  NOT derived from anything -- the
-#: manuscript never published them, and they sit in the "ask the advisor"
-#: parameter list.  They exist so a table can be printed at all; the REPORTABLE
-#: quantity is lambda_q_star() below, which says where the ranking changes.
-#: Anything stated at a single lambda_Q is a statement about that lambda_Q.
-LAMBDA_Q = 0.10
+#: Weights of the composite loss.  ONE of them is now measured and the other
+#: is not, and the difference has to stay visible in the code.
+#:
+#: lambda_T is DECLARED: it is how many harm events one lost clean task is
+#: worth, i.e. the cost of a poisoned patch reaching a repository measured
+#: against the cost of redoing a task.  Nothing in this benchmark can price the
+#: first, so 0.50 is a declaration, and tools/anchor_lambdas.py reports the
+#: ranking across the whole range so the declaration can be argued rather than
+#: assumed.  SSG-G wins over lambda_T in [0.26, 0.57].
+#:
+#: lambda_Q is DERIVED from it: a false quarantine and a lost task are both
+#: priceable on this project's USD scale, so their RATIO is a measurement --
+#: eta_Q(k) over the cost of re-running a task, = 1.0973 (range 0.393..1.874).
+#:
+#: THIS WAS 0.10, A RATIO OF 0.20, WHICH IS 5.5x TOO CHEAP.  That is not a
+#: neutral error: it flatters exactly the policies that quarantine most, and
+#: those are the policies the paper is about.  Measured consequence -- with
+#: lambda_Q = 0.10 the ranking by L is the near-reverse of the ranking by
+#: regret (Spearman -0.43) and looks like an average/worst-case frontier; at
+#: the measured price the two orderings AGREE (+0.86) and SSG-G is simply best
+#: on both.  A whole finding was an artifact of this constant.
 LAMBDA_T = 0.50
+LAMBDA_Q_OVER_LAMBDA_T = 1.0973     # spikes/lambda-anchors.json
+LAMBDA_Q = LAMBDA_Q_OVER_LAMBDA_T * LAMBDA_T
 
 
 def gain(h_b1: float, h_sentinel: float, floor: float = GAIN_FLOOR):
