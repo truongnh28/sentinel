@@ -1,0 +1,193 @@
+{
+  "rho_per_task_tv": 0.5078,
+  "rho_old_audit_marginal_space": 1.108,
+  "per_target": {
+    "B1 audit-at-commit": {
+      "nearest": "SW-commit",
+      "distance": 0.0
+    },
+    "B5 risk-score": {
+      "nearest": "BT-tau0.9-d3",
+      "distance": 0.1953
+    },
+    "B6 two-stage": {
+      "nearest": "SW-ingress",
+      "distance": 0.5078
+    },
+    "B7 minimax-lp": {
+      "nearest": "SW-commit",
+      "distance": 0.3125
+    },
+    "Sentinel": {
+      "nearest": "SW-ingress",
+      "distance": 0.2266
+    },
+    "SentinelW window-belief": {
+      "nearest": "SW-half-commit",
+      "distance": 0.3203
+    },
+    "SSG-G guarded": {
+      "nearest": "SW-commit",
+      "distance": 0.4766
+    }
+  },
+  "saturation_curve": [
+    {
+      "size": 1,
+      "added": "BT-tau0.3-d3",
+      "rho": 0.7266
+    },
+    {
+      "size": 2,
+      "added": "SW-ingress",
+      "rho": 0.7188
+    },
+    {
+      "size": 3,
+      "added": "SW-commit",
+      "rho": 0.6172
+    },
+    {
+      "size": 4,
+      "added": "SW-memory",
+      "rho": 0.5078
+    },
+    {
+      "size": 5,
+      "added": "SW-uniform",
+      "rho": 0.5078
+    },
+    {
+      "size": 6,
+      "added": "SW-carriers",
+      "rho": 0.5078
+    },
+    {
+      "size": 7,
+      "added": "SW-egress",
+      "rho": 0.5078
+    },
+    {
+      "size": 8,
+      "added": "SW-branch",
+      "rho": 0.5078
+    },
+    {
+      "size": 9,
+      "added": "SW-half-commit",
+      "rho": 0.5078
+    },
+    {
+      "size": 10,
+      "added": "BT-tau0.3-d1",
+      "rho": 0.5078
+    },
+    {
+      "size": 11,
+      "added": "BT-tau0.3-d2",
+      "rho": 0.5078
+    },
+    {
+      "size": 12,
+      "added": "BT-tau0.5-d1",
+      "rho": 0.5078
+    },
+    {
+      "size": 13,
+      "added": "BT-tau0.5-d2",
+      "rho": 0.5078
+    },
+    {
+      "size": 14,
+      "added": "BT-tau0.5-d3",
+      "rho": 0.5078
+    },
+    {
+      "size": 15,
+      "added": "BT-tau0.7-d1",
+      "rho": 0.5078
+    },
+    {
+      "size": 16,
+      "added": "BT-tau0.7-d2",
+      "rho": 0.5078
+    },
+    {
+      "size": 17,
+      "added": "BT-tau0.7-d3",
+      "rho": 0.5078
+    },
+    {
+      "size": 18,
+      "added": "BT-tau0.9-d1",
+      "rho": 0.5078
+    },
+    {
+      "size": 19,
+      "added": "BT-tau0.9-d2",
+      "rho": 0.5078
+    },
+    {
+      "size": 20,
+      "added": "BT-tau0.9-d3",
+      "rho": 0.5078
+    },
+    {
+      "size": 21,
+      "added": "ROT-declared-p1",
+      "rho": 0.5078
+    },
+    {
+      "size": 22,
+      "added": "ROT-declared-p2",
+      "rho": 0.5078
+    },
+    {
+      "size": 23,
+      "added": "ROT-cheap-first-p1",
+      "rho": 0.5078
+    },
+    {
+      "size": 24,
+      "added": "ROT-cheap-first-p2",
+      "rho": 0.5078
+    },
+    {
+      "size": 25,
+      "added": "ROT-dear-first-p1",
+      "rho": 0.5078
+    },
+    {
+      "size": 26,
+      "added": "ROT-dear-first-p2",
+      "rho": 0.5078
+    },
+    {
+      "size": 27,
+      "added": "ROT-alternating-p1",
+      "rho": 0.5078
+    },
+    {
+      "size": 28,
+      "added": "ROT-alternating-p2",
+      "rho": 0.5078
+    }
+  ],
+  "saturates_at": 4,
+  "alphabet": [
+    "memory",
+    "skill",
+    "queue",
+    "branch",
+    "commit",
+    "quarantine",
+    "none"
+  ],
+  "reading": "rho is the worst distance from a policy the paper reports to its nearest library member, measured on PER-TASK action distributions. The old number pooled over the episode, so two policies with the same totals and different timing looked identical.",
+  "provenance": {
+    "grid": "8 workflows, H=8, B=17.95, detector mid, seeds (1, 2)",
+    "library_size": 28,
+    "date": "2026-09-23",
+    "commit": "9cb1daef2ced4066a82663b8ee4519cd0898ac7a"
+  }
+}
