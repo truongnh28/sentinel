@@ -1,0 +1,258 @@
+{
+  "measured_ratio_lambda_Q_over_lambda_T": {
+    "usd_per_task": 0.08679643199999999,
+    "per_carrier": {
+      "memory": 1.8735,
+      "skill": 0.3929,
+      "queue": 0.5438,
+      "branch": 1.5788
+    },
+    "mean": 1.0973,
+    "min": 0.3929,
+    "max": 1.8735
+  },
+  "hand_set_ratio": 0.2,
+  "hand_set_understates_by": 5.49,
+  "cells": {
+    "B1 audit-at-commit": {
+      "harm": 1.0,
+      "q_false": 0.0,
+      "t_lost": 0.0
+    },
+    "B5 risk-score": {
+      "harm": 0.875,
+      "q_false": 0.325,
+      "t_lost": 0.0
+    },
+    "B6 two-stage": {
+      "harm": 1.0,
+      "q_false": 0.35,
+      "t_lost": 0.0
+    },
+    "Sentinel": {
+      "harm": 0.725,
+      "q_false": 1.15,
+      "t_lost": 0.05
+    },
+    "SentinelW window-belief": {
+      "harm": 0.7,
+      "q_false": 0.875,
+      "t_lost": 0.0
+    },
+    "SSG-G guarded": {
+      "harm": 0.9,
+      "q_false": 0.0,
+      "t_lost": 0.175
+    },
+    "B7 minimax-lp": {
+      "harm": 1.0,
+      "q_false": 0.0,
+      "t_lost": 0.075
+    }
+  },
+  "sweep": [
+    {
+      "lambda_T": 0.0,
+      "lambda_Q": 0.0,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.7,
+        "SSG-G guarded": 0.9,
+        "B7 minimax-lp": 1.0
+      },
+      "ranking": [
+        "SentinelW window-belief",
+        "Sentinel",
+        "B5 risk-score",
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "B6 two-stage",
+        "B7 minimax-lp"
+      ],
+      "winner": "SentinelW window-belief"
+    },
+    {
+      "lambda_T": 0.1,
+      "lambda_Q": 0.1097,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.9107,
+        "B6 two-stage": 1.0384,
+        "Sentinel": 0.8562,
+        "SentinelW window-belief": 0.796,
+        "SSG-G guarded": 0.9175,
+        "B7 minimax-lp": 1.0075
+      },
+      "ranking": [
+        "SentinelW window-belief",
+        "Sentinel",
+        "B5 risk-score",
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "B7 minimax-lp",
+        "B6 two-stage"
+      ],
+      "winner": "SentinelW window-belief"
+    },
+    {
+      "lambda_T": 0.25,
+      "lambda_Q": 0.2743,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.9642,
+        "B6 two-stage": 1.096,
+        "Sentinel": 1.053,
+        "SentinelW window-belief": 0.94,
+        "SSG-G guarded": 0.9437,
+        "B7 minimax-lp": 1.0188
+      },
+      "ranking": [
+        "SentinelW window-belief",
+        "SSG-G guarded",
+        "B5 risk-score",
+        "B1 audit-at-commit",
+        "B7 minimax-lp",
+        "Sentinel",
+        "B6 two-stage"
+      ],
+      "winner": "SentinelW window-belief"
+    },
+    {
+      "lambda_T": 0.5,
+      "lambda_Q": 0.5486,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.1801,
+        "SSG-G guarded": 0.9875,
+        "B7 minimax-lp": 1.0375
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "B7 minimax-lp",
+        "B5 risk-score",
+        "SentinelW window-belief",
+        "B6 two-stage",
+        "Sentinel"
+      ],
+      "winner": "SSG-G guarded"
+    },
+    {
+      "lambda_T": 0.75,
+      "lambda_Q": 0.823,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.1425,
+        "B6 two-stage": 1.288,
+        "Sentinel": 1.7089,
+        "SentinelW window-belief": 1.4201,
+        "SSG-G guarded": 1.0312,
+        "B7 minimax-lp": 1.0562
+      },
+      "ranking": [
+        "B1 audit-at-commit",
+        "SSG-G guarded",
+        "B7 minimax-lp",
+        "B5 risk-score",
+        "B6 two-stage",
+        "SentinelW window-belief",
+        "Sentinel"
+      ],
+      "winner": "B1 audit-at-commit"
+    },
+    {
+      "lambda_T": 1.0,
+      "lambda_Q": 1.0973,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.2316,
+        "B6 two-stage": 1.3841,
+        "Sentinel": 2.0369,
+        "SentinelW window-belief": 1.6601,
+        "SSG-G guarded": 1.075,
+        "B7 minimax-lp": 1.075
+      },
+      "ranking": [
+        "B1 audit-at-commit",
+        "SSG-G guarded",
+        "B7 minimax-lp",
+        "B5 risk-score",
+        "B6 two-stage",
+        "SentinelW window-belief",
+        "Sentinel"
+      ],
+      "winner": "B1 audit-at-commit"
+    },
+    {
+      "lambda_T": 1.5,
+      "lambda_Q": 1.646,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.4099,
+        "B6 two-stage": 1.5761,
+        "Sentinel": 2.6928,
+        "SentinelW window-belief": 2.1402,
+        "SSG-G guarded": 1.1625,
+        "B7 minimax-lp": 1.1125
+      },
+      "ranking": [
+        "B1 audit-at-commit",
+        "B7 minimax-lp",
+        "SSG-G guarded",
+        "B5 risk-score",
+        "B6 two-stage",
+        "SentinelW window-belief",
+        "Sentinel"
+      ],
+      "winner": "B1 audit-at-commit"
+    },
+    {
+      "lambda_T": 2.0,
+      "lambda_Q": 2.1946,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.5882,
+        "B6 two-stage": 1.7681,
+        "Sentinel": 3.3488,
+        "SentinelW window-belief": 2.6203,
+        "SSG-G guarded": 1.25,
+        "B7 minimax-lp": 1.15
+      },
+      "ranking": [
+        "B1 audit-at-commit",
+        "B7 minimax-lp",
+        "SSG-G guarded",
+        "B5 risk-score",
+        "B6 two-stage",
+        "SentinelW window-belief",
+        "Sentinel"
+      ],
+      "winner": "B1 audit-at-commit"
+    }
+  ],
+  "winner_changes_at": [
+    [
+      0.5,
+      "SentinelW window-belief",
+      "SSG-G guarded"
+    ],
+    [
+      0.75,
+      "SSG-G guarded",
+      "B1 audit-at-commit"
+    ]
+  ],
+  "reading": "lambda_Q is NOT swept independently: it is pinned to lambda_T by the measured ratio, because both price events this project can cost in USD. What stays declared is lambda_T -- how many harm events one lost clean task is worth -- which no measurement here can supply.",
+  "provenance": {
+    "scale": "USD, with the MEASURED eta_Q",
+    "grid": "20 workflows, H=8, Delta=2, detector mid, seeds (1, 2), B=0.0158792",
+    "date": "2026-09-23",
+    "commit": "310e38545051e02e952e6628489e93296b8f152d"
+  }
+}
