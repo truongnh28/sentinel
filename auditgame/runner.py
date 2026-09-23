@@ -33,6 +33,7 @@ from core import CARRIERS, CarrierStore, TaskTrace, item_record, seed_of
 from agent import MockAgent
 from detector import Detector
 import build, oracle, scoring, policies as P
+import checkpoints as audit_checks
 
 #: The four audit stages the manuscript costs separately (SS241), in lifecycle
 #: order.  Task 25a's whole job is to make this axis EXIST in the runner --
@@ -56,6 +57,24 @@ def _act_carrier(act: str) -> str:
     return P.split_action(act)[0]
 
 
+def _checkpoint_seconds(stage: str, items, store=None, task=None) -> float:
+    """CPU seconds one audit STAGE costs on these items.
+
+    `checkpoints` (imported as `audit_checks`) does the work the stage is named for -- integrity of a record,
+    consistency with the request that pulled it, the lineage behind a derived
+    one, the provenance walk behind a commit.  What comes back here is only the
+    DURATION; the findings are dropped, so timing an extra stage decides nothing.
+
+    This replaced timing `detector.score`, which is one Gaussian draw per item
+    and therefore costs the same on every carrier: measured, that gave
+    chi = 0.16 and a cost table describing the simulator instead of the audit.
+    """
+    fn = audit_checks.STAGES[stage]
+    t0 = time.process_time()
+    fn(items, store, task)
+    return time.process_time() - t0
+
+
 def _probe_seconds(det, items, t, seed) -> float:
     """Time-only, side-effect-free: what a real audit's SCORING step would cost
     if it ran here, on these items.  `det.score` is a PURE function of
@@ -66,11 +85,17 @@ def _probe_seconds(det, items, t, seed) -> float:
     caller stores under a stage:carrier key and nowhere else.  It must never be
     threaded into seed_of(...) or an Item's content -- see the module docstring
     and the ObserverInvariant tests in test_audit_stages.py.
+
+    THE CLOCK IS `process_time`, NOT `perf_counter`.  kappa is the cost of the
+    WORK an audit has to do.  Wall-clock also counts the stretches where the OS
+    put this process aside, so the same audit timed on two differently loaded
+    machines yields two different kappas and the cost table stops being
+    reproducible -- which is the one property Stage 2 needs from it.
     """
-    t0 = time.perf_counter()
+    t0 = time.process_time()
     for it in items:
         det.score(it, t, seed)
-    return time.perf_counter() - t0
+    return time.process_time() - t0
 
 
 @dataclass
@@ -343,7 +368,7 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
             for c, its in by_carrier.items():
                 key = f"insertion:{c}"
                 audit_seconds[key] = (audit_seconds.get(key, 0.0)
-                                      + _probe_seconds(det, its, t, seed))
+                                      + _checkpoint_seconds("insertion", its, store, task))
 
             # retrieval -- right after store.retrieve: score what just came back.
             by_carrier = {}
@@ -352,7 +377,7 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
             for c, its in by_carrier.items():
                 key = f"retrieval:{c}"
                 audit_seconds[key] = (audit_seconds.get(key, 0.0)
-                                      + _probe_seconds(det, its, t, seed))
+                                      + _checkpoint_seconds("retrieval", its, store, task))
 
             # delegation -- the skill-induction step is the only place a skill
             # item gets written, and the only "before it is pulled" moment this
@@ -361,7 +386,8 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
             if skill_writes:
                 key = "delegation:skill"
                 audit_seconds[key] = (audit_seconds.get(key, 0.0)
-                                      + _probe_seconds(det, skill_writes, t, seed))
+                                      + _checkpoint_seconds("delegation", skill_writes,
+                                                             store, task))
 
         # CARRIER-level score = the mean-Lambda posterior over live items.
         # NOT the max raw score: E[max_n N(0,1)] grows with n, so a clean 9-item
@@ -395,7 +421,7 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
         quarantines: list = []
         if act is not None:
             pol.charge(P.cost_of(act))
-            audit_t0 = time.perf_counter()
+            audit_t0 = time.process_time()
             if act.startswith(P.QUARANTINE_PREFIX):
                 # DIRECT quarantine: removes the carrier wholesale, no detector, no
                 # evidence.  This is the tool SSA.4's degenerate policy abuses, and it
@@ -438,6 +464,15 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
                     else:
                         fq += 1
             else:                                    # commit audit: inspect the PATCH (D2)
+                # THE REVIEW HALF, and it is real work: walk the record this
+                # commit carries and the whole lineage behind it, re-hashing each
+                # ancestor.  It decides nothing -- `det.fires` below is still what
+                # stops a patch -- but it is what a commit audit HAS to do, so its
+                # cost belongs inside the commit clock.  Differential testing, the
+                # expensive third of Stage 2's definition, still is not run here;
+                # kappa_commit stays a lower bound.  See checkpoints.commit.
+                audit_checks.commit([w for w in o.writes if w.carrier == "branch"],
+                                    store, task)
                 if det.fires(det.score_patch(o.patch_has_marker, task.task_id, seed)):
                     if o.patch_has_marker:
                         detected_at = detected_at if detected_at is not None else t
@@ -455,7 +490,7 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
                         t_lost += 1                  # CI wrongly blocked a GOOD patch
             commit_key = f"commit:{_act_carrier(act)}"
             audit_seconds[commit_key] = (audit_seconds.get(commit_key, 0.0)
-                                         + (time.perf_counter() - audit_t0))
+                                         + (time.process_time() - audit_t0))
 
         # P1..P5, on the SIGMA task only.  A CHAIN, not five independent bits:
         # P4 is "carried the payload AND passed the public tests", so the
