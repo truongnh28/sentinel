@@ -16,6 +16,18 @@ configurations instead, which cannot be held out -- you can withhold a rule, not
 a coordinate.  So the numbers below are NOT the ones in the main grid and must
 not be put in a table beside them.
 
+THE STATISTIC SATURATES, AND IT HAS TO BE SAID BEFORE ANY NUMBER IS READ.
+Worst case over EIGHTEEN rules compromises almost every workflow whatever the
+policy does, so every harm lands in 0.88 .. 0.98 and the differences are
+fractions of one workflow.  Measured: SSG-G's transfer gap is +0.050 at N=20,
+-0.050 at N=40 and -0.025 at N=80 -- the SIGN follows the sample size.  Nothing
+here supports a claim about transfer in either direction, including the earlier
+reading that belief-carrying policies overfit; that was N=20 noise.
+
+Fixing it needs a different statistic (mean over rules, or a per-rule
+breakdown) or far more workflows -- not more seeds, which do not touch the
+saturation.  Until then this tool reports a measurement that cannot yet decide.
+
 THE HONEST DENOMINATOR.  Six of the twelve rules are held out, not seven of
 eighteen: the library is 12 and the split is by hash of the name, fixed before
 any measurement.  A transfer number on 6 rules is quoted as a transfer number on
@@ -87,6 +99,10 @@ def main() -> int:
                   "note": "6 of 12 rules held out by hash of the name, not 7 of "
                           "18 -- the library is not yet the manuscript's size, "
                           "and the transfer number is quoted on what exists"},
+        "saturation_warning": (
+            "worst case over 18 rules leaves every harm in 0.88..0.98; the "
+            "transfer gap's SIGN follows N (+0.050 at 20, -0.050 at 40, -0.025 "
+            "at 80 workflows). Do not read a direction off this."),
         "not_comparable_with": ("the main grid, which maximises over raw "
                                 "(carrier, Delta) configurations rather than "
                                 "over attacker rules"),
