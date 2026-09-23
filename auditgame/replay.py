@@ -263,7 +263,14 @@ def rescore(traces: list, det, pol) -> ReplayResult:
                 carrier, depth = P.split_action(act)
                 deep = det.at_depth(depth)
                 remaining = horizon - tr.t - 1
-                for it in list(store.live(carrier)):
+                here = list(store.live(carrier))
+                # PRO RATA, in lockstep with runner.run_once.  The I9 sweep
+                # compares `spent` to nine places, so charging in one path and
+                # not the other is a red test rather than a silent divergence --
+                # which is how this branch was caught when the runner started
+                # charging for the audit-consequence quarantine.
+                unit_q = P.ETA_Q_COST / len(here) if here else 0.0
+                for it in here:
                     s_raw = deep.score(it, tr.t, tr.seed)
                     if not deep.fires(s_raw):
                         continue
@@ -274,6 +281,9 @@ def rescore(traces: list, det, pol) -> ReplayResult:
                     if expected_harm(p_item, it.topic, topic_counts,
                                      tr.t + 1, remaining) <= pol.eta_Q:
                         continue
+                    if not pol.can(unit_q):
+                        continue
+                    pol.charge(unit_q)
                     store.quarantine(it.item_id)
                     if it.poisoned:
                         tq += 1

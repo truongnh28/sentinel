@@ -334,7 +334,7 @@ def main():
         print(metrics.spend_table(
             {nm: grid[deltas[0]][nm].spent_mean for nm in names
              if grid[deltas[0]][nm].spent_mean == grid[deltas[0]][nm].spent_mean},
-            a.budget))
+            a.budget, kappa_bar=sum(P.KAPPA.values()) / len(P.KAPPA)))
 
         # A1 -- the composite loss, and the weight at which the ranking flips.
         cells = {nm: (grid[deltas[0]][nm].harm, grid[deltas[0]][nm].q_false,
@@ -390,9 +390,14 @@ def main():
         base = dict(P.KAPPA)
         for c in a.chi:
             tab = P.kappa_for_chi(c, base, anchor=a.chi_anchor)
-            print(f"  chi={c:<6} kappa = "
-                  + "  ".join(f"{k}:{v:.3f}" for k, v in tab.items())
-                  + f"   (kappa_bar={sum(tab.values())/len(tab):.3f})")
+            # PRINTED AS A SHAPE (kappa_k / kappa_bar), not as currency.  Two
+            # decimals of USD makes every carrier read "0.002" and the whole
+            # axis look degenerate; the shape is also the only part of the table
+            # the game depends on, since a common factor cancels.
+            kb = sum(tab.values()) / len(tab)
+            print(f"  chi={c:<6} kappa/kappa_bar = "
+                  + "  ".join(f"{k}:{v / kb:.3f}" for k, v in tab.items())
+                  + f"   (kappa_bar={kb:.6g})")
         chi_results = sweep_chi(wfs, deltas, "mid", a.budget, seeds, carriers,
                                 a.chi, chi_anchor=a.chi_anchor)
         print(f"\n  {'chi':>6}" + "".join(f"{'D='+str(d):>9s}" for d in deltas)

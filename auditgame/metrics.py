@@ -190,17 +190,27 @@ def config_sha(*, pi0: float, aggregation: str, tau_sel, theta: float, scope: st
     return hashlib.sha256(blob.encode()).hexdigest()
 
 
-def spend_table(spent: dict, budget: float) -> str:
+def spend_table(spent: dict, budget: float, kappa_bar: float | None = None) -> str:
     """Budget CONSUMED per policy, next to the cap.
 
     "Every policy runs on the same budget B" is true of the CAP and false of the
     SPEND.  Measured: B5 reaches B1's harm on 0.40 of a 17.95 budget while B1
     spends 16.40 and Sentinel 6.47.  A harm table without this one reads three
     policies as comparable when one of them declined to play.
+
+    `kappa_bar` PUTS THE COLUMNS IN A UNIT THAT SURVIVES THE SCALE.  Printed as
+    raw currency with two decimals, the whole table reads "0.02  0.02  100%" on
+    the USD scale -- every policy identical, every difference rounded away --
+    because the numbers were formatted for a budget of 17.95 and the USD budget
+    is 0.0159.  In units of kappa_bar the two scales print the same table, which
+    is the point: the game is invariant under a common factor.
     """
     w = max(len(k) for k in spent) if spent else 10
-    out = [f"{'policy':<{w}}{'spent':>9}{'cap':>9}{'used':>8}"]
-    out.append("-" * (w + 26))
+    unit = " (kappa_bar)" if kappa_bar else ""
+    out = [f"{'policy':<{w}}{'spent' + unit:>21}{'cap':>9}{'used':>8}"]
+    out.append("-" * (w + 38))
+    d = kappa_bar or 1.0
     for k, v in sorted(spent.items(), key=lambda kv: -kv[1]):
-        out.append(f"{k:<{w}}{v:>9.2f}{budget:>9.2f}{100.0*v/budget:>7.0f}%")
+        out.append(f"{k:<{w}}{v / d:>21.3f}{budget / d:>9.3f}"
+                   f"{100.0 * v / budget:>7.0f}%")
     return "\n".join(out)

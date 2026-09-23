@@ -442,7 +442,30 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
                 carrier, depth = P.split_action(act)
                 deep = det.at_depth(depth)           # kappa(k, depth) bought this
                 remaining = len(wf.tasks) - t - 1
-                for it in list(store.live(carrier)):
+                here = list(store.live(carrier))
+                # QUARANTINE COSTS THE SAME WHICHEVER DOOR IT COMES THROUGH.
+                #
+                # This branch used to call store.quarantine with no pol.charge,
+                # so removal as a CONSEQUENCE of an audit was free while removal
+                # as an ACTION cost eta_Q.  It was still recorded, still counted
+                # in true/false_quarantine, still priced by lambda_Q in L -- so
+                # the policy was penalised for it when scored and unconstrained
+                # by it when deciding, which is a preference, not a constraint.
+                # Measured before this line existed: Sentinel, B5 and B6 kept
+                # EXACTLY 246 / 124 / 120 quarantines across a 54x change in
+                # eta_Q, and their L did not move in four digits.
+                #
+                # PRO RATA, so the two doors price the same removal the same.
+                # The wholesale action removes all n live items of the carrier
+                # for eta_Q; taking m of them costs eta_Q * m/n, charged one
+                # item at a time.  At m = n the two coincide exactly, which is
+                # the condition for comparing them to mean anything.
+                # Rejected: a flat eta_Q per removal, which would make the
+                # targeted door dearer than the wholesale one for the same item
+                # and so charge a policy for being precise.  See
+                # docs/preregistration/TIEN-DANG-KY-quarantine-duong-mien-phi.md.
+                unit_q = P.ETA_Q_COST / len(here) if here else 0.0
+                for it in here:
                     s_raw = deep.score(it, t, seed)
                     if not deep.fires(s_raw):
                         continue
@@ -455,6 +478,14 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
                     if expected_harm(p_item, it.topic, topic_counts,
                                      t + 1, remaining) <= pol.eta_Q:
                         continue
+                    if not pol.can(unit_q):
+                        # The audit FOUND it and the budget cannot remove it.
+                        # The item stays live and nothing is detected here: in
+                        # this model harm is stopped by removal, so recording a
+                        # detection would give the policy the benefit of an
+                        # action it could not buy.
+                        continue
+                    pol.charge(unit_q)
                     store.quarantine(it.item_id)       # does NOT distinguish clean from poisoned
                     quarantines.append(_quarantine_record(it, act, "audit"))
                     if it.poisoned:

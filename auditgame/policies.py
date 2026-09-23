@@ -895,9 +895,15 @@ def chi_of(kappa: dict) -> float:
 #: detail of implementation, it decides what the chi axis MEANS:
 #:
 #:   mean   kappa_bar fixed, so the full-sweep bill is fixed and the budget buys
-#:          the same share at every chi.  chi is then PURE SPREAD.  Measured
-#:          consequence: chi becomes inert (39.7% at every chi), because the
-#:          policies that win do so on the mean, not on the spread.
+#:          the same share at every chi.  chi is then PURE SPREAD.
+#:          THE "chi IS INERT" NOTE THAT STOOD HERE WAS WRONG.  It read "39.7%
+#:          at every chi, because the policies that win do so on the mean, not
+#:          on the spread", and it was written from a run whose kappa_commit and
+#:          eta_Q did not move with the table -- so chi was fighting a confound
+#:          rather than being measured.  Once they move (experiment.sweep_delta),
+#:          the axis bites on BOTH scales and in the same direction: the gain
+#:          falls as the spread widens, usd 62.4 -> 57.2 -> 49.7% and legacy
+#:          62.4 -> 61.8 -> 52.0% over chi = 0, 0.5, 1.349 at Delta = 4.
 #:   min    the cheapest carrier is fixed, so the mean RISES with chi and the
 #:          budget buys fewer audits.  chi is confounded with effective budget --
 #:          which is a real regime, not a bug, and it is the one where chi bites.
