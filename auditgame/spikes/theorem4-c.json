@@ -1,0 +1,317 @@
+{
+  "precondition": {
+    "budget_ladder": [
+      2.0,
+      8.0,
+      17.95,
+      60.0,
+      200.0
+    ],
+    "mass_curves": [
+      [
+        0.0003359814295656501,
+        0.0003359814295656501,
+        0.0003359814295656501,
+        0.0003359814295656501,
+        0.0003359814295656501
+      ],
+      [
+        3.617873791204851e-06,
+        3.617873791204851e-06,
+        3.617873791204851e-06,
+        3.617873791204851e-06,
+        3.617873791204851e-06
+      ],
+      [
+        0.08475954366503624,
+        0.08475954366503624,
+        0.08475954366503624,
+        0.08475954366503624,
+        0.08475954366503624
+      ],
+      [
+        0.0024413642597065507,
+        0.0024413642597065507,
+        0.0024413642597065507,
+        0.0024413642597065507,
+        0.0024413642597065507
+      ]
+    ],
+    "max_spread_over_ladder": 0.0,
+    "budget_moves_the_posterior": false
+  },
+  "refused": "c is NOT fitted: the posterior at sigma is identical across the whole budget ladder, so budget buys no information in this harness and Theorem 4's left-hand side has nothing to measure.  Cause: belief.WindowBelief.update is fed the signals of ALL carriers every task, whatever the policy audited -- observations are free.  Fitting c before that is fixed would report a property of the ladder.",
+  "c": null,
+  "c_cell_spread": null,
+  "cells": [
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 0,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 0,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 0,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 2,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 2,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 2,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 4,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 4,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 4,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 0,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 0,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 0,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 2,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 2,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 2,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 4,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 4,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 4,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 0,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 0,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 0,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 2,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 2,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 2,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 4,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 4,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 4,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    }
+  ],
+  "cells_fitted": 0,
+  "cells_total": 27,
+  "non_monotone_episodes": 0,
+  "provenance": {
+    "left_hand_side": "smallest budget whose posterior puts >= 1 - alpha on the true (k, iota, sigma) at sigma",
+    "alpha": 0.05,
+    "budget_ladder": [
+      2.0,
+      4.0,
+      8.0,
+      12.0,
+      17.95,
+      26.0,
+      40.0,
+      60.0,
+      90.0
+    ],
+    "policy": "B7 minimax-lp",
+    "belief_beta": 0.314,
+    "kappa_bar": 1.75,
+    "K": 4,
+    "H": 8,
+    "n_workflows": 4,
+    "date": "2026-09-23",
+    "commit": "cae5dcb7488375566db3a2099e9b721541df3972"
+  }
+}

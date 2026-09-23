@@ -1,0 +1,95 @@
+{
+  "kappa_cpu_seconds": {
+    "insertion": 2.000000000002e-06,
+    "retrieval": 1.000000000001e-06,
+    "delegation": 3.0000000000030003e-06,
+    "commit": 1.1999999999998123e-05
+  },
+  "kappa_cpu_seconds_by_carrier": {
+    "memory": 1.4542500000000007e-05,
+    "skill": 3.6425000000000346e-06,
+    "queue": 4.782499999999926e-06,
+    "branch": 1.0700000000000014e-05
+  },
+  "per_stage": {
+    "insertion": {
+      "median": 2.000000000002e-06,
+      "mean": 2.348623853210987e-06,
+      "min": 9.999999999871223e-07,
+      "max": 9.000000000002062e-06,
+      "n": 436
+    },
+    "retrieval": {
+      "median": 1.000000000001e-06,
+      "mean": 1.6182795698925247e-06,
+      "min": 0.0,
+      "max": 5.0000000000050004e-06,
+      "n": 186
+    },
+    "delegation": {
+      "median": 3.0000000000030003e-06,
+      "mean": 3.704545454544113e-06,
+      "min": 1.9999999999881224e-06,
+      "max": 1.2999999999999123e-05,
+      "n": 44
+    },
+    "commit": {
+      "median": 1.1999999999998123e-05,
+      "mean": 1.6050632911392207e-05,
+      "min": 0.0,
+      "max": 5.7000000000001494e-05,
+      "n": 158
+    }
+  },
+  "per_carrier": {
+    "memory": {
+      "median": 1.4542500000000007e-05,
+      "mean": 1.3488333333333326e-05,
+      "min": 1.0720000000000035e-05,
+      "max": 1.5169999999999975e-05,
+      "n": 12
+    },
+    "skill": {
+      "median": 3.6425000000000346e-06,
+      "mean": 3.879583333333339e-06,
+      "min": 1.7199999999999854e-06,
+      "max": 8.020000000000042e-06,
+      "n": 12
+    },
+    "queue": {
+      "median": 4.782499999999926e-06,
+      "mean": 5.549583333333321e-06,
+      "min": 3.3249999999999944e-06,
+      "max": 1.122000000000005e-05,
+      "n": 12
+    },
+    "branch": {
+      "median": 1.0700000000000014e-05,
+      "mean": 1.039416666666667e-05,
+      "min": 8.074999999999957e-06,
+      "max": 1.1740000000000015e-05,
+      "n": 12
+    }
+  },
+  "items_per_audit": {
+    "memory": 4.88125,
+    "skill": 0.7375,
+    "queue": 1.9625,
+    "branch": 4.20625
+  },
+  "chi": 1.2950174500631146,
+  "chi_formula": "max|k_i - k_j| / mean(k), over the FOUR CARRIERS (commit excluded)",
+  "provenance": {
+    "clock": "time.process_time (user+sys)",
+    "reps_requested": 20,
+    "episodes_built": 20,
+    "H": 8,
+    "setting": "mid",
+    "agent": "MockAgent (defaults)",
+    "policy": "B2 uniform random",
+    "budget": 17.95,
+    "seed_rule": "seed_of('kappa', i) for the workflow, seed=i for the detector",
+    "date": "2026-09-23",
+    "commit": "cae5dcb7488375566db3a2099e9b721541df3972"
+  }
+}

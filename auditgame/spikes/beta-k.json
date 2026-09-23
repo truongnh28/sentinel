@@ -1,0 +1,346 @@
+{
+  "primary_rule_A": {
+    "rule": "A",
+    "beta_across_repos": {
+      "memory": {
+        "median": 0.314075290210974,
+        "min": 0.03345925526173772,
+        "max": 0.5695522388059702,
+        "n_repos": 10
+      },
+      "skill": {
+        "median": 0.058068471107099985,
+        "min": 0.006157635467980296,
+        "max": 0.13940856970428486,
+        "n_repos": 10
+      },
+      "queue": {
+        "median": 0.032540613607705174,
+        "min": 0.0064759848893685915,
+        "max": 0.11761194029850747,
+        "n_repos": 10
+      },
+      "branch": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "n_repos": 10
+      }
+    },
+    "per_repo": {
+      "astropy/astropy": {
+        "beta": {
+          "memory": 0.291869918699187,
+          "skill": 0.07195121951219512,
+          "queue": 0.04154471544715447,
+          "branch": 1.0
+        },
+        "commits": 12300,
+        "windows": 8,
+        "commits_per_window": 1537.5
+      },
+      "django/django": {
+        "beta": {
+          "memory": 0.45731922398589064,
+          "skill": 0.10617283950617284,
+          "queue": 0.007760141093474427,
+          "branch": 1.0
+        },
+        "commits": 5670,
+        "windows": 8,
+        "commits_per_window": 708.75
+      },
+      "matplotlib/matplotlib": {
+        "beta": {
+          "memory": 0.1465286324476942,
+          "skill": 0.02418012017664519,
+          "queue": 0.020705132845869834,
+          "branch": 1.0
+        },
+        "commits": 13813,
+        "windows": 8,
+        "commits_per_window": 1726.625
+      },
+      "psf/requests": {
+        "beta": {
+          "memory": 0.336280661722761,
+          "skill": 0.04449515116942385,
+          "queue": 0.05790074158585282,
+          "branch": 1.0
+        },
+        "commits": 3506,
+        "windows": 7,
+        "commits_per_window": 500.85714285714283
+      },
+      "pydata/xarray": {
+        "beta": {
+          "memory": 0.5695522388059702,
+          "skill": 0.07164179104477612,
+          "queue": 0.11761194029850747,
+          "branch": 1.0
+        },
+        "commits": 1675,
+        "windows": 8,
+        "commits_per_window": 209.375
+      },
+      "pylint-dev/pylint": {
+        "beta": {
+          "memory": 0.49579045837231056,
+          "skill": 0.10944808231992516,
+          "queue": 0.0930776426566885,
+          "branch": 1.0
+        },
+        "commits": 2138,
+        "windows": 8,
+        "commits_per_window": 267.25
+      },
+      "pytest-dev/pytest": {
+        "beta": {
+          "memory": 0.2575923893157702,
+          "skill": 0.013172338090010977,
+          "queue": 0.0570801317233809,
+          "branch": 1.0
+        },
+        "commits": 2733,
+        "windows": 8,
+        "commits_per_window": 341.625
+      },
+      "scikit-learn/scikit-learn": {
+        "beta": {
+          "memory": 0.45745322872661437,
+          "skill": 0.13940856970428486,
+          "queue": 0.023536511768255886,
+          "branch": 1.0
+        },
+        "commits": 1657,
+        "windows": 8,
+        "commits_per_window": 207.125
+      },
+      "sphinx-doc/sphinx": {
+        "beta": {
+          "memory": 0.11822660098522167,
+          "skill": 0.006157635467980296,
+          "queue": 0.01847290640394089,
+          "branch": 1.0
+        },
+        "commits": 812,
+        "windows": 8,
+        "commits_per_window": 101.5
+      },
+      "sympy/sympy": {
+        "beta": {
+          "memory": 0.03345925526173772,
+          "skill": 0.01645979492714517,
+          "queue": 0.0064759848893685915,
+          "branch": 1.0
+        },
+        "commits": 3706,
+        "windows": 8,
+        "commits_per_window": 463.25
+      }
+    },
+    "provenance": {
+      "window": "commits between the base_commit of two consecutive SWE-bench Verified instances of the same repo",
+      "mapping_rule": {
+        "memory": [
+          "*.md",
+          "*.rst",
+          "*.txt",
+          "docs/*",
+          "*/docs/*",
+          "CHANGELOG*",
+          "*/CHANGELOG*"
+        ],
+        "skill": [
+          "*/utils/*",
+          "*/helpers/*",
+          "*_base.py",
+          "*/lib/*",
+          "*/common/*",
+          "*/util.py",
+          "*/utils.py"
+        ],
+        "queue": [
+          "setup.py",
+          "setup.cfg",
+          "tox.ini",
+          "Makefile",
+          ".github/*",
+          "*/.github/*",
+          "scripts/*",
+          "conftest.py",
+          "*/conftest.py"
+        ]
+      },
+      "branch_note": "beta_branch = 1.0 by construction, not measured",
+      "max_windows_per_repo": 8,
+      "date": "2026-09-23",
+      "commit": "cae5dcb7488375566db3a2099e9b721541df3972"
+    }
+  },
+  "alternative_rule_B": {
+    "rule": "B",
+    "beta_across_repos": {
+      "memory": {
+        "median": 0.2789159814302079,
+        "min": 0.03076092822450081,
+        "max": 0.5480597014925374,
+        "n_repos": 10
+      },
+      "skill": {
+        "median": 0.6069281411378604,
+        "min": 0.3636622932116372,
+        "max": 0.7899906454630495,
+        "n_repos": 10
+      },
+      "queue": {
+        "median": 0.012613926487482194,
+        "min": 0.0,
+        "max": 0.07402985074626865,
+        "n_repos": 10
+      },
+      "branch": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "n_repos": 10
+      }
+    },
+    "per_repo": {
+      "astropy/astropy": {
+        "beta": {
+          "memory": 0.28772357723577235,
+          "skill": 0.5282113821138211,
+          "queue": 0.018292682926829267,
+          "branch": 1.0
+        },
+        "commits": 12300,
+        "windows": 8,
+        "commits_per_window": 1537.5
+      },
+      "django/django": {
+        "beta": {
+          "memory": 0.45361552028218693,
+          "skill": 0.7553791887125221,
+          "queue": 0.0021164021164021165,
+          "branch": 1.0
+        },
+        "commits": 5670,
+        "windows": 8,
+        "commits_per_window": 708.75
+      },
+      "matplotlib/matplotlib": {
+        "beta": {
+          "memory": 0.13791355969014696,
+          "skill": 0.48649822630854994,
+          "queue": 0.013248389198581047,
+          "branch": 1.0
+        },
+        "commits": 13813,
+        "windows": 8,
+        "commits_per_window": 1726.625
+      },
+      "psf/requests": {
+        "beta": {
+          "memory": 0.27010838562464345,
+          "skill": 0.3636622932116372,
+          "queue": 0.011979463776383342,
+          "branch": 1.0
+        },
+        "commits": 3506,
+        "windows": 7,
+        "commits_per_window": 500.85714285714283
+      },
+      "pydata/xarray": {
+        "beta": {
+          "memory": 0.5480597014925374,
+          "skill": 0.6925373134328359,
+          "queue": 0.07402985074626865,
+          "branch": 1.0
+        },
+        "commits": 1675,
+        "windows": 8,
+        "commits_per_window": 209.375
+      },
+      "pylint-dev/pylint": {
+        "beta": {
+          "memory": 0.3400374181478017,
+          "skill": 0.7899906454630495,
+          "queue": 0.05144995322731525,
+          "branch": 1.0
+        },
+        "commits": 2138,
+        "windows": 8,
+        "commits_per_window": 267.25
+      },
+      "pytest-dev/pytest": {
+        "beta": {
+          "memory": 0.25466520307354557,
+          "skill": 0.4281009879253567,
+          "queue": 0.028905964141968533,
+          "branch": 1.0
+        },
+        "commits": 2733,
+        "windows": 8,
+        "commits_per_window": 341.625
+      },
+      "scikit-learn/scikit-learn": {
+        "beta": {
+          "memory": 0.45262522631261315,
+          "skill": 0.7272178636089318,
+          "queue": 0.0,
+          "branch": 1.0
+        },
+        "commits": 1657,
+        "windows": 8,
+        "commits_per_window": 207.125
+      },
+      "sphinx-doc/sphinx": {
+        "beta": {
+          "memory": 0.11206896551724138,
+          "skill": 0.3854679802955665,
+          "queue": 0.009852216748768473,
+          "branch": 1.0
+        },
+        "commits": 812,
+        "windows": 8,
+        "commits_per_window": 101.5
+      },
+      "sympy/sympy": {
+        "beta": {
+          "memory": 0.03076092822450081,
+          "skill": 0.6856449001618996,
+          "queue": 0.0,
+          "branch": 1.0
+        },
+        "commits": 3706,
+        "windows": 8,
+        "commits_per_window": 463.25
+      }
+    },
+    "provenance": {
+      "window": "commits between the base_commit of two consecutive SWE-bench Verified instances of the same repo",
+      "mapping_rule": {
+        "memory": [
+          "docs/*",
+          "*/docs/*",
+          "*.rst"
+        ],
+        "skill": [
+          "*.py"
+        ],
+        "queue": [
+          ".github/*",
+          "*/.github/*",
+          "tox.ini"
+        ]
+      },
+      "branch_note": "beta_branch = 1.0 by construction, not measured",
+      "max_windows_per_repo": 8,
+      "date": "2026-09-23",
+      "commit": "cae5dcb7488375566db3a2099e9b721541df3972"
+    }
+  },
+  "carrier_order_agrees_between_rules": false,
+  "reading": "beta is identified by this procedure only if the two rules agree on the qualitative picture; if they disagree, beta moves to M2 and must be swept"
+}

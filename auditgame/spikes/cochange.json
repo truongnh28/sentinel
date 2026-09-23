@@ -1,0 +1,871 @@
+{
+  "per_repo": {
+    "astropy/astropy": {
+      "commits_scanned": 2000,
+      "modules": 81,
+      "pairs_with_support": 355,
+      "pairs_coupled": 34,
+      "pairs_checked_against_import_graph": 25,
+      "pairs_surviving_import_filter": 6,
+      "survival_rate": 0.24,
+      "delta_under_filtered_attribution": {
+        "n": 9,
+        "instances_without_coupled_partner": 3,
+        "task": {
+          "median": 0,
+          "share_ge_2": 0.0,
+          "max": 0
+        },
+        "commit": {
+          "median": 16,
+          "max": 82
+        }
+      },
+      "top_pairs": [
+        {
+          "a": "astropy/io",
+          "b": "docs/changes",
+          "support": 29,
+          "confidence_a_to_b": 0.15,
+          "confidence_b_to_a": 0.113,
+          "import_edge": false
+        },
+        {
+          "a": "astropy/utils",
+          "b": "docs/changes",
+          "support": 27,
+          "confidence_a_to_b": 0.267,
+          "confidence_b_to_a": 0.105,
+          "import_edge": false
+        },
+        {
+          "a": "astropy/cosmology",
+          "b": "docs/changes",
+          "support": 24,
+          "confidence_a_to_b": 0.253,
+          "confidence_b_to_a": 0.093,
+          "import_edge": false
+        },
+        {
+          "a": "astropy/units",
+          "b": "docs/changes",
+          "support": 22,
+          "confidence_a_to_b": 0.333,
+          "confidence_b_to_a": 0.086,
+          "import_edge": false
+        },
+        {
+          "a": "astropy/io",
+          "b": "astropy/utils",
+          "support": 21,
+          "confidence_a_to_b": 0.109,
+          "confidence_b_to_a": 0.208,
+          "import_edge": true
+        },
+        {
+          "a": "astropy/table",
+          "b": "docs/changes",
+          "support": 18,
+          "confidence_a_to_b": 0.243,
+          "confidence_b_to_a": 0.07,
+          "import_edge": false
+        },
+        {
+          "a": "astropy/io",
+          "b": "astropy/table",
+          "support": 16,
+          "confidence_a_to_b": 0.083,
+          "confidence_b_to_a": 0.216,
+          "import_edge": true
+        },
+        {
+          "a": "astropy/coordinates",
+          "b": "docs/changes",
+          "support": 16,
+          "confidence_a_to_b": 0.193,
+          "confidence_b_to_a": 0.062,
+          "import_edge": false
+        }
+      ]
+    },
+    "django/django": {
+      "commits_scanned": 2000,
+      "modules": 202,
+      "pairs_with_support": 1094,
+      "pairs_coupled": 153,
+      "pairs_checked_against_import_graph": 25,
+      "pairs_surviving_import_filter": 11,
+      "survival_rate": 0.44,
+      "delta_under_filtered_attribution": {
+        "n": 8,
+        "instances_without_coupled_partner": 4,
+        "task": {
+          "median": 0.0,
+          "share_ge_2": 0.0,
+          "max": 0
+        },
+        "commit": {
+          "median": 7.0,
+          "max": 153
+        }
+      },
+      "top_pairs": [
+        {
+          "a": "docs/ref",
+          "b": "docs/releases",
+          "support": 163,
+          "confidence_a_to_b": 0.427,
+          "confidence_b_to_a": 0.323,
+          "import_edge": false
+        },
+        {
+          "a": "django/contrib",
+          "b": "docs/releases",
+          "support": 132,
+          "confidence_a_to_b": 0.392,
+          "confidence_b_to_a": 0.261,
+          "import_edge": false
+        },
+        {
+          "a": "django/db",
+          "b": "docs/releases",
+          "support": 122,
+          "confidence_a_to_b": 0.319,
+          "confidence_b_to_a": 0.242,
+          "import_edge": false
+        },
+        {
+          "a": "django/contrib",
+          "b": "docs/ref",
+          "support": 69,
+          "confidence_a_to_b": 0.205,
+          "confidence_b_to_a": 0.181,
+          "import_edge": false
+        },
+        {
+          "a": "django/db",
+          "b": "docs/ref",
+          "support": 60,
+          "confidence_a_to_b": 0.157,
+          "confidence_b_to_a": 0.157,
+          "import_edge": false
+        },
+        {
+          "a": "django/core",
+          "b": "docs/releases",
+          "support": 55,
+          "confidence_a_to_b": 0.387,
+          "confidence_b_to_a": 0.109,
+          "import_edge": false
+        },
+        {
+          "a": "docs/releases",
+          "b": "docs/topics",
+          "support": 54,
+          "confidence_a_to_b": 0.107,
+          "confidence_b_to_a": 0.302,
+          "import_edge": false
+        },
+        {
+          "a": "docs/ref",
+          "b": "docs/topics",
+          "support": 46,
+          "confidence_a_to_b": 0.12,
+          "confidence_b_to_a": 0.257,
+          "import_edge": false
+        }
+      ]
+    },
+    "matplotlib/matplotlib": {
+      "commits_scanned": 2000,
+      "modules": 95,
+      "pairs_with_support": 308,
+      "pairs_coupled": 14,
+      "pairs_checked_against_import_graph": 14,
+      "pairs_surviving_import_filter": 0,
+      "survival_rate": 0.0,
+      "delta_under_filtered_attribution": {
+        "n": 0,
+        "instances_without_coupled_partner": 12
+      },
+      "top_pairs": [
+        {
+          "a": "doc/api",
+          "b": "lib/matplotlib",
+          "support": 75,
+          "confidence_a_to_b": 0.61,
+          "confidence_b_to_a": 0.108,
+          "import_edge": false
+        },
+        {
+          "a": "doc/users",
+          "b": "lib/matplotlib",
+          "support": 32,
+          "confidence_a_to_b": 0.395,
+          "confidence_b_to_a": 0.046,
+          "import_edge": false
+        },
+        {
+          "a": "lib/matplotlib",
+          "b": "lib/mpl_toolkits",
+          "support": 25,
+          "confidence_a_to_b": 0.036,
+          "confidence_b_to_a": 0.333,
+          "import_edge": false
+        },
+        {
+          "a": "doc/api",
+          "b": "lib/mpl_toolkits",
+          "support": 22,
+          "confidence_a_to_b": 0.179,
+          "confidence_b_to_a": 0.293,
+          "import_edge": false
+        },
+        {
+          "a": "galleries/examples",
+          "b": "lib/matplotlib",
+          "support": 16,
+          "confidence_a_to_b": 0.254,
+          "confidence_b_to_a": 0.023,
+          "import_edge": false
+        },
+        {
+          "a": "doc/devel",
+          "b": "lib/matplotlib",
+          "support": 12,
+          "confidence_a_to_b": 0.16,
+          "confidence_b_to_a": 0.017,
+          "import_edge": false
+        },
+        {
+          "a": "doc/api",
+          "b": "doc/devel",
+          "support": 9,
+          "confidence_a_to_b": 0.073,
+          "confidence_b_to_a": 0.12,
+          "import_edge": false
+        },
+        {
+          "a": "ci/mypy-stubtest-allowlist.txt",
+          "b": "lib/matplotlib",
+          "support": 7,
+          "confidence_a_to_b": 0.875,
+          "confidence_b_to_a": 0.01,
+          "import_edge": false
+        }
+      ]
+    },
+    "psf/requests": {
+      "commits_scanned": 2000,
+      "modules": 67,
+      "pairs_with_support": 245,
+      "pairs_coupled": 23,
+      "pairs_checked_against_import_graph": 23,
+      "pairs_surviving_import_filter": 0,
+      "survival_rate": 0.0,
+      "delta_under_filtered_attribution": {
+        "n": 0,
+        "instances_without_coupled_partner": 8
+      },
+      "top_pairs": [
+        {
+          "a": "requests/models.py",
+          "b": "requests/sessions.py",
+          "support": 35,
+          "confidence_a_to_b": 0.121,
+          "confidence_b_to_a": 0.201,
+          "import_edge": false
+        },
+        {
+          "a": "requests/models.py",
+          "b": "test_requests.py",
+          "support": 34,
+          "confidence_a_to_b": 0.118,
+          "confidence_b_to_a": 0.211,
+          "import_edge": false
+        },
+        {
+          "a": "HISTORY.rst",
+          "b": "requests/__init__.py",
+          "support": 25,
+          "confidence_a_to_b": 0.287,
+          "confidence_b_to_a": 0.51,
+          "import_edge": false
+        },
+        {
+          "a": "requests/sessions.py",
+          "b": "test_requests.py",
+          "support": 24,
+          "confidence_a_to_b": 0.138,
+          "confidence_b_to_a": 0.149,
+          "import_edge": false
+        },
+        {
+          "a": "requests/models.py",
+          "b": "tests/test_requests.py",
+          "support": 21,
+          "confidence_a_to_b": 0.073,
+          "confidence_b_to_a": 0.35,
+          "import_edge": false
+        },
+        {
+          "a": "requests/adapters.py",
+          "b": "requests/sessions.py",
+          "support": 20,
+          "confidence_a_to_b": 0.225,
+          "confidence_b_to_a": 0.115,
+          "import_edge": false
+        },
+        {
+          "a": "requests/api.py",
+          "b": "requests/sessions.py",
+          "support": 15,
+          "confidence_a_to_b": 0.682,
+          "confidence_b_to_a": 0.086,
+          "import_edge": false
+        },
+        {
+          "a": "requests/models.py",
+          "b": "requests/utils.py",
+          "support": 12,
+          "confidence_a_to_b": 0.042,
+          "confidence_b_to_a": 0.148,
+          "import_edge": false
+        }
+      ]
+    },
+    "pydata/xarray": {
+      "commits_scanned": 2000,
+      "modules": 134,
+      "pairs_with_support": 870,
+      "pairs_coupled": 141,
+      "pairs_checked_against_import_graph": 25,
+      "pairs_surviving_import_filter": 5,
+      "survival_rate": 0.2,
+      "delta_under_filtered_attribution": {
+        "n": 12,
+        "instances_without_coupled_partner": 0,
+        "task": {
+          "median": 0.0,
+          "share_ge_2": 0.0,
+          "max": 0
+        },
+        "commit": {
+          "median": 2.0,
+          "max": 7
+        }
+      },
+      "top_pairs": [
+        {
+          "a": "doc/whats-new.rst",
+          "b": "xarray/tests",
+          "support": 638,
+          "confidence_a_to_b": 0.704,
+          "confidence_b_to_a": 0.681,
+          "import_edge": false
+        },
+        {
+          "a": "xarray/core",
+          "b": "xarray/tests",
+          "support": 545,
+          "confidence_a_to_b": 0.682,
+          "confidence_b_to_a": 0.582,
+          "import_edge": true
+        },
+        {
+          "a": "doc/whats-new.rst",
+          "b": "xarray/core",
+          "support": 489,
+          "confidence_a_to_b": 0.54,
+          "confidence_b_to_a": 0.612,
+          "import_edge": false
+        },
+        {
+          "a": "xarray/backends",
+          "b": "xarray/tests",
+          "support": 157,
+          "confidence_a_to_b": 0.683,
+          "confidence_b_to_a": 0.168,
+          "import_edge": true
+        },
+        {
+          "a": "doc/whats-new.rst",
+          "b": "xarray/backends",
+          "support": 128,
+          "confidence_a_to_b": 0.141,
+          "confidence_b_to_a": 0.557,
+          "import_edge": false
+        },
+        {
+          "a": "xarray/plot",
+          "b": "xarray/tests",
+          "support": 91,
+          "confidence_a_to_b": 0.791,
+          "confidence_b_to_a": 0.097,
+          "import_edge": true
+        },
+        {
+          "a": "doc/whats-new.rst",
+          "b": "xarray/plot",
+          "support": 77,
+          "confidence_a_to_b": 0.085,
+          "confidence_b_to_a": 0.67,
+          "import_edge": false
+        },
+        {
+          "a": "xarray/backends",
+          "b": "xarray/core",
+          "support": 73,
+          "confidence_a_to_b": 0.317,
+          "confidence_b_to_a": 0.091,
+          "import_edge": false
+        }
+      ]
+    },
+    "pylint-dev/pylint": {
+      "commits_scanned": 2000,
+      "modules": 140,
+      "pairs_with_support": 909,
+      "pairs_coupled": 111,
+      "pairs_checked_against_import_graph": 25,
+      "pairs_surviving_import_filter": 1,
+      "survival_rate": 0.04,
+      "delta_under_filtered_attribution": {
+        "n": 2,
+        "instances_without_coupled_partner": 8,
+        "task": {
+          "median": 0.0,
+          "share_ge_2": 0.0,
+          "max": 0
+        },
+        "commit": {
+          "median": 11.5,
+          "max": 20
+        }
+      },
+      "top_pairs": [
+        {
+          "a": "ChangeLog",
+          "b": "pylint/checkers",
+          "support": 344,
+          "confidence_a_to_b": 0.598,
+          "confidence_b_to_a": 0.493,
+          "import_edge": false
+        },
+        {
+          "a": "pylint/checkers",
+          "b": "tests/functional",
+          "support": 241,
+          "confidence_a_to_b": 0.345,
+          "confidence_b_to_a": 0.567,
+          "import_edge": false
+        },
+        {
+          "a": "ChangeLog",
+          "b": "tests/functional",
+          "support": 222,
+          "confidence_a_to_b": 0.386,
+          "confidence_b_to_a": 0.522,
+          "import_edge": false
+        },
+        {
+          "a": "ChangeLog",
+          "b": "doc/whatsnew",
+          "support": 175,
+          "confidence_a_to_b": 0.304,
+          "confidence_b_to_a": 0.858,
+          "import_edge": false
+        },
+        {
+          "a": "CONTRIBUTORS.txt",
+          "b": "ChangeLog",
+          "support": 128,
+          "confidence_a_to_b": 0.795,
+          "confidence_b_to_a": 0.223,
+          "import_edge": false
+        },
+        {
+          "a": "pylint/checkers",
+          "b": "pylint/test",
+          "support": 117,
+          "confidence_a_to_b": 0.168,
+          "confidence_b_to_a": 0.622,
+          "import_edge": false
+        },
+        {
+          "a": "doc/whatsnew",
+          "b": "pylint/checkers",
+          "support": 112,
+          "confidence_a_to_b": 0.549,
+          "confidence_b_to_a": 0.16,
+          "import_edge": false
+        },
+        {
+          "a": "ChangeLog",
+          "b": "pylint/test",
+          "support": 102,
+          "confidence_a_to_b": 0.177,
+          "confidence_b_to_a": 0.543,
+          "import_edge": false
+        }
+      ]
+    },
+    "pytest-dev/pytest": {
+      "commits_scanned": 2000,
+      "modules": 316,
+      "pairs_with_support": 1035,
+      "pairs_coupled": 36,
+      "pairs_checked_against_import_graph": 25,
+      "pairs_surviving_import_filter": 0,
+      "survival_rate": 0.0,
+      "delta_under_filtered_attribution": {
+        "n": 0,
+        "instances_without_coupled_partner": 12
+      },
+      "top_pairs": [
+        {
+          "a": "src/_pytest",
+          "b": "testing/python",
+          "support": 48,
+          "confidence_a_to_b": 0.07,
+          "confidence_b_to_a": 0.676,
+          "import_edge": false
+        },
+        {
+          "a": "doc/en",
+          "b": "src/_pytest",
+          "support": 44,
+          "confidence_a_to_b": 0.202,
+          "confidence_b_to_a": 0.064,
+          "import_edge": false
+        },
+        {
+          "a": "AUTHORS",
+          "b": "src/_pytest",
+          "support": 36,
+          "confidence_a_to_b": 0.655,
+          "confidence_b_to_a": 0.053,
+          "import_edge": false
+        },
+        {
+          "a": "src/_pytest",
+          "b": "testing/test_config.py",
+          "support": 27,
+          "confidence_a_to_b": 0.039,
+          "confidence_b_to_a": 0.711,
+          "import_edge": false
+        },
+        {
+          "a": "src/_pytest",
+          "b": "testing/code",
+          "support": 26,
+          "confidence_a_to_b": 0.038,
+          "confidence_b_to_a": 0.605,
+          "import_edge": false
+        },
+        {
+          "a": "src/_pytest",
+          "b": "testing/test_terminal.py",
+          "support": 21,
+          "confidence_a_to_b": 0.031,
+          "confidence_b_to_a": 0.618,
+          "import_edge": false
+        },
+        {
+          "a": "src/_pytest",
+          "b": "testing/test_capture.py",
+          "support": 21,
+          "confidence_a_to_b": 0.031,
+          "confidence_b_to_a": 0.677,
+          "import_edge": false
+        },
+        {
+          "a": "src/_pytest",
+          "b": "testing/acceptance_test.py",
+          "support": 19,
+          "confidence_a_to_b": 0.028,
+          "confidence_b_to_a": 0.792,
+          "import_edge": false
+        }
+      ]
+    },
+    "scikit-learn/scikit-learn": {
+      "commits_scanned": 2000,
+      "modules": 163,
+      "pairs_with_support": 827,
+      "pairs_coupled": 80,
+      "pairs_checked_against_import_graph": 25,
+      "pairs_surviving_import_filter": 10,
+      "survival_rate": 0.4,
+      "delta_under_filtered_attribution": {
+        "n": 8,
+        "instances_without_coupled_partner": 4,
+        "task": {
+          "median": 0.0,
+          "share_ge_2": 0.0,
+          "max": 1
+        },
+        "commit": {
+          "median": 5.5,
+          "max": 29
+        }
+      },
+      "top_pairs": [
+        {
+          "a": "sklearn/metrics",
+          "b": "sklearn/tests",
+          "support": 86,
+          "confidence_a_to_b": 0.446,
+          "confidence_b_to_a": 0.186,
+          "import_edge": true
+        },
+        {
+          "a": "doc/whats_new",
+          "b": "sklearn/tests",
+          "support": 70,
+          "confidence_a_to_b": 0.187,
+          "confidence_b_to_a": 0.152,
+          "import_edge": false
+        },
+        {
+          "a": "sklearn/tests",
+          "b": "sklearn/utils",
+          "support": 67,
+          "confidence_a_to_b": 0.145,
+          "confidence_b_to_a": 0.327,
+          "import_edge": true
+        },
+        {
+          "a": "doc/whats_new",
+          "b": "sklearn/utils",
+          "support": 53,
+          "confidence_a_to_b": 0.142,
+          "confidence_b_to_a": 0.259,
+          "import_edge": false
+        },
+        {
+          "a": "doc/whats_new",
+          "b": "sklearn/ensemble",
+          "support": 47,
+          "confidence_a_to_b": 0.126,
+          "confidence_b_to_a": 0.405,
+          "import_edge": false
+        },
+        {
+          "a": "doc/whats_new",
+          "b": "sklearn/linear_model",
+          "support": 36,
+          "confidence_a_to_b": 0.096,
+          "confidence_b_to_a": 0.254,
+          "import_edge": false
+        },
+        {
+          "a": "doc/modules",
+          "b": "doc/whats_new",
+          "support": 36,
+          "confidence_a_to_b": 0.265,
+          "confidence_b_to_a": 0.096,
+          "import_edge": false
+        },
+        {
+          "a": "sklearn/datasets",
+          "b": "sklearn/tests",
+          "support": 35,
+          "confidence_a_to_b": 0.449,
+          "confidence_b_to_a": 0.076,
+          "import_edge": true
+        }
+      ]
+    },
+    "sphinx-doc/sphinx": {
+      "commits_scanned": 2000,
+      "modules": 146,
+      "pairs_with_support": 572,
+      "pairs_coupled": 75,
+      "pairs_checked_against_import_graph": 25,
+      "pairs_surviving_import_filter": 3,
+      "survival_rate": 0.12,
+      "delta_under_filtered_attribution": {
+        "n": 10,
+        "instances_without_coupled_partner": 2,
+        "task": {
+          "median": 0.0,
+          "share_ge_2": 0.0,
+          "max": 1
+        },
+        "commit": {
+          "median": 15.5,
+          "max": 65
+        }
+      },
+      "top_pairs": [
+        {
+          "a": "CHANGES",
+          "b": "sphinx/ext",
+          "support": 113,
+          "confidence_a_to_b": 0.248,
+          "confidence_b_to_a": 0.406,
+          "import_edge": false
+        },
+        {
+          "a": "CHANGES",
+          "b": "sphinx/domains",
+          "support": 63,
+          "confidence_a_to_b": 0.138,
+          "confidence_b_to_a": 0.45,
+          "import_edge": false
+        },
+        {
+          "a": "CHANGES",
+          "b": "sphinx/util",
+          "support": 59,
+          "confidence_a_to_b": 0.13,
+          "confidence_b_to_a": 0.492,
+          "import_edge": false
+        },
+        {
+          "a": "CHANGES",
+          "b": "tests/roots",
+          "support": 53,
+          "confidence_a_to_b": 0.116,
+          "confidence_b_to_a": 0.515,
+          "import_edge": false
+        },
+        {
+          "a": "sphinx/ext",
+          "b": "tests/roots",
+          "support": 46,
+          "confidence_a_to_b": 0.165,
+          "confidence_b_to_a": 0.447,
+          "import_edge": false
+        },
+        {
+          "a": "CHANGES",
+          "b": "sphinx/__init__.py",
+          "support": 39,
+          "confidence_a_to_b": 0.086,
+          "confidence_b_to_a": 0.951,
+          "import_edge": false
+        },
+        {
+          "a": "CHANGES",
+          "b": "doc/extdev",
+          "support": 37,
+          "confidence_a_to_b": 0.081,
+          "confidence_b_to_a": 0.771,
+          "import_edge": false
+        },
+        {
+          "a": "CHANGES",
+          "b": "doc/usage",
+          "support": 37,
+          "confidence_a_to_b": 0.081,
+          "confidence_b_to_a": 0.336,
+          "import_edge": false
+        }
+      ]
+    },
+    "sympy/sympy": {
+      "commits_scanned": 2000,
+      "modules": 76,
+      "pairs_with_support": 288,
+      "pairs_coupled": 9,
+      "pairs_checked_against_import_graph": 9,
+      "pairs_surviving_import_filter": 7,
+      "survival_rate": 0.7777777777777778,
+      "delta_under_filtered_attribution": {
+        "n": 1,
+        "instances_without_coupled_partner": 11,
+        "task": {
+          "median": 0,
+          "share_ge_2": 0.0,
+          "max": 0
+        },
+        "commit": {
+          "median": 10,
+          "max": 10
+        }
+      },
+      "top_pairs": [
+        {
+          "a": "sympy/physics",
+          "b": "sympy/printing",
+          "support": 13,
+          "confidence_a_to_b": 0.143,
+          "confidence_b_to_a": 0.061,
+          "import_edge": true
+        },
+        {
+          "a": "sympy/integrals",
+          "b": "sympy/solvers",
+          "support": 7,
+          "confidence_a_to_b": 0.132,
+          "confidence_b_to_a": 0.043,
+          "import_edge": true
+        },
+        {
+          "a": "sympy/integrals",
+          "b": "sympy/printing",
+          "support": 6,
+          "confidence_a_to_b": 0.113,
+          "confidence_b_to_a": 0.028,
+          "import_edge": true
+        },
+        {
+          "a": "sympy/integrals",
+          "b": "sympy/physics",
+          "support": 6,
+          "confidence_a_to_b": 0.113,
+          "confidence_b_to_a": 0.066,
+          "import_edge": true
+        },
+        {
+          "a": "sympy/physics",
+          "b": "sympy/polys",
+          "support": 5,
+          "confidence_a_to_b": 0.055,
+          "confidence_b_to_a": 0.125,
+          "import_edge": true
+        },
+        {
+          "a": "sympy/series",
+          "b": "sympy/solvers",
+          "support": 5,
+          "confidence_a_to_b": 0.116,
+          "confidence_b_to_a": 0.031,
+          "import_edge": true
+        },
+        {
+          "a": "doc/src",
+          "b": "sympy/utilities",
+          "support": 5,
+          "confidence_a_to_b": 0.132,
+          "confidence_b_to_a": 0.048,
+          "import_edge": false
+        },
+        {
+          "a": "doc/src",
+          "b": "sympy/printing",
+          "support": 5,
+          "confidence_a_to_b": 0.132,
+          "confidence_b_to_a": 0.023,
+          "import_edge": false
+        }
+      ]
+    }
+  },
+  "thresholds": {
+    "min_support": 5,
+    "min_confidence": 0.1,
+    "module_depth": 2,
+    "max_modules_per_commit": 8
+  },
+  "reading": "The survival rate is the finding: it says what share of the strongest evolutionary coupling in a repository is backed by an actual import path, and what share is bookkeeping.",
+  "provenance": {
+    "support": "commits touching both modules, over the most recent 2000 commits",
+    "confidence": "support / commits touching the module",
+    "import_edge": "grep of import statements in one module's tree for the other's dotted name, both directions",
+    "date": "2026-09-23",
+    "commit": "cae5dcb7488375566db3a2099e9b721541df3972"
+  }
+}

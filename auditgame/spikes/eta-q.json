@@ -1,0 +1,90 @@
+{
+  "eta_q": {
+    "memory": {
+      "detach_seconds": 0.0,
+      "detach_usd": 0.0,
+      "restore_items": 5.34,
+      "restore_usd": 0.16262910416842105,
+      "eta_q_usd": 0.16262910416842105,
+      "kappa_usd": 0.0026433
+    },
+    "skill": {
+      "detach_seconds": 0.0,
+      "detach_usd": 0.0,
+      "restore_items": 1.12,
+      "restore_usd": 0.03410947503157895,
+      "eta_q_usd": 0.03410947503157895,
+      "kappa_usd": 0.0005544
+    },
+    "queue": {
+      "detach_seconds": 0.0,
+      "detach_usd": 0.0,
+      "restore_items": 1.55,
+      "restore_usd": 0.04720507705263158,
+      "eta_q_usd": 0.04720507705263158,
+      "kappa_usd": 0.00076725
+    },
+    "branch": {
+      "detach_seconds": 0.0,
+      "detach_usd": 0.0,
+      "restore_items": 4.5,
+      "restore_usd": 0.13704699789473684,
+      "eta_q_usd": 0.13704699789473684,
+      "kappa_usd": 0.0022275
+    }
+  },
+  "eta_q_over_kappa": {
+    "memory": 61.52502711323764,
+    "skill": 61.525027113237634,
+    "queue": 61.525027113237634,
+    "branch": 61.52502711323764
+  },
+  "usd_per_write": 0.03045488842105263,
+  "usd_per_task_p2": {
+    "median": 0.08679643199999999,
+    "mean": 0.1412510926153846,
+    "min": 0.00505104,
+    "max": 0.46620059999999997,
+    "n": 13,
+    "model": "deepseek-v4.1-flash",
+    "priced_at": "2026-09-15"
+  },
+  "writes_per_task": 2.85,
+  "detach_raw": {
+    "memory": {
+      "median_delta_seconds": -9.000000000000674e-05,
+      "mean_delta_seconds": -7.425000000000175e-05,
+      "n": 20
+    },
+    "skill": {
+      "median_delta_seconds": -3.49999999999899e-05,
+      "mean_delta_seconds": -6.515000000000375e-05,
+      "n": 20
+    },
+    "queue": {
+      "median_delta_seconds": -9.10000000000008e-05,
+      "mean_delta_seconds": -0.00010810000000000125,
+      "n": 20
+    },
+    "branch": {
+      "median_delta_seconds": -7.500000000000562e-05,
+      "mean_delta_seconds": -3.069999999999809e-05,
+      "n": 20
+    }
+  },
+  "notes": [
+    "detach(memory) measured at -0.000090s <= 0: in this harness removing a carrier removes work, so the detach half is reported as 0 and eta_Q is a LOWER BOUND",
+    "detach(skill) measured at -0.000035s <= 0: in this harness removing a carrier removes work, so the detach half is reported as 0 and eta_Q is a LOWER BOUND",
+    "detach(queue) measured at -0.000091s <= 0: in this harness removing a carrier removes work, so the detach half is reported as 0 and eta_Q is a LOWER BOUND",
+    "detach(branch) measured at -0.000075s <= 0: in this harness removing a carrier removes work, so the detach half is reported as 0 and eta_Q is a LOWER BOUND"
+  ],
+  "provenance": {
+    "detach_clock": "time.process_time (user+sys), whole episode",
+    "restore_price": "P2 pilot token counts priced through llms.py (deepseek-v4.1-flash), divided by writes per task",
+    "reps": 20,
+    "H": 8,
+    "setting": "mid",
+    "date": "2026-09-23",
+    "commit": "cae5dcb7488375566db3a2099e9b721541df3972"
+  }
+}

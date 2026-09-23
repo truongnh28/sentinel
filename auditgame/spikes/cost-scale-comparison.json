@@ -1,0 +1,605 @@
+{
+  "comparison": {
+    "B1 audit-at-commit": {
+      "draft": {
+        "harm": 0.9,
+        "L": 0.9875,
+        "q_false": 0.0,
+        "t_lost": 0.175,
+        "spent_pct": 91.4,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 1.0,
+        "L": 1.0,
+        "q_false": 0.0,
+        "t_lost": 0.0,
+        "spent_pct": 78.0,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 1.0,
+        "L": 1.0,
+        "q_false": 0.0,
+        "t_lost": 0.0,
+        "spent_pct": 78.0,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.375,
+        "L": 0.5125,
+        "q_false": 0.0,
+        "t_lost": 0.275,
+        "spent_pct": 97.3,
+        "n_feasible": 20
+      }
+    },
+    "B5 risk-score": {
+      "draft": {
+        "harm": 0.925,
+        "L": 0.955,
+        "q_false": 0.3,
+        "t_lost": 0.0,
+        "spent_pct": 7.2,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 0.925,
+        "L": 0.955,
+        "q_false": 0.3,
+        "t_lost": 0.0,
+        "spent_pct": 6.1,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.925,
+        "L": 0.955,
+        "q_false": 0.3,
+        "t_lost": 0.0,
+        "spent_pct": 6.1,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.925,
+        "L": 0.955,
+        "q_false": 0.3,
+        "t_lost": 0.0,
+        "spent_pct": 6.3,
+        "n_feasible": 20
+      }
+    },
+    "B6 two-stage": {
+      "draft": {
+        "harm": 0.975,
+        "L": 1.0575,
+        "q_false": 0.825,
+        "t_lost": 0.0,
+        "spent_pct": 21.4,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 0.975,
+        "L": 1.0075,
+        "q_false": 0.325,
+        "t_lost": 0.0,
+        "spent_pct": 28.6,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.975,
+        "L": 1.0075,
+        "q_false": 0.325,
+        "t_lost": 0.0,
+        "spent_pct": 28.6,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.975,
+        "L": 1.0075,
+        "q_false": 0.325,
+        "t_lost": 0.0,
+        "spent_pct": 34.4,
+        "n_feasible": 20
+      }
+    },
+    "Sentinel": {
+      "draft": {
+        "harm": 0.85,
+        "L": 1.0125,
+        "q_false": 1.625,
+        "t_lost": 0.0,
+        "spent_pct": 49.3,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 0.85,
+        "L": 0.97,
+        "q_false": 1.2,
+        "t_lost": 0.0,
+        "spent_pct": 53.7,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.85,
+        "L": 0.97,
+        "q_false": 1.2,
+        "t_lost": 0.0,
+        "spent_pct": 53.7,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.85,
+        "L": 0.9725,
+        "q_false": 1.225,
+        "t_lost": 0.0,
+        "spent_pct": 58.0,
+        "n_feasible": 20
+      }
+    },
+    "SentinelW window-belief": {
+      "draft": {
+        "harm": 0.75,
+        "L": 0.9925,
+        "q_false": 2.05,
+        "t_lost": 0.075,
+        "spent_pct": 96.0,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 0.75,
+        "L": 0.855,
+        "q_false": 0.925,
+        "t_lost": 0.025,
+        "spent_pct": 91.6,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.825,
+        "L": 1.095,
+        "q_false": 2.7,
+        "t_lost": 0.0,
+        "spent_pct": 91.8,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.675,
+        "L": 0.9025,
+        "q_false": 1.025,
+        "t_lost": 0.25,
+        "spent_pct": 91.6,
+        "n_feasible": 20
+      }
+    },
+    "SSG-G guarded": {
+      "draft": {
+        "harm": 0.775,
+        "L": 0.925,
+        "q_false": 0.0,
+        "t_lost": 0.3,
+        "spent_pct": 86.8,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 0.9,
+        "L": 0.9875,
+        "q_false": 0.0,
+        "t_lost": 0.175,
+        "spent_pct": 78.0,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.9,
+        "L": 0.9875,
+        "q_false": 0.0,
+        "t_lost": 0.175,
+        "spent_pct": 78.0,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.55,
+        "L": 0.7625,
+        "q_false": 0.0,
+        "t_lost": 0.425,
+        "spent_pct": 96.3,
+        "n_feasible": 20
+      }
+    },
+    "B7 minimax-lp": {
+      "draft": {
+        "harm": 0.95,
+        "L": 1.0375,
+        "q_false": 0.0,
+        "t_lost": 0.175,
+        "spent_pct": 87.4,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 1.0,
+        "L": 1.0375,
+        "q_false": 0.0,
+        "t_lost": 0.075,
+        "spent_pct": 64.3,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 1.0,
+        "L": 1.0375,
+        "q_false": 0.0,
+        "t_lost": 0.075,
+        "spent_pct": 64.3,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.5,
+        "L": 0.625,
+        "q_false": 0.0,
+        "t_lost": 0.25,
+        "spent_pct": 96.3,
+        "n_feasible": 20
+      }
+    },
+    "NC1 quarantine-everything": {
+      "draft": {
+        "harm": 0.9,
+        "L": 1.4,
+        "q_false": 5.0,
+        "t_lost": 0.0,
+        "spent_pct": 89.1,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 1.0,
+        "L": 1.0,
+        "q_false": 0.0,
+        "t_lost": 0.0,
+        "spent_pct": 0.0,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.9,
+        "L": 1.4,
+        "q_false": 5.0,
+        "t_lost": 0.0,
+        "spent_pct": 89.1,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 1.0,
+        "L": 1.0,
+        "q_false": 0.0,
+        "t_lost": 0.0,
+        "spent_pct": 0.0,
+        "n_feasible": 20
+      }
+    }
+  },
+  "commit_price_sweep": {
+    "usd": {
+      "1": {
+        "kappa_commit": 0.0015481124999999999,
+        "commit_audits_per_episode": 10.257142857142856,
+        "B1_L": 0.5375,
+        "Sentinel_L": 0.97,
+        "B1_harm": 0.375,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": false
+      },
+      "1.43": {
+        "kappa_commit": 0.0022138008749999997,
+        "commit_audits_per_episode": 7.172827172827173,
+        "B1_L": 0.5125,
+        "Sentinel_L": 0.97,
+        "B1_harm": 0.375,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": false
+      },
+      "2": {
+        "kappa_commit": 0.0030962249999999998,
+        "commit_audits_per_episode": 5.128571428571428,
+        "B1_L": 1.0375,
+        "Sentinel_L": 0.97,
+        "B1_harm": 0.875,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "3": {
+        "kappa_commit": 0.0046443375,
+        "commit_audits_per_episode": 3.4190476190476184,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.97,
+        "B1_harm": 0.975,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "4": {
+        "kappa_commit": 0.0061924499999999995,
+        "commit_audits_per_episode": 2.564285714285714,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.97,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "6": {
+        "kappa_commit": 0.009288675,
+        "commit_audits_per_episode": 1.7095238095238092,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.97,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "8": {
+        "kappa_commit": 0.012384899999999999,
+        "commit_audits_per_episode": 1.282142857142857,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.97,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "12": {
+        "kappa_commit": 0.01857735,
+        "commit_audits_per_episode": 0.8547619047619046,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.97,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "16": {
+        "kappa_commit": 0.024769799999999998,
+        "commit_audits_per_episode": 0.6410714285714285,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.97,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "24": {
+        "kappa_commit": 0.0371547,
+        "commit_audits_per_episode": 0.4273809523809523,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.97,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      }
+    },
+    "cpu": {
+      "1": {
+        "kappa_commit": 8.415e-06,
+        "commit_audits_per_episode": 10.257142857142856,
+        "B1_L": 0.5375,
+        "Sentinel_L": 0.9725,
+        "B1_harm": 0.375,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": false
+      },
+      "1.43": {
+        "kappa_commit": 1.2033449999999999e-05,
+        "commit_audits_per_episode": 7.172827172827173,
+        "B1_L": 0.5125,
+        "Sentinel_L": 0.9725,
+        "B1_harm": 0.375,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": false
+      },
+      "2": {
+        "kappa_commit": 1.683e-05,
+        "commit_audits_per_episode": 5.128571428571428,
+        "B1_L": 1.0375,
+        "Sentinel_L": 0.9725,
+        "B1_harm": 0.875,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "3": {
+        "kappa_commit": 2.5245e-05,
+        "commit_audits_per_episode": 3.419047619047619,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.9725,
+        "B1_harm": 0.975,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "4": {
+        "kappa_commit": 3.366e-05,
+        "commit_audits_per_episode": 2.564285714285714,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.9725,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "6": {
+        "kappa_commit": 5.049e-05,
+        "commit_audits_per_episode": 1.7095238095238094,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.9725,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "8": {
+        "kappa_commit": 6.732e-05,
+        "commit_audits_per_episode": 1.282142857142857,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.9725,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "12": {
+        "kappa_commit": 0.00010098,
+        "commit_audits_per_episode": 0.8547619047619047,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.9725,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "16": {
+        "kappa_commit": 0.00013464,
+        "commit_audits_per_episode": 0.6410714285714285,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.9725,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      },
+      "24": {
+        "kappa_commit": 0.00020196,
+        "commit_audits_per_episode": 0.42738095238095236,
+        "B1_L": 1.0,
+        "Sentinel_L": 0.9725,
+        "B1_harm": 1.0,
+        "Sentinel_harm": 0.85,
+        "sentinel_wins_on_L": true
+      }
+    }
+  },
+  "ranking_by_L": {
+    "draft": [
+      "SSG-G guarded",
+      "B5 risk-score",
+      "B1 audit-at-commit",
+      "SentinelW window-belief",
+      "Sentinel",
+      "B7 minimax-lp",
+      "B6 two-stage",
+      "NC1 quarantine-everything"
+    ],
+    "usd": [
+      "SentinelW window-belief",
+      "B5 risk-score",
+      "Sentinel",
+      "SSG-G guarded",
+      "B1 audit-at-commit",
+      "NC1 quarantine-everything",
+      "B6 two-stage",
+      "B7 minimax-lp"
+    ],
+    "usd-legacy-etaQ": [
+      "B5 risk-score",
+      "Sentinel",
+      "SSG-G guarded",
+      "B1 audit-at-commit",
+      "B6 two-stage",
+      "B7 minimax-lp",
+      "SentinelW window-belief",
+      "NC1 quarantine-everything"
+    ],
+    "cpu": [
+      "B1 audit-at-commit",
+      "B7 minimax-lp",
+      "SSG-G guarded",
+      "SentinelW window-belief",
+      "B5 risk-score",
+      "Sentinel",
+      "NC1 quarantine-everything",
+      "B6 two-stage"
+    ]
+  },
+  "ranking_identical": false,
+  "scales": {
+    "draft": {
+      "kappa": {
+        "memory": 0.4,
+        "skill": 0.9,
+        "queue": 1.6,
+        "branch": 4.1
+      },
+      "kappa_commit": 4.1,
+      "eta_q": 2.0,
+      "budget": 17.95,
+      "note": "per-STAGE costs of the manuscript, used as a per-carrier table"
+    },
+    "usd": {
+      "kappa": {
+        "memory": 0.0026433,
+        "skill": 0.0005544,
+        "queue": 0.00076725,
+        "branch": 0.0022275
+      },
+      "kappa_commit": 0.0061924499999999995,
+      "eta_q": 0.09523862999999999,
+      "budget": 0.01587921107142857,
+      "note": "items_scored(k) x USD per judgement, with the MEASURED eta_Q (rebuild cost of the quarantined carrier)"
+    },
+    "usd-legacy-etaQ": {
+      "kappa": {
+        "memory": 0.0026433,
+        "skill": 0.0005544,
+        "queue": 0.00076725,
+        "branch": 0.0022275
+      },
+      "kappa_commit": 0.0061924499999999995,
+      "eta_q": 0.0017692714285714283,
+      "budget": 0.01587921107142857,
+      "note": "same kappa, but quarantine priced by the placeholder's ratio instead of the measurement -- kept as evidence, this is what costs.install() still does"
+    },
+    "cpu": {
+      "kappa": {
+        "memory": 1.454e-05,
+        "skill": 3.64e-06,
+        "queue": 4.78e-06,
+        "branch": 1.07e-05
+      },
+      "kappa_commit": 1.2e-05,
+      "eta_q": 0.0005175225,
+      "budget": 8.631385714285714e-05,
+      "note": "measured through checkpoints.py; commit EXCLUDES differential testing, so it is a lower bound"
+    }
+  },
+  "chi": {
+    "draft": 2.114,
+    "usd": 1.349,
+    "usd-legacy-etaQ": 1.349,
+    "cpu": 1.295
+  },
+  "affordability": {
+    "draft": {
+      "budget": 17.95,
+      "cheapest_audit": 0.022284122562674098,
+      "dearest_audit": 0.22841225626740946,
+      "commit_audit": 0.22841225626740946,
+      "one_quarantine": 0.11142061281337048,
+      "full_sweep_per_step": 0.38997214484679665,
+      "unit": "fraction of the episode budget"
+    },
+    "usd": {
+      "budget": 0.01587921107142857,
+      "cheapest_audit": 0.034913573319617294,
+      "dearest_audit": 0.16646292993460388,
+      "commit_audit": 0.3899721448467967,
+      "one_quarantine": 5.997692805492249,
+      "full_sweep_per_step": 0.3899721448467967,
+      "unit": "fraction of the episode budget"
+    },
+    "usd-legacy-etaQ": {
+      "budget": 0.01587921107142857,
+      "cheapest_audit": 0.034913573319617294,
+      "dearest_audit": 0.16646292993460388,
+      "commit_audit": 0.3899721448467967,
+      "one_quarantine": 0.11142061281337048,
+      "full_sweep_per_step": 0.3899721448467967,
+      "unit": "fraction of the episode budget"
+    },
+    "cpu": {
+      "budget": 8.631385714285714e-05,
+      "cheapest_audit": 0.04217167579448425,
+      "dearest_audit": 0.1684549906735717,
+      "commit_audit": 0.13902750261917884,
+      "one_quarantine": 5.995821727019499,
+      "full_sweep_per_step": 0.38997214484679665,
+      "unit": "fraction of the episode budget"
+    }
+  },
+  "provenance": {
+    "grid": "20 workflows, H=8, Delta=2, detector mid, seeds (1, 2)",
+    "budget_rule": "same share of the full audit bill as the legacy 17.95",
+    "date": "2026-09-23",
+    "commit": "cae5dcb7488375566db3a2099e9b721541df3972"
+  }
+}
