@@ -24,17 +24,37 @@ def make_corpus(n, H, seed):
     rng = random.Random(seed)
     return [build.make_workflow(f"wf-{i:03d}", "django", H, rng) for i in range(n)]
 
-def sweep_delta(wfs, deltas, det_name, budget, seeds, carriers, chi=None):
+def sweep_delta(wfs, deltas, det_name, budget, seeds, carriers, chi=None,
+                chi_anchor="mean"):
     """One (policy x Delta) grid at one detector setting and one chi.
 
     `chi` patches policies.KAPPA for the duration.  It is a module-level dict, so
     there is no way to pass a cost table in -- the same reason fixtures.Profile
     patches it rather than parameterising.
+
+    `chi_anchor` decides WHICH statistic of the cost table is held fixed while
+    the spread is stretched, and it changes what the chi axis means -- see
+    policies.CHI_ANCHORS.  It is threaded through rather than defaulted silently
+    because a chi table that does not say which anchor produced it is unreadable.
     """
     det, ag = detector.Detector.from_setting(det_name), agent.MockAgent()
     old = dict(P.KAPPA)
+    old_commit, old_eta = P.KAPPA_COMMIT, P.ETA_Q_COST
     if chi is not None:
-        P.KAPPA.clear(); P.KAPPA.update(P.kappa_for_chi(chi, old))
+        tab = P.kappa_for_chi(chi, old, anchor=chi_anchor)
+        # THE COMMIT CHANNEL AND QUARANTINE MOVE WITH THE TABLE, or the chi axis
+        # is not a chi axis.  Stretching only the per-carrier costs leaves
+        # KAPPA_COMMIT and ETA_Q_COST at their old absolute values, so their
+        # price RELATIVE to an audit drifts as chi moves -- and kappa_commit /
+        # kappa_bar is precisely the quantity that decides which policy wins
+        # (docs/.../Runbook section 1.7).  RQ2 would then be measuring RQ1's
+        # confound.  Measured before this line existed: at chi = 1.349 the three
+        # anchors gave B1 harm 0.7632 / 0.7632 / 0.7368 and B7 0.6053 / 0.7632 /
+        # 0.5 -- three different answers from three ways of writing one table.
+        scale = (sum(tab.values()) / len(tab)) / (sum(old.values()) / len(old))
+        P.KAPPA.clear(); P.KAPPA.update(tab)
+        P.KAPPA_COMMIT = old_commit * scale
+        P.ETA_Q_COST = old_eta * scale
     try:
         out = {}
         for d in deltas:
@@ -47,16 +67,22 @@ def sweep_delta(wfs, deltas, det_name, budget, seeds, carriers, chi=None):
         return out
     finally:
         P.KAPPA.clear(); P.KAPPA.update(old)
+        P.KAPPA_COMMIT, P.ETA_Q_COST = old_commit, old_eta
 
 
-def sweep_chi(wfs, deltas, det_name, budget, seeds, carriers, chis):
+def sweep_chi(wfs, deltas, det_name, budget, seeds, carriers, chis,
+              chi_anchor="mean"):
     """RQ2's axis, swept for the first time.
 
     experiment.py's docstring claimed a (Delta x chi x detector) grid while the code
     looped over deltas and detector settings only -- chi was a property of one fixed
     KAPPA table, so RQ2 had never been tested even though tables kept printing.
+    Worse, this function EXISTED and was never called from anywhere, so the claim
+    read as implemented.  main() now calls it; tests/gate1_integrity/test_chi_axis.py
+    fails if that stops being true.
     """
-    return {c: sweep_delta(wfs, deltas, det_name, budget, seeds, carriers, chi=c)
+    return {c: sweep_delta(wfs, deltas, det_name, budget, seeds, carriers, chi=c,
+                           chi_anchor=chi_anchor)
             for c in chis}
 
 def hidden_suite_declared(scope) -> str:
@@ -133,6 +159,17 @@ def main():
                          "datasets.REGISTRY -- the agent is still MockAgent; "
                          "a real agent plugs in at this same spot via "
                          "agents.REGISTRY (Task 16), no separate code path.")
+    ap.add_argument("--chi", type=float, nargs="*",
+                    default=[0.0, 0.5, 1.349],
+                    help="RQ2 axis. Default grid: 0 (uniform costs), 0.5 "
+                         "(intermediate), 1.349 (the chi of OUR measured USD "
+                         "table -- not the draft's 1.34, which its own numbers "
+                         "do not produce). Pass --chi with no values to skip.")
+    ap.add_argument("--chi-anchor", choices=P.CHI_ANCHORS, default="mean",
+                    help="which statistic of the cost table stays fixed while "
+                         "the spread is stretched. MUST be declared before the "
+                         "run: see policies.CHI_ANCHORS for what each one makes "
+                         "the axis mean.")
     ap.add_argument("--json", metavar="FILE")
     a = ap.parse_args()
 
@@ -263,6 +300,44 @@ def main():
                                               sn.n_total, sn.n_feasible).splitlines():
                 print(f"     {line}")
 
+    # ---------------------------------------------------------------- RQ2
+    # The chi axis, in the MAIN PATH.  It ran at the mid detector only: three
+    # chi values x |deltas| x |REGISTRY| is already the most expensive block
+    # here, and RQ2 asks how the gain moves with COST SPREAD, not with the
+    # detector -- that interaction is RQ4's question and has its own table.
+    chi_results = {}
+    if a.chi:
+        print("\n" + "=" * 78)
+        print(f"RQ2 -- chi axis  [detector = mid, anchor = {a.chi_anchor}]")
+        print("=" * 78)
+        print(f"  anchor={a.chi_anchor}: "
+              f"{'kappa_bar fixed, so the budget buys the same share at every chi'
+                 if a.chi_anchor == 'mean' else
+                 'the cheapest carrier is fixed, so the mean RISES with chi'
+                 if a.chi_anchor == 'min' else
+                 'the dearest carrier is fixed, so the mean FALLS with chi'}")
+        base = dict(P.KAPPA)
+        for c in a.chi:
+            tab = P.kappa_for_chi(c, base, anchor=a.chi_anchor)
+            print(f"  chi={c:<6} kappa = "
+                  + "  ".join(f"{k}:{v:.3f}" for k, v in tab.items())
+                  + f"   (kappa_bar={sum(tab.values())/len(tab):.3f})")
+        chi_results = sweep_chi(wfs, deltas, "mid", a.budget, seeds, carriers,
+                                a.chi, chi_anchor=a.chi_anchor)
+        print(f"\n  {'chi':>6}" + "".join(f"{'D='+str(d):>9s}" for d in deltas)
+              + "     <- Sentinel vs B1, worst-case harm")
+        print("  " + "-" * (6 + 9 * len(deltas)))
+        for c in a.chi:
+            print(f"  {c:>6.3f}"
+                  + "".join(f"{gain(chi_results[c][d]):+8.1f}%" for d in deltas))
+        flat = all(abs(gain(chi_results[a.chi[0]][d]) - gain(chi_results[c][d])) < 0.05
+                   for c in a.chi for d in deltas)
+        print(f"\n  chi moves the gain: {'NO -- the axis is INERT under this anchor' if flat else 'YES'}")
+        if flat and a.chi_anchor == "mean":
+            print("  Expected under anchor=mean: the policies that win do so on the")
+            print("  MEAN cost, not on the spread. Re-run with --chi-anchor min to")
+            print("  see the regime where chi bites, and report BOTH.")
+
     print("\n" + "=" * 78)
     print("READING THE TABLE")
     print("=" * 78)
@@ -279,8 +354,13 @@ def main():
 
     if a.json:
         from dataclasses import asdict
-        dump = {s: {str(d): {nm: asdict(c) for nm, c in row.items()}
-                    for d, row in grid.items()} for s, grid in results.items()}
+        dump = {"by_detector": {s: {str(d): {nm: asdict(c) for nm, c in row.items()}
+                                    for d, row in grid.items()}
+                                for s, grid in results.items()},
+                "by_chi": {str(c): {str(d): {nm: asdict(cell) for nm, cell in row.items()}
+                                    for d, row in grid.items()}
+                           for c, grid in chi_results.items()},
+                "chi_anchor": a.chi_anchor}
         json.dump(dump, open(a.json, "w"), indent=2, ensure_ascii=False)
         print(f"\n  wrote {a.json}")
 

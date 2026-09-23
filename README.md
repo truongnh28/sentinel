@@ -32,7 +32,7 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 
 Đếm theo **hạng mục bàn giao được**: 51 hạng mục, chia tám nhóm. Quy ước: **✅ xong = 1 · 🟡 một phần = 0,5 · ❌ chưa làm = 0**.
 
-**Tổng: 35 / 51 = 69%.**
+**Tổng: 36 / 51 = 71%.**
 
 | Nhóm | Tiến độ | Hạng mục |
 |---|---|---|
@@ -41,12 +41,12 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 | **C. Corpus lành tính và cổng** | **60%** (3/5) | ✅ Corpus từ item SWE-bench thật · ✅ Ghép theo 5 đặc trưng bề mặt · 🟡 Cổng AUC v2, 20 split ($\Delta = 4$ còn đỏ) · ❌ Permutation test · 🟡 $\beta_k$ đo trên 10 repo thật; skill và queue chuyển sang quét |
 | **D. Detector và tín hiệu** | **90%** (4,5/5) | ✅ Detector mô phỏng theo $d'$ · 🟡 Ba mức $(\psi,\varphi)$ của draft chạy như lưới riêng · ✅ CarrierSignal mean và bảng $\tau_{\text{sel}}$ · ✅ Sweep $d'$ liên tục, ra $d'^{*}$ · ✅ Detector nội dung $D_{\text{lex}}$, $D_{\text{llm}}$ |
 | **E. Chính sách và lý thuyết** | **69%** (5,5/8) | ✅ B1–B6 · ✅ Minimax LP · ✅ Các biến thể SSG · ✅ Belief tính chính xác · ❌ Thư viện 28 policy · ❌ 240 game nhỏ giải chính xác · 🟡 $\rho$ (đang đo trong không gian proxy) · ✅ $\zeta$ |
-| **F. Đo lường và kết quả** | **44%** (3,5/8) | ✅ Lưới $\Delta$ × detector trên MockAgent · ❌ Trục $\chi$ trong đường chính (`experiment.sweep_chi` định nghĩa nhưng **không nơi nào gọi**) · ❌ $\Delta = 8$ (`deltas = (0,1,2,4)`) · 🟡 100 workflow (hiện 40) · ❌ Worst-case trên held-out (`attackers.held_out()` có 6 tên nhưng không công cụ nào đo trên nó) · 🟡 Exploitability: `spikes/exploitability-full.json` có $v^{*}$, minimax mix, `worst_case_L`, `best_response_gap`, `regret` trên 4 ô $(\lambda_Q,\lambda_T)$ — nhưng trên lớp 12 attacker, chưa phải 18 · 🟡 Ablation: có C4 (bỏ belief), C8 (bỏ ngẫu nhiên hoá), NC1; thiếu rotation và benign-drift · ✅ CI bootstrap theo cụm |
+| **F. Đo lường và kết quả** | **56%** (4,5/8) | ✅ Lưới $\Delta$ × detector trên MockAgent · ✅ Trục $\chi$ trong đường chính: `--chi 0 0.5 1.349`, chạy ở detector mid, kèm test bắt `main()` phải gọi `sweep_chi` · ❌ $\Delta = 8$ (`deltas = (0,1,2,4)`) · 🟡 100 workflow (hiện 40) · ❌ Worst-case trên held-out (`attackers.held_out()` có 6 tên nhưng không công cụ nào đo trên nó) · 🟡 Exploitability: `spikes/exploitability-full.json` có $v^{*}$, minimax mix, `worst_case_L`, `best_response_gap`, `regret` trên 4 ô $(\lambda_Q,\lambda_T)$ — nhưng trên lớp 12 attacker, chưa phải 18 · 🟡 Ablation: có C4 (bỏ belief), C8 (bỏ ngẫu nhiên hoá), NC1; thiếu rotation và benign-drift · ✅ CI bootstrap theo cụm |
 | **G. Tính toàn vẹn** | **50%** (2,5/5) | ✅ Ba cổng kiểm thử, 780 test · ✅ Tài liệu tiền đăng ký · 🟡 Digest rời (cổng v2, payload, prompt) · ❌ Manifest đóng băng toàn phần · ❌ Harness từ chối policy chưa đóng băng |
 | **H. Tài liệu** | **75%** (3/4) | ✅ Phương pháp luận · ✅ Parameter Estimation Report · ✅ Reports và báo cáo tiến độ · ❌ Bản thảo ACM |
 
 **Đọc các con số này thế nào.**
-1. **Nhóm A và D gần xong, nhóm F mới 31%.** Cỗ máy đo đã chạy được, nhưng phần lớn *số để đưa vào bài* thì chưa có. Câu trả lời cho "bài viết được bao nhiêu" là **15–20%**, không phải 69%.
+1. **Nhóm A và D gần xong, nhóm F mới 31%.** Cỗ máy đo đã chạy được, nhưng phần lớn *số để đưa vào bài* thì chưa có. Câu trả lời cho "bài viết được bao nhiêu" là **15–20%**, không phải 71%.
 2. **Ba hạng mục kéo tụt cả ba nhóm B, E, G:** thư viện 28 policy, 6 attacker còn thiếu, manifest đóng băng. Làm xong ba thứ này thì nhóm F mở khoá theo: exploitability đã có số nhưng trên lớp 12 attacker, và worst-case trên held-out thì chưa ai đo dù phép chia held-out đã có sẵn. Cả ba nằm trong [§3.4](#34-issue-cần-xử-lý) và [§4](#4-kế-hoạch-bổ-sung-đưa-các-hạng-mục-còn-thiếu-vào-sprint).
 3. **Một phần công đã bỏ ra không nằm trong 51 hạng mục này:** hơn 60 spike, arm P2, detector nội dung, năm biến thể SSG. Chúng cho ra bốn phát hiện dưới đây, nhưng trong bản nộp nhiều thứ chỉ còn một dòng ở mục Threats.
 
@@ -239,7 +239,7 @@ Cột **"TODO còn lại"** là danh sách việc phải làm, gắn mã: **W…
 | $\beta_k$ | — | M1 → **M2** | 🟡 Một phần | 10 repo thật: memory **0,31**, branch 1,0; skill 0,06 hay 0,61 tuỳ luật ánh xạ | Hai luật không đồng ý ⇒ skill và queue phải quét, không chốt |
 | $\pi_0, b_0$ | — | M3 | ✅ Hoàn thành | Suy dẫn **0,0799** (thế giới) / **0,0400** (mô hình), một nguồn trong `costs.py` | Bảng $\tau_{\text{sel}}$ đang sinh lại; sau đó quét $\pi_0$ |
 | $c$ | — | M1 | 🔴 **Không đo được** | Tiền đề hỏng: posterior đứng yên ở 0,000336 khi $B$ đi từ 2 đến 200 | `runner.py` chấm cả 4 carrier mỗi task bất kể audit cái gì ⇒ ngân sách mua **hành động**, không mua **thông tin**. Bốn mô hình quan sát để chọn — **M0** giữ nguyên · **MA** trả tiền mới được nhìn (đề xuất) · **MB** hai tầng · **ME** chỉ thấy cái đã động vào — xem [đợt 3 P2](docs/design/plans/2026-09-23-Remaining-Parameters-Measurement-Plan.md). Đã kiểm: MA để lại **32% độ phủ quan sát**, belief thưa chứ không mù |
-| Quy ước quét $\chi$ | — | Thiết kế | ❌ Chưa khai báo | Đề xuất neo $\kappa_{\min}$ | Khai báo trước khi chạy; báo cả ba quy ước |
+| Quy ước quét $\chi$ | — | Thiết kế → **M4** | ✅ **Tan biến** | Ba quy ước (neo $\bar\kappa$ / $\kappa_{\min}$ / $\kappa_{\max}$) cho **kết quả trùng khít** | Hai bảng cùng $\chi$ trên cùng một hình dạng thì **tỉ lệ với nhau**, nên quy ước chỉ đổi thang. Khi $\kappa_{\text{commit}}$ và $\eta_Q$ **đi theo bảng** và ngân sách tính theo *tỉ lệ* hoá đơn audit, cả ba cho cùng một số — không còn gì để chọn |
 
 W1–W5 đã xong trong đợt 23/09; W6 ($c$) hỏng tiền đề và W7 ($\rho$) còn chờ thư viện 28 policy. Việc đo **giá trị cao nhất còn lại** là $\kappa_{\text{commit}}$ có chạy test thật — nó là số duy nhất quyết định dấu của kết luận chính. Riêng $\lambda_Q, \lambda_T$ và quy ước quét $\chi$ là quyết định neo, làm cùng lúc với việc đóng băng.
 
@@ -254,7 +254,7 @@ Các số "đo được" dưới đây chạy trên **thiết lập hiện tại
 | B5 so với Sentinel | B5 = 0,359, tệ hơn Sentinel 0,272 | **B5 dẫn trước ở 61/64 ô** ($\lambda_Q = 0{,}10$) | Lệch so với giả thuyết; đo lại sau khi có Sentinel-28 |
 | Crossover | $\Delta \approx 2{,}1$ | Không có điểm hoà vốn ở $\Delta \le 1$ | Cùng hướng với Hệ quả 5 |
 | RQ4: lợi thế lớn nhất ở detector yếu | 21,4%–39,8%, lớn nhất ở detector yếu | Không lớn nhất ở detector yếu (MockAgent) | Ngược giả thuyết |
-| Tác động của $\chi$ | Thu hẹp độ lợi, làm chậm crossover | Neo $\bar\kappa$: không tác động (39,7% ở mọi $\chi$); neo $\kappa_{\min}$: 39,7% → 36,1% | Phụ thuộc quy ước chuẩn hoá |
+| Tác động của $\chi$ | Thu hẹp độ lợi, làm chậm crossover | **Khớp hướng draft**: ở $\Delta = 4$ độ lợi 34,5% → 20,7% khi $\chi$ đi 0 → 1,349; ở $\Delta = 2$: 16,7% → 8,3% | 20 workflow × 2 seed, detector mid; quy ước không còn là biến tự do |
 | Ngẫu nhiên hoá > thích nghi | Bỏ randomization tốn 0,184 harm | Ví dụ 4×4 khớp | Ablation đầy đủ chưa chạy |
 | Exploitability | 0,34 → 0,09 (Sentinel **giảm** regret) | **Đo rồi, và ngược dấu:** regret Sentinel 0,155–0,333 so với B1 0,039–0,104; hỗn hợp minimax đặt **76–83%** khối lượng lên B1 | Đo trên lớp 12 attacker, chưa phải 18; `spikes/exploitability-full.json` |
 | Worst-case trên held-out | 27,6% | Chưa đo | Phép chia held-out đã có (`attackers.held_out()`, 6 tên) nhưng chưa công cụ nào chạy trên nó |

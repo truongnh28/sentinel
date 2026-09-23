@@ -767,22 +767,86 @@ def chi_of(kappa: dict) -> float:
     return (max(vals) - min(vals)) / mean if mean else 0.0
 
 
-def kappa_for_chi(chi: float, base: dict | None = None) -> dict:
-    """A cost table with the requested chi and the SAME mean as `base`.
+#: The three ways to hold a cost table fixed while stretching its spread.
+#: WHICH ONE IS USED HAS TO BE DECLARED BEFORE THE SWEEP RUNS -- it is not a
+#: detail of implementation, it decides what the chi axis MEANS:
+#:
+#:   mean   kappa_bar fixed, so the full-sweep bill is fixed and the budget buys
+#:          the same share at every chi.  chi is then PURE SPREAD.  Measured
+#:          consequence: chi becomes inert (39.7% at every chi), because the
+#:          policies that win do so on the mean, not on the spread.
+#:   min    the cheapest carrier is fixed, so the mean RISES with chi and the
+#:          budget buys fewer audits.  chi is confounded with effective budget --
+#:          which is a real regime, not a bug, and it is the one where chi bites.
+#:   max    the dearest carrier is fixed, so the mean FALLS and the budget buys
+#:          more.  The mirror image, reported so the direction of the confound
+#:          cannot be chosen after seeing the result.
+#:
+#: `mean` and a "hold the total fixed" convention are THE SAME THING here: K is
+#: fixed across the sweep, so total = K x mean.  Three names for two behaviours
+#: would be padding, so there are three genuinely different anchors instead.
+CHI_ANCHORS = ("mean", "min", "max")
 
-        kappa_c(chi) = kappa_bar + s * (kappa_c - kappa_bar),   s = chi / chi(base)
 
-    The mean is held fixed on purpose.  If it moved, sweeping chi would secretly
-    sweep the effective budget as well, and the RQ2 axis would be confounded with
-    the very quantity RQ1 holds constant -- the same class of error as per-carrier
-    alpha drifting along Delta.
+def kappa_for_chi(chi: float, base: dict | None = None,
+                  anchor: str = "mean") -> dict:
+    """A cost table with the requested chi, holding `anchor` fixed.
+
+        kappa_c(chi) = m + s * (kappa_c - m),   s = chi / chi(base)
+
+    where m is the mean and the result is then shifted so the anchored statistic
+    matches `base`.  See CHI_ANCHORS for why the anchor is a declared choice.
+
+    The default is `mean`, because a sweep that moved the mean would secretly
+    sweep the effective budget as well and confound the RQ2 axis with the very
+    quantity RQ1 holds constant -- the same class of error as per-carrier alpha
+    drifting along Delta.  The other two exist so that confound can be REPORTED
+    rather than avoided by silence.
     """
+    if anchor not in CHI_ANCHORS:
+        raise ValueError(f"anchor must be one of {CHI_ANCHORS}, got {anchor!r}")
     base = dict(KAPPA if base is None else base)
     vals = list(base.values())
     mean = sum(vals) / len(vals)
     chi0 = chi_of(base)
     s = 0.0 if chi0 == 0 else chi / chi0
-    return {k: mean + s * (v - mean) for k, v in base.items()}
+    if anchor == "mean":
+        # chi(out) = s * (d_max - d_min) / mean, and the mean is untouched, so
+        # scaling the deviations by s = chi/chi0 lands exactly on chi.
+        out = {k: mean + s * (v - mean) for k, v in base.items()}
+    else:
+        # Under a min/max anchor the mean MOVES, and chi has the mean in its
+        # denominator -- so scaling and then shifting does NOT give the chi that
+        # was asked for.  (Shifting a chi=0.5 table to hold the min fixed lands on
+        # chi=1.217.)  Solve for the scale and the shift together instead.
+        #
+        # Write out_c = s*d_c + t with d_c = kappa_c - mean, so mean(out) = t and
+        #     chi(out) = s*(d_max - d_min)/t   =>   t = s*(d_max - d_min)/chi.
+        # Anchoring min:  s*d_min + t = min(base)  =>  s = min(base) / (d_min + R)
+        # Anchoring max:  s*d_max + t = max(base)  =>  s = max(base) / (d_max + R)
+        # with R = (d_max - d_min)/chi.
+        d = {k: v - mean for k, v in base.items()}
+        d_min, d_max = min(d.values()), max(d.values())
+        if chi <= 0:
+            # Every cost equal: the only table with no spread that still pins the
+            # anchored carrier is the flat one at that carrier's cost.
+            flat = min(vals) if anchor == "min" else max(vals)
+            return {k: flat for k in base}
+        R = (d_max - d_min) / chi
+        denom = (d_min + R) if anchor == "min" else (d_max + R)
+        if abs(denom) < 1e-15:
+            raise ValueError(f"chi={chi} is unreachable under anchor={anchor!r} "
+                             f"on this base: the anchor equation is degenerate.")
+        s = (min(vals) if anchor == "min" else max(vals)) / denom
+        t = s * (d_max - d_min) / chi
+        out = {k: s * dc + t for k, dc in d.items()}
+    # A cost cannot be negative, and a large chi under a min/max anchor can push
+    # one there.  Refuse rather than clamp: a clamped table no longer has the chi
+    # it was asked for, and the sweep would report a value it is not running.
+    if any(v <= 0 for v in out.values()):
+        raise ValueError(f"chi={chi} under anchor={anchor!r} gives a non-positive "
+                         f"cost: {out}. The sweep cannot reach this chi on this base.")
+    return out
 
 
 def split_action(action: str) -> tuple:
