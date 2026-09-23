@@ -1,0 +1,540 @@
+<title>Sentinel Parameter Measurements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']] }, svg: { fontCache: 'global' }, options: { enableMenu: false } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js" defer></script>
+<style>
+:root{
+  color-scheme: light;
+  --ground:#F6F7F9; --paper:#FFFFFF; --ink:#18202D; --ink-2:#4A5467; --muted:#6B7486;
+  --rule:#DCE1E8; --rule-2:#EDF0F4; --accent:#1D5A78; --accent-soft:#E6EFF4;
+  --good:#256B45; --good-bg:#E3F1E8; --warn:#8A5A00; --warn-bg:#FBF0DC;
+  --bad:#A33427; --bad-bg:#FBE6E3; --code-bg:#EEF1F5;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --grid:#E4E8EE;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --ground:#11151C; --paper:#171C25; --ink:#E4E8EF; --ink-2:#B4BCCA; --muted:#8C95A6;
+    --rule:#2C3442; --rule-2:#222935; --accent:#7FB6D3; --accent-soft:#1D2B36;
+    --good:#7CC99A; --good-bg:#16291F; --warn:#E4B45C; --warn-bg:#2E2413;
+    --bad:#EE8E80; --bad-bg:#33201D; --code-bg:#212835;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --grid:#2A3240;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --ground:#11151C; --paper:#171C25; --ink:#E4E8EF; --ink-2:#B4BCCA; --muted:#8C95A6;
+  --rule:#2C3442; --rule-2:#222935; --accent:#7FB6D3; --accent-soft:#1D2B36;
+  --good:#7CC99A; --good-bg:#16291F; --warn:#E4B45C; --warn-bg:#2E2413;
+  --bad:#EE8E80; --bad-bg:#33201D; --code-bg:#212835;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+  --grid:#2A3240;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
+  padding-inline:16px;padding-block:30px 72px}
+.page{max-width:1060px;margin:0 auto;display:grid;gap:18px}
+section{background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:26px clamp(16px,3.6vw,34px)}
+.kind{font-family:var(--sans);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 10px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(27px,3.6vw,36px);line-height:1.18;margin:0 0 14px;text-wrap:balance}
+h2{font-family:var(--sans);font-size:19px;font-weight:600;margin:0 0 4px;text-wrap:balance}
+h2 .w{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-soft);
+  padding:2px 7px;border-radius:3px;vertical-align:3px;margin-right:8px}
+.sub{font-family:var(--sans);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 14px}
+p{margin:0 0 12px;max-width:68ch;font-family:var(--serif);font-size:16px;line-height:1.6}
+p.tight{margin-bottom:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px 22px;color:var(--ink-2);font-size:14px;margin:0;font-family:var(--sans)}
+.meta b{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.85em;background:var(--code-bg);padding:.06em .36em;border-radius:3px}
+a{color:var(--accent)}
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px}
+.tile{border:1px solid var(--rule);border-radius:4px;padding:13px 15px;display:grid;gap:3px;align-content:start}
+.tile .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.tile .val{font-family:var(--serif);font-size:27px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile .sub2{font-size:12.5px;color:var(--ink-2)}
+.tile.ok .val{color:var(--good)} .tile.warn .val{color:var(--warn)} .tile.bad .val{color:var(--bad)}
+/* chart shell */
+figure{margin:18px 0 6px}
+figcaption{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-top:8px;max-width:72ch}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--sans);font-size:12.5px;color:var(--ink-2);margin:2px 0 10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:2px;display:inline-block}
+.chart{width:100%;overflow-x:auto}
+svg{display:block;max-width:100%;height:auto}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif;fill:var(--ink-2)}
+svg text.val{fill:var(--ink);font-variant-numeric:tabular-nums}
+svg .axis{stroke:var(--rule)}
+svg .grid{stroke:var(--grid)}
+.tip{position:fixed;pointer-events:none;background:var(--paper);border:1px solid var(--rule);border-radius:4px;
+  padding:7px 10px;font-family:var(--sans);font-size:12.5px;color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.12);
+  z-index:9;opacity:0;transition:opacity .08s}
+.tip b{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion: reduce){.tip{transition:none}}
+/* readings */
+.reading{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 3px 3px 0;margin:14px 0 0}
+.reading p{margin:0;max-width:70ch}
+.reading.bad{border-left-color:var(--bad);background:var(--bad-bg)}
+.reading.warn{border-left-color:var(--warn);background:var(--warn-bg)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;margin:14px 0 0}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:13.5px;font-variant-numeric:tabular-nums}
+th{text-align:left;font-weight:600;background:var(--rule-2);padding:8px 11px;border-bottom:1px solid var(--rule);white-space:nowrap}
+td{padding:8px 11px;border-bottom:1px solid var(--rule-2);vertical-align:top}
+tr:last-child td{border-bottom:0}
+details{margin-top:12px;font-family:var(--sans);font-size:13.5px}
+summary{cursor:pointer;color:var(--accent);font-weight:600}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+pre{font-family:var(--mono);font-size:12.5px;background:var(--code-bg);padding:11px 13px;border-radius:4px;overflow-x:auto;margin:10px 0 0}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px}
+.c-ok{color:var(--good);background:var(--good-bg)} .c-warn{color:var(--warn);background:var(--warn-bg)}
+.c-bad{color:var(--bad);background:var(--bad-bg)}
+@media (max-width:640px){ body{font-size:14.5px} p{font-size:15px} }
+</style>
+
+<div class="page">
+
+<section>
+  <p class="kind">Báo cáo đo tham số · 23/09/2026</p>
+  <h1>Sáu tham số của Sentinel, đo bằng dữ liệu thay vì gán tay</h1>
+  <p class="meta"><span><b>Đề tài</b> FSE-2027-15</span><span><b>Học viên</b> Nguyễn Hữu Trưởng</span><span><b>GVHD</b> TS. Lê Xuân Bách</span><span><b>Phạm vi</b> W1–W6</span></p>
+  <div class="tiles">
+    <div class="tile"><span class="lbl">π₀ suy dẫn</span><span class="val">0,0799</span><span class="sub2">thay cho 0,10 gán tay</span></div>
+    <div class="tile warn"><span class="lbl">Cách ly so với audit</span><span class="val">61,5×</span><span class="sub2">η_Q trên κ, cùng carrier</span></div>
+    <div class="tile warn"><span class="lbl">Instance có Δ ≥ 2</span><span class="val">19%</span><span class="sub2">10 repo SWE-bench</span></div>
+    <div class="tile warn"><span class="lbl">Coupling có import</span><span class="val">19%</span><span class="sub2">43 trên 221 cặp</span></div>
+    <div class="tile bad"><span class="lbl">Hằng số c</span><span class="val">—</span><span class="sub2">tiền đề không thoả</span></div>
+    <div class="tile ok"><span class="lbl">Ba cổng sau khi đổi π₀</span><span class="val">547<span style="font-size:17px">/560</span></span><span class="sub2">không test nào gãy</span></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="w">W4</span>Chi phí audit κ, đo bằng CPU-time</h2>
+  <p class="sub">Đo trong chính vòng chạy game · 30 episode · đồng hồ <code>process_time</code></p>
+  <p>Wall-clock đếm cả lúc tiến trình bị hệ điều hành cho ra rìa, nên cùng một phép audit trên hai máy bận khác nhau cho hai κ khác nhau. Điều này được giữ bằng test: một detector giả ngủ 50 ms mỗi item phải cho ra gần 0 giây CPU.</p>
+  <figure>
+    <div class="legend"><span><i style="background:var(--s1)"></i>χ tính từ bảng tương ứng</span></div>
+    <div class="chart" id="c-chi"></div>
+    <figcaption>Ba định nghĩa khác nhau của cùng một ký hiệu. Cột đầu là bảng của draft (chi phí theo <em>giai đoạn</em> audit, bị dùng như bảng theo carrier), cột hai là bảng USD (đơn giá chấm × số item mỗi carrier), cột ba là CPU-time của bốn checkpoint. Hai bảng đo gần nhau vì cùng bị chi phối bởi số item mỗi lượt audit.</figcaption>
+  </figure>
+  <div class="reading warn"><p><strong>Phải nói ra:</strong> bốn checkpoint nay đã làm việc thật (<code>checkpoints.py</code>) và χ lên 1,295 — bản trước đo <em>bộ mô phỏng</em> và cho 0,16. Nhưng commit audit vẫn <em>chưa</em> chạy differential testing, nên κ<sub>commit</sub> đo được là <strong>cận dưới</strong>, và nó thiên vị đúng baseline B1.</p></div>
+  <details><summary>Số liệu theo giai đoạn</summary>
+    <div class="tbl"><table><thead><tr><th>Giai đoạn</th><th>CPU-time trung vị (giây)</th><th>Việc phép kiểm làm</th></tr></thead>
+      <tbody>
+        <tr><td>retrieval</td><td>0,000001</td><td>tính lại độ khớp từ nội dung</td></tr>
+        <tr><td>insertion</td><td>0,000002</td><td>băm lại id, kiểm provenance, đối chiếu topic</td></tr>
+        <tr><td>delegation</td><td>0,000003</td><td>đi ngược chuỗi <code>derived_from</code></td></tr>
+        <tr><td>commit</td><td>0,000012</td><td>lineage bắc cầu — <em>chưa</em> có differential testing</td></tr>
+      </tbody></table></div>
+  </details>
+</section>
+
+<section>
+  <h2><span class="w">W4b</span>Đơn vị của κ quyết định ai thắng</h2>
+  <p class="sub">Cùng một lưới · 20 workflow · H = 8 · Δ = 2 · detector mid · seed 1–2 · cùng 32,1% hoá đơn audit</p>
+  <p>Ba bảng giá cho cùng một ký hiệu, và ngân sách của mỗi thang được đặt để mua <em>cùng một tỉ lệ</em> hoá đơn audit đầy đủ — nếu không thì so sánh giữa các thang là so hai ngân sách khác nhau. Thứ hạng <strong>đổi hẳn</strong> theo đơn vị.</p>
+  <figure>
+    <div class="legend"><span><i style="background:var(--s3)"></i>bảng draft</span><span><i style="background:var(--s1)"></i>bảng USD</span><span><i style="background:var(--s2)"></i>bảng CPU-time</span></div>
+    <div class="chart" id="c-scales"></div>
+    <figcaption>Tổn thất \(L = E[\text{harm}] + \lambda_Q E[Q_{\text{false}}] + \lambda_T E[T_{\text{lost}}]\), thấp hơn là tốt hơn. Trên thang USD, <strong>SentinelW thắng B1 14,5% theo \(L\) và 25,0% theo harm</strong> — đúng hướng draft mong đợi. Trên thang CPU-time, B1 đứng đầu và mọi biến thể Sentinel thua.</figcaption>
+  </figure>
+  <div class="reading"><p><strong>Chú ý khi đọc:</strong> <code>Sentinel</code> khai <code>ACTIONS = frozenset(CARRIERS)</code> — nó không có kênh commit, kiểm chứng bằng 0 lần chọn commit trên 80 quyết định kể cả khi commit rẻ hơn carrier rẻ nhất. Vì vậy "Sentinel so với B1" là so <em>hai kênh rời nhau</em>; hai chính sách có cả hai kênh là SentinelW và SSG-G.</p></div>
+  <figure>
+    <div class="legend"><span><i style="background:var(--s2)"></i>B1 audit-at-commit</span><span><i style="background:var(--s1)"></i>Sentinel</span></div>
+    <div class="chart" id="c-cross"></div>
+    <figcaption>Quét giá một lượt audit tại commit, theo bội số của \(\bar\kappa\), giữ nguyên bảng carrier và ngân sách. Hai thang cho kết quả <strong>trùng khít</strong> — nên toàn bộ khác biệt giữa chúng nằm ở đúng con số này.</figcaption>
+  </figure>
+  <div class="reading warn"><p><strong>Đây là phép đo có giá trị cao nhất còn lại:</strong> ngưỡng lật nằm giữa <strong>5,13 và 7,17</strong> lượt commit mỗi episode 8 task. Thang USD <em>định nghĩa</em> \(\kappa_{\text{commit}} = 4{,}00\bar\kappa\) (chấm cả bốn carrier); thang CPU <em>đo</em> được \(1{,}43\bar\kappa\) nhưng thiếu differential testing nên là cận dưới. Giá trị thật nằm <em>trên cả hai</em>, còn ngưỡng lật nằm <em>giữa</em> chúng — nên dấu của kết luận chính hiện do một đại lượng chưa ai đo quyết định.</p></div>
+  <details><summary>Cách ly với giá đo được: rẻ đi không phải là tốt hơn</summary>
+    <p><code>costs.py</code> đang giữ hai giá cho cùng \(\eta_Q\), lệch 54 lần: <code>ETA_Q_USD</code> chở tỉ lệ placeholder sang (1,14 \(\bar\kappa\)) và <code>eta_q(k)</code> đo được (61,5 \(\bar\kappa\)). <code>costs.install()</code> vẫn cài cái thứ nhất, nên mọi bảng USD trước hôm nay chạy trên giá cách ly placeholder. Giá đúng <em>cải thiện</em> chính sách chủ lực:</p>
+    <div class="tbl"><table><thead><tr><th>SentinelW, thang USD</th><th>L</th><th>harm</th><th>Q<sub>false</sub></th></tr></thead>
+      <tbody>
+        <tr><td>η_Q placeholder (rẻ)</td><td>1,095</td><td>0,825</td><td>2,70</td></tr>
+        <tr><td>η_Q <strong>đo được</strong> (đắt)</td><td><strong>0,855</strong></td><td><strong>0,750</strong></td><td><strong>0,93</strong></td></tr>
+      </tbody></table></div>
+    <p class="tight">Cách ly đắt buộc nó thôi cách ly bừa. Ngược lại, NC1 "cách ly tất cả" không mua nổi một lượt nào (6,0 lần ngân sách) nên chi 0% — <em>bị vô hiệu hoá, không phải được so sánh</em>.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="w">W1</span>Tiên nghiệm π₀, suy dẫn từ thiết kế episode</h2>
+  <p class="sub">Một payload giữa 12,51 item sống · bảng τ_sel sinh lại, 800.000 mẫu mỗi ô</p>
+  <p>π₀ không phải thuộc tính của thế giới mà là hệ quả của cách dựng episode, nên nó suy ra được: \(\pi_0 = 1/12{,}51 = 0{,}0799\) cho thế giới, và nhân thêm \(\pi_{\text{attack}} = 0{,}5\) cho mô hình của defender. Bảng ngưỡng chọn carrier được sinh <em>từ</em> π₀, nên đổi π₀ là phải sinh lại bảng.</p>
+  <figure>
+    <div class="legend">
+      <span><i style="background:var(--s2)"></i>bảng cũ, π₀ = 0,10</span>
+      <span><i style="background:var(--s1)"></i>bảng mới, π₀ = 0,0799</span>
+    </div>
+    <div class="chart" id="c-tau"></div>
+    <figcaption>Ngưỡng chọn carrier τ_sel theo số item sống, ở K = 4. Ngưỡng giảm đều 0,02–0,06 — nhưng thứ phải kiểm là <em>tính chất</em>: mức yếu giảm theo n, mức mạnh tăng. Cả hai vẫn đúng sau khi sinh lại.</figcaption>
+  </figure>
+  <div class="reading"><p><strong>π₀ chưa phải một trục kết quả.</strong> Chạy cùng lưới trên hai bảng, thứ hạng chính sách giữ nguyên: B1 → Sentinel → B5 → B6. Bảng có tác động (harm của B5 dịch 0,875 → 0,850) nhưng không đổi thứ tự.</p></div>
+</section>
+
+<section>
+  <h2><span class="w">W2</span>Chi phí cách ly η_Q</h2>
+  <p class="sub">Phần gỡ đo bằng CPU-time · phần phục hồi suy từ chi phí agent thật của P2</p>
+  <p>Cách ly xoá <em>mọi</em> item của carrier, kể cả item sạch, nên phục hồi tốn \(n_{\text{live}}(k)\) lần ghi. Ghi một item là việc của agent: 0,0868 USD một lần chạy agent thật chia cho 2,85 item ghi mỗi task, ra <strong>0,0305 USD một lần ghi</strong>. Chấm một item chỉ tốn 0,000495 USD.</p>
+  <figure>
+    <div class="legend">
+      <span><i style="background:var(--s2)"></i>η_Q — cách ly</span>
+      <span><i style="background:var(--s1)"></i>κ — audit</span>
+    </div>
+    <div class="chart" id="c-eta"></div>
+    <figcaption>Thang logarit, đơn vị USD. Khoảng cách giữa hai cột là không đổi ở cả bốn carrier: <strong>61,5 lần</strong>.</figcaption>
+  </figure>
+  <div class="reading warn"><p><strong>Hệ quả chưa xử lý.</strong> Tỉ lệ này đo trên thang USD, còn <code>policies.ETA_Q_COST = 2,0</code> nằm trên thang placeholder. Áp 61,5× vào thang placeholder thì cách ly memory tốn 24,6 — vượt ngân sách 17,95, tức không chính sách nào cách ly nổi, và NC1 lẫn hành vi cách ly của Sentinel biến mất khỏi mọi bảng. Đây là quyết định phải chốt trước khi chạy lưới chính.</p></div>
+</section>
+
+<section>
+  <h2><span class="w">W3</span>Tốc độ trôi lành tính β</h2>
+  <p class="sub">10 repo SWE-bench · cửa sổ là khoảng commit giữa hai instance liên tiếp · hai luật ánh xạ</p>
+  <p>Carrier sống ngoài repo nên không commit nào "chạm memory". Phải khai một phép tương tự, và vì đó là quyết định mô hình hoá chứ không phải phép đo, script chạy hai luật rồi báo cả hai. Điều kiện khai trước: nếu kết luận định tính đổi giữa hai luật thì β chuyển sang quét.</p>
+  <figure>
+    <div class="legend">
+      <span><i style="background:var(--s1)"></i>luật A — tài liệu, tiện ích, cấu hình</span>
+      <span><i style="background:var(--s2)"></i>luật B — chỉ docs, mọi .py, chỉ CI</span>
+    </div>
+    <div class="chart" id="c-beta"></div>
+    <figcaption>Trung vị qua 10 repo. Vạch mảnh trên cột luật A là dải [min, max] giữa các repo — rộng ở memory (0,03–0,57). branch bằng 1,0 theo cấu tạo, không phải đo.</figcaption>
+  </figure>
+  <div class="reading bad"><p><strong>β không định danh được.</strong> Hai luật lệch hơn 10 lần ở skill (0,058 so với 0,607) và đổi thứ tự carrier — đúng điều kiện đã khai trước. Chỉ memory (0,28–0,31) và branch (1,0) được trích dẫn; skill và queue phải quét.</p></div>
+</section>
+
+<section>
+  <h2><span class="w">W5</span>Độ trễ thật Δ trên repo SWE-bench</h2>
+  <p class="sub">SZZ trên file mà gold patch sửa · hai đơn vị: task và commit</p>
+  <p>Crossover mà đề tài dự đoán nằm ở Δ ≈ 2. Dự đoán đó chỉ đáng quan tâm nếu workflow thật có Δ cùng thang, nên Δ phải đo trên chính quần thể mà benchmark dựng từ đó.</p>
+  <figure>
+    <div class="legend"><span><i style="background:var(--s1)"></i>tỉ lệ instance có Δ ≥ 2</span></div>
+    <div class="chart" id="c-delta"></div>
+    <figcaption>Vùng mà phân bổ thích nghi có lợi phủ bao nhiêu phần workload của từng repo. Đường đứt là mức gộp 19%.</figcaption>
+  </figure>
+  <figure>
+    <div class="legend"><span><i style="background:var(--s3)"></i>Δ theo commit, trung vị</span></div>
+    <div class="chart" id="c-deltac"></div>
+    <figcaption>Cùng dữ liệu, đơn vị commit — độc lập với mật độ lấy mẫu của benchmark. Mọi repo đều có độ trễ thật.</figcaption>
+  </figure>
+  <div class="reading"><p><strong>Đơn vị task phụ thuộc cách benchmark lấy mẫu.</strong> Django có 231/500 instance nên nhiều instance rơi vào giữa hai mốc; repo thưa cho Δ = 0 gần như luôn luôn. Vì vậy ranh giới vùng nên phát biểu theo tỉ lệ workload từng repo, thay vì một con số crossover duy nhất.</p></div>
+</section>
+
+<section>
+  <h2><span class="w">W5</span>Co-change, lọc bằng đồ thị import</h2>
+  <p class="sub">2.000 commit mỗi repo · support ≥ 5, confidence ≥ 0,10 · cạnh import dò trong file .py</p>
+  <p>Hai module cùng đổi trong một commit có thể chỉ thuộc cùng một tính năng, một đợt phát hành hay một lần format lại. Một cặp chỉ được giữ khi mã thật sự nối chúng: có file của module này import module kia.</p>
+  <figure>
+    <div class="legend"><span><i style="background:var(--s3)"></i>tỉ lệ cặp coupling có đường import</span></div>
+    <div class="chart" id="c-cc"></div>
+    <figcaption>Trong 25 cặp coupling mạnh nhất của mỗi repo. Tổng cộng 43 trên 221 cặp sống sót.</figcaption>
+  </figure>
+  <div class="reading"><p><strong>81% coupling mạnh nhất không có đường import nào chống lưng.</strong> Đây là con số định lượng cho đúng cảnh báo của tài liệu phương pháp luận: co-change là tương quan tiến hoá, không hẳn nhân quả. Và Δ phụ thuộc mạnh vào luật quy trách — tự-liên-đới cho 14–194 commit, liên-đới-đã-lọc cho 2–16.</p></div>
+  <details><summary>Hai lỗi đã bắt được trong lúc làm</summary>
+    <p style="margin-top:10px"><strong>1.</strong> <code>git grep -E</code> dùng POSIX ERE nên không hiểu <code>\s</code> và <code>\b</code>. Mẫu dùng chúng khớp <em>không gì cả</em> trong khi trông vẫn như đang chạy — bộ lọc lần đầu báo 0% ở cả 10 repo.</p>
+    <p class="tight"><strong>2.</strong> Tài liệu chứa ví dụ mã. Quét cả cây nguồn thì <code>django/db</code> được tính là import <code>docs/releases</code> với support 122, vì file <code>.rst</code> có dòng <code>from django.db</code>. Giới hạn trong file <code>.py</code> làm tỉ lệ sống sót rơi từ 27% xuống 19%.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="w">W6</span>Hằng số c của Định lý 4</h2>
+  <p class="sub">Kiểm tiền đề trước khi fit · thang ngân sách B từ 2 đến 200</p>
+  <p>Định lý 4 nói ngân sách mua thông tin: \(B \ge c\,\bar\kappa\,(1+\chi)\log(1/\alpha)/\gamma^2 \cdot (1 + \Delta K/H)\). Vế trái đo được nếu hiểu định lý là phát biểu về sự hội tụ của belief. Script vì vậy kiểm một điều kiện cần trước khi fit: ngân sách có làm dịch posterior không.</p>
+  <figure>
+    <div class="legend"><span><i style="background:var(--s2)"></i>khối lượng posterior trên window thật, 4 workflow</span></div>
+    <div class="chart" id="c-budget"></div>
+    <figcaption>Trục hoành là ngân sách (thang logarit), trục tung là khối lượng posterior tại thời điểm kích hoạt. Đường phẳng tuyệt đối: biên độ trên toàn thang bằng 0,0.</figcaption>
+  </figure>
+  <div class="reading bad"><p><strong>Script từ chối trả số, và lý do quan trọng hơn con số.</strong> <code>belief.WindowBelief.update</code> nhận tín hiệu của <em>mọi</em> carrier ở <em>mọi</em> task, bất kể chính sách audit cái gì — quan sát là miễn phí. Ngân sách chỉ quyết định item có bị cách ly hay không, không quyết định defender biết được gì. Vậy vế trái của Định lý 4 không tồn tại trong harness, và mọi c fit ở đây sẽ là phát biểu về thang ngân sách chứ không về định lý.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Đại lượng</th><th>Giá trị lớn nhất đạt được</th></tr></thead>
+    <tbody>
+      <tr><td>Khối lượng trên đúng window (trong 72 window)</td><td>0,085</td></tr>
+      <tr><td>Khối lượng trên đúng carrier</td><td>0,835</td></tr>
+      <tr><td>Xác suất có tấn công</td><td>0,999</td></tr>
+    </tbody></table></div>
+</section>
+
+<section>
+  <h2>Ba cổng sau khi đổi π₀</h2>
+  <p class="sub">Chạy lại toàn bộ ngày 23/09</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Cổng</th><th>Kết quả</th><th>Đọc thế nào</th></tr></thead>
+    <tbody>
+      <tr><td>1 — Integrity</td><td><span class="chip c-warn">547/560 · 13 bỏ qua</span></td><td>Harness tự tuyên bố UNKNOWN, không phải xanh: 13 test cần image Docker. Tăng 9 test so với lần trước, đều là test mới của đợt đo này</td></tr>
+      <tr><td>2 — Validity</td><td><span class="chip c-bad">203/205 · 2 đỏ</span></td><td>Đúng hai test đỏ cũ, không phát sinh thêm: không ε nào chạm trần trên trung vị 20 split, và tiêu chí đa phân hoạch hết tác dụng ở Δ ∈ {0, 2}</td></tr>
+      <tr><td>3 — Power</td><td><span class="chip c-ok">15/15 xanh</span></td><td>Ngưỡng 15% phát biểu được</td></tr>
+    </tbody></table></div>
+  <div class="reading"><p><strong>Đổi π₀ không làm gãy test nào.</strong> Các test khẳng định tính chất vẫn xanh, và không test nào khoá cứng giá trị sinh từ π₀ = 0,10. Đây là điều kiện cần để việc đổi tiên nghiệm được coi là an toàn.</p></div>
+</section>
+
+<section>
+  <h2>Còn nợ</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Việc</th><th>Vì sao chưa làm</th></tr></thead>
+    <tbody>
+      <tr><td>Quét π₀ đầy đủ bốn giá trị</td><td>Mỗi giá trị cần một bảng τ_sel riêng, 23 phút mỗi bảng; hiện mới có phép kiểm hai điểm</td></tr>
+      <tr><td>Quét β cho skill và queue</td><td>Hệ quả của việc β không định danh được</td></tr>
+      <tr><td>W7 — 240 game nhỏ và ρ đúng không gian</td><td>Phụ thuộc thư viện 28 policy, chưa dựng</td></tr>
+      <tr><td>Fit c</td><td>Phải sửa mô hình quan sát trước: belief chỉ được cập nhật từ carrier đã audit</td></tr>
+      <tr><td>κ đúng nghĩa Stage 2</td><td>Phải hiện thực bốn checkpoint làm việc thật, gồm cả differential testing ở commit audit</td></tr>
+    </tbody></table></div>
+  <p style="margin-top:16px">Runbook đầy đủ, kèm lệnh chạy từng bước cho mỗi tham số: <code>docs/AuditGame-SE_Parameter_Measurement_Runbook.md</code>. Dữ liệu thô kèm provenance: <code>auditgame/spikes/</code> — <code>kappa-cpu.json</code>, <code>eta-q.json</code>, <code>beta-k.json</code>, <code>delta-swebench.json</code>, <code>cochange.json</code>, <code>theorem4-c.json</code>.</p>
+</section>
+
+</div>
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+const DATA = {
+  chi: [{k:"Bảng draft", v:2.114, note:"theo giai đoạn audit"},
+        {k:"Bảng USD", v:1.349, note:"theo số item mỗi carrier"},
+        {k:"CPU-time", v:1.295, note:"bốn checkpoint làm việc thật"}],
+  tau: {
+    weak:  {old:[0.509,0.4519,0.4133,0.3898,0.3673,0.3523,0.3389,0.3289,0.3195,0.3107],
+            new:[0.4477,0.392,0.3552,0.3331,0.3122,0.2984,0.2861,0.2771,0.2686,0.2606]},
+    mid:   {old:[0.576,0.5489,0.5314,0.515,0.5044,0.4908,0.4839,0.4744,0.466,0.4598],
+            new:[0.5151,0.4875,0.47,0.4537,0.4432,0.4297,0.4231,0.4138,0.4056,0.3996]},
+    strong:{old:[0.5107,0.5292,0.5336,0.5382,0.5368,0.538,0.529,0.5332,0.5289,0.5273],
+            new:[0.4494,0.4678,0.4722,0.4768,0.4754,0.4766,0.4676,0.4718,0.4675,0.4659]}},
+  eta: [{k:"memory", eta:0.16263, kap:0.002643},{k:"skill", eta:0.03411, kap:0.000554},
+        {k:"queue", eta:0.04721, kap:0.000767},{k:"branch", eta:0.13705, kap:0.002227}],
+  beta: [{k:"memory", A:0.314, B:0.279, lo:0.033, hi:0.570},
+         {k:"skill", A:0.058, B:0.607, lo:0.006, hi:0.139},
+         {k:"queue", A:0.033, B:0.013, lo:0.006, hi:0.118},
+         {k:"branch", A:1.0, B:1.0, lo:1.0, hi:1.0}],
+  delta: [{k:"django", s:0.55, c:180.5},{k:"astropy", s:0.25, c:194.5},{k:"sphinx", s:0.25, c:75.5},
+          {k:"sympy", s:0.25, c:140},{k:"matplotlib", s:0.15, c:88.5},{k:"scikit-learn", s:0.15, c:35.5},
+          {k:"pytest", s:0.105, c:56},{k:"pylint", s:0.0, c:15},{k:"xarray", s:0.0, c:13.5},
+          {k:"requests", s:0.0, c:18.5}],
+  cc: [{k:"sympy", v:0.78, n:9},{k:"django", v:0.44, n:25},{k:"scikit-learn", v:0.40, n:25},
+       {k:"astropy", v:0.24, n:25},{k:"xarray", v:0.20, n:25},{k:"sphinx", v:0.12, n:25},
+       {k:"pylint", v:0.04, n:25},{k:"matplotlib", v:0.0, n:14},{k:"pytest", v:0.0, n:25},
+       {k:"requests", v:0.0, n:23}],
+  budget: {x:[2,8,17.95,60,200], y:0.000336},
+  scales: [{k:"B1 audit-at-commit", draft:0.988, usd:1.000, cpu:0.512},
+           {k:"B5 risk-score", draft:0.955, usd:0.955, cpu:0.955},
+           {k:"B6 two-stage", draft:1.058, usd:1.008, cpu:1.008},
+           {k:"Sentinel", draft:1.012, usd:0.970, cpu:0.973},
+           {k:"SentinelW", draft:0.993, usd:0.855, cpu:0.902},
+           {k:"SSG-G guarded", draft:0.925, usd:0.988, cpu:0.762},
+           {k:"B7 minimax-lp", draft:1.038, usd:1.038, cpu:0.625},
+           {k:"NC1 quarantine-all", draft:1.400, usd:1.000, cpu:1.000}],
+  cross: {m:[1,1.43,2,3,4,6,8,12,16,24],
+          audits:[10.26,7.17,5.13,3.42,2.56,1.71,1.28,0.85,0.64,0.43],
+          b1:[0.375,0.375,0.875,0.975,1.0,1.0,1.0,1.0,1.0,1.0],
+          sent:[0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85]}
+};
+
+const tip = document.getElementById("tip");
+function showTip(e, html){ tip.innerHTML = html; tip.style.opacity = 1;
+  const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = e.clientX + pad, y = e.clientY - h - 8;
+  if (x + w > innerWidth - 8) x = e.clientX - w - pad;
+  if (y < 8) y = e.clientY + pad;
+  tip.style.left = x + "px"; tip.style.top = y + "px"; }
+function hideTip(){ tip.style.opacity = 0; }
+function el(tag, attrs, kids){ const n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  (kids||[]).forEach(c => n.appendChild(c)); return n; }
+function txt(s, attrs){ const n = el("text", attrs); n.textContent = s; return n; }
+function bind(node, html){ node.style.cursor = "default";
+  node.addEventListener("mousemove", e => showTip(e, html));
+  node.addEventListener("mouseleave", hideTip); }
+
+/* ---- horizontal bars: label | bar | value ---- */
+function hbars(mount, rows, opts){
+  const o = Object.assign({w:820, rowH:34, labelW:120, valW:74, max:null, fmt:v=>v,
+                           color:"var(--s1)", ref:null, refLabel:""}, opts||{});
+  const h = rows.length*o.rowH + 26, plotW = o.w - o.labelW - o.valW;
+  const max = o.max ?? Math.max(...rows.map(r=>r.v))*1.08;
+  const svg = el("svg", {viewBox:`0 0 ${o.w} ${h}`, role:"img"});
+  rows.forEach((r,i) => {
+    const y = i*o.rowH + 6, bw = Math.max(2, plotW*(r.v/max));
+    svg.appendChild(txt(r.k, {x:o.labelW-10, y:y+16, "text-anchor":"end", "font-size":"13"}));
+    const rect = el("rect", {x:o.labelW, y:y+4, width:bw, height:18, rx:4, fill:r.color||o.color});
+    bind(rect, r.tip || `<b>${o.fmt(r.v)}</b> — ${r.k}`);
+    svg.appendChild(rect);
+    svg.appendChild(txt(o.fmt(r.v), {x:o.labelW+bw+8, y:y+18, "font-size":"12.5", class:"val"}));
+  });
+  if (o.ref != null){
+    const x = o.labelW + plotW*(o.ref/max);
+    svg.appendChild(el("line", {x1:x, x2:x, y1:2, y2:rows.length*o.rowH+2,
+      stroke:"var(--muted)", "stroke-dasharray":"4 4", "stroke-width":1}));
+    svg.appendChild(txt(o.refLabel, {x:x+6, y:rows.length*o.rowH+18, "font-size":"11.5"}));
+  }
+  mount.appendChild(svg);
+}
+
+/* ---- grouped horizontal bars, optional log scale ---- */
+function gbars(mount, rows, series, opts){
+  const o = Object.assign({w:820, groupH:52, labelW:92, valW:96, log:false, fmt:v=>v}, opts||{});
+  const h = rows.length*o.groupH + 20, plotW = o.w - o.labelW - o.valW;
+  const vals = rows.flatMap(r => series.map(s => r[s.key])).filter(v => v > 0);
+  const max = Math.max(...vals), min = Math.min(...vals);
+  const pos = v => o.log ? (v <= 0 ? 0 : plotW * (Math.log10(v/min) / Math.log10(max/min) * 0.96 + 0.04))
+                         : plotW * (v/(max*1.06));
+  const svg = el("svg", {viewBox:`0 0 ${o.w} ${h}`, role:"img"});
+  rows.forEach((r,i) => {
+    const gy = i*o.groupH + 6;
+    svg.appendChild(txt(r.k, {x:o.labelW-10, y:gy+24, "text-anchor":"end", "font-size":"13"}));
+    series.forEach((s,j) => {
+      const y = gy + j*20, bw = Math.max(2, pos(r[s.key]));
+      const rect = el("rect", {x:o.labelW, y:y+2, width:bw, height:16, rx:4, fill:s.color});
+      bind(rect, `<b>${o.fmt(r[s.key])}</b> — ${s.name}, ${r.k}`);
+      svg.appendChild(rect);
+      svg.appendChild(txt(o.fmt(r[s.key]), {x:o.labelW+bw+8, y:y+15, "font-size":"12", class:"val"}));
+      if (s.range && r.lo != null && r.hi != null && r.lo !== r.hi){
+        const x1 = o.labelW + pos(r.lo), x2 = o.labelW + pos(r.hi), yy = y + 10;
+        svg.appendChild(el("line", {x1, x2, y1:yy, y2:yy, stroke:"var(--ink-2)", "stroke-width":1}));
+        [x1,x2].forEach(x => svg.appendChild(el("line", {x1:x, x2:x, y1:yy-4, y2:yy+4,
+          stroke:"var(--ink-2)", "stroke-width":1})));
+      }
+    });
+  });
+  mount.appendChild(svg);
+}
+
+/* ---- small-multiple line panels ---- */
+function linePanels(mount, panels, opts){
+  const o = Object.assign({w:820, h:200, pad:{t:22,r:14,b:34,l:44}}, opts||{});
+  const cols = panels.length, gap = 16, pw = (o.w - gap*(cols-1))/cols;
+  const svg = el("svg", {viewBox:`0 0 ${o.w} ${o.h}`, role:"img"});
+  const allY = panels.flatMap(p => p.series.flatMap(s => s.y));
+  const ymin = Math.min(...allY)*0.94, ymax = Math.max(...allY)*1.04;
+  panels.forEach((p, pi) => {
+    const x0 = pi*(pw+gap), iw = pw - o.pad.l - o.pad.r, ih = o.h - o.pad.t - o.pad.b;
+    const X = i => x0 + o.pad.l + iw*(i/(p.x.length-1));
+    const Y = v => o.pad.t + ih*(1 - (v-ymin)/(ymax-ymin));
+    svg.appendChild(txt(p.title, {x:x0+o.pad.l, y:13, "font-size":"12.5", "font-weight":"600", fill:"var(--ink)"}));
+    [0,0.5,1].forEach(f => { const y = o.pad.t + ih*f;
+      svg.appendChild(el("line", {x1:x0+o.pad.l, x2:x0+o.pad.l+iw, y1:y, y2:y, class:"grid", "stroke-width":1}));
+      svg.appendChild(txt((ymax-(ymax-ymin)*f).toFixed(2).replace(".",","),
+        {x:x0+o.pad.l-7, y:y+4, "text-anchor":"end", "font-size":"11"})); });
+    [0, p.x.length-1].forEach(i => svg.appendChild(
+      txt("n=" + p.x[i], {x:X(i), y:o.h-o.pad.b+16, "text-anchor":i?"end":"start", "font-size":"11"})));
+    p.series.forEach(s => {
+      svg.appendChild(el("path", {d:s.y.map((v,i)=>`${i?"L":"M"}${X(i)},${Y(v)}`).join(" "),
+        fill:"none", stroke:s.color, "stroke-width":2, "stroke-linejoin":"round"}));
+      s.y.forEach((v,i) => { const c = el("circle", {cx:X(i), cy:Y(v), r:4.5, fill:s.color,
+        stroke:"var(--paper)", "stroke-width":2});
+        bind(c, `<b>${v.toFixed(4).replace(".",",")}</b> — ${s.name}, ${p.title}, n = ${p.x[i]}`);
+        svg.appendChild(c); });
+    });
+  });
+  mount.appendChild(svg);
+}
+
+/* ---- render ---- */
+const pct = v => (v*100).toFixed(0) + "%";
+const num = d => v => v.toFixed(d).replace(".", ",");
+const usd = v => "$" + (v < 0.01 ? v.toFixed(6) : v.toFixed(4));
+
+hbars(document.getElementById("c-chi"),
+  DATA.chi.map(d => ({k:d.k, v:d.v, tip:`<b>χ = ${num(3)(d.v)}</b><br>${d.note}`})),
+  {fmt:num(3), labelW:130, rowH:38, w:760});
+
+linePanels(document.getElementById("c-tau"), ["weak","mid","strong"].map(s => ({
+  title: s, x: Array.from({length:10}, (_,i)=>i+1),
+  series: [{name:"bảng cũ (π₀ = 0,10)", y:DATA.tau[s].old, color:"var(--s2)"},
+           {name:"bảng mới (π₀ = 0,0799)", y:DATA.tau[s].new, color:"var(--s1)"}]})));
+
+gbars(document.getElementById("c-eta"),
+  DATA.eta.map(d => ({k:d.k, eta:d.eta, kap:d.kap})),
+  [{key:"eta", name:"η_Q (cách ly)", color:"var(--s2)"},
+   {key:"kap", name:"κ (audit)", color:"var(--s1)"}],
+  {log:true, fmt:usd, w:800});
+
+gbars(document.getElementById("c-beta"),
+  DATA.beta.map(d => ({k:d.k, A:d.A, B:d.B, lo:d.lo, hi:d.hi})),
+  [{key:"A", name:"luật A", color:"var(--s1)", range:true},
+   {key:"B", name:"luật B", color:"var(--s2)"}],
+  {fmt:num(3), w:800, labelW:86});
+
+hbars(document.getElementById("c-delta"),
+  DATA.delta.map(d => ({k:d.k, v:d.s, tip:`<b>${pct(d.s)}</b> instance có Δ ≥ 2 — ${d.k}`})),
+  {fmt:pct, max:0.62, ref:0.19, refLabel:"gộp 19%", rowH:30, w:760});
+
+hbars(document.getElementById("c-deltac"),
+  DATA.delta.slice().sort((a,b)=>b.c-a.c).map(d => ({k:d.k, v:d.c, color:"var(--s3)",
+    tip:`<b>${num(1)(d.c)} commit</b> — trung vị, ${d.k}`})),
+  {fmt:num(0), rowH:30, w:760});
+
+hbars(document.getElementById("c-cc"),
+  DATA.cc.map(d => ({k:d.k, v:d.v, color:"var(--s3)",
+    tip:`<b>${pct(d.v)}</b> — ${d.k}<br>${Math.round(d.v*d.n)} trên ${d.n} cặp kiểm`})),
+  {fmt:pct, max:0.9, rowH:30, w:760});
+
+gbars(document.getElementById("c-scales"), DATA.scales,
+  [{key:"draft", name:"bảng draft", color:"var(--s3)"},
+   {key:"usd", name:"bảng USD", color:"var(--s1)"},
+   {key:"cpu", name:"bảng CPU-time", color:"var(--s2)"}],
+  {fmt:num(3), w:820, labelW:128, groupH:68, valW:66});
+
+/* ---- the crossover: kappa_commit as a multiple of mean kappa ---- */
+(function crossChart(){
+  const mount = document.getElementById("c-cross"), w = 820, h = 268,
+        pad = {t:20,r:22,b:52,l:52}, D = DATA.cross;
+  const iw = w-pad.l-pad.r, ih = h-pad.t-pad.b;
+  const lx = i => pad.l + iw*(Math.log10(D.m[i]/D.m[0])/Math.log10(D.m[D.m.length-1]/D.m[0]));
+  const Y = v => pad.t + ih*(1 - v/1.05);
+  const svg = el("svg", {viewBox:`0 0 ${w} ${h}`, role:"img"});
+  [0,0.25,0.5,0.75,1].forEach(v => {
+    svg.appendChild(el("line", {x1:pad.l, x2:pad.l+iw, y1:Y(v), y2:Y(v), class:"grid", "stroke-width":1}));
+    svg.appendChild(txt(v.toFixed(2).replace(".",","),
+      {x:pad.l-8, y:Y(v)+4, "text-anchor":"end", "font-size":"11"}));
+  });
+  // the two points that were actually measured, named on the axis
+  [[1,"1,43× — đo (CPU)"],[4,"4,00× — định nghĩa (USD)"]].forEach(([i,label]) => {
+    svg.appendChild(el("line", {x1:lx(i), x2:lx(i), y1:pad.t, y2:pad.t+ih,
+      stroke:"var(--muted)", "stroke-dasharray":"4 4", "stroke-width":1}));
+    svg.appendChild(txt(label, {x:lx(i), y:h-pad.b+32, "text-anchor":"middle", "font-size":"11"}));
+  });
+  D.m.forEach((m,i) => svg.appendChild(txt(String(m).replace(".",","),
+    {x:lx(i), y:h-pad.b+16, "text-anchor":"middle", "font-size":"11"})));
+  svg.appendChild(txt("harm", {x:pad.l-8, y:pad.t-6, "text-anchor":"end", "font-size":"11.5"}));
+  [["b1","B1 audit-at-commit","var(--s2)"],["sent","Sentinel","var(--s1)"]].forEach(([k,name,col]) => {
+    svg.appendChild(el("path", {d:D[k].map((v,i)=>`${i?"L":"M"}${lx(i)},${Y(v)}`).join(" "),
+      fill:"none", stroke:col, "stroke-width":2, "stroke-linejoin":"round"}));
+    D[k].forEach((v,i) => { const c = el("circle", {cx:lx(i), cy:Y(v), r:4.5, fill:col,
+        stroke:"var(--paper)", "stroke-width":2});
+      bind(c, `<b>harm ${num(3)(v)}</b> — ${name}<br>κ_commit = ${String(D.m[i]).replace(".",",")}× κ̄`
+             + `<br>${num(2)(D.audits[i])} lượt commit mỗi episode`);
+      svg.appendChild(c); });
+  });
+  svg.appendChild(txt("ngưỡng lật", {x:lx(1)+8, y:Y(0.60), "font-size":"12.5", class:"val"}));
+  svg.appendChild(txt("κ_commit / κ̄", {x:pad.l+iw, y:h-6, "text-anchor":"end", "font-size":"11.5"}));
+  mount.appendChild(svg);
+})();
+
+(function budgetChart(){
+  const mount = document.getElementById("c-budget"), w = 760, h = 230,
+        pad = {t:20,r:24,b:40,l:64};
+  const iw = w-pad.l-pad.r, ih = h-pad.t-pad.b, xs = DATA.budget.x;
+  const lx = v => pad.l + iw*(Math.log10(v/xs[0])/Math.log10(xs[xs.length-1]/xs[0]));
+  const ymax = 0.001, Y = v => pad.t + ih*(1 - v/ymax);
+  const svg = el("svg", {viewBox:`0 0 ${w} ${h}`, role:"img"});
+  [0, 0.00025, 0.0005, 0.00075, 0.001].forEach(v => {
+    svg.appendChild(el("line", {x1:pad.l, x2:pad.l+iw, y1:Y(v), y2:Y(v), class:"grid", "stroke-width":1}));
+    svg.appendChild(txt(v.toFixed(5).replace(".",","), {x:pad.l-8, y:Y(v)+4, "text-anchor":"end", "font-size":"11"}));
+  });
+  xs.forEach(v => svg.appendChild(txt("B=" + String(v).replace(".",","),
+    {x:lx(v), y:h-pad.b+18, "text-anchor":"middle", "font-size":"11"})));
+  svg.appendChild(el("path", {d:xs.map((v,i)=>`${i?"L":"M"}${lx(v)},${Y(DATA.budget.y)}`).join(" "),
+    fill:"none", stroke:"var(--s2)", "stroke-width":2}));
+  xs.forEach(v => { const c = el("circle", {cx:lx(v), cy:Y(DATA.budget.y), r:5, fill:"var(--s2)",
+      stroke:"var(--paper)", "stroke-width":2});
+    bind(c, `<b>0,000336</b> — khối lượng posterior tại B = ${String(v).replace(".",",")}`);
+    svg.appendChild(c); });
+  svg.appendChild(txt("0,000336 ở mọi ngân sách — biên độ 0,0",
+    {x:pad.l+10, y:Y(DATA.budget.y)-14, "font-size":"12.5", class:"val"}));
+  mount.appendChild(svg);
+})();
+</script>
