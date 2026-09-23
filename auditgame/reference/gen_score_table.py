@@ -61,7 +61,10 @@ byte-identical.  Regenerating is not a cheap way out either: M=800k samples acro
 from __future__ import annotations
 import argparse, json, math, random, statistics, sys, hashlib, datetime, pathlib
 
-PI0 = 0.10                    # per-item prior -- a MODEL CONSTANT, see SPEC SS2.6
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+import costs                  # noqa: E402
+
+PI0 = costs.PI0_WORLD         # DERIVED -- see costs.PI0_WORLD, and W1 of the plan
 N_MAX = 30                    # real n_c <= 20; build out to 30 for headroom
 M = 800_000                   # samples per cell
 SEED = 20260915

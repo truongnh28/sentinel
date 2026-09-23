@@ -34,6 +34,7 @@ posterior.
 """
 from __future__ import annotations
 
+import costs
 import scoring
 
 
@@ -47,7 +48,7 @@ class WindowBelief:
 
     NULL = "null"
 
-    def __init__(self, carriers, H: int, deltas, beta: float = 0.25,
+    def __init__(self, carriers, H: int, deltas, beta: float = costs.BETA_DEFAULT,
                  pi_attack: float = 0.5):
         """`beta` is the drift rate of section 5.4; `pi_attack` the prior that
         an attack exists at all, split evenly over the feasible windows.

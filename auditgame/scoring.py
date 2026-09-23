@@ -26,7 +26,12 @@ NOTATION -- TWO thresholds, two different objects:
 from __future__ import annotations
 import functools, json, math, pathlib
 
-PI0 = 0.10            # per-item prior -- a MODEL CONSTANT, NOT derived from the dataset
+import costs
+
+#: DERIVED, not assigned: one payload among E[n_total] live items, see
+#: costs.PI0_WORLD.  Kept as an import rather than a copy because
+#: reference/score_table.json is generated from this same number.
+PI0 = costs.PI0_WORLD
 ALPHA_TASK = 0.05     # false-positive budget PER TASK (not per carrier)
 
 _TABLE = pathlib.Path(__file__).resolve().parent / "reference" / "score_table.json"
