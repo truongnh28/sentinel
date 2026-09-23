@@ -1,0 +1,64 @@
+{
+  "harm": {
+    "development": {
+      "B1 audit-at-commit": 0.925,
+      "B5 risk-score": 0.975,
+      "B6 two-stage": 1.0,
+      "Sentinel": 0.9,
+      "SentinelW window-belief": 0.775,
+      "SSG-G guarded": 0.925,
+      "SSG-B belief-weighted": 0.95,
+      "B7 minimax-lp": 0.95
+    },
+    "held_out": {
+      "B1 audit-at-commit": 0.925,
+      "B5 risk-score": 0.95,
+      "B6 two-stage": 0.925,
+      "Sentinel": 0.925,
+      "SentinelW window-belief": 0.875,
+      "SSG-G guarded": 0.9,
+      "SSG-B belief-weighted": 0.925,
+      "B7 minimax-lp": 0.925
+    }
+  },
+  "transfer_gap_held_out_minus_development": {
+    "B1 audit-at-commit": 0.0,
+    "B5 risk-score": -0.025,
+    "B6 two-stage": -0.075,
+    "Sentinel": 0.025,
+    "SentinelW window-belief": 0.1,
+    "SSG-G guarded": -0.025,
+    "SSG-B belief-weighted": -0.025,
+    "B7 minimax-lp": -0.025
+  },
+  "gain_vs_b1": {
+    "development": 2.7,
+    "held_out": 0.0
+  },
+  "split": {
+    "library_size": 12,
+    "development": [
+      "half-dormancy",
+      "memory-late",
+      "priciest-carrier",
+      "queue-immediate",
+      "skill-late",
+      "sparse-carrier"
+    ],
+    "held_out": [
+      "branch-max",
+      "cheapest-carrier",
+      "crowded-carrier",
+      "immediate",
+      "max-dormancy",
+      "skill-immediate"
+    ],
+    "note": "6 of 12 rules held out by hash of the name, not 7 of 18 -- the library is not yet the manuscript's size, and the transfer number is quoted on what exists"
+  },
+  "not_comparable_with": "the main grid, which maximises over raw (carrier, Delta) configurations rather than over attacker rules",
+  "provenance": {
+    "grid": "20 workflows, H=8, B=17.95, detector mid, seeds (1, 2)",
+    "date": "2026-09-23",
+    "commit": "8fe7523eb27fbcd3cc170bfb07958d8b66866393"
+  }
+}

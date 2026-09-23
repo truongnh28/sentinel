@@ -131,7 +131,8 @@ def solve_stackelberg_lp(K: int, H: int, B: float, kap: list[float], kc: float,
 
 def solve_remaining_lp(K: int, H: int, t: int, B_rem: float, kap: list[float],
                        kc: float, deltas: tuple[int, ...],
-                       done: dict | None = None):
+                       done: dict | None = None,
+                       weights: dict | None = None):
     """Minimax coverage for the windows STILL OPEN at task t.
 
     Spec: docs/preregistration/TIEN-DANG-KY-Sentinel-SSG.md SS4 ("hieu ung duoi").
@@ -150,6 +151,21 @@ def solve_remaining_lp(K: int, H: int, t: int, B_rem: float, kap: list[float],
     just as live as one already placed.  `max(i, t)` in the lower limit is what
     handles that case; an extra `i < t` filter would silently drop future
     insertions.
+
+    `weights[(k, i, s)]` turns the flat minimax into a BELIEF-WEIGHTED one.
+    The guarantee constraint becomes w * m <= coverage, so a window the defender
+    thinks likely has to be covered MORE to buy the same m, and one it thinks
+    impossible stops consuming budget.  `None` -- the default -- is a uniform
+    weight of 1.0 and reproduces the flat solve EXACTLY, so every number taken
+    before this parameter existed is still reachable.
+
+    WHY WEIGHT THE CONSTRAINT AND NOT THE OBJECTIVE.  Maximising EXPECTED
+    coverage under a belief throws the worst case away entirely: a window the
+    belief happens to be wrong about gets no protection at all, which is the
+    failure mode a Stackelberg defender exists to avoid.  Weighting the
+    constraint keeps a guarantee for EVERY open window and merely buys more of
+    it where the posterior is concentrated.  A wrong belief then costs coverage,
+    not the guarantee.
 
     `done[(k, i, s)]` is the count of audits ALREADY PERFORMED on carrier k at
     some t' in [i, s).  It is a COUNT of realised actions, never a planned
@@ -197,7 +213,8 @@ def solve_remaining_lp(K: int, H: int, t: int, B_rem: float, kap: list[float],
                 for tp in range(max(i, t), s):   # NO `i < t` filter -- see docstring
                     row[k * Hr + (tp - t)] = -1.0
                 row[nU + (s - t)] += -1.0
-                row[im] = 1.0
+                # w * m <= coverage + done.  w = 1.0 is the flat solve.
+                row[im] = float((weights or {}).get((k, i, s), 1.0))
                 A.append(row)
                 b.append(float(done.get((k, i, s), 0)))
 

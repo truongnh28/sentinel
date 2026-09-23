@@ -41,7 +41,7 @@ import runner
 
 POLICIES = ["B1 audit-at-commit", "B5 risk-score", "B6 two-stage",
             "Sentinel", "SentinelW window-belief", "SSG-G guarded",
-            "B7 minimax-lp"]
+            "SSG-B belief-weighted", "B7 minimax-lp"]
 
 
 def gain_vs_b1(row: dict) -> float:

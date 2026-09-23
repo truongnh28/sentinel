@@ -742,7 +742,10 @@ class SSGRecedingGuarded(MinimaxLP):
                 K=len(self._carriers), H=len(self.v) or 8, t=t,
                 B_rem=max(self.budget - self.spent, 0.0), kap=kap,
                 kc=KAPPA_COMMIT, deltas=self.deltas,
-                done=getattr(self, "_done", None))
+                done=getattr(self, "_done", None),
+                # None for SSG-G itself -- the flat solve, unchanged. SSG-B sets
+                # this from the window posterior before delegating here.
+                weights=getattr(self, "_pending_weights", None))
             # SAN: chi nhan nghiem moi khi no KHONG HA bao dam.  n_win == 0 la
             # "khong con gi de bao ve", khac han "phu hoan hao" -- tu choi.
             if n_win and rv and rm >= self._m_open(t) - 1e-12:
@@ -768,6 +771,73 @@ class SSGRecedingGuarded(MinimaxLP):
     _log_audit = SSGReceding._log_audit
 
 
+class SSGBelief(SSGRecedingGuarded):
+    """SSG-B -- SSG-G's solve, with the attacker prior taken from the belief.
+
+    Spec: docs/preregistration/TIEN-DANG-KY-SSG-B-giai-tren-belief.md.
+
+    THE EMPTY CELL THIS FILLS.  Measured on the USD scale at Delta = 2, ranking
+    by L is the exact reverse of ranking by regret across six policies:
+
+        SentinelW  L 0.787  regret 0.3219      <- best average, worst case
+        Sentinel   L 0.865  regret 0.2076
+        B5         L 0.907  regret 0.1433
+        SSG-G      L 0.988  regret 0.0119      <- worst average, best case
+
+    and the cause is nameable. `SSGRecedingGuarded` inherits `MinimaxLP` and
+    reads NO belief: it solves, so it is robust, and it is blind. `SentinelWindow`
+    carries a `WindowBelief` and then weights by hand, mass(c)/kappa(c): it is
+    responsive, and it is routable. Nothing had both.
+
+    SSG-B changes exactly one thing: the LP's per-window guarantee constraint is
+    scaled by that window's posterior, so the solve buys more coverage where the
+    belief is concentrated while still guaranteeing EVERY open window. Nothing
+    else about SSG-G moves -- same guard, same receding horizon, same tau.
+
+    WHAT IS BEING TESTED IS THE FRONTIER, NOT THIS POLICY.  If SSG-B cannot hold
+    regret near SSG-G's while approaching SentinelW's L, then the average-case /
+    worst-case trade-off is a property of the PROBLEM and not a gap in the policy
+    set -- which is a stronger statement than any winning policy would be. The
+    prereg fixes the acceptance bar and it is on HELD-OUT attackers.
+    """
+    SEED_TAG = "ssg_belief"
+    BETA_DRIFT = 0.25
+    belief_state: object = None
+
+    def _window_weights(self, t: int, signals: dict) -> dict:
+        """Posterior mass per (k, iota, sigma), normalised to mean 1.0.
+
+        Mean 1.0 rather than sum 1.0 on purpose: the LP constraint is w * m <=
+        coverage, so scaling all weights scales m and makes the guard's
+        comparison against `_m_open` meaningless. Holding the MEAN at 1.0 keeps
+        m on the same scale as the flat solve, so a guarded re-solve is still
+        comparing like with like.
+        """
+        if self.belief_state is None:
+            import belief
+            self.belief_state = belief.WindowBelief(
+                list(self._carriers), H=len(self.v) or 8, deltas=self.deltas,
+                beta=self.BETA_DRIFT)
+        b = self.belief_state
+        b.update(t, signals or {})
+        raw = {w: b.b.get(w, 0.0) for w in b.windows}
+        if not raw:
+            return {}
+        mean = sum(raw.values()) / len(raw)
+        if mean <= 0:
+            return {}
+        idx = {c: i for i, c in enumerate(self._carriers)}
+        out = {}
+        for (k, i, sg), v in raw.items():
+            if k in idx:
+                out[(idx[k], i, sg)] = v / mean
+        return out
+
+    def choose(self, t: int, retrieved_carriers: list, signals: dict) -> str | None:
+        self._pending_weights = self._window_weights(t, signals)
+        return super().choose(t, retrieved_carriers, signals)
+
+
 class SSGGuardedUpstream(SSGRecedingGuarded):
     """Ban guarded tren lop UPSTREAM -- lop ma tien dang ky goi ten cho phan quyet."""
     DELTAS = (2, 4)
@@ -788,6 +858,7 @@ REGISTRY = {
     "SentinelW window-belief": SentinelWindow,
     "SSG-G guarded":      SSGRecedingGuarded,
     "SSG-GU guarded upstream": SSGGuardedUpstream,
+    "SSG-B belief-weighted": SSGBelief,
     "Sentinel":           Sentinel,
     "C4 blind sentinel":         BlindSentinel,
     "C8 deterministic sentinel": DeterministicSentinel,
