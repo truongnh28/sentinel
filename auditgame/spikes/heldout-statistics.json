@@ -1,0 +1,400 @@
+{
+  "statistics": {
+    "development": {
+      "B1 audit-at-commit": {
+        "worst_case": 0.9812,
+        "mean_over_rules": 0.5033,
+        "rules_defeated": 3.4875,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "B5 risk-score": {
+        "worst_case": 0.9812,
+        "mean_over_rules": 0.4709,
+        "rules_defeated": 3.9625,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "B6 two-stage": {
+        "worst_case": 1.0,
+        "mean_over_rules": 0.5,
+        "rules_defeated": 3.7875,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "Sentinel": {
+        "worst_case": 0.975,
+        "mean_over_rules": 0.332,
+        "rules_defeated": 5.2625,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "SentinelW window-belief": {
+        "worst_case": 0.925,
+        "mean_over_rules": 0.2624,
+        "rules_defeated": 5.925,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "SSG-G guarded": {
+        "worst_case": 0.9625,
+        "mean_over_rules": 0.4313,
+        "rules_defeated": 4.2875,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "SSG-B belief-weighted": {
+        "worst_case": 0.9812,
+        "mean_over_rules": 0.4172,
+        "rules_defeated": 4.475,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "B7 minimax-lp": {
+        "worst_case": 0.975,
+        "mean_over_rules": 0.4308,
+        "rules_defeated": 4.35,
+        "n_rules": 9,
+        "n_workflows": 80
+      }
+    },
+    "held_out": {
+      "B1 audit-at-commit": {
+        "worst_case": 0.9625,
+        "mean_over_rules": 0.4986,
+        "rules_defeated": 3.125,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "B5 risk-score": {
+        "worst_case": 0.975,
+        "mean_over_rules": 0.5235,
+        "rules_defeated": 3.075,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "B6 two-stage": {
+        "worst_case": 0.95,
+        "mean_over_rules": 0.455,
+        "rules_defeated": 3.7625,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "Sentinel": {
+        "worst_case": 0.9313,
+        "mean_over_rules": 0.395,
+        "rules_defeated": 4.2,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "SentinelW window-belief": {
+        "worst_case": 0.8875,
+        "mean_over_rules": 0.3082,
+        "rules_defeated": 4.8625,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "SSG-G guarded": {
+        "worst_case": 0.9812,
+        "mean_over_rules": 0.4477,
+        "rules_defeated": 3.825,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "SSG-B belief-weighted": {
+        "worst_case": 0.9563,
+        "mean_over_rules": 0.4657,
+        "rules_defeated": 3.5875,
+        "n_rules": 9,
+        "n_workflows": 80
+      },
+      "B7 minimax-lp": {
+        "worst_case": 0.9625,
+        "mean_over_rules": 0.455,
+        "rules_defeated": 3.8,
+        "n_rules": 9,
+        "n_workflows": 80
+      }
+    }
+  },
+  "transfer_gap_with_ci": {
+    "B1 audit-at-commit": {
+      "worst": {
+        "held_minus_dev": -0.0187,
+        "ci95": [
+          -0.0563,
+          0.0187
+        ],
+        "separates_from_zero": false
+      },
+      "mean": {
+        "held_minus_dev": -0.0047,
+        "ci95": [
+          -0.0588,
+          0.0494
+        ],
+        "separates_from_zero": false
+      },
+      "defeated": {
+        "held_minus_dev": -0.3625,
+        "ci95": [
+          -0.825,
+          0.1
+        ],
+        "separates_from_zero": false
+      }
+    },
+    "B5 risk-score": {
+      "worst": {
+        "held_minus_dev": -0.0062,
+        "ci95": [
+          -0.0437,
+          0.025
+        ],
+        "separates_from_zero": false
+      },
+      "mean": {
+        "held_minus_dev": 0.0526,
+        "ci95": [
+          -0.0014,
+          0.1067
+        ],
+        "separates_from_zero": false
+      },
+      "defeated": {
+        "held_minus_dev": -0.8875,
+        "ci95": [
+          -1.3625,
+          -0.425
+        ],
+        "separates_from_zero": true
+      }
+    },
+    "B6 two-stage": {
+      "worst": {
+        "held_minus_dev": -0.05,
+        "ci95": [
+          -0.1,
+          -0.0125
+        ],
+        "separates_from_zero": true
+      },
+      "mean": {
+        "held_minus_dev": -0.045,
+        "ci95": [
+          -0.0929,
+          0.0018
+        ],
+        "separates_from_zero": false
+      },
+      "defeated": {
+        "held_minus_dev": -0.025,
+        "ci95": [
+          -0.4375,
+          0.3875
+        ],
+        "separates_from_zero": false
+      }
+    },
+    "Sentinel": {
+      "worst": {
+        "held_minus_dev": -0.0437,
+        "ci95": [
+          -0.1,
+          0.0125
+        ],
+        "separates_from_zero": false
+      },
+      "mean": {
+        "held_minus_dev": 0.063,
+        "ci95": [
+          0.0168,
+          0.1075
+        ],
+        "separates_from_zero": true
+      },
+      "defeated": {
+        "held_minus_dev": -1.0625,
+        "ci95": [
+          -1.4375,
+          -0.6875
+        ],
+        "separates_from_zero": true
+      }
+    },
+    "SentinelW window-belief": {
+      "worst": {
+        "held_minus_dev": -0.0375,
+        "ci95": [
+          -0.1125,
+          0.0312
+        ],
+        "separates_from_zero": false
+      },
+      "mean": {
+        "held_minus_dev": 0.0458,
+        "ci95": [
+          -0.0025,
+          0.0936
+        ],
+        "separates_from_zero": false
+      },
+      "defeated": {
+        "held_minus_dev": -1.0625,
+        "ci95": [
+          -1.5,
+          -0.625
+        ],
+        "separates_from_zero": true
+      }
+    },
+    "SSG-G guarded": {
+      "worst": {
+        "held_minus_dev": 0.0187,
+        "ci95": [
+          -0.0187,
+          0.0625
+        ],
+        "separates_from_zero": false
+      },
+      "mean": {
+        "held_minus_dev": 0.0165,
+        "ci95": [
+          -0.0371,
+          0.0719
+        ],
+        "separates_from_zero": false
+      },
+      "defeated": {
+        "held_minus_dev": -0.4625,
+        "ci95": [
+          -1.0,
+          0.05
+        ],
+        "separates_from_zero": false
+      }
+    },
+    "SSG-B belief-weighted": {
+      "worst": {
+        "held_minus_dev": -0.025,
+        "ci95": [
+          -0.075,
+          0.0187
+        ],
+        "separates_from_zero": false
+      },
+      "mean": {
+        "held_minus_dev": 0.0485,
+        "ci95": [
+          -0.0051,
+          0.1011
+        ],
+        "separates_from_zero": false
+      },
+      "defeated": {
+        "held_minus_dev": -0.8875,
+        "ci95": [
+          -1.3375,
+          -0.45
+        ],
+        "separates_from_zero": true
+      }
+    },
+    "B7 minimax-lp": {
+      "worst": {
+        "held_minus_dev": -0.0125,
+        "ci95": [
+          -0.0625,
+          0.0375
+        ],
+        "separates_from_zero": false
+      },
+      "mean": {
+        "held_minus_dev": 0.0242,
+        "ci95": [
+          -0.0327,
+          0.0812
+        ],
+        "separates_from_zero": false
+      },
+      "defeated": {
+        "held_minus_dev": -0.55,
+        "ci95": [
+          -1.0625,
+          -0.05
+        ],
+        "separates_from_zero": true
+      }
+    }
+  },
+  "why_three_statistics": "worst_case is the manuscript's quantity and it SATURATES at 18 rules -- almost every workflow is compromised by something, so every value lands in 0.88..0.98 and its sign followed the sample size (+0.050 at N=20, -0.050 at N=40, -0.025 at N=80). mean_over_rules and rules_defeated are reported beside it because they do not, not instead of it.",
+  "harm": {
+    "development": {
+      "B1 audit-at-commit": 0.9812,
+      "B5 risk-score": 0.9812,
+      "B6 two-stage": 1.0,
+      "Sentinel": 0.975,
+      "SentinelW window-belief": 0.925,
+      "SSG-G guarded": 0.9625,
+      "SSG-B belief-weighted": 0.9812,
+      "B7 minimax-lp": 0.975
+    },
+    "held_out": {
+      "B1 audit-at-commit": 0.9625,
+      "B5 risk-score": 0.975,
+      "B6 two-stage": 0.95,
+      "Sentinel": 0.9313,
+      "SentinelW window-belief": 0.8875,
+      "SSG-G guarded": 0.9812,
+      "SSG-B belief-weighted": 0.9563,
+      "B7 minimax-lp": 0.9625
+    }
+  },
+  "transfer_gap_held_out_minus_development": {
+    "B1 audit-at-commit": -0.0187,
+    "B5 risk-score": -0.0062,
+    "B6 two-stage": -0.05,
+    "Sentinel": -0.0437,
+    "SentinelW window-belief": -0.0375,
+    "SSG-G guarded": 0.0187,
+    "SSG-B belief-weighted": -0.0249,
+    "B7 minimax-lp": -0.0125
+  },
+  "gain_vs_b1": {
+    "development": 0.63,
+    "held_out": 3.24
+  },
+  "split": {
+    "library_size": 18,
+    "development": [
+      "crowd-seeking",
+      "half-dormancy",
+      "ingress-early",
+      "just-inside-max",
+      "memory-late",
+      "priciest-carrier",
+      "queue-immediate",
+      "skill-late",
+      "sparse-carrier"
+    ],
+    "held_out": [
+      "branch-max",
+      "cheapest-carrier",
+      "cost-aware",
+      "cost-aware-late",
+      "crowded-carrier",
+      "immediate",
+      "max-dormancy",
+      "skill-immediate",
+      "uniform-by-workflow"
+    ],
+    "note": "6 of 12 rules held out by hash of the name, not 7 of 18 -- the library is not yet the manuscript's size, and the transfer number is quoted on what exists"
+  },
+  "saturation_warning": "worst case over 18 rules leaves every harm in 0.88..0.98; the transfer gap's SIGN follows N (+0.050 at 20, -0.050 at 40, -0.025 at 80 workflows). Do not read a direction off this.",
+  "not_comparable_with": "the main grid, which maximises over raw (carrier, Delta) configurations rather than over attacker rules",
+  "provenance": {
+    "grid": "80 workflows, H=8, B=17.95, detector mid, seeds (1, 2)",
+    "date": "2026-09-23",
+    "commit": "c6113511b68938dca1d1eda0b11b76c57357d8e1"
+  }
+}

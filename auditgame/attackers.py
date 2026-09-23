@@ -177,6 +177,75 @@ def development() -> set:
     return {n for n in REGISTRY if not _is_held_out(n)}
 
 
+def per_rule_harm(policy_name, attacker_names, wfs, det, ag, budget, seeds,
+                  setting) -> dict:
+    """{rule -> [harm per workflow]}.  Everything else here is a view of this.
+
+    WHY THE RAW TABLE AND NOT JUST A SUMMARY.  `worst_case_over` takes a max
+    across rules, and with eighteen rules that max saturates: almost every
+    workflow is compromised by SOMETHING whatever the policy does, so every
+    number lands in 0.88..0.98 and the differences are fractions of one
+    workflow.  Measured, SSG-G's transfer gap was +0.050 at N=20, -0.050 at
+    N=40 and -0.025 at N=80 -- the sign followed the sample size.
+
+    Keeping the per-rule harms lets the saturating statistic be reported beside
+    ones that do not saturate, instead of being replaced quietly by a different
+    number under the same name.
+
+    Workflows on which a rule cannot build leave that rule's list (N3): a
+    configuration that could not be constructed is not a defence success.
+    """
+    out: dict = {}
+    for name in sorted(attacker_names):
+        atk = REGISTRY[name]
+        per_wf = []
+        for wf in wfs:
+            ps = atk.plan(wf, random.Random(seed_of(wf.wf_id, name)))
+            if ps is None:
+                continue
+            hs = []
+            for s in seeds:
+                r = runner.paired(wf, ps, policy_name, det, ag, s, budget, setting)
+                if r is not None:
+                    hs.append(r.harm)
+            if hs:
+                per_wf.append(sum(hs) / len(hs))
+        out[name] = per_wf
+    return out
+
+
+def summarise_rules(per_rule: dict) -> dict:
+    """Three statistics over the same table, two of which do not saturate.
+
+      worst_case    max over rules, averaged over workflows -- the manuscript's
+                    quantity, kept so the comparison is like for like, and
+                    SATURATING at eighteen rules.
+      mean_over_rules   average over rules. A policy that stops most attacks
+                    scores well even when one rule always gets through, which is
+                    exactly the distinction the max destroys.
+      rules_defeated   mean number of rules scoring harm 0 on a workflow. Runs
+                    from 0 to |rules| and cannot saturate at the top the way a
+                    harm in [0,1] does.
+    """
+    names = sorted(per_rule)
+    if not names:
+        return {}
+    n_wf = max((len(v) for v in per_rule.values()), default=0)
+    worst, means, beaten = [], [], []
+    for i in range(n_wf):
+        vals = [per_rule[n][i] for n in names if i < len(per_rule[n])]
+        if not vals:
+            continue
+        worst.append(max(vals))
+        means.append(sum(vals) / len(vals))
+        beaten.append(sum(1 for v in vals if v <= 0.0))
+    f = lambda xs: sum(xs) / len(xs) if xs else float("nan")
+    return {"worst_case": f(worst), "mean_over_rules": f(means),
+            "rules_defeated": f(beaten), "n_rules": len(names),
+            "n_workflows": len(worst),
+            "per_workflow": {"worst": worst, "mean": means, "defeated": beaten}}
+
+
 def worst_case_over(policy_name, attacker_names, wfs, det, ag, budget, seeds,
                     setting) -> float:
     """Worst-case harm over a SET OF ATTACKER POLICIES, averaged across workflows.

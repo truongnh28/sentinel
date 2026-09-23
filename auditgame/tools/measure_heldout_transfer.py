@@ -76,13 +76,19 @@ def main() -> int:
     dev, held = attackers.development(), attackers.held_out()
 
     out = {"development": {}, "held_out": {}}
+    raw = {"development": {}, "held_out": {}}
     for split, names in (("development", dev), ("held_out", held)):
         for nm in POLICIES:
             runner.reset_survivor_cache()
-            h = attackers.worst_case_over(nm, names, wfs, det, ag,
-                                          a.budget, seeds, a.detector)
-            out[split][nm] = round(h, 4)
-            print(f"{split:12} {nm:26} harm {h:.4f}", file=sys.stderr)
+            table = attackers.per_rule_harm(nm, names, wfs, det, ag,
+                                            a.budget, seeds, a.detector)
+            summ = attackers.summarise_rules(table)
+            raw[split][nm] = summ
+            out[split][nm] = round(summ["worst_case"], 4)
+            print(f"{split:12} {nm:26} worst {summ['worst_case']:.4f}  "
+                  f"mean {summ['mean_over_rules']:.4f}  "
+                  f"defeated {summ['rules_defeated']:.2f}/{summ['n_rules']}",
+                  file=sys.stderr)
 
     # The transfer gap: how much worse a policy does on rules it was never tuned
     # against.  Positive means the held-out rules hurt more, which is the
@@ -90,7 +96,36 @@ def main() -> int:
     transfer = {nm: round(out["held_out"][nm] - out["development"][nm], 4)
                 for nm in POLICIES}
 
+    # CI95 on the transfer gap, RESAMPLED BY WORKFLOW -- the unit, because cases
+    # from one workflow share a task chain. Without it this table repeats the
+    # mistake it was written to correct: reading a direction off noise.
+    gaps = {}
+    for nm in POLICIES:
+        d_, h_ = raw["development"][nm], raw["held_out"][nm]
+        gaps[nm] = {}
+        for stat in ("worst", "mean", "defeated"):
+            a_, b_ = h_["per_workflow"][stat], d_["per_workflow"][stat]
+            k = min(len(a_), len(b_))
+            lo, hi = runner.bootstrap_paired(a_[:k], b_[:k])
+            gaps[nm][stat] = {
+                "held_minus_dev": round(sum(a_[:k]) / k - sum(b_[:k]) / k, 4),
+                "ci95": [round(lo, 4), round(hi, 4)],
+                "separates_from_zero": not (lo <= 0.0 <= hi),
+            }
+
     print(json.dumps({
+        "statistics": {
+            split: {nm: {k: round(v, 4) for k, v in raw[split][nm].items()
+                         if k != "per_workflow"} for nm in POLICIES}
+            for split in raw},
+        "transfer_gap_with_ci": gaps,
+        "why_three_statistics": (
+            "worst_case is the manuscript's quantity and it SATURATES at 18 "
+            "rules -- almost every workflow is compromised by something, so "
+            "every value lands in 0.88..0.98 and its sign followed the sample "
+            "size (+0.050 at N=20, -0.050 at N=40, -0.025 at N=80). "
+            "mean_over_rules and rules_defeated are reported beside it because "
+            "they do not, not instead of it."),
         "harm": out,
         "transfer_gap_held_out_minus_development": transfer,
         "gain_vs_b1": {s: round(gain_vs_b1(out[s]), 2) for s in out},
