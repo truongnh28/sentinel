@@ -1,0 +1,334 @@
+{
+  "lambda_T": 0.5,
+  "lambda_Q": 0.5486,
+  "ratio_source": "measured, spikes/lambda-anchors.json",
+  "cells": {
+    "weak/D0": {
+      "L": {
+        "B1 audit-at-commit": 1.0354,
+        "B5 risk-score": 1.2363,
+        "B6 two-stage": 1.1563,
+        "Sentinel": 1.8324,
+        "SentinelW window-belief": 1.6583,
+        "SSG-G guarded": 1.0792,
+        "SSG-B belief-weighted": 1.174,
+        "B7 minimax-lp": 1.0542
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.9833,
+        "B5 risk-score": 0.9917,
+        "B6 two-stage": 0.9917,
+        "Sentinel": 0.9917,
+        "SentinelW window-belief": 0.9833,
+        "SSG-G guarded": 0.9792,
+        "SSG-B belief-weighted": 0.9708,
+        "B7 minimax-lp": 0.9667
+      },
+      "best": "B1 audit-at-commit",
+      "worst": "Sentinel"
+    },
+    "weak/D1": {
+      "L": {
+        "B1 audit-at-commit": 1.0188,
+        "B5 risk-score": 1.1922,
+        "B6 two-stage": 1.2161,
+        "Sentinel": 1.8067,
+        "SentinelW window-belief": 1.5987,
+        "SSG-G guarded": 1.0521,
+        "SSG-B belief-weighted": 1.0708,
+        "B7 minimax-lp": 1.0167
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.9875,
+        "B5 risk-score": 0.975,
+        "B6 two-stage": 0.9875,
+        "Sentinel": 0.9583,
+        "SentinelW window-belief": 0.9167,
+        "SSG-G guarded": 0.9667,
+        "SSG-B belief-weighted": 0.9542,
+        "B7 minimax-lp": 0.9417
+      },
+      "best": "B7 minimax-lp",
+      "worst": "Sentinel"
+    },
+    "weak/D2": {
+      "L": {
+        "B1 audit-at-commit": 1.0354,
+        "B5 risk-score": 1.1018,
+        "B6 two-stage": 1.063,
+        "Sentinel": 1.7153,
+        "SentinelW window-belief": 1.5197,
+        "SSG-G guarded": 1.0125,
+        "SSG-B belief-weighted": 1.0436,
+        "B7 minimax-lp": 1.0125
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.975,
+        "B5 risk-score": 0.9167,
+        "B6 two-stage": 0.9167,
+        "Sentinel": 0.7958,
+        "SentinelW window-belief": 0.7833,
+        "SSG-G guarded": 0.9208,
+        "SSG-B belief-weighted": 0.9,
+        "B7 minimax-lp": 0.925
+      },
+      "best": "SSG-G guarded",
+      "worst": "Sentinel"
+    },
+    "weak/D4": {
+      "L": {
+        "B1 audit-at-commit": 0.8649,
+        "B5 risk-score": 0.8501,
+        "B6 two-stage": 0.9644,
+        "Sentinel": 1.4895,
+        "SentinelW window-belief": 1.342,
+        "SSG-G guarded": 0.786,
+        "SSG-B belief-weighted": 0.818,
+        "B7 minimax-lp": 0.8581
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.7793,
+        "B5 risk-score": 0.7117,
+        "B6 two-stage": 0.7568,
+        "Sentinel": 0.5856,
+        "SentinelW window-belief": 0.6306,
+        "SSG-G guarded": 0.6937,
+        "SSG-B belief-weighted": 0.7072,
+        "B7 minimax-lp": 0.7297
+      },
+      "best": "SSG-G guarded",
+      "worst": "Sentinel"
+    },
+    "mid/D0": {
+      "L": {
+        "B1 audit-at-commit": 1.0083,
+        "B5 risk-score": 1.2774,
+        "B6 two-stage": 1.1608,
+        "Sentinel": 1.5732,
+        "SentinelW window-belief": 1.4055,
+        "SSG-G guarded": 0.9521,
+        "SSG-B belief-weighted": 1.2578,
+        "B7 minimax-lp": 1.0125
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.9833,
+        "B5 risk-score": 0.9917,
+        "B6 two-stage": 0.9917,
+        "Sentinel": 0.9833,
+        "SentinelW window-belief": 0.9833,
+        "SSG-G guarded": 0.9083,
+        "SSG-B belief-weighted": 0.9792,
+        "B7 minimax-lp": 0.9583
+      },
+      "best": "SSG-G guarded",
+      "worst": "Sentinel"
+    },
+    "mid/D1": {
+      "L": {
+        "B1 audit-at-commit": 1.0042,
+        "B5 risk-score": 1.0709,
+        "B6 two-stage": 1.1198,
+        "Sentinel": 1.4425,
+        "SentinelW window-belief": 1.2838,
+        "SSG-G guarded": 1.0125,
+        "SSG-B belief-weighted": 1.1555,
+        "B7 minimax-lp": 0.9833
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.9875,
+        "B5 risk-score": 0.8583,
+        "B6 two-stage": 0.9667,
+        "Sentinel": 0.9042,
+        "SentinelW window-belief": 0.8625,
+        "SSG-G guarded": 0.9583,
+        "SSG-B belief-weighted": 0.9417,
+        "B7 minimax-lp": 0.9417
+      },
+      "best": "B7 minimax-lp",
+      "worst": "Sentinel"
+    },
+    "mid/D2": {
+      "L": {
+        "B1 audit-at-commit": 1.0125,
+        "B5 risk-score": 0.9982,
+        "B6 two-stage": 1.0447,
+        "Sentinel": 1.2604,
+        "SentinelW window-belief": 1.1536,
+        "SSG-G guarded": 0.9542,
+        "SSG-B belief-weighted": 1.0391,
+        "B7 minimax-lp": 0.9708
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.975,
+        "B5 risk-score": 0.7833,
+        "B6 two-stage": 0.9167,
+        "Sentinel": 0.6583,
+        "SentinelW window-belief": 0.7,
+        "SSG-G guarded": 0.8875,
+        "SSG-B belief-weighted": 0.7917,
+        "B7 minimax-lp": 0.9125
+      },
+      "best": "SSG-G guarded",
+      "worst": "Sentinel"
+    },
+    "mid/D4": {
+      "L": {
+        "B1 audit-at-commit": 0.8243,
+        "B5 risk-score": 0.8064,
+        "B6 two-stage": 0.9372,
+        "Sentinel": 0.9646,
+        "SentinelW window-belief": 0.9301,
+        "SSG-G guarded": 0.7432,
+        "SSG-B belief-weighted": 0.8445,
+        "B7 minimax-lp": 0.795
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.7793,
+        "B5 risk-score": 0.6532,
+        "B6 two-stage": 0.7568,
+        "Sentinel": 0.3919,
+        "SentinelW window-belief": 0.4865,
+        "SSG-G guarded": 0.6937,
+        "SSG-B belief-weighted": 0.6532,
+        "B7 minimax-lp": 0.7297
+      },
+      "best": "SSG-G guarded",
+      "worst": "Sentinel"
+    },
+    "strong/D0": {
+      "L": {
+        "B1 audit-at-commit": 0.9729,
+        "B5 risk-score": 1.218,
+        "B6 two-stage": 1.0717,
+        "Sentinel": 1.2521,
+        "SentinelW window-belief": 1.229,
+        "SSG-G guarded": 0.9312,
+        "SSG-B belief-weighted": 1.1815,
+        "B7 minimax-lp": 0.9438
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.9667,
+        "B5 risk-score": 0.9917,
+        "B6 two-stage": 0.9917,
+        "Sentinel": 0.9833,
+        "SentinelW window-belief": 0.9833,
+        "SSG-G guarded": 0.9042,
+        "SSG-B belief-weighted": 0.9833,
+        "B7 minimax-lp": 0.925
+      },
+      "best": "SSG-G guarded",
+      "worst": "Sentinel"
+    },
+    "strong/D1": {
+      "L": {
+        "B1 audit-at-commit": 0.9979,
+        "B5 risk-score": 0.862,
+        "B6 two-stage": 1.0232,
+        "Sentinel": 1.162,
+        "SentinelW window-belief": 1.0802,
+        "SSG-G guarded": 0.975,
+        "SSG-B belief-weighted": 1.0414,
+        "B7 minimax-lp": 0.9375
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.9875,
+        "B5 risk-score": 0.6792,
+        "B6 two-stage": 0.95,
+        "Sentinel": 0.875,
+        "SentinelW window-belief": 0.8,
+        "SSG-G guarded": 0.95,
+        "SSG-B belief-weighted": 0.8083,
+        "B7 minimax-lp": 0.9333
+      },
+      "best": "B5 risk-score",
+      "worst": "Sentinel"
+    },
+    "strong/D2": {
+      "L": {
+        "B1 audit-at-commit": 0.9979,
+        "B5 risk-score": 0.6522,
+        "B6 two-stage": 0.9682,
+        "Sentinel": 0.8325,
+        "SentinelW window-belief": 0.9185,
+        "SSG-G guarded": 0.9125,
+        "SSG-B belief-weighted": 0.8625,
+        "B7 minimax-lp": 0.9354
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.975,
+        "B5 risk-score": 0.5333,
+        "B6 two-stage": 0.9042,
+        "Sentinel": 0.5542,
+        "SentinelW window-belief": 0.6417,
+        "SSG-G guarded": 0.8875,
+        "SSG-B belief-weighted": 0.6417,
+        "B7 minimax-lp": 0.9125
+      },
+      "best": "B5 risk-score",
+      "worst": "B1 audit-at-commit"
+    },
+    "strong/D4": {
+      "L": {
+        "B1 audit-at-commit": 0.8041,
+        "B5 risk-score": 0.5608,
+        "B6 two-stage": 0.8655,
+        "Sentinel": 0.6195,
+        "SentinelW window-belief": 0.5844,
+        "SSG-G guarded": 0.714,
+        "SSG-B belief-weighted": 0.6819,
+        "B7 minimax-lp": 0.768
+      },
+      "harm": {
+        "B1 audit-at-commit": 0.7793,
+        "B5 risk-score": 0.4595,
+        "B6 two-stage": 0.7568,
+        "Sentinel": 0.2883,
+        "SentinelW window-belief": 0.3559,
+        "SSG-G guarded": 0.6892,
+        "SSG-B belief-weighted": 0.536,
+        "B7 minimax-lp": 0.7297
+      },
+      "best": "B5 risk-score",
+      "worst": "B6 two-stage"
+    }
+  },
+  "regret": {
+    "B1 audit-at-commit": 0.0179,
+    "B5 risk-score": 0.1433,
+    "B6 two-stage": 0.2219,
+    "Sentinel": 0.2076,
+    "SentinelW window-belief": 0.3219,
+    "SSG-G guarded": 0.0119,
+    "SSG-B belief-weighted": 0.1416,
+    "B7 minimax-lp": 0.0254
+  },
+  "regret_source": "spikes/exploitability-ssgb.json, lambda cell 3",
+  "spearman_L_vs_regret": {
+    "weak/D0": 0.738,
+    "weak/D1": 0.833,
+    "weak/D2": 0.81,
+    "weak/D4": 0.714,
+    "mid/D0": 0.81,
+    "mid/D1": 0.738,
+    "mid/D2": 0.81,
+    "mid/D4": 0.786,
+    "strong/D0": 0.786,
+    "strong/D1": 0.548,
+    "strong/D2": -0.143,
+    "strong/D4": -0.333
+  },
+  "summary": {
+    "cells": 12,
+    "mean": 0.591,
+    "min": -0.333,
+    "max": 0.833,
+    "cells_with_strong_inversion": 0
+  },
+  "reading": "Spearman near -1 in a cell means ranking by L is the reverse of ranking by regret there -- the frontier. Near 0 means no trade-off in that cell. Reported per cell and not pooled: a mean would average a regime where the law holds with one where it does not.",
+  "caveat": "regret is measured ONCE, on the declared attacker class over deltas (0,2,4), so it does not vary by cell. The correlation therefore asks whether each cell's L ordering matches one fixed robustness ordering -- which is the question -- not whether both move together.",
+  "provenance": {
+    "grid": "40 workflows, H=8, seeds (1, 2, 3), USD scale, measured eta_Q, B=0.0158792",
+    "date": "2026-09-23",
+    "commit": "07e660c05fabed1385b1003a88ba5fd94b3e9f27"
+  }
+}
