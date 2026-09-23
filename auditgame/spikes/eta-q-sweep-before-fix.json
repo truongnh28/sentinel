@@ -1,0 +1,961 @@
+{
+  "generated": "2026-09-24T00:15:05",
+  "commit": "0468bc5",
+  "setup": {
+    "n": 20,
+    "H": 8,
+    "seeds": 2,
+    "delta": 2,
+    "detector": "mid",
+    "budget": 0.01587921107142857,
+    "kappa_bar": 0.0015481124999999999,
+    "scale": "usd",
+    "lambda_Q": 0.54865,
+    "lambda_T": 0.5
+  },
+  "derived_thresholds": {
+    "one_quarantine_is_one_task_share": 1.2821,
+    "one_quarantine_is_the_whole_budget": 10.2571
+  },
+  "legacy_r": 1.1429,
+  "measured_r": 61.5192,
+  "curve": [
+    {
+      "r": 1.143,
+      "eta_q": 0.0017694925875,
+      "quarantine_over_budget": 0.1114,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 2.1015,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 3.6432
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.675,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 0.9
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 102,
+          "false": 248,
+          "total": 350,
+          "per_episode": 3.4314
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 40,
+          "false": 510,
+          "total": 550,
+          "per_episode": 5.3922
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "B5 risk-score",
+        "B6 two-stage",
+        "Sentinel",
+        "SentinelW window-belief",
+        "NC1 quarantine-everything"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 1390
+    },
+    {
+      "r": 1.282,
+      "eta_q": 0.001984680225,
+      "quarantine_over_budget": 0.125,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.9369,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 3.6432
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.675,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 0.9
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 96,
+          "false": 221,
+          "total": 317,
+          "per_episode": 3.1078
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 40,
+          "false": 510,
+          "total": 550,
+          "per_episode": 5.3922
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "B5 risk-score",
+        "B6 two-stage",
+        "Sentinel",
+        "SentinelW window-belief",
+        "NC1 quarantine-everything"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 1357
+    },
+    {
+      "r": 2.0,
+      "eta_q": 0.0030962249999999998,
+      "quarantine_over_budget": 0.195,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.6214,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 2.621
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.675,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 0.975
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 91,
+          "false": 148,
+          "total": 239,
+          "per_episode": 2.3431
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 28,
+          "false": 306,
+          "total": 334,
+          "per_episode": 3.2745
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "B5 risk-score",
+        "B6 two-stage",
+        "Sentinel",
+        "SentinelW window-belief",
+        "NC1 quarantine-everything"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 1063
+    },
+    {
+      "r": 4.0,
+      "eta_q": 0.0061924499999999995,
+      "quarantine_over_budget": 0.39,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.3697,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 1.0
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.725,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 1.0
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 86,
+          "false": 106,
+          "total": 192,
+          "per_episode": 1.8824
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "NC1 quarantine-everything",
+        "B5 risk-score",
+        "B6 two-stage",
+        "SentinelW window-belief",
+        "Sentinel"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 682
+    },
+    {
+      "r": 6.0,
+      "eta_q": 0.009288675,
+      "quarantine_over_budget": 0.585,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.2301,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 1.0
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.75,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 1.0
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 82,
+          "false": 90,
+          "total": 172,
+          "per_episode": 1.6863
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "NC1 quarantine-everything",
+        "B5 risk-score",
+        "B6 two-stage",
+        "SentinelW window-belief",
+        "Sentinel"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 662
+    },
+    {
+      "r": 8.0,
+      "eta_q": 0.012384899999999999,
+      "quarantine_over_budget": 0.7799,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.2599,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 1.0
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.725,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 1.0
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 83,
+          "false": 97,
+          "total": 180,
+          "per_episode": 1.7647
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "NC1 quarantine-everything",
+        "B5 risk-score",
+        "B6 two-stage",
+        "SentinelW window-belief",
+        "Sentinel"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 670
+    },
+    {
+      "r": 10.257,
+      "eta_q": 0.0158789899125,
+      "quarantine_over_budget": 1.0,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.1252,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 1.0
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.7,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 1.0
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 83,
+          "false": 85,
+          "total": 168,
+          "per_episode": 1.6471
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "NC1 quarantine-everything",
+        "B5 risk-score",
+        "SentinelW window-belief",
+        "B6 two-stage",
+        "Sentinel"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 658
+    },
+    {
+      "r": 14.0,
+      "eta_q": 0.021673574999999997,
+      "quarantine_over_budget": 1.3649,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.1801,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 1.0
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.7,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 1.0
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 83,
+          "false": 93,
+          "total": 176,
+          "per_episode": 1.7255
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "NC1 quarantine-everything",
+        "B5 risk-score",
+        "SentinelW window-belief",
+        "B6 two-stage",
+        "Sentinel"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 666
+    },
+    {
+      "r": 20.0,
+      "eta_q": 0.030962249999999997,
+      "quarantine_over_budget": 1.9499,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.1801,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 1.0
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.7,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 1.0
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 83,
+          "false": 93,
+          "total": 176,
+          "per_episode": 1.7255
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "NC1 quarantine-everything",
+        "B5 risk-score",
+        "SentinelW window-belief",
+        "B6 two-stage",
+        "Sentinel"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 666
+    },
+    {
+      "r": 32.0,
+      "eta_q": 0.049539599999999996,
+      "quarantine_over_budget": 3.1198,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.1801,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 1.0
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.7,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 1.0
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 83,
+          "false": 93,
+          "total": 176,
+          "per_episode": 1.7255
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "NC1 quarantine-everything",
+        "B5 risk-score",
+        "SentinelW window-belief",
+        "B6 two-stage",
+        "Sentinel"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 666
+    },
+    {
+      "r": 61.519,
+      "eta_q": 0.09523833288749999,
+      "quarantine_over_budget": 5.9977,
+      "L": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 1.0533,
+        "B6 two-stage": 1.192,
+        "Sentinel": 1.3809,
+        "SentinelW window-belief": 1.1801,
+        "SSG-G guarded": 0.9875,
+        "NC1 quarantine-everything": 1.0
+      },
+      "harm": {
+        "B1 audit-at-commit": 1.0,
+        "B5 risk-score": 0.875,
+        "B6 two-stage": 1.0,
+        "Sentinel": 0.725,
+        "SentinelW window-belief": 0.7,
+        "SSG-G guarded": 0.9,
+        "NC1 quarantine-everything": 1.0
+      },
+      "quarantines": {
+        "B1 audit-at-commit": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "B5 risk-score": {
+          "episodes": 102,
+          "true": 95,
+          "false": 29,
+          "total": 124,
+          "per_episode": 1.2157
+        },
+        "B6 two-stage": {
+          "episodes": 102,
+          "true": 85,
+          "false": 35,
+          "total": 120,
+          "per_episode": 1.1765
+        },
+        "Sentinel": {
+          "episodes": 102,
+          "true": 125,
+          "false": 121,
+          "total": 246,
+          "per_episode": 2.4118
+        },
+        "SentinelW window-belief": {
+          "episodes": 102,
+          "true": 83,
+          "false": 93,
+          "total": 176,
+          "per_episode": 1.7255
+        },
+        "SSG-G guarded": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        },
+        "NC1 quarantine-everything": {
+          "episodes": 102,
+          "true": 0,
+          "false": 0,
+          "total": 0,
+          "per_episode": 0.0
+        }
+      },
+      "ranking": [
+        "SSG-G guarded",
+        "B1 audit-at-commit",
+        "NC1 quarantine-everything",
+        "B5 risk-score",
+        "SentinelW window-belief",
+        "B6 two-stage",
+        "Sentinel"
+      ],
+      "winner": "SSG-G guarded",
+      "any_quarantine": 666
+    }
+  ],
+  "winner_flips": [],
+  "last_r_with_a_quarantine": 61.519
+}
