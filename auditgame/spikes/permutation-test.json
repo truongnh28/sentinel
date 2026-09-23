@@ -1,0 +1,68 @@
+{
+  "per_delta": {
+    "0": {
+      "statistic": "median held-out AUC over the declared split set",
+      "observed": 0.5247,
+      "n_permutations": 200,
+      "null_mean": 0.5058,
+      "null_p50": 0.5018,
+      "null_p95": 0.5641,
+      "null_max": 0.5901,
+      "p_value": 0.2836,
+      "reading": "This gate certifies NON-separability, so a HIGH p is the wanted outcome: the labels explain nothing the shuffle cannot. A low p says the corpus is separable and the gate has failed, whatever the AUC ceiling says.",
+      "n_poisoned": 80,
+      "n_benign": 320,
+      "parametric": {
+        "auc_median": 0.5247,
+        "ci_hi_mean": 0.6127,
+        "ceiling": 0.56,
+        "clears": "5/20 splits"
+      }
+    },
+    "2": {
+      "statistic": "median held-out AUC over the declared split set",
+      "observed": 0.5359,
+      "n_permutations": 200,
+      "null_mean": 0.5092,
+      "null_p50": 0.5055,
+      "null_p95": 0.5679,
+      "null_max": 0.6129,
+      "p_value": 0.2537,
+      "reading": "This gate certifies NON-separability, so a HIGH p is the wanted outcome: the labels explain nothing the shuffle cannot. A low p says the corpus is separable and the gate has failed, whatever the AUC ceiling says.",
+      "n_poisoned": 80,
+      "n_benign": 320,
+      "parametric": {
+        "auc_median": 0.5359,
+        "ci_hi_mean": 0.6504,
+        "ceiling": 0.56,
+        "clears": "0/20 splits"
+      }
+    },
+    "4": {
+      "statistic": "median held-out AUC over the declared split set",
+      "observed": 0.6077,
+      "n_permutations": 200,
+      "null_mean": 0.508,
+      "null_p50": 0.507,
+      "null_p95": 0.5721,
+      "null_max": 0.616,
+      "p_value": 0.01,
+      "reading": "This gate certifies NON-separability, so a HIGH p is the wanted outcome: the labels explain nothing the shuffle cannot. A low p says the corpus is separable and the gate has failed, whatever the AUC ceiling says.",
+      "n_poisoned": 80,
+      "n_benign": 320,
+      "parametric": {
+        "auc_median": 0.6077,
+        "ci_hi_mean": 0.7043,
+        "ceiling": 0.56,
+        "clears": "1/20 splits"
+      }
+    }
+  },
+  "provenance": {
+    "events_per_class": 80,
+    "permutations": 200,
+    "split_seeds": 20,
+    "date": "2026-09-23",
+    "commit": "617167544bd9d04be9799b9d5931b63d988febf2"
+  }
+}

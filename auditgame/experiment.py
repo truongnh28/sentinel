@@ -12,7 +12,7 @@ not.
 """
 from __future__ import annotations
 import argparse, json, random, sys
-import build, agent, datasets, detector, metrics, oracle, retrieval, runner, scoring
+import build, agent, datasets, detector, freeze, metrics, oracle, retrieval, runner, scoring
 import policies as P
 
 def gain(row):
@@ -60,6 +60,10 @@ def sweep_delta(wfs, deltas, det_name, budget, seeds, carriers, chi=None,
         for d in deltas:
             row = {}
             for name in P.REGISTRY:
+                # Refuses only once a freeze EXISTS; before that this is a no-op.
+                # A policy added after the freeze would otherwise be reported
+                # beside frozen numbers and look identical to them.
+                freeze.require_frozen(name)
                 runner.reset_survivor_cache()
                 row[name] = runner.worst_case(name, wfs, (d,), carriers, det, ag,
                                               budget, seeds, det_name)
@@ -215,6 +219,12 @@ def main():
     oracle_scope = oracle.default_oracle().scope()
     for line in scope_header(scope, oracle_scope):
         print(line)
+    # Stage 8: a results table has to say whether it is pinned to a
+    # configuration.  Three states, and the difference matters: no freeze at all,
+    # a clean one, or a freeze the tree has drifted from.  Printed in the header
+    # rather than left to a reader to check, because the state nobody checks is
+    # the one that goes wrong.
+    print(freeze.header_line())
     if grouping is not None:
         # The step-4 drop belongs beside the feasibility numbers: "N workflows"
         # means nothing without how many were thrown out to get there.
