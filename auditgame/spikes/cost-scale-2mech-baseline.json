@@ -1,0 +1,420 @@
+{
+  "comparison": {
+    "B1 audit-at-commit": {
+      "draft": {
+        "harm": 0.9,
+        "L": 0.9875,
+        "q_false": 0.0,
+        "t_lost": 0.175,
+        "spent_pct": 91.4,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 1.0,
+        "L": 1.0,
+        "q_false": 0.0,
+        "t_lost": 0.0,
+        "spent_pct": 78.0,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 1.0,
+        "L": 1.0,
+        "q_false": 0.0,
+        "t_lost": 0.0,
+        "spent_pct": 78.0,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.375,
+        "L": 0.5125,
+        "q_false": 0.0,
+        "t_lost": 0.275,
+        "spent_pct": 97.3,
+        "n_feasible": 20
+      }
+    },
+    "B5 risk-score": {
+      "draft": {
+        "harm": 0.875,
+        "L": 0.9075,
+        "q_false": 0.325,
+        "t_lost": 0.0,
+        "spent_pct": 7.1,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 0.875,
+        "L": 0.9075,
+        "q_false": 0.325,
+        "t_lost": 0.0,
+        "spent_pct": 6.4,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.875,
+        "L": 0.9075,
+        "q_false": 0.325,
+        "t_lost": 0.0,
+        "spent_pct": 6.4,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.875,
+        "L": 0.9075,
+        "q_false": 0.325,
+        "t_lost": 0.0,
+        "spent_pct": 6.6,
+        "n_feasible": 20
+      }
+    },
+    "B6 two-stage": {
+      "draft": {
+        "harm": 0.975,
+        "L": 1.0675,
+        "q_false": 0.925,
+        "t_lost": 0.0,
+        "spent_pct": 24.0,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 1.0,
+        "L": 1.035,
+        "q_false": 0.35,
+        "t_lost": 0.0,
+        "spent_pct": 28.6,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 1.0,
+        "L": 1.035,
+        "q_false": 0.35,
+        "t_lost": 0.0,
+        "spent_pct": 28.6,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 1.0,
+        "L": 1.035,
+        "q_false": 0.35,
+        "t_lost": 0.0,
+        "spent_pct": 34.4,
+        "n_feasible": 20
+      }
+    },
+    "Sentinel": {
+      "draft": {
+        "harm": 0.8,
+        "L": 0.92,
+        "q_false": 1.2,
+        "t_lost": 0.0,
+        "spent_pct": 50.1,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 0.85,
+        "L": 0.955,
+        "q_false": 1.05,
+        "t_lost": 0.0,
+        "spent_pct": 52.7,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.85,
+        "L": 0.955,
+        "q_false": 1.05,
+        "t_lost": 0.0,
+        "spent_pct": 52.7,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.775,
+        "L": 0.885,
+        "q_false": 1.1,
+        "t_lost": 0.0,
+        "spent_pct": 57.9,
+        "n_feasible": 20
+      }
+    },
+    "SentinelW window-belief": {
+      "draft": {
+        "harm": 0.6,
+        "L": 0.7825,
+        "q_false": 1.825,
+        "t_lost": 0.0,
+        "spent_pct": 94.8,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 0.7,
+        "L": 0.7875,
+        "q_false": 0.875,
+        "t_lost": 0.0,
+        "spent_pct": 91.6,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.675,
+        "L": 0.935,
+        "q_false": 2.6,
+        "t_lost": 0.0,
+        "spent_pct": 92.8,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.525,
+        "L": 0.705,
+        "q_false": 0.925,
+        "t_lost": 0.175,
+        "spent_pct": 91.1,
+        "n_feasible": 20
+      }
+    },
+    "SSG-G guarded": {
+      "draft": {
+        "harm": 0.75,
+        "L": 0.8875,
+        "q_false": 0.0,
+        "t_lost": 0.275,
+        "spent_pct": 89.1,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 0.9,
+        "L": 0.9875,
+        "q_false": 0.0,
+        "t_lost": 0.175,
+        "spent_pct": 74.1,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.9,
+        "L": 0.9875,
+        "q_false": 0.0,
+        "t_lost": 0.175,
+        "spent_pct": 74.1,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.525,
+        "L": 0.7125,
+        "q_false": 0.0,
+        "t_lost": 0.375,
+        "spent_pct": 95.2,
+        "n_feasible": 20
+      }
+    },
+    "B7 minimax-lp": {
+      "draft": {
+        "harm": 0.95,
+        "L": 1.0375,
+        "q_false": 0.0,
+        "t_lost": 0.175,
+        "spent_pct": 87.4,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 1.0,
+        "L": 1.0375,
+        "q_false": 0.0,
+        "t_lost": 0.075,
+        "spent_pct": 64.3,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 1.0,
+        "L": 1.0375,
+        "q_false": 0.0,
+        "t_lost": 0.075,
+        "spent_pct": 64.3,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 0.5,
+        "L": 0.625,
+        "q_false": 0.0,
+        "t_lost": 0.25,
+        "spent_pct": 96.3,
+        "n_feasible": 20
+      }
+    },
+    "NC1 quarantine-everything": {
+      "draft": {
+        "harm": 0.9,
+        "L": 1.4,
+        "q_false": 5.0,
+        "t_lost": 0.0,
+        "spent_pct": 89.1,
+        "n_feasible": 20
+      },
+      "usd": {
+        "harm": 1.0,
+        "L": 1.0,
+        "q_false": 0.0,
+        "t_lost": 0.0,
+        "spent_pct": 0.0,
+        "n_feasible": 20
+      },
+      "usd-legacy-etaQ": {
+        "harm": 0.9,
+        "L": 1.4,
+        "q_false": 5.0,
+        "t_lost": 0.0,
+        "spent_pct": 89.1,
+        "n_feasible": 20
+      },
+      "cpu": {
+        "harm": 1.0,
+        "L": 1.0,
+        "q_false": 0.0,
+        "t_lost": 0.0,
+        "spent_pct": 0.0,
+        "n_feasible": 20
+      }
+    }
+  },
+  "commit_price_sweep": null,
+  "ranking_by_L": {
+    "draft": [
+      "SentinelW window-belief",
+      "SSG-G guarded",
+      "B5 risk-score",
+      "Sentinel",
+      "B1 audit-at-commit",
+      "B7 minimax-lp",
+      "B6 two-stage",
+      "NC1 quarantine-everything"
+    ],
+    "usd": [
+      "SentinelW window-belief",
+      "B5 risk-score",
+      "Sentinel",
+      "SSG-G guarded",
+      "B1 audit-at-commit",
+      "NC1 quarantine-everything",
+      "B6 two-stage",
+      "B7 minimax-lp"
+    ],
+    "usd-legacy-etaQ": [
+      "B5 risk-score",
+      "SentinelW window-belief",
+      "Sentinel",
+      "SSG-G guarded",
+      "B1 audit-at-commit",
+      "B6 two-stage",
+      "B7 minimax-lp",
+      "NC1 quarantine-everything"
+    ],
+    "cpu": [
+      "B1 audit-at-commit",
+      "B7 minimax-lp",
+      "SentinelW window-belief",
+      "SSG-G guarded",
+      "Sentinel",
+      "B5 risk-score",
+      "NC1 quarantine-everything",
+      "B6 two-stage"
+    ]
+  },
+  "ranking_identical": false,
+  "scales": {
+    "draft": {
+      "kappa": {
+        "memory": 0.4,
+        "skill": 0.9,
+        "queue": 1.6,
+        "branch": 4.1
+      },
+      "kappa_commit": 4.1,
+      "eta_q": 2.0,
+      "budget": 17.95,
+      "note": "per-STAGE costs of the manuscript, used as a per-carrier table"
+    },
+    "usd": {
+      "kappa": {
+        "memory": 0.0026433,
+        "skill": 0.0005544,
+        "queue": 0.00076725,
+        "branch": 0.0022275
+      },
+      "kappa_commit": 0.0061924499999999995,
+      "eta_q": 0.09523862999999999,
+      "budget": 0.01587921107142857,
+      "note": "items_scored(k) x USD per judgement, with the MEASURED eta_Q (rebuild cost of the quarantined carrier)"
+    },
+    "usd-legacy-etaQ": {
+      "kappa": {
+        "memory": 0.0026433,
+        "skill": 0.0005544,
+        "queue": 0.00076725,
+        "branch": 0.0022275
+      },
+      "kappa_commit": 0.0061924499999999995,
+      "eta_q": 0.0017692714285714283,
+      "budget": 0.01587921107142857,
+      "note": "same kappa, but quarantine priced by the placeholder's ratio instead of the measurement -- kept as evidence, this is what costs.install() still does"
+    },
+    "cpu": {
+      "kappa": {
+        "memory": 1.454e-05,
+        "skill": 3.64e-06,
+        "queue": 4.78e-06,
+        "branch": 1.07e-05
+      },
+      "kappa_commit": 1.2e-05,
+      "eta_q": 0.0005175225,
+      "budget": 8.631385714285714e-05,
+      "note": "measured through checkpoints.py; commit EXCLUDES differential testing, so it is a lower bound"
+    }
+  },
+  "chi": {
+    "draft": 2.114,
+    "usd": 1.349,
+    "usd-legacy-etaQ": 1.349,
+    "cpu": 1.295
+  },
+  "affordability": {
+    "draft": {
+      "budget": 17.95,
+      "cheapest_audit": 0.022284122562674098,
+      "dearest_audit": 0.22841225626740946,
+      "commit_audit": 0.22841225626740946,
+      "one_quarantine": 0.11142061281337048,
+      "full_sweep_per_step": 0.38997214484679665,
+      "unit": "fraction of the episode budget"
+    },
+    "usd": {
+      "budget": 0.01587921107142857,
+      "cheapest_audit": 0.034913573319617294,
+      "dearest_audit": 0.16646292993460388,
+      "commit_audit": 0.3899721448467967,
+      "one_quarantine": 5.997692805492249,
+      "full_sweep_per_step": 0.3899721448467967,
+      "unit": "fraction of the episode budget"
+    },
+    "usd-legacy-etaQ": {
+      "budget": 0.01587921107142857,
+      "cheapest_audit": 0.034913573319617294,
+      "dearest_audit": 0.16646292993460388,
+      "commit_audit": 0.3899721448467967,
+      "one_quarantine": 0.11142061281337048,
+      "full_sweep_per_step": 0.3899721448467967,
+      "unit": "fraction of the episode budget"
+    },
+    "cpu": {
+      "budget": 8.631385714285714e-05,
+      "cheapest_audit": 0.04217167579448425,
+      "dearest_audit": 0.1684549906735717,
+      "commit_audit": 0.13902750261917884,
+      "one_quarantine": 5.995821727019499,
+      "full_sweep_per_step": 0.38997214484679665,
+      "unit": "fraction of the episode budget"
+    }
+  },
+  "provenance": {
+    "grid": "20 workflows, H=8, Delta=2, detector mid, seeds (1, 2)",
+    "budget_rule": "same share of the full audit bill as the legacy 17.95",
+    "date": "2026-09-23",
+    "commit": "63dd71c094ecc0cf1ae52e3e37809b892913590d"
+  }
+}

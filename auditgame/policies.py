@@ -228,11 +228,20 @@ class Sentinel(Policy):
     """
     belief: dict = field(default_factory=lambda: {c: 1.0 for c in CARRIERS})
 
-    ACTIONS = frozenset(CARRIERS)
+    ACTIONS = frozenset(CARRIERS) | {"commit"}
     READS_SCORES = True
     RANDOMIZED = True
 
     BETA = 0.25          # update rate
+
+    #: Tasks a carrier may go unaudited before rotation starts pushing for it.
+    #: SWEPT, not chosen: `tools/measure_rotation.py` reports the whole range.
+    #: ROTATION_PERIOD = 0 disables rotation and reproduces the two-mechanism
+    #: policy exactly, so the old numbers stay reachable.
+    ROTATION_PERIOD = 2
+
+    #: How hard a starved carrier is pushed, per task past ROTATION_PERIOD.
+    ROTATION_GAIN = 0.5
 
     def observe(self, signals: dict):
         """belief <- (1-beta) belief + beta * (p_c / pi0).
@@ -253,18 +262,61 @@ class Sentinel(Policy):
             evidence = rule(sig.p) if sig is not None else 1.0
             self.belief[c] = (1 - self.BETA) * self.belief[c] + self.BETA * max(evidence, 0.0)
 
+    def _starved(self, carrier: str, t: int) -> float:
+        """MECHANISM 3, which the docstring above has always claimed and the code
+        has never had: `Policy._rot` was declared and read nowhere.
+
+        Belief-weighted sampling can starve a carrier indefinitely -- if the
+        detector is weak the posterior never rises anywhere, and the sampler then
+        follows 1/kappa alone and keeps returning to the cheap carriers.  That is
+        exactly the regime RQ4 asks about.  Rotation puts a floor under it: a
+        carrier unaudited for longer than ROTATION_PERIOD has its weight
+        multiplied, and the multiplier grows with how long it has been starved.
+
+        `self._last` is a per-carrier "last audited at" clock, kept here rather
+        than in the base class so a policy without rotation carries no state it
+        does not use.
+        """
+        if self.ROTATION_PERIOD <= 0:
+            return 1.0
+        last = getattr(self, "_last", None)
+        if last is None:
+            last = self._last = {c: -1 for c in CARRIERS}
+        starved = t - last[carrier] - 1
+        over = starved - self.ROTATION_PERIOD
+        return 1.0 + self.ROTATION_GAIN * over if over > 0 else 1.0
+
     def choose(self, t, retrieved_carriers, signals):
         self.observe(signals)
-        opts = [c for c in CARRIERS if self.can(KAPPA[c])]
-        if not opts: return None
-        # weight = belief / cost  -> prefer the suspicious places that are cheap
-        w = [self.belief[c] / KAPPA[c] for c in opts]
+        opts, w = [], []
+        for c in CARRIERS:
+            if self.can(KAPPA[c]):
+                opts.append(c)
+                # weight = belief / cost, lifted for a carrier nobody has looked
+                # at lately -> prefer suspicious places that are cheap, but never
+                # let anywhere go unwatched indefinitely.
+                w.append(self.belief[c] / KAPPA[c] * self._starved(c, t))
+        # THE COMMIT GATE, which this policy's action space left out entirely.
+        # It is the last place a poisoned patch can be stopped whatever carrier
+        # carried it, so its weight is the TOTAL belief mass rather than any one
+        # carrier's -- the same rule SentinelW uses, so the two variants differ
+        # in the FORM of the belief and not in which channels exist.
+        if self.can(KAPPA_COMMIT):
+            opts.append("commit")
+            w.append(sum(self.belief.values()) / len(CARRIERS) / KAPPA_COMMIT)
+        if not opts:
+            return None
         tot = sum(w)
+        if tot <= 0.0:
+            return None
         r = random.Random(seed_of(self.rng_seed, t, "sentinel")).random() * tot
         acc = 0.0
         for c, wi in zip(opts, w):
             acc += wi
-            if r <= acc: return c
+            if r <= acc:
+                if c != "commit" and hasattr(self, "_last"):
+                    self._last[c] = t
+                return c
         return opts[-1]
 
 # --------------------------------------------------------------------------
