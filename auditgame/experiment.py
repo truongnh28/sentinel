@@ -179,6 +179,12 @@ def main():
                          "r=1.28 and the whole episode budget at r=10.26, while "
                          "the measured value is 61.5.")
     ap.add_argument("--seeds", type=int, default=3)
+    ap.add_argument("--deltas", type=int, nargs="+", default=[0, 1, 2, 4],
+                    help="the trigger delays to sweep. Every value must be < H, "
+                         "because plan_poison needs sigma in range(delta, H); "
+                         "the draft states its main result over Delta > 2, and "
+                         "at H=8 this grid holds exactly ONE point in that "
+                         "region (Delta=4).")
     ap.add_argument("--dataset", choices=("mock", "swebench"), default="mock",
                     help="mock: synthetic workflows, numbers unchanged from "
                          "before. swebench: real SWE-bench metadata via "
@@ -249,7 +255,18 @@ def main():
         grouping = report(H=a.H) if report else None
 
     seeds = tuple(range(1, a.seeds + 1))
-    deltas = (0, 1, 2, 4)
+    # DELTA IS BOUNDED BY THE HORIZON, and the bound is structural rather than a
+    # choice: build.plan_poison picks sigma from range(delta, H), so delta >= H
+    # leaves no feasible (iota, sigma) at all and the whole column is empty.
+    # That is why the default stops at 4 while H = 8, and why reaching the
+    # draft's delta = 8 needs H >= 9 -- a DIFFERENT CORPUS, not another column
+    # on this one, so its table has to be reported separately.
+    deltas = tuple(a.deltas)
+    over = [d for d in deltas if d >= a.H]
+    if over:
+        ap.error(f"delta {over} >= H={a.H}: build.plan_poison draws sigma from "
+                 f"range(delta, H), so these columns have no feasible attack on "
+                 f"any workflow and would print an empty denominator. Raise --H.")
     # D5 -- the attacker class must cover ALL FOUR carriers.  Sweeping only
     # {memory, skill} takes the two CHEAPEST carriers (0.4 and 0.9), so chi -- the
     # cost spread BETWEEN carriers -- is nearly fixed, and RQ2 was never actually
