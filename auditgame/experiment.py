@@ -12,7 +12,7 @@ not.
 """
 from __future__ import annotations
 import argparse, json, random, sys
-import build, agent, datasets, detector, freeze, metrics, oracle, retrieval, runner, scoring
+import build, agent, costs, datasets, detector, freeze, metrics, oracle, retrieval, runner, scoring
 import policies as P
 
 def gain(row):
@@ -155,7 +155,29 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=40, help="number of workflows")
     ap.add_argument("--H", type=int, default=8, help="tasks per workflow")
-    ap.add_argument("--budget", type=float, default=17.95)
+    ap.add_argument("--budget", type=float, default=None,
+                    help="audit budget per episode. Default: derived from the "
+                         "cost table by costs.budget_for_table, so that "
+                         "B/(H*sum kappa) -- the only dimensionless form of the "
+                         "budget -- is the SAME on every scale. Pass a number "
+                         "only to break that on purpose.")
+    ap.add_argument("--scale", choices=("usd", "legacy"), default="usd",
+                    help="which cost table the run is priced in. usd: the "
+                         "measured table (costs.KAPPA_USD), which is the "
+                         "operating scale this project declared. legacy: the "
+                         "manuscript's per-STAGE placeholder, kept so tables "
+                         "published before 2026-09-23 stay reproducible. THE "
+                         "TWO DISAGREE ON THREE OF THE FOUR DIMENSIONLESS "
+                         "RATIOS and reverse the carrier ordering, so a table "
+                         "that does not name its scale cannot be read.")
+    ap.add_argument("--eta-q-over-kappa", type=float, default=None,
+                    help="override the MEASURED quarantine price with a chosen "
+                         "r = eta_Q/kappa_bar (usd scale only). This ratio is "
+                         "swept rather than fixed because it decides whether "
+                         "quarantine is an affordable action at all: at H=8 one "
+                         "quarantine costs a whole task's share of budget at "
+                         "r=1.28 and the whole episode budget at r=10.26, while "
+                         "the measured value is 61.5.")
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--dataset", choices=("mock", "swebench"), default="mock",
                     help="mock: synthetic workflows, numbers unchanged from "
@@ -176,6 +198,28 @@ def main():
                          "the axis mean.")
     ap.add_argument("--json", metavar="FILE")
     a = ap.parse_args()
+
+    # THE SCALE IS INSTALLED BEFORE ANYTHING READS A COST.  policies.KAPPA is a
+    # module-level dict and every policy reads it at decision time, so patching
+    # it here is enough -- but it has to happen before make_corpus, because the
+    # budget is derived from the table and sweep_delta captures dict(P.KAPPA) at
+    # call time.
+    #
+    # WHY THE DEFAULT IS `usd`.  Until 2026-09-23 this file never called
+    # costs.install(), so every table it produced ran on the manuscript's
+    # per-STAGE placeholder -- the table README SS3.2 says was withdrawn from the
+    # main path.  They disagree on three of the four dimensionless ratios
+    # (chi 2.114 vs 1.349, kappa_commit/kbar 2.343 vs 4.000, eta_Q/kbar 1.143 vs
+    # 61.519) and they REVERSE the carrier ordering, which chi does not
+    # constrain.  See docs/preregistration/TIEN-DANG-KY-thang-van-hanh-USD.md.
+    if a.scale == "usd":
+        costs.install(P, eta_q_over_kappa_ratio=a.eta_q_over_kappa)
+    elif a.eta_q_over_kappa is not None:
+        ap.error("--eta-q-over-kappa needs --scale usd: on the legacy scale "
+                 "eta_Q is the placeholder 2.0 and overriding it would produce "
+                 "a table that is neither scale.")
+    if a.budget is None:
+        a.budget = costs.budget_for_table(P.KAPPA, a.H)
 
     # `--dataset mock` (the default) MUST keep calling make_corpus, not
     # datasets.REGISTRY["mock"].workflows(): MockDataset.workflows() seeds each
@@ -233,8 +277,25 @@ def main():
               f"(theta={grouping['theta']}, deltas={grouping['sweep_deltas']}), "
               f"{grouping['feasible']} usable")
     hidden_suite = hidden_suite_declared(scope)
-    print(f"{a.n} workflows - H={a.H} - B={a.budget} - {a.seeds} seeds - "
+    print(f"{a.n} workflows - H={a.H} - B={a.budget:.6g} - {a.seeds} seeds - "
           f"injection carriers: {', '.join(carriers)}")
+    # THE FOUR DIMENSIONLESS RATIOS, printed with every run.  The game is
+    # invariant under scaling (kappa, kappa_commit, eta_Q, B) by a common factor,
+    # so these four -- and not the numbers above -- are what the table depends
+    # on.  A harm table that does not carry them cannot be compared with another.
+    kbar = sum(P.KAPPA.values()) / len(P.KAPPA)
+    print(f"scale={a.scale}  chi={P.chi_of(P.KAPPA):.4f}  "
+          f"kappa_commit/kbar={P.KAPPA_COMMIT / kbar:.4f}  "
+          f"eta_Q/kbar={P.ETA_Q_COST / kbar:.4f}  "
+          f"B/(H*sum kappa)={a.budget / (a.H * sum(P.KAPPA.values())):.4f}")
+    print("  kappa order (cheap -> dear): "
+          + " < ".join(f"{k} {P.KAPPA[k] / kbar:.3f}"
+                       for k in sorted(P.KAPPA, key=P.KAPPA.get)))
+    if P.ETA_Q_COST / kbar > costs.eta_q_kills_action(a.H):
+        print(f"  NOTE: one quarantine costs "
+              f"{P.ETA_Q_COST / a.budget:.2f}x the WHOLE episode budget -- "
+              f"quarantine is not an expensive action here, it is not an action. "
+              f"Sweep --eta-q-over-kappa to find where it stops being one.")
     print("=" * 78)
 
     results = {}

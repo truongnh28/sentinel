@@ -222,33 +222,83 @@ def eta_q(carrier: str) -> float:
     return sum(eta_q_parts(carrier).values())
 
 
-#: Quarantine cost, carried over BY RATIO rather than by number.
+#: Quarantine cost.  TWO NUMBERS, and which one runs is a declared choice.
 #:
-#: `policies.ETA_Q_COST = 2.0` sat at about 1.25x the mean placeholder kappa.
-#: Copying the 2.0 into a USD run would make quarantine ~1400x the mean carrier
-#: cost, so no policy could ever afford the action -- and a policy that cannot
-#: afford an action is not being compared, it is being disabled. The tables
-#: published before 2026-09-20 did not trip over this only because the policies
-#: in them never quarantine; `Sentinel` does, so its L10 was measured against a
-#: quarantine that was far too cheap relative to auditing.
+#: LEGACY (what install() used until 2026-09-23).  `policies.ETA_Q_COST = 2.0`
+#: sat at about 1.14x the mean placeholder kappa, and that RATIO was carried
+#: across to USD rather than the number.  The reasoning written here was: copying
+#: the 2.0 itself would make quarantine ~1400x the mean carrier cost, so no
+#: policy could afford the action -- and a policy that cannot afford an action is
+#: not being compared, it is being disabled.
+#:
+#: WHY THAT REASONING WAS WRONG.  It rejects the MEASURED price on the grounds
+#: that the measurement is inconvenient.  eta_q(k) is priced in the same unit as
+#: KAPPA_USD from the same two measurements (judge cost, write cost); it is not a
+#: unit error, it is a fact about this system: rebuilding a carrier's live items
+#: is agent work and auditing one is judge work, and that gap is 61.5x.
+#:
+#: WHAT REPLACES IT.  The measured value is the default, and the ratio becomes a
+#: SWEPT AXIS (M2) rather than a constant, because it decides a qualitative
+#: outcome -- see ETA_Q_KILLS_ACTION below.  Reporting one number here would hide
+#: the only interesting thing the number does.
 ETA_Q_RATIO_TO_MEAN_KAPPA = 2.0 / (sum(KAPPA_PLACEHOLDER.values()) / len(KAPPA_PLACEHOLDER))
-ETA_Q_USD = ETA_Q_RATIO_TO_MEAN_KAPPA * (sum(KAPPA_USD.values()) / len(KAPPA_USD))
+
+#: The legacy scalar, kept so pre-2026-09-23 tables stay reproducible.
+ETA_Q_USD_LEGACY = ETA_Q_RATIO_TO_MEAN_KAPPA * (sum(KAPPA_USD.values()) / len(KAPPA_USD))
+
+#: The measured scalar: eta_q(k) averaged over the four carriers.
+#:
+#: COLLAPSING FOUR NUMBERS INTO ONE IS A ROUNDING, NOT A FACT -- eta_q_parts says
+#: so, and n_live differs 4.8x between memory and skill.  It is done because
+#: policies.ETA_Q_COST is a scalar in the action-cost model; the per-carrier
+#: values remain in eta_q(k) for anything that wants them.
+ETA_Q_USD = sum(eta_q(c) for c in ITEMS_PER_AUDIT) / len(ITEMS_PER_AUDIT)
+
+#: THE TWO SCALE-FREE THRESHOLDS on r = eta_Q / kappa_bar.
+#:
+#: Both follow from the budget rule alone, so they hold in EVERY unit:
+#:     B = budget_fraction(H) * H * 4 * kappa_bar
+#: At H = 8 that is 10.257 * kappa_bar, hence
+#:     r = 1.282   one quarantine costs a whole task's share of budget, B/H
+#:     r = 10.257  one quarantine costs the WHOLE episode budget
+#: Above the second, quarantine is not an expensive action -- it is not an action.
+#: Measured r is 61.5, six times past it.  This is why the ratio is swept.
+def eta_q_kills_action(H: int = 8) -> float:
+    """The r = eta_Q/kappa_bar at which one quarantine eats the whole budget."""
+    return budget_fraction(H) * H * len(KAPPA_USD)
 
 
-def install(policies_module) -> dict:
+def eta_q_over_kappa(eta_q_cost: float, kappa: dict) -> float:
+    """r = eta_Q / kappa_bar -- the dimensionless form, the only comparable one."""
+    return eta_q_cost / (sum(kappa.values()) / len(kappa))
+
+
+def install(policies_module, eta_q_over_kappa_ratio: float | None = None) -> dict:
     """Point a policies module at the USD table.  Returns what was replaced.
 
     KAPPA, KAPPA_COMMIT and ETA_Q_COST move TOGETHER. Leaving the commit
     channel on the old scale would make it ~1800x every carrier and silently
     delete it from the action space; leaving quarantine there does the same to
     quarantine. Either way the comparison stops being a comparison.
+
+    `eta_q_over_kappa_ratio` overrides the MEASURED quarantine price with a
+    chosen r = eta_Q/kappa_bar.  It exists for the sweep (M2), which is how this
+    ratio enters the paper -- the default is the measurement, not a choice.
+
+    THE BUDGET IS NOT SET HERE.  Call `budget_for(H)`, or the scale moves while
+    the budget does not and B/(H*sum kappa) stops being the fixed quantity the
+    whole comparison rests on.
     """
     old = {"KAPPA": dict(policies_module.KAPPA),
            "KAPPA_COMMIT": policies_module.KAPPA_COMMIT,
            "ETA_Q_COST": policies_module.ETA_Q_COST}
     policies_module.KAPPA = dict(KAPPA_USD)
     policies_module.KAPPA_COMMIT = KAPPA_COMMIT_USD
-    policies_module.ETA_Q_COST = ETA_Q_USD
+    if eta_q_over_kappa_ratio is None:
+        policies_module.ETA_Q_COST = ETA_Q_USD
+    else:
+        kbar = sum(KAPPA_USD.values()) / len(KAPPA_USD)
+        policies_module.ETA_Q_COST = eta_q_over_kappa_ratio * kbar
     return old
 
 

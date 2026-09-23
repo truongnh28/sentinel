@@ -73,13 +73,14 @@ def scales(H: int) -> dict:
             "note": "per-STAGE costs of the manuscript, used as a per-carrier table",
         },
         # TWO USD COLUMNS, because costs.py holds two different prices for
-        # quarantine and they disagree by 54x.  `ETA_Q_USD` scales the
+        # quarantine and they disagree by 54x.  `ETA_Q_USD_LEGACY` scales the
         # PLACEHOLDER's ratio (2.0 / mean placeholder kappa = 1.14x) onto the USD
-        # table; `eta_q(k)` is the MEASURED one (n_live(k) rebuild writes, 61.5x
-        # an audit).  Which one is installed decides whether quarantine is an
+        # table; `ETA_Q_USD` = mean eta_q(k) is the MEASURED one (n_live(k)
+        # rebuild writes, 61.5x an audit).  Which one is installed decides whether quarantine is an
         # affordable action at all, so both are run rather than one being chosen
-        # silently.  `usd` is the all-measured column; `usd-legacy-etaQ` is the
-        # column every USD table published before today was actually run on.
+        # silently.  `usd` is the all-measured column and is now what
+        # costs.install() does; `usd-legacy-etaQ` is the column every USD table
+        # published before 2026-09-23 was actually run on.
         "usd": {
             "kappa": dict(costs.KAPPA_USD), "kappa_commit": costs.KAPPA_COMMIT_USD,
             "eta_q": sum(costs.eta_q(c) for c in CARRIERS) / len(CARRIERS),
@@ -89,11 +90,11 @@ def scales(H: int) -> dict:
         },
         "usd-legacy-etaQ": {
             "kappa": dict(costs.KAPPA_USD), "kappa_commit": costs.KAPPA_COMMIT_USD,
-            "eta_q": costs.ETA_Q_USD,
+            "eta_q": costs.ETA_Q_USD_LEGACY,
             "budget": costs.budget_for_table(costs.KAPPA_USD, H),
             "note": "same kappa, but quarantine priced by the placeholder's "
                     "ratio instead of the measurement -- kept as evidence, this "
-                    "is what costs.install() still does",
+                    "is what costs.install() did until 2026-09-23",
         },
         "cpu": {
             "kappa": dict(costs.KAPPA_CPU), "kappa_commit": costs.KAPPA_COMMIT_CPU,
