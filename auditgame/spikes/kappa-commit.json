@@ -1,0 +1,368 @@
+{
+  "t_test_basis": "cpu_seconds_per_test x tests actually requested, NOT the raw run total -- see the -k over-selection note",
+  "t_test_cpu_seconds": {
+    "median": 0.599,
+    "min": 0.047,
+    "max": 6.071,
+    "n_instances": 6
+  },
+  "per_repo": {
+    "sympy/sympy": {
+      "env_build_cpu_seconds": 0.95,
+      "instances": [
+        {
+          "instance_id": "sympy__sympy-11618",
+          "n_tests_asked": 4,
+          "n_tests_requested": 4,
+          "selection": "-k names",
+          "n_tests_executed": 42,
+          "cpu_seconds_median": 22.144,
+          "cpu_seconds_all": [
+            44.765,
+            22.144,
+            19.77
+          ],
+          "cpu_seconds_per_test": 0.5272,
+          "cpu_seconds_scaled": 2.109,
+          "usable": true
+        },
+        {
+          "instance_id": "sympy__sympy-12096",
+          "n_tests_asked": 43,
+          "n_tests_requested": 43,
+          "selection": "-k names",
+          "n_tests_executed": 545,
+          "cpu_seconds_median": 76.947,
+          "cpu_seconds_all": [
+            894.051,
+            67.26,
+            76.947
+          ],
+          "cpu_seconds_per_test": 0.1412,
+          "cpu_seconds_scaled": 6.071,
+          "usable": true
+        },
+        {
+          "instance_id": "sympy__sympy-12419",
+          "n_tests_asked": 25,
+          "n_tests_requested": 25,
+          "selection": "-k names",
+          "n_tests_executed": 196,
+          "cpu_seconds_median": 6.924,
+          "cpu_seconds_all": [
+            6.953,
+            6.924,
+            6.656
+          ],
+          "cpu_seconds_per_test": 0.0353,
+          "cpu_seconds_scaled": 0.883,
+          "usable": true
+        },
+        {
+          "instance_id": "sympy__sympy-12481",
+          "n_tests_asked": 7,
+          "n_tests_requested": 7,
+          "selection": "-k names",
+          "n_tests_executed": 109,
+          "cpu_seconds_median": 4.901,
+          "cpu_seconds_all": [
+            4.903,
+            4.774,
+            4.901
+          ],
+          "cpu_seconds_per_test": 0.045,
+          "cpu_seconds_scaled": 0.315,
+          "usable": true
+        },
+        {
+          "instance_id": "sympy__sympy-12489",
+          "n_tests_asked": 8,
+          "n_tests_requested": 8,
+          "selection": "-k names",
+          "n_tests_executed": 961,
+          "cpu_seconds_median": 5.679,
+          "cpu_seconds_all": [
+            5.858,
+            5.599,
+            5.679
+          ],
+          "cpu_seconds_per_test": 0.0059,
+          "cpu_seconds_scaled": 0.047,
+          "usable": true
+        },
+        {
+          "instance_id": "sympy__sympy-13031",
+          "n_tests_asked": 9,
+          "n_tests_requested": 9,
+          "selection": "-k names",
+          "n_tests_executed": 86,
+          "cpu_seconds_median": 2.512,
+          "cpu_seconds_all": [
+            2.6,
+            2.512,
+            2.484
+          ],
+          "cpu_seconds_per_test": 0.0292,
+          "cpu_seconds_scaled": 0.263,
+          "usable": true
+        }
+      ]
+    },
+    "pytest-dev/pytest": {
+      "env_build_cpu_seconds": 1.12,
+      "instances": [
+        {
+          "instance_id": "pytest-dev__pytest-10051",
+          "n_tests_asked": 15,
+          "n_tests_requested": 15,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.105,
+          "cpu_seconds_all": [
+            0.158,
+            0.105,
+            0.069
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "pytest-dev__pytest-10081",
+          "n_tests_asked": 63,
+          "n_tests_requested": 63,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.068,
+          "cpu_seconds_all": [
+            0.071,
+            0.068,
+            0.067
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "pytest-dev__pytest-10356",
+          "n_tests_asked": 79,
+          "n_tests_requested": 79,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.067,
+          "cpu_seconds_all": [
+            0.068,
+            0.066,
+            0.067
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "pytest-dev__pytest-5262",
+          "n_tests_asked": 108,
+          "n_tests_requested": 108,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.067,
+          "cpu_seconds_all": [
+            0.067,
+            0.067,
+            0.067
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "pytest-dev__pytest-5631",
+          "n_tests_asked": 15,
+          "n_tests_requested": 15,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.065,
+          "cpu_seconds_all": [
+            0.067,
+            0.065,
+            0.065
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "pytest-dev__pytest-5787",
+          "n_tests_asked": 123,
+          "n_tests_requested": 120,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.067,
+          "cpu_seconds_all": [
+            0.066,
+            0.067,
+            0.069
+          ],
+          "usable": false
+        }
+      ]
+    },
+    "pylint-dev/pylint": {
+      "env_build_cpu_seconds": 0.54,
+      "instances": [
+        {
+          "instance_id": "pylint-dev__pylint-4970",
+          "n_tests_asked": 17,
+          "n_tests_requested": 17,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.215,
+          "cpu_seconds_all": [
+            0.32,
+            0.215,
+            0.106
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "pylint-dev__pylint-6386",
+          "n_tests_asked": 7,
+          "n_tests_requested": 7,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.098,
+          "cpu_seconds_all": [
+            0.098,
+            0.099,
+            0.096
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "pylint-dev__pylint-6528",
+          "n_tests_asked": 171,
+          "n_tests_requested": 120,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.101,
+          "cpu_seconds_all": [
+            0.101,
+            0.101,
+            0.099
+          ],
+          "usable": false
+        }
+      ]
+    },
+    "sphinx-doc/sphinx": {
+      "env_build_cpu_seconds": 0.85,
+      "instances": [
+        {
+          "instance_id": "sphinx-doc__sphinx-10323",
+          "n_tests_asked": 40,
+          "n_tests_requested": 40,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.416,
+          "cpu_seconds_all": [
+            0.813,
+            0.416,
+            0.157
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "sphinx-doc__sphinx-10435",
+          "n_tests_asked": 74,
+          "n_tests_requested": 74,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.144,
+          "cpu_seconds_all": [
+            0.147,
+            0.144,
+            0.142
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "sphinx-doc__sphinx-10449",
+          "n_tests_asked": 30,
+          "n_tests_requested": 30,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.14,
+          "cpu_seconds_all": [
+            0.138,
+            0.148,
+            0.14
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "sphinx-doc__sphinx-10466",
+          "n_tests_asked": 6,
+          "n_tests_requested": 6,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.138,
+          "cpu_seconds_all": [
+            0.14,
+            0.138,
+            0.138
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "sphinx-doc__sphinx-10614",
+          "n_tests_asked": 5,
+          "n_tests_requested": 5,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.136,
+          "cpu_seconds_all": [
+            0.137,
+            0.135,
+            0.136
+          ],
+          "usable": false
+        },
+        {
+          "instance_id": "sphinx-doc__sphinx-10673",
+          "n_tests_asked": 9,
+          "n_tests_requested": 9,
+          "selection": "node-ids",
+          "n_tests_executed": 0,
+          "cpu_seconds_median": 0.137,
+          "cpu_seconds_all": [
+            0.137,
+            0.136,
+            0.143
+          ],
+          "usable": false
+        }
+      ]
+    }
+  },
+  "review_half_usd": 0.0061924499999999995,
+  "kappa_bar_usd": 0.0015481124999999999,
+  "usd_per_cpu_second": null,
+  "kappa_commit_over_kappa_bar_floor": 4.0,
+  "crossover_band": [
+    1.43,
+    2.0
+  ],
+  "verdict": "kappa_commit / kappa_bar >= 4.00 from the review half alone, which is already above the 1.43-2.0 crossover band. Adding the measured test cost only raises it. The sign of RQ1 does NOT depend on the CPU price.",
+  "breakeven_usd_per_cpu_second": {
+    "1.43": {
+      "usd_per_cpu_second": -0.00664215,
+      "meaning": "no price can reach this ratio: the review half (0.006192 USD) already exceeds 1.43 x kappa_bar (0.002214 USD), so kappa_commit/kappa_bar is above the crossover at ANY non-negative CPU price"
+    },
+    "2.0": {
+      "usd_per_cpu_second": -0.00516899,
+      "meaning": "no price can reach this ratio: the review half (0.006192 USD) already exceeds 2.0 x kappa_bar (0.003096 USD), so kappa_commit/kappa_bar is above the crossover at ANY non-negative CPU price"
+    }
+  },
+  "reading": "kappa_commit(r) = review + T_test * r, with r the USD price of a CPU second. B1 keeps winning only while kappa_commit stays below about 2.0 * kappa_bar, so the breakeven r above is the price at which the answer changes. Compare it with the machine bill rather than picking a number here.",
+  "caveats": [
+    "tests run at HEAD, not at base_commit -- era pinning needs the per-instance Docker images this project does not have",
+    "environment build time is measured and EXCLUDED: paid once per machine, not once per audit",
+    "repos needing compiled dependencies are skipped, with the reason"
+  ],
+  "provenance": {
+    "python": "3.11",
+    "repeats": 3,
+    "date": "2026-09-23",
+    "commit": "70e5676e130dfec46a2e0f6df64fbe08cb2c4894"
+  }
+}
