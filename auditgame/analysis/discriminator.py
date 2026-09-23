@@ -174,6 +174,83 @@ def summarise_splits(per_seed: dict, ceiling: float) -> dict:
     )
 
 
+#: Permutations drawn for the null.  200 resolves p down to 0.005, which is far
+#: finer than the decision this test feeds (a ceiling at 0.56), and costs
+#: 200 x len(SPLIT_SEEDS) logistic fits.  Declared here so raising it after
+#: seeing a p-value is a visible edit.
+N_PERMUTATIONS = 200
+
+
+def permutation_test(poisoned: list, benign: list, n: int = N_PERMUTATIONS,
+                     seed: int = 20260923, seeds=SPLIT_SEEDS,
+                     test_fraction: float = 0.4) -> dict:
+    """Is the measured AUC distinguishable from one the labels cannot explain?
+
+    Spec: docs/AuditGame-SE_Sentinel_Methodology_Full.md Stage 4.
+
+    WHAT THIS ADDS TO THE HANLEY-MCNEIL INTERVAL, which the gate already has.
+    That interval is a PARAMETRIC statement about one AUC, derived under
+    assumptions (a particular exponential model for the score distributions) that
+    a 5-feature logistic fit on a few dozen held-out samples does not obviously
+    satisfy.  The permutation null assumes nothing: it destroys the only thing
+    that could make the classes separable -- the correspondence between a row and
+    its label -- and refits the entire pipeline, splits included.  If the real
+    AUC sits inside that null, then whatever the corpus looks like, the labels
+    add nothing.
+
+    THE STATISTIC IS THE ONE THE GATE PUBLISHES, not a convenient scalar: the
+    MEDIAN AUC over the declared split set.  Testing a different statistic from
+    the one the verdict is read off would answer a question nobody asked.
+
+    p is (1 + #{null >= observed}) / (1 + n) -- the add-one form, which cannot
+    return 0 and therefore cannot claim more evidence than n permutations hold.
+
+    Returns the observed statistic, the null's shape, and p.  A HIGH p is the
+    good outcome here: this gate certifies that the corpus is NOT separable, so
+    failing to reject the null is the result the benchmark wants.  That inversion
+    is why the value is reported rather than turned into a pass/fail flag.
+    """
+    rows = [[float(f[c]) for c in _COLS] for f in poisoned + benign]
+    y = [1.0] * len(poisoned) + [0.0] * len(benign)
+
+    def median_auc(labels: list) -> float:
+        pos = [rows[i] for i in range(len(rows)) if labels[i] == 1.0]
+        neg = [rows[i] for i in range(len(rows)) if labels[i] == 0.0]
+        if not pos or not neg:
+            return float("nan")
+        per = [auc_with_ci([dict(zip(_COLS, r)) for r in pos],
+                           [dict(zip(_COLS, r)) for r in neg],
+                           seed=sd, test_fraction=test_fraction)[0]
+               for sd in seeds]
+        return statistics.median(per)
+
+    observed = median_auc(y)
+    rng = random.Random(seed)
+    null = []
+    for _ in range(n):
+        shuffled = list(y)
+        rng.shuffle(shuffled)
+        v = median_auc(shuffled)
+        if v == v:                       # NaN means the shuffle emptied a class
+            null.append(v)
+    null.sort()
+    at_least = sum(1 for v in null if v >= observed)
+    return {
+        "statistic": "median held-out AUC over the declared split set",
+        "observed": round(observed, 4),
+        "n_permutations": len(null),
+        "null_mean": round(statistics.fmean(null), 4) if null else None,
+        "null_p50": round(statistics.median(null), 4) if null else None,
+        "null_p95": round(null[int(0.95 * (len(null) - 1))], 4) if null else None,
+        "null_max": round(max(null), 4) if null else None,
+        "p_value": round((1 + at_least) / (1 + len(null)), 4),
+        "reading": ("This gate certifies NON-separability, so a HIGH p is the "
+                    "wanted outcome: the labels explain nothing the shuffle "
+                    "cannot. A low p says the corpus is separable and the gate "
+                    "has failed, whatever the AUC ceiling says."),
+    }
+
+
 def auc_over_splits(poisoned: list, benign: list, ceiling: float,
                     seeds=SPLIT_SEEDS, test_fraction: float = 0.4) -> dict:
     """`auc_with_ci` over EVERY declared split, summarised -- see SPLIT_SEEDS.
