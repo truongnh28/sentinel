@@ -26,6 +26,10 @@ gets ignored within a week:
     table digests    reference/score_table.json, which is GENERATED from pi0:
                      a table rebuilt at another prior is a different experiment
                      wearing the same filename.
+    pins             the four digests that were ALREADY BEING TAKEN somewhere
+                     else -- the gate-2 definition, the frozen payload bank, the
+                     judge prompt template, the subset rule.  See `pins()` for why
+                     gathering them here is the point rather than a convenience.
 
 WHAT THIS DELIBERATELY DOES NOT DO.  It does not hash the SWE-bench data or the
 cloned repositories.  They are large, externally owned and already pinned by
@@ -48,6 +52,16 @@ SOURCE = (
     "experiment.py", "lp.py", "metrics.py", "oracle.py", "policies.py",
     "policies_library.py", "retrieval.py", "runner.py", "scoring.py",
     "attackers.py", "belief.py", "theory.py",
+    #: The hidden-test scoring path.  `oracle.py` alone was not the claim: what
+    #: the real oracle scores is decided by which families `registry.FAMILIES`
+    #: holds and by what their checks accept.  Registering R1 moved the instances
+    #: the oracle can score from 1 to 15 without touching a single byte of
+    #: oracle.py, which is exactly the edit this list has to notice.  The R1
+    #: yardstick modules (agreement, r1_fixtures, r1_gold, r1_subset) are NOT in
+    #: here: they measure the proxy, they do not score a run.
+    "hidden_tests/registry.py", "hidden_tests/h1_deprecation.py",
+    "hidden_tests/r1_tier.py", "hidden_tests/per_instance.py",
+    "hidden_tests/diffutil.py",
 )
 
 #: Generated tables.  score_table.json is built FROM pi0, so it is a separate
@@ -82,6 +96,87 @@ def constants() -> dict:
     }
 
 
+def pins() -> dict:
+    """The digests this project was ALREADY TAKING, gathered into the one cell.
+
+    WHY THIS EXISTS.  Three configurations were pinned by three separate digests,
+    each with its own private notion of "clean", and the run-level manifest covered
+    none of them:
+
+        gate 2 v2      `analysis/gate2_v2.md5()` over the frozen definition, with
+                       `FROZEN_MD5` as its committed declaration.
+        payload bank   `payloads/frozen_payloads.json`, which self-seals: the file
+                       carries `payloads_sha256` over its own records.
+        judge prompt   `fdetect.prompt_sha()` over the frozen prompt template --
+                       the only one of the three with no declaration at all, so
+                       nothing could tell you it had moved.
+
+    Each of those catches its own file being edited.  None of them catches the OTHER
+    two, and `freeze.digest()` caught neither, so "freeze: clean" was printable on a
+    run whose gate-2 criterion, payload corpus or judge prompt had changed since the
+    numbers were produced.  Scattered digests do not compose; one cell does.
+
+    TWO VALUES PER PIN, NOT ONE, wherever a declaration exists.  A pin whose live
+    digest is copied into the manifest and whose own declaration has drifted is
+    WORSE than no pin: the manifest goes on reporting clean while the artefact and
+    the module that generates it say different things.  `pin_conflicts()` reads that
+    second column, and it answers BEFORE any freeze exists -- the drift it finds is
+    a fact about the tree, not about the manifest.
+
+    THE IMPORTS ARE LOCAL, the same rule `constants()` already follows.  `freeze`
+    is imported by `experiment.py` and by anything that only wants
+    `require_frozen`; pulling `analysis.gate2_v2` -- and through it `build`,
+    `benign_corpus` and `discriminator` -- into module scope would make a refusal
+    check drag the analysis stack behind it, and would put `freeze` in the import
+    cycle of modules that `gate2_v2` itself reads.  Measured, the four pins cost
+    about 25 ms on a cold call and nothing on the next.
+    """
+    import payloads
+    import retrieval
+    from analysis import gate2_v2
+    import fdetect
+
+    doc = json.loads((ROOT / "payloads" / "frozen_payloads.json")
+                     .read_text(encoding="utf-8"))
+    return {
+        "gate2_v2": {"live": gate2_v2.md5(), "declared": gate2_v2.FROZEN_MD5},
+        "payload_bank": {
+            "live": payloads._records_sha256(doc["payloads"]),
+            "declared": doc["payloads_sha256"],
+        },
+        # NO DECLARATION EXISTS for either of these, so `declared` is None: the
+        # digest IS the declaration, which is exactly why they belong in a cell
+        # something else checks.  A pin with no declaration catches "this moved
+        # since the freeze" and CANNOT catch "this disagrees with its artefact",
+        # and the two are different claims -- `pin_conflicts` only makes the
+        # second, and only where there is a second column to make it against.
+        "judge_prompt": {"live": fdetect.prompt_sha(), "declared": None},
+        # ALSO a field of gate2_v2's record, and listed separately on purpose: the
+        # gate-2 md5 moves for any of twenty fields, so it says THAT the definition
+        # changed and never WHICH part.  With both entries, a drift report that
+        # names gate2_v2 and subset_rule together localises the edit to the tag
+        # rule -- the one field whose silent replacement moved a certify cell from
+        # 1/20 to 19/20 splits (docs/preregistration/cong-v2.md S3.9).
+        "subset_rule": {"live": retrieval.subset_rule_fingerprint(),
+                        "declared": None},
+    }
+
+
+def pin_conflicts(p: dict | None = None) -> list:
+    """Pins whose LIVE digest disagrees with their own committed declaration.
+
+    Independent of the freeze, and reported by `header_line` even when no manifest
+    exists: `gate2_v2.md5() != FROZEN_MD5` means the gate-2 definition has been
+    edited without regenerating `reference/gate2_v2.json`, and that is true whether
+    or not anybody has frozen anything.  Folding it into `drift()` would have hidden
+    it until the freeze, which is the one moment it is too late to find.
+    """
+    p = pins() if p is None else p
+    return [f"pins/{k}: live {v['live'][:12]} != declared {v['declared'][:12]}"
+            for k, v in sorted(p.items())
+            if v.get("declared") and v["live"] != v["declared"]]
+
+
 def manifest() -> dict:
     import attackers
     import policies as P
@@ -90,6 +185,7 @@ def manifest() -> dict:
         "source": {f: _digest(ROOT / f) for f in sorted(SOURCE)},
         "tables": {f: _digest(ROOT / f) for f in sorted(TABLES)},
         "constants": constants(),
+        "pins": pins(),
         "policies": sorted(P.REGISTRY),
         "policy_library": sorted(L.LIBRARY),
         "attackers": sorted(attackers.REGISTRY),
@@ -139,6 +235,21 @@ def drift(path: pathlib.Path = MANIFEST_PATH) -> list:
         if frozen["constants"].get(key) != live["constants"].get(key):
             out.append(f"constants/{key}: {frozen['constants'].get(key)} -> "
                        f"{live['constants'].get(key)}")
+    #: `.get("pins", {})` and not `frozen["pins"]`: a manifest written before pins
+    #: existed is a real file on somebody's disk, and a KeyError there would make
+    #: the whole drift report unreadable rather than reporting one missing section.
+    fpins, lpins = frozen.get("pins", {}), live.get("pins", {})
+    for key in sorted(set(fpins) | set(lpins)):
+        a = (fpins.get(key) or {}).get("live")
+        b = (lpins.get(key) or {}).get("live")
+        if a == b:
+            continue
+        if a is None:
+            out.append(f"pins/{key}: added")
+        elif b is None:
+            out.append(f"pins/{key}: removed")
+        else:
+            out.append(f"pins/{key}: {a[:12]} -> {b[:12]}")
     for section in ("policies", "policy_library", "attackers"):
         extra = set(live[section]) - set(frozen[section])
         gone = set(frozen[section]) - set(live[section])
@@ -179,13 +290,23 @@ def require_frozen(policy_name: str, path: pathlib.Path = MANIFEST_PATH) -> None
 
 
 def header_line(path: pathlib.Path = MANIFEST_PATH) -> str:
-    """One line for a results table: frozen, drifted, or never frozen."""
+    """One line for a results table: frozen, drifted, or never frozen.
+
+    A pin conflict is reported in EVERY one of those three states, including
+    "never frozen".  `gate2_v2.md5() != FROZEN_MD5` says the gate-2 definition and
+    its committed artefact disagree right now; that is a fact about the tree the
+    table was produced on, and holding it back until a freeze exists would hide it
+    for the whole period in which it is still cheap to fix.
+    """
+    conflicts = pin_conflicts()
+    tail = (f"  |  PIN CONFLICT: {'; '.join(conflicts)}" if conflicts else "")
     frozen = load(path)
     if frozen is None:
-        return "freeze: NONE -- these numbers are not pinned to a configuration"
+        return ("freeze: NONE -- these numbers are not pinned to a configuration"
+                + tail)
     d = drift(path)
     if not d:
-        return f"freeze: clean sha256:{frozen['digest'][:12]}"
+        return f"freeze: clean sha256:{frozen['digest'][:12]}" + tail
     return (f"freeze: DRIFTED from sha256:{frozen['digest'][:12]} "
             f"in {len(d)} place(s): {'; '.join(d[:3])}"
-            + (" ..." if len(d) > 3 else ""))
+            + (" ..." if len(d) > 3 else "") + tail)
