@@ -1,0 +1,176 @@
+{
+  "generated": "2026-09-24T10:00:51",
+  "commit": "d78f24a",
+  "setup": {
+    "n": 40,
+    "H": 8,
+    "seeds": 3,
+    "scale": "usd",
+    "detector": "mid",
+    "budget": 0.01587921107142857,
+    "rotation_period": 2,
+    "rotation_gain": 0.5
+  },
+  "draft_reference": {
+    "removing randomisation costs": 0.184,
+    "removing belief costs": 0.099,
+    "removing benign-drift": 0.264,
+    "sentinel_full": 0.272,
+    "note": "the draft's benign-drift row is LOWER than full Sentinel, which README SS3.4 issue 10 already flags as a question for the advisor rather than a number to reproduce"
+  },
+  "cells": [
+    {
+      "delta": 0,
+      "arms": {
+        "full": {
+          "policy": "Sentinel",
+          "harm": 0.9833,
+          "L": 1.0063,
+          "q_false": 0.0,
+          "n_feasible": 40,
+          "note": "all three mechanisms, the control every row is read against"
+        },
+        "minus_belief": {
+          "policy": "C4 blind sentinel",
+          "harm": 0.9833,
+          "L": 1.0,
+          "q_false": 0.0,
+          "n_feasible": 40,
+          "note": "registry arm: belief removed"
+        },
+        "minus_randomisation": {
+          "policy": "C8 deterministic sentinel",
+          "harm": 0.9917,
+          "L": 0.9917,
+          "q_false": 0.0,
+          "n_feasible": 40,
+          "note": "registry arm: randomisation removed"
+        },
+        "minus_rotation": {
+          "policy": "Sentinel",
+          "harm": 0.9833,
+          "L": 1.0063,
+          "q_false": 0.0,
+          "n_feasible": 40,
+          "note": "ROTATION_PERIOD=0 -- the class says this reproduces the two-mechanism version"
+        },
+        "minus_benign_drift": {
+          "policy": "Sentinel",
+          "harm": 0.9833,
+          "L": 1.0063,
+          "q_false": 0.0,
+          "n_feasible": 40,
+          "note": "COUNTERFACTUAL WORLD: clean items never fire, so no budget is spent on false alarms. Reads ground truth; never a policy result"
+        }
+      },
+      "cost_of_removing": {
+        "minus_belief": 0.0,
+        "minus_randomisation": 0.0084,
+        "minus_rotation": 0.0,
+        "minus_benign_drift": 0.0
+      }
+    },
+    {
+      "delta": 2,
+      "arms": {
+        "full": {
+          "policy": "Sentinel",
+          "harm": 0.9583,
+          "L": 0.9583,
+          "q_false": 0.0,
+          "n_feasible": 40,
+          "note": "all three mechanisms, the control every row is read against"
+        },
+        "minus_belief": {
+          "policy": "C4 blind sentinel",
+          "harm": 0.9583,
+          "L": 0.9625,
+          "q_false": 0.0,
+          "n_feasible": 40,
+          "note": "registry arm: belief removed"
+        },
+        "minus_randomisation": {
+          "policy": "C8 deterministic sentinel",
+          "harm": 0.975,
+          "L": 0.975,
+          "q_false": 0.0,
+          "n_feasible": 40,
+          "note": "registry arm: randomisation removed"
+        },
+        "minus_rotation": {
+          "policy": "Sentinel",
+          "harm": 0.9583,
+          "L": 0.9625,
+          "q_false": 0.0,
+          "n_feasible": 40,
+          "note": "ROTATION_PERIOD=0 -- the class says this reproduces the two-mechanism version"
+        },
+        "minus_benign_drift": {
+          "policy": "Sentinel",
+          "harm": 0.9583,
+          "L": 0.9583,
+          "q_false": 0.0,
+          "n_feasible": 40,
+          "note": "COUNTERFACTUAL WORLD: clean items never fire, so no budget is spent on false alarms. Reads ground truth; never a policy result"
+        }
+      },
+      "cost_of_removing": {
+        "minus_belief": 0.0,
+        "minus_randomisation": 0.0167,
+        "minus_rotation": 0.0,
+        "minus_benign_drift": 0.0
+      }
+    },
+    {
+      "delta": 4,
+      "arms": {
+        "full": {
+          "policy": "Sentinel",
+          "harm": 0.7523,
+          "L": 0.7658,
+          "q_false": 0.0,
+          "n_feasible": 37,
+          "note": "all three mechanisms, the control every row is read against"
+        },
+        "minus_belief": {
+          "policy": "C4 blind sentinel",
+          "harm": 0.7523,
+          "L": 0.7523,
+          "q_false": 0.0,
+          "n_feasible": 37,
+          "note": "registry arm: belief removed"
+        },
+        "minus_randomisation": {
+          "policy": "C8 deterministic sentinel",
+          "harm": 0.7793,
+          "L": 0.7793,
+          "q_false": 0.0,
+          "n_feasible": 37,
+          "note": "registry arm: randomisation removed"
+        },
+        "minus_rotation": {
+          "policy": "Sentinel",
+          "harm": 0.7523,
+          "L": 0.7658,
+          "q_false": 0.0,
+          "n_feasible": 37,
+          "note": "ROTATION_PERIOD=0 -- the class says this reproduces the two-mechanism version"
+        },
+        "minus_benign_drift": {
+          "policy": "Sentinel",
+          "harm": 0.7523,
+          "L": 0.7658,
+          "q_false": 0.0,
+          "n_feasible": 37,
+          "note": "COUNTERFACTUAL WORLD: clean items never fire, so no budget is spent on false alarms. Reads ground truth; never a policy result"
+        }
+      },
+      "cost_of_removing": {
+        "minus_belief": 0.0,
+        "minus_randomisation": 0.027,
+        "minus_rotation": 0.0,
+        "minus_benign_drift": 0.0
+      }
+    }
+  ]
+}
