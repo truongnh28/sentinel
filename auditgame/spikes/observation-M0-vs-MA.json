@@ -1,0 +1,153 @@
+{
+  "prereg": "docs/preregistration/TIEN-DANG-KY-mo-hinh-quan-sat-MA.md",
+  "MA1_harm_never_falls": {
+    "verdict": "REFUTED",
+    "cells_up": 19,
+    "cells_down": 25,
+    "cells_same": 16,
+    "largest_falls": [
+      {
+        "detector": "strong",
+        "policy": "SSG-B belief-weighted",
+        "delta": 2,
+        "M0": 0.963,
+        "MA": 0.879
+      },
+      {
+        "detector": "strong",
+        "policy": "SSG-B belief-weighted",
+        "delta": 1,
+        "M0": 0.992,
+        "MA": 0.933
+      },
+      {
+        "detector": "mid",
+        "policy": "SSG-B belief-weighted",
+        "delta": 2,
+        "M0": 0.929,
+        "MA": 0.883
+      },
+      {
+        "detector": "mid",
+        "policy": "SSG-B belief-weighted",
+        "delta": 1,
+        "M0": 0.979,
+        "MA": 0.942
+      },
+      {
+        "detector": "strong",
+        "policy": "SentinelW window-belief",
+        "delta": 0,
+        "M0": 0.983,
+        "MA": 0.946
+      },
+      {
+        "detector": "mid",
+        "policy": "SentinelW window-belief",
+        "delta": 0,
+        "M0": 0.983,
+        "MA": 0.954
+      }
+    ]
+  },
+  "MA2_B1_identical": true,
+  "policies_moved_by_MA": [
+    "B5 risk-score",
+    "SSG-B belief-weighted",
+    "SSG-G guarded",
+    "SSG-GU guarded upstream",
+    "SentinelW window-belief"
+  ],
+  "policies_unchanged": [
+    "B1 audit-at-commit",
+    "B2 uniform random",
+    "B3 audit-on-insertion",
+    "B4 audit-on-retrieval",
+    "B6 two-stage",
+    "B7 minimax-lp",
+    "B7U minimax-lp upstream",
+    "C4 blind sentinel",
+    "C8 deterministic sentinel",
+    "NC1 quarantine-everything",
+    "SSG-full receding",
+    "SSG-up receding",
+    "Sentinel"
+  ],
+  "gain_vs_B1_delta4_pct": {
+    "weak": {
+      "SSG-full receding": {
+        "M0": 12.7,
+        "MA": 12.7
+      },
+      "SSG-G guarded": {
+        "M0": 10.9,
+        "MA": 10.9
+      },
+      "Sentinel": {
+        "M0": 1.7,
+        "MA": 1.7
+      },
+      "SentinelW window-belief": {
+        "M0": 0.5,
+        "MA": 3.5
+      },
+      "SSG-B belief-weighted": {
+        "M0": 9.2,
+        "MA": 9.2
+      }
+    },
+    "mid": {
+      "SSG-full receding": {
+        "M0": 17.8,
+        "MA": 17.8
+      },
+      "SSG-G guarded": {
+        "M0": 10.9,
+        "MA": 14.4
+      },
+      "Sentinel": {
+        "M0": 3.5,
+        "MA": 3.5
+      },
+      "SentinelW window-belief": {
+        "M0": 0.5,
+        "MA": 3.5
+      },
+      "SSG-B belief-weighted": {
+        "M0": 8.6,
+        "MA": 9.2
+      }
+    },
+    "strong": {
+      "SSG-full receding": {
+        "M0": 17.8,
+        "MA": 17.8
+      },
+      "SSG-G guarded": {
+        "M0": 11.6,
+        "MA": 14.4
+      },
+      "Sentinel": {
+        "M0": 4.6,
+        "MA": 4.6
+      },
+      "SentinelW window-belief": {
+        "M0": 0.5,
+        "MA": 1.7
+      },
+      "SSG-B belief-weighted": {
+        "M0": 6.3,
+        "MA": 9.2
+      }
+    }
+  },
+  "caveat": "N = 40 workflows x 3 seeds, point estimates, no CI.",
+  "provenance": {
+    "date": "2026-09-24",
+    "commit": "f877f1db2ae4fd59de60bde1c9d1cda353ea6921",
+    "runs": [
+      "spikes/grid-usd-H8-baseline-for-15.txt (M0)",
+      "spikes/grid-usd-H8-observation-MA.txt (MA)"
+    ]
+  }
+}
