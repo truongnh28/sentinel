@@ -20,9 +20,27 @@ def gain(row):
     b1 = row["B1 audit-at-commit"].harm
     return 100.0 * (b1 - row["Sentinel"].harm) / max(b1, 1e-9)
 
-def make_corpus(n, H, seed):
+def make_corpus(n, H, seed, H_gen=None):
+    """n mock workflows of H tasks.
+
+    `H_gen` SEPARATES THE HORIZON FROM THE CORPUS (issue #15).  One rng is shared
+    across the corpus and each workflow draws H topics from it, so changing H
+    changes the random stream and therefore EVERY workflow: a grid at H=8 and a
+    grid at H=12 were run on two different corpora, and the difference between
+    them could not be attributed to the horizon.  With H_gen >= H the corpus is
+    generated at H_gen and each workflow is truncated to its first H tasks, so
+    two horizons share the same workflows.  None keeps every existing number.
+    """
+    if H_gen is None:
+        H_gen = H
+    if H_gen < H:
+        raise ValueError(f"H_gen={H_gen} < H={H}: a workflow cannot be truncated "
+                         f"to more tasks than it was generated with")
     rng = random.Random(seed)
-    return [build.make_workflow(f"wf-{i:03d}", "django", H, rng) for i in range(n)]
+    wfs = [build.make_workflow(f"wf-{i:03d}", "django", H_gen, rng) for i in range(n)]
+    for wf in wfs:
+        del wf.tasks[H:]
+    return wfs
 
 def sweep_delta(wfs, deltas, det_name, budget, seeds, carriers, chi=None,
                 chi_anchor="mean"):
@@ -178,6 +196,10 @@ def main():
                          "quarantine costs a whole task's share of budget at "
                          "r=1.28 and the whole episode budget at r=10.26, while "
                          "the measured value is 61.5.")
+    ap.add_argument("--corpus-horizon", type=int, default=None, metavar="H_GEN",
+                    help="generate the mock corpus at H_GEN tasks and truncate each "
+                         "workflow to --H, so grids at two horizons share the same "
+                         "workflows (issue #15). Default: generate at --H.")
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--deltas", type=int, nargs="+", default=[0, 1, 2, 4],
                     help="the trigger delays to sweep. Every value must be < H, "
@@ -233,7 +255,7 @@ def main():
     # rng across the whole corpus -- routing the default path through the
     # registry would move every existing number in the mock table.
     if a.dataset == "mock":
-        wfs = make_corpus(a.n, a.H, seed=2026)
+        wfs = make_corpus(a.n, a.H, seed=2026, H_gen=a.corpus_horizon)
         scope = datasets.REGISTRY["mock"].scope()
         grouping = None
     else:
