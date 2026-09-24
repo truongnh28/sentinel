@@ -87,13 +87,21 @@ def main() -> int:
     ap.add_argument("--H", type=int, default=8)
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--deltas", type=int, nargs="+", default=[0, 2, 4])
+    ap.add_argument("--budget-share", type=float, default=None,
+                    help="B/(H*sum kappa). Default: the published 0.3205 via "
+                         "costs.budget_for_table. Any other value is computed "
+                         "exactly as tools/sweep_budget.py does (share*H*sum kappa), "
+                         "so the two tools report the same cell (README issue #17).")
+    ap.add_argument("--candidates", nargs="+", default=CANDIDATES,
+                    help="policies compared against B1. Default: the published set.")
     a = ap.parse_args()
 
     wfs = experiment.make_corpus(a.n, a.H, seed=2026)
     ag = agent.MockAgent()
     seeds = tuple(range(1, a.seeds + 1))
     old = costs.install(P)                       # the declared operating scale
-    budget = costs.budget_for_table(P.KAPPA, a.H)
+    budget = (costs.budget_for_table(P.KAPPA, a.H) if a.budget_share is None
+              else a.budget_share * a.H * sum(P.KAPPA.values()))
     try:
         cells = []
         for det_name in ("weak", "mid", "strong"):
@@ -102,7 +110,7 @@ def main() -> int:
                 runner.reset_survivor_cache()
                 base = runner.worst_case(BASELINE, wfs, (d,), CARRIERS, det, ag,
                                          budget, seeds, det_name)
-                for nm in CANDIDATES:
+                for nm in a.candidates:
                     runner.reset_survivor_cache()
                     c = runner.worst_case(nm, wfs, (d,), CARRIERS, det, ag,
                                           budget, seeds, det_name)
@@ -135,7 +143,8 @@ def main() -> int:
         "commit": subprocess.run(["git", "rev-parse", "--short", "HEAD"],
                                  capture_output=True, text=True).stdout.strip(),
         "setup": {"n": a.n, "H": a.H, "seeds": a.seeds, "scale": "usd",
-                  "budget": budget, "gate_pct": GATE_PCT,
+                  "budget": budget, "budget_share": a.budget_share or costs.BUDGET_SHARE,
+                  "candidates": list(a.candidates), "gate_pct": GATE_PCT,
                   "resample_unit": "workflow", "n_boot": 10000},
         "gate_verdict_per_delta": GATE,
         "cells": cells,
