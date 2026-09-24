@@ -24,7 +24,7 @@ import random
 
 import build
 import runner
-from core import CARRIERS, CarrierStore, seed_of
+from core import CARRIERS, CarrierStore, agent_seed, seed_of
 
 #: Coordinates of the marginal: the four carriers plus commit.
 ACTIONS = tuple(CARRIERS) + ("commit",)
@@ -93,7 +93,7 @@ def audit_marginal(policy_name, wfs, det, ag, budget, seeds, setting) -> tuple:
             for t, task in enumerate(wf.tasks):
                 if t == ps.iota:
                     build.inject(st, wf, ps)
-                o = a2.run_task(t, task, st, seed=s, marker=ps.marker)
+                o = a2.run_task(t, task, st, seed=agent_seed(wf.wf_id, s), marker=ps.marker)
                 sig = {}
                 for c in CARRIERS:
                     items = st.live(c)
@@ -141,7 +141,8 @@ def zeta_of(agent_a, agent_b, n_wf: int = 12, seeds=(1, 2), horizon: int = 8) ->
             for s in seeds:
                 st = CarrierStore()
                 for t, task in enumerate(wf.tasks):
-                    for it in ag.run_task(t, task, st, seed=s, marker="raw_write").writes:
+                    for it in ag.run_task(t, task, st, seed=agent_seed(wf.wf_id, s),
+                                           marker="raw_write").writes:
                         counts[it.carrier] += 1
         tot = sum(counts.values()) or 1
         return {c: counts[c] / tot for c in CARRIERS}

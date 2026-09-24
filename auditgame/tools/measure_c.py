@@ -55,7 +55,7 @@ import costs            # noqa: E402
 import detector         # noqa: E402
 import policies as P    # noqa: E402
 import scoring          # noqa: E402
-from core import CARRIERS, CarrierStore, seed_of   # noqa: E402
+from core import CARRIERS, CarrierStore, agent_seed, seed_of   # noqa: E402
 
 ALPHA = 0.05
 K = len(CARRIERS)
@@ -90,7 +90,7 @@ def _posterior_mass_on_truth(budget: float, wf, ps, det, ag, seed: int,
     for t, task in enumerate(wf.tasks):
         if t == ps.iota:
             build.inject(store, wf, ps)
-        out = ag.run_task(t, task, store, seed=seed, marker=ps.marker)
+        out = ag.run_task(t, task, store, seed=agent_seed(wf.wf_id, seed), marker=ps.marker)
         signals = {}
         for c in CARRIERS:
             items = store.live(c)

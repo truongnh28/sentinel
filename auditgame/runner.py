@@ -29,7 +29,7 @@ from __future__ import annotations
 import random
 import time
 from dataclasses import dataclass, field
-from core import CARRIERS, CarrierStore, TaskTrace, item_record, seed_of
+from core import CARRIERS, CarrierStore, TaskTrace, agent_seed, item_record, seed_of
 from agent import MockAgent
 from detector import Detector
 import build, oracle, scoring, policies as P
@@ -387,7 +387,8 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
             payload_id = payload.item_id
             if record_traces:
                 injected_rec = item_record(payload)
-        o = ag.run_task(t, task, store, seed=seed, marker=ps.marker if ps else "x")
+        o = ag.run_task(t, task, store, seed=agent_seed(wf.wf_id, seed),
+                          marker=ps.marker if ps else "x")
 
         # P1/P2 are read HERE, before this task's audit can act: "payload still
         # alive at sigma" means alive when the agent reached for it.

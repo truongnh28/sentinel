@@ -52,6 +52,9 @@ SOURCE = (
     "experiment.py", "lp.py", "metrics.py", "oracle.py", "policies.py",
     "policies_library.py", "retrieval.py", "runner.py", "scoring.py",
     "attackers.py", "belief.py", "theory.py",
+    #: The mock agent decides adoption, propagation and solving: every harm
+    #: figure runs through it.  Left out until README #20 found its seeding.
+    "agent.py",
     #: The hidden-test scoring path.  `oracle.py` alone was not the claim: what
     #: the real oracle scores is decided by which families `registry.FAMILIES`
     #: holds and by what their checks accept.  Registering R1 moved the instances

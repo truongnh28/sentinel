@@ -632,6 +632,23 @@ def _trace_from_dict(d: dict) -> TaskTrace:
     return TaskTrace(**d)
 
 
+def agent_seed(wf_id: str, seed: int) -> int:
+    """The seed a GAME run hands the agent: one stream per (workflow, seed).
+
+    MockAgent draws from seed_of(seed, t).  Handed the raw run seed, task t of
+    EVERY workflow received the same draw -- adopt, induce, queue, drift, solve --
+    so a seed was one dice roll shared by the whole corpus, not noise inside a
+    workflow (README #20; the N2 bug, fixed for policies, left open for the
+    agent).  Measured before the fix: B1's harm at the headline cell was 0.18
+    under seed 2 and 0.86 under seed 3, on the same 100 workflows.
+
+    Keyed here rather than inside agent.py on purpose: the gate-2 benign corpus
+    calls the agent directly with seeds already split per task, and its
+    committed digests must not move with a fix to the game path.
+    """
+    return seed_of("agent", wf_id, seed)
+
+
 def seed_of(*parts) -> int:
     """Seed that is stable across runs.
 

@@ -1103,7 +1103,13 @@ class TheAttackerMaximisesHarmAndThatIsADirectionNotJustABound(unittest.TestCase
     cells instead of argued: `policy_curve` can run the same attacker-max loop with
     L as the objective, and the two are compared."""
 
-    N, H, SEEDS, BUDGET = 6, 4, (1, 2, 3), 17.95
+    #: N was 6 until README #20.  Six workflows steered Q_false only because the
+    #: mock agent handed every workflow the same draws, so one lucky draw moved
+    #: all six at once.  Seeded per workflow, six moved no policy's L at all and
+    #: the non-vacuity check went red (the direction check itself held).  Measured
+    #: after the fix: N = 10 and 12 move one policy, 16 moves two, 20 moves two
+    #: by 0.04-0.06; no N moves any policy DOWN.  20 costs about one second.
+    N, H, SEEDS, BUDGET = 20, 4, (1, 2, 3), 17.95
 
     def _curves(self, lambda_Q, lambda_T=metrics.LAMBDA_T):
         wfs = S.make_corpus(self.N, self.H, seed=2026)

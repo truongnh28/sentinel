@@ -564,7 +564,13 @@ class ReplayReDerivesANeverRunCell(unittest.TestCase):
     MIN_CASES = 1200
     MIN_VALID = 400
     MIN_INVALID = 600
-    MIN_CELLS_THAT_MOVED = 200
+    #:
+    #: MIN_CELLS_THAT_MOVED came down from 200 when the agent was seeded per
+    #: workflow (README #20).  Re-measured: 1440 cases, 463 re-derived, 977
+    #: invalid, 173 moved.  Every equality above held on all 463; the floor only
+    #: guards against a rescore that echoes configuration A, and 173 cells where
+    #: A and B differ still catch that.
+    MIN_CELLS_THAT_MOVED = 150
 
     @classmethod
     def setUpClass(cls):
