@@ -1,0 +1,228 @@
+{
+  "generated": "2026-09-24T13:11:33",
+  "commit": "eee203e",
+  "setup": {
+    "n": 40,
+    "H": 8,
+    "seeds": 3,
+    "delta": 4,
+    "scale": "usd",
+    "target_harm": 0.5,
+    "policy": "SSG-full receding",
+    "shares": [
+      0.16,
+      0.25,
+      0.3205,
+      0.4,
+      0.5,
+      0.6,
+      0.75,
+      0.9,
+      1.0
+    ]
+  },
+  "operating_points": {
+    "weak": {
+      "psi": 0.75,
+      "phi": 0.2,
+      "gamma": 0.55,
+      "d_prime": 1.5161,
+      "tau_det": 0.8416,
+      "draft_d": 1.52,
+      "draft_gamma": 0.55,
+      "matches_draft": true,
+      "inv_gamma_sq": 3.3058
+    },
+    "mid": {
+      "psi": 0.85,
+      "phi": 0.12,
+      "gamma": 0.73,
+      "d_prime": 2.2114,
+      "tau_det": 1.175,
+      "draft_d": 2.21,
+      "draft_gamma": 0.73,
+      "matches_draft": true,
+      "inv_gamma_sq": 1.8765
+    },
+    "strong": {
+      "psi": 0.92,
+      "phi": 0.06,
+      "gamma": 0.86,
+      "d_prime": 2.9598,
+      "tau_det": 1.5548,
+      "draft_d": 2.96,
+      "draft_gamma": 0.86,
+      "matches_draft": true,
+      "inv_gamma_sq": 1.3521
+    }
+  },
+  "code_matches_draft_derivation": true,
+  "curves": {
+    "weak": [
+      {
+        "share": 0.16,
+        "SSG-full receding": 0.6802,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.25,
+        "SSG-full receding": 0.6712,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.3205,
+        "SSG-full receding": 0.6802,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.4,
+        "SSG-full receding": 0.5766,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.5,
+        "SSG-full receding": 0.536,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.6,
+        "SSG-full receding": 0.5315,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.75,
+        "SSG-full receding": 0.4279,
+        "B1 audit-at-commit": 0.6577
+      },
+      {
+        "share": 0.9,
+        "SSG-full receding": 0.3919,
+        "B1 audit-at-commit": 0.3739
+      },
+      {
+        "share": 1.0,
+        "SSG-full receding": 0.3018,
+        "B1 audit-at-commit": 0.3018
+      }
+    ],
+    "mid": [
+      {
+        "share": 0.16,
+        "SSG-full receding": 0.6667,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.25,
+        "SSG-full receding": 0.6261,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.3205,
+        "SSG-full receding": 0.6396,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.4,
+        "SSG-full receding": 0.518,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.5,
+        "SSG-full receding": 0.455,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.6,
+        "SSG-full receding": 0.491,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.75,
+        "SSG-full receding": 0.3108,
+        "B1 audit-at-commit": 0.6306
+      },
+      {
+        "share": 0.9,
+        "SSG-full receding": 0.2568,
+        "B1 audit-at-commit": 0.2703
+      },
+      {
+        "share": 1.0,
+        "SSG-full receding": 0.1577,
+        "B1 audit-at-commit": 0.1577
+      }
+    ],
+    "strong": [
+      {
+        "share": 0.16,
+        "SSG-full receding": 0.6667,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.25,
+        "SSG-full receding": 0.6171,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.3205,
+        "SSG-full receding": 0.6396,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.4,
+        "SSG-full receding": 0.5045,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.5,
+        "SSG-full receding": 0.4369,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.6,
+        "SSG-full receding": 0.464,
+        "B1 audit-at-commit": 0.7793
+      },
+      {
+        "share": 0.75,
+        "SSG-full receding": 0.2793,
+        "B1 audit-at-commit": 0.6216
+      },
+      {
+        "share": 0.9,
+        "SSG-full receding": 0.2252,
+        "B1 audit-at-commit": 0.2297
+      },
+      {
+        "share": 1.0,
+        "SSG-full receding": 0.0811,
+        "B1 audit-at-commit": 0.0811
+      }
+    ]
+  },
+  "budget_to_reach_target": {
+    "weak": 0.6456081081081081,
+    "mid": 0.4285714285714286,
+    "strong": 0.4066568047337278
+  },
+  "one_over_gamma_squared_check": {
+    "weak": {
+      "budget_share_to_target": 0.6456,
+      "measured_ratio_vs_strong": 1.588,
+      "predicted_ratio_1_over_gamma_sq": 2.445,
+      "measured_over_predicted": 0.649
+    },
+    "mid": {
+      "budget_share_to_target": 0.4286,
+      "measured_ratio_vs_strong": 1.054,
+      "predicted_ratio_1_over_gamma_sq": 1.388,
+      "measured_over_predicted": 0.759
+    },
+    "strong": {
+      "budget_share_to_target": 0.4067,
+      "measured_ratio_vs_strong": 1.0,
+      "predicted_ratio_1_over_gamma_sq": 1.0,
+      "measured_over_predicted": 1.0
+    }
+  }
+}
