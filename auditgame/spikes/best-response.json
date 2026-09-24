@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-24T10:27:12",
-  "commit": "a2f0ee8",
+  "generated": "2026-09-25T00:59:25",
+  "commit": "81d0d7d",
   "setup": {
     "n": 40,
     "H": 8,
@@ -31,29 +31,29 @@
       "delta": 0,
       "harm": {
         "B1 audit-at-commit": {
-          "sampled": 0.9833,
+          "sampled": 0.9708,
           "free": 1.0,
-          "rise": 0.0167
+          "rise": 0.0292
         },
         "SSG-full receding": {
-          "sampled": 0.9292,
+          "sampled": 0.9583,
           "free": 1.0,
-          "rise": 0.0708
+          "rise": 0.0417
         },
         "SSG-G guarded": {
-          "sampled": 0.9083,
+          "sampled": 0.9167,
           "free": 1.0,
-          "rise": 0.0917
+          "rise": 0.0833
         },
         "SentinelW window-belief": {
-          "sampled": 0.9833,
+          "sampled": 0.9917,
           "free": 1.0,
-          "rise": 0.0167
+          "rise": 0.0083
         },
         "Sentinel": {
-          "sampled": 0.9833,
+          "sampled": 0.9792,
           "free": 1.0,
-          "rise": 0.0167
+          "rise": 0.0208
         },
         "C8 deterministic sentinel": {
           "sampled": 0.9917,
@@ -61,41 +61,41 @@
           "rise": 0.0083
         },
         "B2 uniform random": {
-          "sampled": 0.9708,
+          "sampled": 0.9667,
           "free": 1.0,
-          "rise": 0.0292
+          "rise": 0.0333
         }
       },
       "gain_vs_b1": {
         "SSG-full receding": {
-          "sampled": 5.5,
+          "sampled": 1.29,
           "free": 0.0,
-          "narrowed_by": 5.5
+          "narrowed_by": 1.29
         },
         "SSG-G guarded": {
-          "sampled": 7.63,
+          "sampled": 5.57,
           "free": 0.0,
-          "narrowed_by": 7.63
+          "narrowed_by": 5.57
         },
         "SentinelW window-belief": {
-          "sampled": 0.0,
+          "sampled": -2.15,
           "free": 0.0,
-          "narrowed_by": 0.0
+          "narrowed_by": -2.15
         },
         "Sentinel": {
-          "sampled": 0.0,
+          "sampled": -0.87,
           "free": 0.0,
-          "narrowed_by": 0.0
+          "narrowed_by": -0.87
         },
         "C8 deterministic sentinel": {
-          "sampled": -0.85,
+          "sampled": -2.15,
           "free": 0.0,
-          "narrowed_by": -0.85
+          "narrowed_by": -2.15
         },
         "B2 uniform random": {
-          "sampled": 1.27,
+          "sampled": 0.42,
           "free": 0.0,
-          "narrowed_by": 1.27
+          "narrowed_by": 0.42
         }
       }
     },
@@ -103,61 +103,61 @@
       "delta": 2,
       "harm": {
         "B1 audit-at-commit": {
-          "sampled": 0.975,
+          "sampled": 0.9875,
           "free": 1.0,
-          "rise": 0.025
+          "rise": 0.0125
         },
         "SSG-full receding": {
-          "sampled": 0.8833,
+          "sampled": 0.8958,
           "free": 0.9542,
-          "rise": 0.0708
-        },
-        "SSG-G guarded": {
-          "sampled": 0.8875,
-          "free": 0.95,
-          "rise": 0.0625
-        },
-        "SentinelW window-belief": {
-          "sampled": 0.9333,
-          "free": 0.9917,
           "rise": 0.0583
         },
-        "Sentinel": {
-          "sampled": 0.9583,
-          "free": 1.0,
-          "rise": 0.0417
+        "SSG-G guarded": {
+          "sampled": 0.9208,
+          "free": 0.9583,
+          "rise": 0.0375
         },
-        "C8 deterministic sentinel": {
-          "sampled": 0.975,
+        "SentinelW window-belief": {
+          "sampled": 0.9875,
           "free": 1.0,
+          "rise": 0.0125
+        },
+        "Sentinel": {
+          "sampled": 0.9667,
+          "free": 0.9917,
           "rise": 0.025
         },
+        "C8 deterministic sentinel": {
+          "sampled": 0.9875,
+          "free": 1.0,
+          "rise": 0.0125
+        },
         "B2 uniform random": {
-          "sampled": 0.9292,
-          "free": 0.9917,
-          "rise": 0.0625
+          "sampled": 0.9708,
+          "free": 0.9833,
+          "rise": 0.0125
         }
       },
       "gain_vs_b1": {
         "SSG-full receding": {
-          "sampled": 9.41,
+          "sampled": 9.29,
           "free": 4.58,
-          "narrowed_by": 4.83
+          "narrowed_by": 4.71
         },
         "SSG-G guarded": {
-          "sampled": 8.97,
-          "free": 5.0,
-          "narrowed_by": 3.97
+          "sampled": 6.75,
+          "free": 4.17,
+          "narrowed_by": 2.58
         },
         "SentinelW window-belief": {
-          "sampled": 4.28,
-          "free": 0.83,
-          "narrowed_by": 3.45
+          "sampled": 0.0,
+          "free": 0.0,
+          "narrowed_by": 0.0
         },
         "Sentinel": {
-          "sampled": 1.71,
-          "free": 0.0,
-          "narrowed_by": 1.71
+          "sampled": 2.11,
+          "free": 0.83,
+          "narrowed_by": 1.28
         },
         "C8 deterministic sentinel": {
           "sampled": 0.0,
@@ -165,9 +165,9 @@
           "narrowed_by": 0.0
         },
         "B2 uniform random": {
-          "sampled": 4.7,
-          "free": 0.83,
-          "narrowed_by": 3.87
+          "sampled": 1.69,
+          "free": 1.67,
+          "narrowed_by": 0.02
         }
       }
     },
@@ -175,61 +175,61 @@
       "delta": 4,
       "harm": {
         "B1 audit-at-commit": {
-          "sampled": 0.7793,
-          "free": 0.8108,
-          "rise": 0.0315
+          "sampled": 0.8694,
+          "free": 0.8784,
+          "rise": 0.009
         },
         "SSG-full receding": {
-          "sampled": 0.6396,
-          "free": 0.6577,
-          "rise": 0.018
+          "sampled": 0.7072,
+          "free": 0.7072,
+          "rise": 0.0
         },
         "SSG-G guarded": {
-          "sampled": 0.6937,
-          "free": 0.7477,
-          "rise": 0.0541
+          "sampled": 0.8333,
+          "free": 0.8514,
+          "rise": 0.018
         },
         "SentinelW window-belief": {
-          "sampled": 0.7748,
-          "free": 0.8018,
-          "rise": 0.027
+          "sampled": 0.8288,
+          "free": 0.8784,
+          "rise": 0.0495
         },
         "Sentinel": {
-          "sampled": 0.7523,
-          "free": 0.7838,
-          "rise": 0.0315
+          "sampled": 0.8514,
+          "free": 0.8604,
+          "rise": 0.009
         },
         "C8 deterministic sentinel": {
-          "sampled": 0.7793,
-          "free": 0.8108,
-          "rise": 0.0315
+          "sampled": 0.8694,
+          "free": 0.8784,
+          "rise": 0.009
         },
         "B2 uniform random": {
-          "sampled": 0.7297,
-          "free": 0.7568,
-          "rise": 0.027
+          "sampled": 0.8153,
+          "free": 0.8378,
+          "rise": 0.0225
         }
       },
       "gain_vs_b1": {
         "SSG-full receding": {
-          "sampled": 17.93,
-          "free": 18.88,
-          "narrowed_by": -0.95
+          "sampled": 18.66,
+          "free": 19.49,
+          "narrowed_by": -0.83
         },
         "SSG-G guarded": {
-          "sampled": 10.98,
-          "free": 7.78,
-          "narrowed_by": 3.2
+          "sampled": 4.15,
+          "free": 3.07,
+          "narrowed_by": 1.08
         },
         "SentinelW window-belief": {
-          "sampled": 0.58,
-          "free": 1.11,
-          "narrowed_by": -0.53
+          "sampled": 4.67,
+          "free": 0.0,
+          "narrowed_by": 4.67
         },
         "Sentinel": {
-          "sampled": 3.46,
-          "free": 3.33,
-          "narrowed_by": 0.13
+          "sampled": 2.07,
+          "free": 2.05,
+          "narrowed_by": 0.02
         },
         "C8 deterministic sentinel": {
           "sampled": 0.0,
@@ -237,9 +237,9 @@
           "narrowed_by": 0.0
         },
         "B2 uniform random": {
-          "sampled": 6.36,
-          "free": 6.66,
-          "narrowed_by": -0.3
+          "sampled": 6.22,
+          "free": 4.62,
+          "narrowed_by": 1.6
         }
       }
     }
@@ -247,20 +247,20 @@
   "BR4_randomisation_vs_deterministic": [
     {
       "delta": 0,
-      "sentinel_rise": 0.0167,
+      "sentinel_rise": 0.0208,
       "c8_rise": 0.0083,
       "randomisation_helps": false
     },
     {
       "delta": 2,
-      "sentinel_rise": 0.0417,
-      "c8_rise": 0.025,
+      "sentinel_rise": 0.025,
+      "c8_rise": 0.0125,
       "randomisation_helps": false
     },
     {
       "delta": 4,
-      "sentinel_rise": 0.0315,
-      "c8_rise": 0.0315,
+      "sentinel_rise": 0.009,
+      "c8_rise": 0.009,
       "randomisation_helps": false
     }
   ]

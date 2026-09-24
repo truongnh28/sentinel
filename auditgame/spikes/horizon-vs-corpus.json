@@ -4,82 +4,64 @@
     "detector": "mid",
     "delta": 4,
     "policy": "SSG-full receding",
-    "corpus_H8": 17.8,
-    "corpus_H12_truncated": 5.9
+    "corpus_H8": 18.6,
+    "corpus_H12_truncated": 9.7
   },
-  "published_H12_value": 4.0,
-  "verdict": "H2",
+  "published_H12_value": 5.8,
+  "verdict": "H3",
   "gains_pct": {
     "weak": {
       "SSG-full receding": {
         "D0": {
-          "corpus_H8": 3.4,
-          "corpus_H12_truncated": 3.4
+          "corpus_H8": 0.0,
+          "corpus_H12_truncated": 0.0
         },
         "D1": {
-          "corpus_H8": 2.5,
-          "corpus_H12_truncated": 5.3
+          "corpus_H8": 0.9,
+          "corpus_H12_truncated": 2.3
         },
         "D2": {
-          "corpus_H8": 5.9,
-          "corpus_H12_truncated": 6.1
+          "corpus_H8": 6.8,
+          "corpus_H12_truncated": 9.5
         },
         "D4": {
-          "corpus_H8": 12.7,
-          "corpus_H12_truncated": 1.9
+          "corpus_H8": 17.6,
+          "corpus_H12_truncated": 7.3
         }
       },
       "SSG-G guarded": {
         "D0": {
-          "corpus_H8": 0.4,
-          "corpus_H12_truncated": 0.4
+          "corpus_H8": 2.6,
+          "corpus_H12_truncated": 2.6
         },
         "D1": {
-          "corpus_H8": 2.1,
-          "corpus_H12_truncated": 2.7
+          "corpus_H8": 0.0,
+          "corpus_H12_truncated": 2.3
         },
         "D2": {
-          "corpus_H8": 5.5,
-          "corpus_H12_truncated": 8.7
+          "corpus_H8": 3.4,
+          "corpus_H12_truncated": 3.5
         },
         "D4": {
-          "corpus_H8": 10.9,
-          "corpus_H12_truncated": 11.3
+          "corpus_H8": 9.3,
+          "corpus_H12_truncated": 9.3
         }
       },
       "Sentinel": {
         "D0": {
-          "corpus_H8": -0.9,
-          "corpus_H12_truncated": -0.9
-        },
-        "D1": {
-          "corpus_H8": -1.2,
-          "corpus_H12_truncated": -1.7
-        },
-        "D2": {
-          "corpus_H8": 0.8,
-          "corpus_H12_truncated": 0.0
-        },
-        "D4": {
-          "corpus_H8": 1.7,
-          "corpus_H12_truncated": 0.0
-        }
-      },
-      "SentinelW window-belief": {
-        "D0": {
           "corpus_H8": 0.0,
-          "corpus_H12_truncated": 1.2
-        },
-        "D1": {
-          "corpus_H8": 1.7,
           "corpus_H12_truncated": 0.0
         },
+        "D1": {
+          "corpus_H8": -2.2,
+          "corpus_H12_truncated": -4.9
+        },
         "D2": {
-          "corpus_H8": 3.4,
-          "corpus_H12_truncated": 3.9
+          "corpus_H8": 0.0,
+          "corpus_H12_truncated": 0.0
         },
         "D4": {
-          "corpus_H8": 0.5,
+          "corpus_H8": 1.0,
           "corpus_H12_truncated": 0.0
         }
       }
@@ -87,158 +69,123 @@
     "mid": {
       "SSG-full receding": {
         "D0": {
-          "corpus_H8": 5.5,
-          "corpus_H12_truncated": 5.5
+          "corpus_H8": 1.3,
+          "corpus_H12_truncated": 1.3
         },
         "D1": {
-          "corpus_H8": 2.5,
-          "corpus_H12_truncated": 6.3
+          "corpus_H8": 0.9,
+          "corpus_H12_truncated": 3.5
         },
         "D2": {
-          "corpus_H8": 9.4,
-          "corpus_H12_truncated": 9.1
+          "corpus_H8": 9.3,
+          "corpus_H12_truncated": 10.8
         },
         "D4": {
-          "corpus_H8": 17.8,
-          "corpus_H12_truncated": 5.9
+          "corpus_H8": 18.6,
+          "corpus_H12_truncated": 9.7
         }
       },
       "SSG-G guarded": {
         "D0": {
-          "corpus_H8": 7.6,
-          "corpus_H12_truncated": 6.7
+          "corpus_H8": 5.6,
+          "corpus_H12_truncated": 6.5
         },
         "D1": {
-          "corpus_H8": 3.0,
-          "corpus_H12_truncated": 4.5
+          "corpus_H8": 2.2,
+          "corpus_H12_truncated": 4.9
         },
         "D2": {
-          "corpus_H8": 9.0,
-          "corpus_H12_truncated": 10.3
+          "corpus_H8": 6.8,
+          "corpus_H12_truncated": 7.3
         },
         "D4": {
-          "corpus_H8": 10.9,
-          "corpus_H12_truncated": 9.5
+          "corpus_H8": 4.1,
+          "corpus_H12_truncated": 7.3
         }
       },
       "Sentinel": {
         "D0": {
-          "corpus_H8": 0.0,
-          "corpus_H12_truncated": 0.0
+          "corpus_H8": -0.8,
+          "corpus_H12_truncated": -0.8
         },
         "D1": {
-          "corpus_H8": -1.2,
-          "corpus_H12_truncated": -1.7
+          "corpus_H8": -2.2,
+          "corpus_H12_truncated": -4.9
         },
         "D2": {
-          "corpus_H8": 1.7,
+          "corpus_H8": 2.1,
           "corpus_H12_truncated": 0.0
         },
         "D4": {
-          "corpus_H8": 3.5,
-          "corpus_H12_truncated": 1.9
-        }
-      },
-      "SentinelW window-belief": {
-        "D0": {
-          "corpus_H8": 0.0,
-          "corpus_H12_truncated": 0.8
-        },
-        "D1": {
-          "corpus_H8": 1.3,
-          "corpus_H12_truncated": -1.3
-        },
-        "D2": {
-          "corpus_H8": 4.3,
-          "corpus_H12_truncated": 4.8
-        },
-        "D4": {
-          "corpus_H8": 0.5,
-          "corpus_H12_truncated": 1.2
+          "corpus_H8": 2.1,
+          "corpus_H12_truncated": 1.0
         }
       }
     },
     "strong": {
       "SSG-full receding": {
         "D0": {
-          "corpus_H8": 5.7,
-          "corpus_H12_truncated": 5.7
+          "corpus_H8": 2.2,
+          "corpus_H12_truncated": 2.2
         },
         "D1": {
-          "corpus_H8": 3.4,
-          "corpus_H12_truncated": 7.1
+          "corpus_H8": 0.9,
+          "corpus_H12_truncated": 3.5
         },
         "D2": {
-          "corpus_H8": 10.7,
-          "corpus_H12_truncated": 10.3
+          "corpus_H8": 10.2,
+          "corpus_H12_truncated": 11.7
         },
         "D4": {
-          "corpus_H8": 17.8,
-          "corpus_H12_truncated": 7.6
+          "corpus_H8": 21.2,
+          "corpus_H12_truncated": 9.7
         }
       },
       "SSG-G guarded": {
         "D0": {
           "corpus_H8": 6.5,
-          "corpus_H12_truncated": 6.5
+          "corpus_H12_truncated": 8.1
         },
         "D1": {
-          "corpus_H8": 3.8,
-          "corpus_H12_truncated": 5.8
+          "corpus_H8": 3.5,
+          "corpus_H12_truncated": 4.9
         },
         "D2": {
-          "corpus_H8": 9.0,
-          "corpus_H12_truncated": 11.3
+          "corpus_H8": 6.8,
+          "corpus_H12_truncated": 8.7
         },
         "D4": {
-          "corpus_H8": 11.6,
-          "corpus_H12_truncated": 6.6
+          "corpus_H8": 9.3,
+          "corpus_H12_truncated": 5.8
         }
       },
       "Sentinel": {
         "D0": {
-          "corpus_H8": -1.7,
-          "corpus_H12_truncated": -1.7
+          "corpus_H8": -0.8,
+          "corpus_H12_truncated": -0.8
         },
         "D1": {
-          "corpus_H8": -1.2,
-          "corpus_H12_truncated": -1.7
+          "corpus_H8": -2.2,
+          "corpus_H12_truncated": -4.9
         },
         "D2": {
-          "corpus_H8": 1.7,
+          "corpus_H8": 0.9,
           "corpus_H12_truncated": 0.0
         },
         "D4": {
-          "corpus_H8": 4.6,
-          "corpus_H12_truncated": 2.4
-        }
-      },
-      "SentinelW window-belief": {
-        "D0": {
-          "corpus_H8": -1.7,
-          "corpus_H12_truncated": -1.7
-        },
-        "D1": {
-          "corpus_H8": 1.3,
-          "corpus_H12_truncated": -1.3
-        },
-        "D2": {
-          "corpus_H8": 5.1,
-          "corpus_H12_truncated": 6.5
-        },
-        "D4": {
-          "corpus_H8": 0.5,
-          "corpus_H12_truncated": 0.0
+          "corpus_H8": 2.1,
+          "corpus_H12_truncated": 1.0
         }
       }
     }
   },
   "provenance": {
-    "date": "2026-09-24",
-    "commit": "cef941b901c8a175c19fd2788ba25fe8b5d2dda4",
+    "date": "2026-09-25",
+    "commit": "81d0d7d95cf0ca00e5609960f9624a07afa345d8",
     "runs": [
-      "spikes/grid-usd-H8-baseline-for-15.txt",
-      "spikes/grid-usd-H8-from-H12-corpus.txt"
+      "spikes/frozen/grid-usd-H8.txt",
+      "spikes/grid-usd-H8-from-H12-corpus.txt",
+      "spikes/grid-usd-H12-delta8.txt"
     ]
   }
 }

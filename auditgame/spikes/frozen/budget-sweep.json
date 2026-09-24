@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-24T19:25:45",
-  "commit": "9f78967",
+  "generated": "2026-09-25T00:52:34",
+  "commit": "81d0d7d",
   "setup": {
     "n": 40,
     "H": 8,
@@ -16,22 +16,22 @@
       "delta": 2,
       "budget": 0.007926335999999999,
       "harm": {
-        "B1 audit-at-commit": 0.975,
+        "B1 audit-at-commit": 0.9875,
         "SSG-full receding": 0.9583,
-        "SSG-G guarded": 0.925,
-        "SentinelW window-belief": 0.9583,
-        "Sentinel": 0.9667,
-        "B2 uniform random": 0.9667
+        "SSG-G guarded": 0.95,
+        "SentinelW window-belief": 0.9875,
+        "Sentinel": 0.9875,
+        "B2 uniform random": 0.9875
       },
       "gain_vs_b1": {
-        "SSG-full receding": 1.71,
-        "SSG-G guarded": 5.13,
-        "SentinelW window-belief": 1.71,
-        "Sentinel": 0.85,
-        "B2 uniform random": 0.85
+        "SSG-full receding": 2.96,
+        "SSG-G guarded": 3.8,
+        "SentinelW window-belief": 0.0,
+        "Sentinel": 0.0,
+        "B2 uniform random": 0.0
       },
       "best_policy": "SSG-G guarded",
-      "best_gain": 5.13,
+      "best_gain": 3.8,
       "clears_15": false
     },
     {
@@ -39,22 +39,22 @@
       "delta": 4,
       "budget": 0.007926335999999999,
       "harm": {
-        "B1 audit-at-commit": 0.7793,
-        "SSG-full receding": 0.6667,
-        "SSG-G guarded": 0.7162,
-        "SentinelW window-belief": 0.7793,
-        "Sentinel": 0.7793,
-        "B2 uniform random": 0.7793
+        "B1 audit-at-commit": 0.8694,
+        "SSG-full receding": 0.8288,
+        "SSG-G guarded": 0.8243,
+        "SentinelW window-belief": 0.8694,
+        "Sentinel": 0.8694,
+        "B2 uniform random": 0.8694
       },
       "gain_vs_b1": {
-        "SSG-full receding": 14.45,
-        "SSG-G guarded": 8.1,
+        "SSG-full receding": 4.67,
+        "SSG-G guarded": 5.19,
         "SentinelW window-belief": 0.0,
         "Sentinel": 0.0,
         "B2 uniform random": 0.0
       },
-      "best_policy": "SSG-full receding",
-      "best_gain": 14.45,
+      "best_policy": "SSG-G guarded",
+      "best_gain": 5.19,
       "clears_15": false
     },
     {
@@ -62,22 +62,22 @@
       "delta": 2,
       "budget": 0.0158774418,
       "harm": {
-        "B1 audit-at-commit": 0.975,
-        "SSG-full receding": 0.8833,
-        "SSG-G guarded": 0.8875,
-        "SentinelW window-belief": 0.9333,
-        "Sentinel": 0.9583,
-        "B2 uniform random": 0.9292
+        "B1 audit-at-commit": 0.9875,
+        "SSG-full receding": 0.8958,
+        "SSG-G guarded": 0.9208,
+        "SentinelW window-belief": 0.9875,
+        "Sentinel": 0.9667,
+        "B2 uniform random": 0.9708
       },
       "gain_vs_b1": {
-        "SSG-full receding": 9.41,
-        "SSG-G guarded": 8.97,
-        "SentinelW window-belief": 4.28,
-        "Sentinel": 1.71,
-        "B2 uniform random": 4.7
+        "SSG-full receding": 9.29,
+        "SSG-G guarded": 6.75,
+        "SentinelW window-belief": 0.0,
+        "Sentinel": 2.11,
+        "B2 uniform random": 1.69
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 9.41,
+      "best_gain": 9.29,
       "clears_15": false
     },
     {
@@ -85,22 +85,22 @@
       "delta": 4,
       "budget": 0.0158774418,
       "harm": {
-        "B1 audit-at-commit": 0.7793,
-        "SSG-full receding": 0.6396,
-        "SSG-G guarded": 0.6937,
-        "SentinelW window-belief": 0.7748,
-        "Sentinel": 0.7523,
-        "B2 uniform random": 0.7297
+        "B1 audit-at-commit": 0.8694,
+        "SSG-full receding": 0.7072,
+        "SSG-G guarded": 0.8333,
+        "SentinelW window-belief": 0.8288,
+        "Sentinel": 0.8514,
+        "B2 uniform random": 0.8153
       },
       "gain_vs_b1": {
-        "SSG-full receding": 17.93,
-        "SSG-G guarded": 10.98,
-        "SentinelW window-belief": 0.58,
-        "Sentinel": 3.46,
-        "B2 uniform random": 6.36
+        "SSG-full receding": 18.66,
+        "SSG-G guarded": 4.15,
+        "SentinelW window-belief": 4.67,
+        "Sentinel": 2.07,
+        "B2 uniform random": 6.22
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 17.93,
+      "best_gain": 18.66,
       "clears_15": true
     },
     {
@@ -108,22 +108,22 @@
       "delta": 2,
       "budget": 0.024769799999999998,
       "harm": {
-        "B1 audit-at-commit": 0.8208,
-        "SSG-full receding": 0.6917,
-        "SSG-G guarded": 0.7833,
-        "SentinelW window-belief": 0.9083,
-        "Sentinel": 0.9583,
+        "B1 audit-at-commit": 0.9417,
+        "SSG-full receding": 0.6792,
+        "SSG-G guarded": 0.8333,
+        "SentinelW window-belief": 0.9292,
+        "Sentinel": 0.9458,
         "B2 uniform random": 0.9
       },
       "gain_vs_b1": {
-        "SSG-full receding": 15.73,
-        "SSG-G guarded": 4.57,
-        "SentinelW window-belief": -10.66,
-        "Sentinel": -16.75,
-        "B2 uniform random": -9.65
+        "SSG-full receding": 27.88,
+        "SSG-G guarded": 11.51,
+        "SentinelW window-belief": 1.33,
+        "Sentinel": -0.44,
+        "B2 uniform random": 4.43
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 15.73,
+      "best_gain": 27.88,
       "clears_15": true
     },
     {
@@ -131,22 +131,22 @@
       "delta": 4,
       "budget": 0.024769799999999998,
       "harm": {
-        "B1 audit-at-commit": 0.7793,
-        "SSG-full receding": 0.455,
-        "SSG-G guarded": 0.509,
-        "SentinelW window-belief": 0.7072,
-        "Sentinel": 0.7297,
-        "B2 uniform random": 0.6802
+        "B1 audit-at-commit": 0.8694,
+        "SSG-full receding": 0.5045,
+        "SSG-G guarded": 0.5721,
+        "SentinelW window-belief": 0.7793,
+        "Sentinel": 0.8514,
+        "B2 uniform random": 0.7838
       },
       "gain_vs_b1": {
-        "SSG-full receding": 41.61,
-        "SSG-G guarded": 34.68,
-        "SentinelW window-belief": 9.25,
-        "Sentinel": 6.36,
-        "B2 uniform random": 12.72
+        "SSG-full receding": 41.97,
+        "SSG-G guarded": 34.2,
+        "SentinelW window-belief": 10.36,
+        "Sentinel": 2.07,
+        "B2 uniform random": 9.85
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 41.61,
+      "best_gain": 41.97,
       "clears_15": true
     },
     {
@@ -154,22 +154,22 @@
       "delta": 2,
       "budget": 0.0371547,
       "harm": {
-        "B1 audit-at-commit": 0.75,
-        "SSG-full receding": 0.5417,
-        "SSG-G guarded": 0.6333,
-        "SentinelW window-belief": 0.875,
-        "Sentinel": 0.9042,
-        "B2 uniform random": 0.8625
+        "B1 audit-at-commit": 0.7458,
+        "SSG-full receding": 0.4958,
+        "SSG-G guarded": 0.5208,
+        "SentinelW window-belief": 0.8542,
+        "Sentinel": 0.8958,
+        "B2 uniform random": 0.8958
       },
       "gain_vs_b1": {
-        "SSG-full receding": 27.77,
-        "SSG-G guarded": 15.56,
-        "SentinelW window-belief": -16.67,
-        "Sentinel": -20.56,
-        "B2 uniform random": -15.0
+        "SSG-full receding": 33.52,
+        "SSG-G guarded": 30.17,
+        "SentinelW window-belief": -14.53,
+        "Sentinel": -20.11,
+        "B2 uniform random": -20.11
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 27.77,
+      "best_gain": 33.52,
       "clears_15": true
     },
     {
@@ -177,22 +177,22 @@
       "delta": 4,
       "budget": 0.0371547,
       "harm": {
-        "B1 audit-at-commit": 0.6306,
-        "SSG-full receding": 0.3108,
-        "SSG-G guarded": 0.3739,
-        "SentinelW window-belief": 0.5946,
-        "Sentinel": 0.6532,
-        "B2 uniform random": 0.6261
+        "B1 audit-at-commit": 0.5991,
+        "SSG-full receding": 0.3694,
+        "SSG-G guarded": 0.4324,
+        "SentinelW window-belief": 0.6847,
+        "Sentinel": 0.7793,
+        "B2 uniform random": 0.7432
       },
       "gain_vs_b1": {
-        "SSG-full receding": 50.71,
-        "SSG-G guarded": 40.71,
-        "SentinelW window-belief": 5.71,
-        "Sentinel": -3.58,
-        "B2 uniform random": 0.71
+        "SSG-full receding": 38.34,
+        "SSG-G guarded": 27.83,
+        "SentinelW window-belief": -14.29,
+        "Sentinel": -30.08,
+        "B2 uniform random": -24.05
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 50.71,
+      "best_gain": 38.34,
       "clears_15": true
     },
     {
@@ -200,19 +200,19 @@
       "delta": 2,
       "budget": 0.049539599999999996,
       "harm": {
-        "B1 audit-at-commit": 0.2875,
-        "SSG-full receding": 0.2875,
-        "SSG-G guarded": 0.2875,
+        "B1 audit-at-commit": 0.2042,
+        "SSG-full receding": 0.2042,
+        "SSG-G guarded": 0.2042,
         "SentinelW window-belief": 0.8125,
-        "Sentinel": 0.8333,
-        "B2 uniform random": 0.8125
+        "Sentinel": 0.8958,
+        "B2 uniform random": 0.825
       },
       "gain_vs_b1": {
         "SSG-full receding": 0.0,
         "SSG-G guarded": 0.0,
-        "SentinelW window-belief": -182.61,
-        "Sentinel": -189.84,
-        "B2 uniform random": -182.61
+        "SentinelW window-belief": -297.89,
+        "Sentinel": -338.69,
+        "B2 uniform random": -304.02
       },
       "best_policy": "SSG-full receding",
       "best_gain": 0.0,
@@ -223,19 +223,19 @@
       "delta": 4,
       "budget": 0.049539599999999996,
       "harm": {
-        "B1 audit-at-commit": 0.1577,
-        "SSG-full receding": 0.1577,
-        "SSG-G guarded": 0.1577,
-        "SentinelW window-belief": 0.5315,
-        "Sentinel": 0.6441,
-        "B2 uniform random": 0.5991
+        "B1 audit-at-commit": 0.1036,
+        "SSG-full receding": 0.1036,
+        "SSG-G guarded": 0.1036,
+        "SentinelW window-belief": 0.6261,
+        "Sentinel": 0.7613,
+        "B2 uniform random": 0.7342
       },
       "gain_vs_b1": {
         "SSG-full receding": 0.0,
         "SSG-G guarded": 0.0,
-        "SentinelW window-belief": -237.03,
-        "Sentinel": -308.43,
-        "B2 uniform random": -279.9
+        "SentinelW window-belief": -504.34,
+        "Sentinel": -634.85,
+        "B2 uniform random": -608.69
       },
       "best_policy": "SSG-full receding",
       "best_gain": 0.0,
@@ -246,19 +246,19 @@
       "delta": 2,
       "budget": 0.0743094,
       "harm": {
-        "B1 audit-at-commit": 0.2875,
-        "SSG-full receding": 0.2875,
-        "SSG-G guarded": 0.2875,
-        "SentinelW window-belief": 0.7083,
-        "Sentinel": 0.7625,
-        "B2 uniform random": 0.7708
+        "B1 audit-at-commit": 0.2042,
+        "SSG-full receding": 0.2042,
+        "SSG-G guarded": 0.2042,
+        "SentinelW window-belief": 0.6792,
+        "Sentinel": 0.8375,
+        "B2 uniform random": 0.8042
       },
       "gain_vs_b1": {
         "SSG-full receding": 0.0,
         "SSG-G guarded": 0.0,
-        "SentinelW window-belief": -146.37,
-        "Sentinel": -165.22,
-        "B2 uniform random": -168.1
+        "SentinelW window-belief": -232.62,
+        "Sentinel": -310.14,
+        "B2 uniform random": -293.83
       },
       "best_policy": "SSG-full receding",
       "best_gain": 0.0,
@@ -269,19 +269,19 @@
       "delta": 4,
       "budget": 0.0743094,
       "harm": {
-        "B1 audit-at-commit": 0.1577,
-        "SSG-full receding": 0.1577,
-        "SSG-G guarded": 0.1577,
-        "SentinelW window-belief": 0.3649,
-        "Sentinel": 0.545,
-        "B2 uniform random": 0.5766
+        "B1 audit-at-commit": 0.1036,
+        "SSG-full receding": 0.1036,
+        "SSG-G guarded": 0.1036,
+        "SentinelW window-belief": 0.455,
+        "Sentinel": 0.6351,
+        "B2 uniform random": 0.6892
       },
       "gain_vs_b1": {
         "SSG-full receding": 0.0,
         "SSG-G guarded": 0.0,
-        "SentinelW window-belief": -131.39,
-        "Sentinel": -245.59,
-        "B2 uniform random": -265.63
+        "SentinelW window-belief": -339.19,
+        "Sentinel": -513.03,
+        "B2 uniform random": -565.25
       },
       "best_policy": "SSG-full receding",
       "best_gain": 0.0,
@@ -292,19 +292,19 @@
       "delta": 2,
       "budget": 0.09907919999999999,
       "harm": {
-        "B1 audit-at-commit": 0.2875,
-        "SSG-full receding": 0.2875,
-        "SSG-G guarded": 0.2875,
-        "SentinelW window-belief": 0.6417,
-        "Sentinel": 0.6875,
-        "B2 uniform random": 0.7583
+        "B1 audit-at-commit": 0.2042,
+        "SSG-full receding": 0.2042,
+        "SSG-G guarded": 0.2042,
+        "SentinelW window-belief": 0.5542,
+        "Sentinel": 0.8208,
+        "B2 uniform random": 0.7833
       },
       "gain_vs_b1": {
         "SSG-full receding": 0.0,
         "SSG-G guarded": 0.0,
-        "SentinelW window-belief": -123.2,
-        "Sentinel": -139.13,
-        "B2 uniform random": -163.76
+        "SentinelW window-belief": -171.4,
+        "Sentinel": -301.96,
+        "B2 uniform random": -283.59
       },
       "best_policy": "SSG-full receding",
       "best_gain": 0.0,
@@ -315,19 +315,19 @@
       "delta": 4,
       "budget": 0.09907919999999999,
       "harm": {
-        "B1 audit-at-commit": 0.1577,
-        "SSG-full receding": 0.1577,
-        "SSG-G guarded": 0.1577,
-        "SentinelW window-belief": 0.3559,
-        "Sentinel": 0.464,
-        "B2 uniform random": 0.518
+        "B1 audit-at-commit": 0.1036,
+        "SSG-full receding": 0.1036,
+        "SSG-G guarded": 0.1036,
+        "SentinelW window-belief": 0.4009,
+        "Sentinel": 0.5856,
+        "B2 uniform random": 0.7162
       },
       "gain_vs_b1": {
         "SSG-full receding": 0.0,
         "SSG-G guarded": 0.0,
-        "SentinelW window-belief": -125.68,
-        "Sentinel": -194.23,
-        "B2 uniform random": -228.47
+        "SentinelW window-belief": -286.97,
+        "Sentinel": -465.25,
+        "B2 uniform random": -591.31
       },
       "best_policy": "SSG-full receding",
       "best_gain": 0.0,

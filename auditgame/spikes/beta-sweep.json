@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-24T09:25:18",
-  "commit": "defd857",
+  "generated": "2026-09-25T01:03:42",
+  "commit": "81d0d7d",
   "setup": {
     "n": 20,
     "H": 8,
@@ -34,277 +34,277 @@
     {
       "beta": 0.013,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     },
     {
       "beta": 0.033,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     },
     {
       "beta": 0.058,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     },
     {
       "beta": 0.15,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     },
     {
       "beta": 0.25,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     },
     {
       "beta": 0.279,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     },
     {
       "beta": 0.314,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     },
     {
       "beta": 0.45,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     },
     {
       "beta": 0.607,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     },
     {
       "beta": 0.8,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     },
     {
       "beta": 1.0,
       "harm": {
-        "SentinelW window-belief": 0.975,
-        "SSG-B belief-weighted": 0.95,
+        "SentinelW window-belief": 1.0,
+        "SSG-B belief-weighted": 1.0,
         "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9,
-        "Sentinel": 1.0
+        "SSG-G guarded": 0.8947,
+        "Sentinel": 0.9737
       },
       "L": {
-        "SentinelW window-belief": 0.9875,
-        "SSG-B belief-weighted": 0.9625,
-        "B1 audit-at-commit": 1.0,
-        "SSG-G guarded": 0.9875,
-        "Sentinel": 1.025
+        "SentinelW window-belief": 1.0526,
+        "SSG-B belief-weighted": 1.0395,
+        "B1 audit-at-commit": 1.0921,
+        "SSG-G guarded": 0.9868,
+        "Sentinel": 1.0
       },
       "ranking": [
+        "SSG-G guarded",
+        "Sentinel",
         "SSG-B belief-weighted",
         "SentinelW window-belief",
-        "SSG-G guarded",
-        "B1 audit-at-commit",
-        "Sentinel"
+        "B1 audit-at-commit"
       ],
-      "winner": "SSG-B belief-weighted"
+      "winner": "SSG-G guarded"
     }
   ],
   "L_span_over_the_sweep": {

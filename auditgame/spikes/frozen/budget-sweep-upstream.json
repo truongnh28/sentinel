@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-24T22:00:32",
-  "commit": "335b1e3",
+  "generated": "2026-09-25T00:55:47",
+  "commit": "81d0d7d",
   "setup": {
     "n": 40,
     "H": 8,
@@ -16,20 +16,20 @@
       "delta": 2,
       "budget": 0.007926335999999999,
       "harm": {
-        "B1 audit-at-commit": 0.975,
+        "B1 audit-at-commit": 0.9875,
         "SSG-full receding": 0.9583,
-        "SSG-up receding": 0.9458,
-        "SSG-GU guarded upstream": 0.9667,
-        "B7U minimax-lp upstream": 0.975
+        "SSG-up receding": 0.9875,
+        "SSG-GU guarded upstream": 0.9875,
+        "B7U minimax-lp upstream": 0.9875
       },
       "gain_vs_b1": {
-        "SSG-full receding": 1.71,
-        "SSG-up receding": 2.99,
-        "SSG-GU guarded upstream": 0.85,
+        "SSG-full receding": 2.96,
+        "SSG-up receding": 0.0,
+        "SSG-GU guarded upstream": 0.0,
         "B7U minimax-lp upstream": 0.0
       },
-      "best_policy": "SSG-up receding",
-      "best_gain": 2.99,
+      "best_policy": "SSG-full receding",
+      "best_gain": 2.96,
       "clears_15": false
     },
     {
@@ -37,20 +37,20 @@
       "delta": 4,
       "budget": 0.007926335999999999,
       "harm": {
-        "B1 audit-at-commit": 0.7793,
-        "SSG-full receding": 0.6667,
-        "SSG-up receding": 0.7793,
-        "SSG-GU guarded upstream": 0.7793,
-        "B7U minimax-lp upstream": 0.7793
+        "B1 audit-at-commit": 0.8694,
+        "SSG-full receding": 0.8288,
+        "SSG-up receding": 0.8694,
+        "SSG-GU guarded upstream": 0.8694,
+        "B7U minimax-lp upstream": 0.8694
       },
       "gain_vs_b1": {
-        "SSG-full receding": 14.45,
+        "SSG-full receding": 4.67,
         "SSG-up receding": 0.0,
         "SSG-GU guarded upstream": 0.0,
         "B7U minimax-lp upstream": 0.0
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 14.45,
+      "best_gain": 4.67,
       "clears_15": false
     },
     {
@@ -58,20 +58,20 @@
       "delta": 2,
       "budget": 0.0158774418,
       "harm": {
-        "B1 audit-at-commit": 0.975,
-        "SSG-full receding": 0.8833,
-        "SSG-up receding": 0.9125,
-        "SSG-GU guarded upstream": 0.8875,
-        "B7U minimax-lp upstream": 0.9125
+        "B1 audit-at-commit": 0.9875,
+        "SSG-full receding": 0.8958,
+        "SSG-up receding": 0.9667,
+        "SSG-GU guarded upstream": 0.95,
+        "B7U minimax-lp upstream": 0.9625
       },
       "gain_vs_b1": {
-        "SSG-full receding": 9.41,
-        "SSG-up receding": 6.41,
-        "SSG-GU guarded upstream": 8.97,
-        "B7U minimax-lp upstream": 6.41
+        "SSG-full receding": 9.29,
+        "SSG-up receding": 2.11,
+        "SSG-GU guarded upstream": 3.8,
+        "B7U minimax-lp upstream": 2.53
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 9.41,
+      "best_gain": 9.29,
       "clears_15": false
     },
     {
@@ -79,20 +79,20 @@
       "delta": 4,
       "budget": 0.0158774418,
       "harm": {
-        "B1 audit-at-commit": 0.7793,
-        "SSG-full receding": 0.6396,
-        "SSG-up receding": 0.7703,
-        "SSG-GU guarded upstream": 0.7523,
-        "B7U minimax-lp upstream": 0.7432
+        "B1 audit-at-commit": 0.8694,
+        "SSG-full receding": 0.7072,
+        "SSG-up receding": 0.8378,
+        "SSG-GU guarded upstream": 0.8604,
+        "B7U minimax-lp upstream": 0.8243
       },
       "gain_vs_b1": {
-        "SSG-full receding": 17.93,
-        "SSG-up receding": 1.15,
-        "SSG-GU guarded upstream": 3.46,
-        "B7U minimax-lp upstream": 4.63
+        "SSG-full receding": 18.66,
+        "SSG-up receding": 3.63,
+        "SSG-GU guarded upstream": 1.04,
+        "B7U minimax-lp upstream": 5.19
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 17.93,
+      "best_gain": 18.66,
       "clears_15": true
     },
     {
@@ -100,20 +100,20 @@
       "delta": 2,
       "budget": 0.024769799999999998,
       "harm": {
-        "B1 audit-at-commit": 0.8208,
-        "SSG-full receding": 0.6917,
-        "SSG-up receding": 0.7375,
-        "SSG-GU guarded upstream": 0.725,
-        "B7U minimax-lp upstream": 0.8167
+        "B1 audit-at-commit": 0.9417,
+        "SSG-full receding": 0.6792,
+        "SSG-up receding": 0.8208,
+        "SSG-GU guarded upstream": 0.8625,
+        "B7U minimax-lp upstream": 0.85
       },
       "gain_vs_b1": {
-        "SSG-full receding": 15.73,
-        "SSG-up receding": 10.15,
-        "SSG-GU guarded upstream": 11.67,
-        "B7U minimax-lp upstream": 0.5
+        "SSG-full receding": 27.88,
+        "SSG-up receding": 12.84,
+        "SSG-GU guarded upstream": 8.41,
+        "B7U minimax-lp upstream": 9.74
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 15.73,
+      "best_gain": 27.88,
       "clears_15": true
     },
     {
@@ -121,20 +121,20 @@
       "delta": 4,
       "budget": 0.024769799999999998,
       "harm": {
-        "B1 audit-at-commit": 0.7793,
-        "SSG-full receding": 0.455,
-        "SSG-up receding": 0.5991,
-        "SSG-GU guarded upstream": 0.5766,
-        "B7U minimax-lp upstream": 0.4685
+        "B1 audit-at-commit": 0.8694,
+        "SSG-full receding": 0.5045,
+        "SSG-up receding": 0.6577,
+        "SSG-GU guarded upstream": 0.7252,
+        "B7U minimax-lp upstream": 0.6261
       },
       "gain_vs_b1": {
-        "SSG-full receding": 41.61,
-        "SSG-up receding": 23.12,
-        "SSG-GU guarded upstream": 26.01,
-        "B7U minimax-lp upstream": 39.88
+        "SSG-full receding": 41.97,
+        "SSG-up receding": 24.35,
+        "SSG-GU guarded upstream": 16.59,
+        "B7U minimax-lp upstream": 27.98
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 41.61,
+      "best_gain": 41.97,
       "clears_15": true
     },
     {
@@ -142,20 +142,20 @@
       "delta": 2,
       "budget": 0.0371547,
       "harm": {
-        "B1 audit-at-commit": 0.75,
-        "SSG-full receding": 0.5417,
-        "SSG-up receding": 0.4708,
-        "SSG-GU guarded upstream": 0.5083,
-        "B7U minimax-lp upstream": 0.6875
+        "B1 audit-at-commit": 0.7458,
+        "SSG-full receding": 0.4958,
+        "SSG-up receding": 0.4167,
+        "SSG-GU guarded upstream": 0.5458,
+        "B7U minimax-lp upstream": 0.5875
       },
       "gain_vs_b1": {
-        "SSG-full receding": 27.77,
-        "SSG-up receding": 37.23,
-        "SSG-GU guarded upstream": 32.23,
-        "B7U minimax-lp upstream": 8.33
+        "SSG-full receding": 33.52,
+        "SSG-up receding": 44.13,
+        "SSG-GU guarded upstream": 26.82,
+        "B7U minimax-lp upstream": 21.23
       },
       "best_policy": "SSG-up receding",
-      "best_gain": 37.23,
+      "best_gain": 44.13,
       "clears_15": true
     },
     {
@@ -163,20 +163,20 @@
       "delta": 4,
       "budget": 0.0371547,
       "harm": {
-        "B1 audit-at-commit": 0.6306,
-        "SSG-full receding": 0.3108,
-        "SSG-up receding": 0.2883,
-        "SSG-GU guarded upstream": 0.3423,
-        "B7U minimax-lp upstream": 0.2973
+        "B1 audit-at-commit": 0.5991,
+        "SSG-full receding": 0.3694,
+        "SSG-up receding": 0.2658,
+        "SSG-GU guarded upstream": 0.4099,
+        "B7U minimax-lp upstream": 0.3739
       },
       "gain_vs_b1": {
-        "SSG-full receding": 50.71,
-        "SSG-up receding": 54.28,
-        "SSG-GU guarded upstream": 45.72,
-        "B7U minimax-lp upstream": 52.85
+        "SSG-full receding": 38.34,
+        "SSG-up receding": 55.63,
+        "SSG-GU guarded upstream": 31.58,
+        "B7U minimax-lp upstream": 37.59
       },
       "best_policy": "SSG-up receding",
-      "best_gain": 54.28,
+      "best_gain": 55.63,
       "clears_15": true
     },
     {
@@ -184,17 +184,17 @@
       "delta": 2,
       "budget": 0.049539599999999996,
       "harm": {
-        "B1 audit-at-commit": 0.2875,
-        "SSG-full receding": 0.2875,
-        "SSG-up receding": 0.2875,
-        "SSG-GU guarded upstream": 0.4792,
-        "B7U minimax-lp upstream": 0.6458
+        "B1 audit-at-commit": 0.2042,
+        "SSG-full receding": 0.2042,
+        "SSG-up receding": 0.2042,
+        "SSG-GU guarded upstream": 0.6083,
+        "B7U minimax-lp upstream": 0.5792
       },
       "gain_vs_b1": {
         "SSG-full receding": 0.0,
         "SSG-up receding": 0.0,
-        "SSG-GU guarded upstream": -66.68,
-        "B7U minimax-lp upstream": -124.63
+        "SSG-GU guarded upstream": -197.89,
+        "B7U minimax-lp upstream": -183.64
       },
       "best_policy": "SSG-full receding",
       "best_gain": 0.0,
@@ -205,17 +205,17 @@
       "delta": 4,
       "budget": 0.049539599999999996,
       "harm": {
-        "B1 audit-at-commit": 0.1577,
-        "SSG-full receding": 0.1577,
-        "SSG-up receding": 0.1757,
-        "SSG-GU guarded upstream": 0.2883,
-        "B7U minimax-lp upstream": 0.2568
+        "B1 audit-at-commit": 0.1036,
+        "SSG-full receding": 0.1036,
+        "SSG-up receding": 0.1486,
+        "SSG-GU guarded upstream": 0.3784,
+        "B7U minimax-lp upstream": 0.3378
       },
       "gain_vs_b1": {
         "SSG-full receding": 0.0,
-        "SSG-up receding": -11.41,
-        "SSG-GU guarded upstream": -82.82,
-        "B7U minimax-lp upstream": -62.84
+        "SSG-up receding": -43.44,
+        "SSG-GU guarded upstream": -265.25,
+        "B7U minimax-lp upstream": -226.06
       },
       "best_policy": "SSG-full receding",
       "best_gain": 0.0,
@@ -226,59 +226,59 @@
       "delta": 2,
       "budget": 0.0743094,
       "harm": {
-        "B1 audit-at-commit": 0.2875,
-        "SSG-full receding": 0.2875,
-        "SSG-up receding": 0.3417,
-        "SSG-GU guarded upstream": 0.4375,
-        "B7U minimax-lp upstream": 0.6417
-      },
-      "gain_vs_b1": {
-        "SSG-full receding": 0.0,
-        "SSG-up receding": -18.85,
-        "SSG-GU guarded upstream": -52.17,
-        "B7U minimax-lp upstream": -123.2
-      },
-      "best_policy": "SSG-full receding",
-      "best_gain": 0.0,
-      "clears_15": false
-    },
-    {
-      "share": 1.5,
-      "delta": 4,
-      "budget": 0.0743094,
-      "harm": {
-        "B1 audit-at-commit": 0.1577,
-        "SSG-full receding": 0.1577,
-        "SSG-up receding": 0.1667,
-        "SSG-GU guarded upstream": 0.2613,
-        "B7U minimax-lp upstream": 0.2523
-      },
-      "gain_vs_b1": {
-        "SSG-full receding": 0.0,
-        "SSG-up receding": -5.71,
-        "SSG-GU guarded upstream": -65.69,
-        "B7U minimax-lp upstream": -59.99
-      },
-      "best_policy": "SSG-full receding",
-      "best_gain": 0.0,
-      "clears_15": false
-    },
-    {
-      "share": 2.0,
-      "delta": 2,
-      "budget": 0.09907919999999999,
-      "harm": {
-        "B1 audit-at-commit": 0.2875,
-        "SSG-full receding": 0.2875,
-        "SSG-up receding": 0.4,
+        "B1 audit-at-commit": 0.2042,
+        "SSG-full receding": 0.2042,
+        "SSG-up receding": 0.2875,
         "SSG-GU guarded upstream": 0.4958,
-        "B7U minimax-lp upstream": 0.6542
+        "B7U minimax-lp upstream": 0.55
       },
       "gain_vs_b1": {
         "SSG-full receding": 0.0,
-        "SSG-up receding": -39.13,
-        "SSG-GU guarded upstream": -72.45,
-        "B7U minimax-lp upstream": -127.55
+        "SSG-up receding": -40.79,
+        "SSG-GU guarded upstream": -142.8,
+        "B7U minimax-lp upstream": -169.34
+      },
+      "best_policy": "SSG-full receding",
+      "best_gain": 0.0,
+      "clears_15": false
+    },
+    {
+      "share": 1.5,
+      "delta": 4,
+      "budget": 0.0743094,
+      "harm": {
+        "B1 audit-at-commit": 0.1036,
+        "SSG-full receding": 0.1036,
+        "SSG-up receding": 0.1577,
+        "SSG-GU guarded upstream": 0.3063,
+        "B7U minimax-lp upstream": 0.2432
+      },
+      "gain_vs_b1": {
+        "SSG-full receding": 0.0,
+        "SSG-up receding": -52.22,
+        "SSG-GU guarded upstream": -195.66,
+        "B7U minimax-lp upstream": -134.75
+      },
+      "best_policy": "SSG-full receding",
+      "best_gain": 0.0,
+      "clears_15": false
+    },
+    {
+      "share": 2.0,
+      "delta": 2,
+      "budget": 0.09907919999999999,
+      "harm": {
+        "B1 audit-at-commit": 0.2042,
+        "SSG-full receding": 0.2042,
+        "SSG-up receding": 0.2958,
+        "SSG-GU guarded upstream": 0.4792,
+        "B7U minimax-lp upstream": 0.5792
+      },
+      "gain_vs_b1": {
+        "SSG-full receding": 0.0,
+        "SSG-up receding": -44.86,
+        "SSG-GU guarded upstream": -134.67,
+        "B7U minimax-lp upstream": -183.64
       },
       "best_policy": "SSG-full receding",
       "best_gain": 0.0,
@@ -289,17 +289,17 @@
       "delta": 4,
       "budget": 0.09907919999999999,
       "harm": {
-        "B1 audit-at-commit": 0.1577,
-        "SSG-full receding": 0.1577,
-        "SSG-up receding": 0.2027,
-        "SSG-GU guarded upstream": 0.2838,
-        "B7U minimax-lp upstream": 0.2793
+        "B1 audit-at-commit": 0.1036,
+        "SSG-full receding": 0.1036,
+        "SSG-up receding": 0.1306,
+        "SSG-GU guarded upstream": 0.2973,
+        "B7U minimax-lp upstream": 0.2658
       },
       "gain_vs_b1": {
         "SSG-full receding": 0.0,
-        "SSG-up receding": -28.54,
-        "SSG-GU guarded upstream": -79.96,
-        "B7U minimax-lp upstream": -77.11
+        "SSG-up receding": -26.06,
+        "SSG-GU guarded upstream": -186.97,
+        "B7U minimax-lp upstream": -156.56
       },
       "best_policy": "SSG-full receding",
       "best_gain": 0.0,

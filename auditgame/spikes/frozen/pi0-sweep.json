@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-24T22:29:05",
-  "commit": "947a87a",
+  "generated": "2026-09-25T00:56:06",
+  "commit": "81d0d7d",
   "setup": {
     "n": 40,
     "H": 8,
@@ -36,26 +36,26 @@
       "share": 0.3205,
       "delta": 2,
       "harm": {
-        "B1 audit-at-commit": 0.975,
-        "B2 uniform random": 0.9292,
-        "B5 risk-score": 0.975,
-        "SSG-full receding": 0.8833,
-        "SSG-up receding": 0.9125,
-        "SSG-G guarded": 0.8875,
-        "SentinelW window-belief": 0.9333,
-        "Sentinel": 0.9583
+        "B1 audit-at-commit": 0.9875,
+        "B2 uniform random": 0.9708,
+        "B5 risk-score": 0.9792,
+        "SSG-full receding": 0.8958,
+        "SSG-up receding": 0.9667,
+        "SSG-G guarded": 0.9458,
+        "SentinelW window-belief": 0.9875,
+        "Sentinel": 0.9667
       },
       "gain_vs_b1": {
-        "B2 uniform random": 4.7,
-        "B5 risk-score": 0.0,
-        "SSG-full receding": 9.41,
-        "SSG-up receding": 6.41,
-        "SSG-G guarded": 8.97,
-        "SentinelW window-belief": 4.28,
-        "Sentinel": 1.71
+        "B2 uniform random": 1.69,
+        "B5 risk-score": 0.84,
+        "SSG-full receding": 9.29,
+        "SSG-up receding": 2.11,
+        "SSG-G guarded": 4.22,
+        "SentinelW window-belief": 0.0,
+        "Sentinel": 2.11
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 9.41,
+      "best_gain": 9.29,
       "clears_15": false
     },
     {
@@ -63,26 +63,26 @@
       "share": 0.3205,
       "delta": 4,
       "harm": {
-        "B1 audit-at-commit": 0.7793,
-        "B2 uniform random": 0.7297,
-        "B5 risk-score": 0.7793,
-        "SSG-full receding": 0.6396,
-        "SSG-up receding": 0.7703,
-        "SSG-G guarded": 0.6937,
-        "SentinelW window-belief": 0.7748,
-        "Sentinel": 0.7523
+        "B1 audit-at-commit": 0.8694,
+        "B2 uniform random": 0.8153,
+        "B5 risk-score": 0.8694,
+        "SSG-full receding": 0.7072,
+        "SSG-up receding": 0.8378,
+        "SSG-G guarded": 0.8423,
+        "SentinelW window-belief": 0.8288,
+        "Sentinel": 0.8514
       },
       "gain_vs_b1": {
-        "B2 uniform random": 6.36,
+        "B2 uniform random": 6.22,
         "B5 risk-score": 0.0,
-        "SSG-full receding": 17.93,
-        "SSG-up receding": 1.15,
-        "SSG-G guarded": 10.98,
-        "SentinelW window-belief": 0.58,
-        "Sentinel": 3.46
+        "SSG-full receding": 18.66,
+        "SSG-up receding": 3.63,
+        "SSG-G guarded": 3.12,
+        "SentinelW window-belief": 4.67,
+        "Sentinel": 2.07
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 17.93,
+      "best_gain": 18.66,
       "clears_15": true
     },
     {
@@ -90,26 +90,26 @@
       "share": 0.75,
       "delta": 2,
       "harm": {
-        "B1 audit-at-commit": 0.75,
-        "B2 uniform random": 0.8625,
-        "B5 risk-score": 0.9292,
-        "SSG-full receding": 0.5417,
-        "SSG-up receding": 0.4708,
-        "SSG-G guarded": 0.6333,
-        "SentinelW window-belief": 0.875,
+        "B1 audit-at-commit": 0.7458,
+        "B2 uniform random": 0.8958,
+        "B5 risk-score": 0.9542,
+        "SSG-full receding": 0.4958,
+        "SSG-up receding": 0.4167,
+        "SSG-G guarded": 0.55,
+        "SentinelW window-belief": 0.8542,
         "Sentinel": 0.8958
       },
       "gain_vs_b1": {
-        "B2 uniform random": -15.0,
-        "B5 risk-score": -23.89,
-        "SSG-full receding": 27.77,
-        "SSG-up receding": 37.23,
-        "SSG-G guarded": 15.56,
-        "SentinelW window-belief": -16.67,
-        "Sentinel": -19.44
+        "B2 uniform random": -20.11,
+        "B5 risk-score": -27.94,
+        "SSG-full receding": 33.52,
+        "SSG-up receding": 44.13,
+        "SSG-G guarded": 26.25,
+        "SentinelW window-belief": -14.53,
+        "Sentinel": -20.11
       },
       "best_policy": "SSG-up receding",
-      "best_gain": 37.23,
+      "best_gain": 44.13,
       "clears_15": true
     },
     {
@@ -117,26 +117,26 @@
       "share": 0.75,
       "delta": 4,
       "harm": {
-        "B1 audit-at-commit": 0.6306,
-        "B2 uniform random": 0.6261,
-        "B5 risk-score": 0.7207,
-        "SSG-full receding": 0.3108,
-        "SSG-up receding": 0.2883,
-        "SSG-G guarded": 0.3739,
-        "SentinelW window-belief": 0.5541,
-        "Sentinel": 0.6532
+        "B1 audit-at-commit": 0.5991,
+        "B2 uniform random": 0.7432,
+        "B5 risk-score": 0.8378,
+        "SSG-full receding": 0.3694,
+        "SSG-up receding": 0.2658,
+        "SSG-G guarded": 0.4459,
+        "SentinelW window-belief": 0.7072,
+        "Sentinel": 0.7658
       },
       "gain_vs_b1": {
-        "B2 uniform random": 0.71,
-        "B5 risk-score": -14.29,
-        "SSG-full receding": 50.71,
-        "SSG-up receding": 54.28,
-        "SSG-G guarded": 40.71,
-        "SentinelW window-belief": 12.13,
-        "Sentinel": -3.58
+        "B2 uniform random": -24.05,
+        "B5 risk-score": -39.84,
+        "SSG-full receding": 38.34,
+        "SSG-up receding": 55.63,
+        "SSG-G guarded": 25.57,
+        "SentinelW window-belief": -18.04,
+        "Sentinel": -27.83
       },
       "best_policy": "SSG-up receding",
-      "best_gain": 54.28,
+      "best_gain": 55.63,
       "clears_15": true
     },
     {
@@ -144,26 +144,26 @@
       "share": 0.3205,
       "delta": 2,
       "harm": {
-        "B1 audit-at-commit": 0.975,
-        "B2 uniform random": 0.9292,
-        "B5 risk-score": 0.975,
-        "SSG-full receding": 0.8833,
-        "SSG-up receding": 0.9125,
-        "SSG-G guarded": 0.8875,
-        "SentinelW window-belief": 0.9333,
-        "Sentinel": 0.9583
+        "B1 audit-at-commit": 0.9875,
+        "B2 uniform random": 0.9708,
+        "B5 risk-score": 0.9792,
+        "SSG-full receding": 0.8958,
+        "SSG-up receding": 0.9667,
+        "SSG-G guarded": 0.9208,
+        "SentinelW window-belief": 0.9875,
+        "Sentinel": 0.9667
       },
       "gain_vs_b1": {
-        "B2 uniform random": 4.7,
-        "B5 risk-score": 0.0,
-        "SSG-full receding": 9.41,
-        "SSG-up receding": 6.41,
-        "SSG-G guarded": 8.97,
-        "SentinelW window-belief": 4.28,
-        "Sentinel": 1.71
+        "B2 uniform random": 1.69,
+        "B5 risk-score": 0.84,
+        "SSG-full receding": 9.29,
+        "SSG-up receding": 2.11,
+        "SSG-G guarded": 6.75,
+        "SentinelW window-belief": 0.0,
+        "Sentinel": 2.11
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 9.41,
+      "best_gain": 9.29,
       "clears_15": false
     },
     {
@@ -171,26 +171,26 @@
       "share": 0.3205,
       "delta": 4,
       "harm": {
-        "B1 audit-at-commit": 0.7793,
-        "B2 uniform random": 0.7297,
-        "B5 risk-score": 0.7793,
-        "SSG-full receding": 0.6396,
-        "SSG-up receding": 0.7703,
-        "SSG-G guarded": 0.6937,
-        "SentinelW window-belief": 0.7748,
-        "Sentinel": 0.7523
+        "B1 audit-at-commit": 0.8694,
+        "B2 uniform random": 0.8153,
+        "B5 risk-score": 0.8694,
+        "SSG-full receding": 0.7072,
+        "SSG-up receding": 0.8378,
+        "SSG-G guarded": 0.8333,
+        "SentinelW window-belief": 0.8288,
+        "Sentinel": 0.8514
       },
       "gain_vs_b1": {
-        "B2 uniform random": 6.36,
+        "B2 uniform random": 6.22,
         "B5 risk-score": 0.0,
-        "SSG-full receding": 17.93,
-        "SSG-up receding": 1.15,
-        "SSG-G guarded": 10.98,
-        "SentinelW window-belief": 0.58,
-        "Sentinel": 3.46
+        "SSG-full receding": 18.66,
+        "SSG-up receding": 3.63,
+        "SSG-G guarded": 4.15,
+        "SentinelW window-belief": 4.67,
+        "Sentinel": 2.07
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 17.93,
+      "best_gain": 18.66,
       "clears_15": true
     },
     {
@@ -198,134 +198,134 @@
       "share": 0.75,
       "delta": 2,
       "harm": {
-        "B1 audit-at-commit": 0.75,
-        "B2 uniform random": 0.8625,
-        "B5 risk-score": 0.9292,
-        "SSG-full receding": 0.5417,
-        "SSG-up receding": 0.4708,
-        "SSG-G guarded": 0.6333,
-        "SentinelW window-belief": 0.875,
+        "B1 audit-at-commit": 0.7458,
+        "B2 uniform random": 0.8958,
+        "B5 risk-score": 0.9542,
+        "SSG-full receding": 0.4958,
+        "SSG-up receding": 0.4167,
+        "SSG-G guarded": 0.5208,
+        "SentinelW window-belief": 0.8542,
+        "Sentinel": 0.8958
+      },
+      "gain_vs_b1": {
+        "B2 uniform random": -20.11,
+        "B5 risk-score": -27.94,
+        "SSG-full receding": 33.52,
+        "SSG-up receding": 44.13,
+        "SSG-G guarded": 30.17,
+        "SentinelW window-belief": -14.53,
+        "Sentinel": -20.11
+      },
+      "best_policy": "SSG-up receding",
+      "best_gain": 44.13,
+      "clears_15": true
+    },
+    {
+      "pi0": 0.0799,
+      "share": 0.75,
+      "delta": 4,
+      "harm": {
+        "B1 audit-at-commit": 0.5991,
+        "B2 uniform random": 0.7432,
+        "B5 risk-score": 0.8378,
+        "SSG-full receding": 0.3694,
+        "SSG-up receding": 0.2658,
+        "SSG-G guarded": 0.4324,
+        "SentinelW window-belief": 0.6847,
+        "Sentinel": 0.7793
+      },
+      "gain_vs_b1": {
+        "B2 uniform random": -24.05,
+        "B5 risk-score": -39.84,
+        "SSG-full receding": 38.34,
+        "SSG-up receding": 55.63,
+        "SSG-G guarded": 27.83,
+        "SentinelW window-belief": -14.29,
+        "Sentinel": -30.08
+      },
+      "best_policy": "SSG-up receding",
+      "best_gain": 55.63,
+      "clears_15": true
+    },
+    {
+      "pi0": 0.1,
+      "share": 0.3205,
+      "delta": 2,
+      "harm": {
+        "B1 audit-at-commit": 0.9875,
+        "B2 uniform random": 0.9708,
+        "B5 risk-score": 0.9792,
+        "SSG-full receding": 0.8958,
+        "SSG-up receding": 0.9667,
+        "SSG-G guarded": 0.9333,
+        "SentinelW window-belief": 0.9875,
+        "Sentinel": 0.9667
+      },
+      "gain_vs_b1": {
+        "B2 uniform random": 1.69,
+        "B5 risk-score": 0.84,
+        "SSG-full receding": 9.29,
+        "SSG-up receding": 2.11,
+        "SSG-G guarded": 5.49,
+        "SentinelW window-belief": 0.0,
+        "Sentinel": 2.11
+      },
+      "best_policy": "SSG-full receding",
+      "best_gain": 9.29,
+      "clears_15": false
+    },
+    {
+      "pi0": 0.1,
+      "share": 0.3205,
+      "delta": 4,
+      "harm": {
+        "B1 audit-at-commit": 0.8694,
+        "B2 uniform random": 0.8153,
+        "B5 risk-score": 0.8694,
+        "SSG-full receding": 0.7072,
+        "SSG-up receding": 0.8378,
+        "SSG-G guarded": 0.8063,
+        "SentinelW window-belief": 0.8288,
+        "Sentinel": 0.8514
+      },
+      "gain_vs_b1": {
+        "B2 uniform random": 6.22,
+        "B5 risk-score": 0.0,
+        "SSG-full receding": 18.66,
+        "SSG-up receding": 3.63,
+        "SSG-G guarded": 7.26,
+        "SentinelW window-belief": 4.67,
+        "Sentinel": 2.07
+      },
+      "best_policy": "SSG-full receding",
+      "best_gain": 18.66,
+      "clears_15": true
+    },
+    {
+      "pi0": 0.1,
+      "share": 0.75,
+      "delta": 2,
+      "harm": {
+        "B1 audit-at-commit": 0.7458,
+        "B2 uniform random": 0.8958,
+        "B5 risk-score": 0.9542,
+        "SSG-full receding": 0.4958,
+        "SSG-up receding": 0.4167,
+        "SSG-G guarded": 0.5375,
+        "SentinelW window-belief": 0.8542,
         "Sentinel": 0.9042
       },
       "gain_vs_b1": {
-        "B2 uniform random": -15.0,
-        "B5 risk-score": -23.89,
-        "SSG-full receding": 27.77,
-        "SSG-up receding": 37.23,
-        "SSG-G guarded": 15.56,
-        "SentinelW window-belief": -16.67,
-        "Sentinel": -20.56
+        "B2 uniform random": -20.11,
+        "B5 risk-score": -27.94,
+        "SSG-full receding": 33.52,
+        "SSG-up receding": 44.13,
+        "SSG-G guarded": 27.93,
+        "SentinelW window-belief": -14.53,
+        "Sentinel": -21.24
       },
       "best_policy": "SSG-up receding",
-      "best_gain": 37.23,
-      "clears_15": true
-    },
-    {
-      "pi0": 0.0799,
-      "share": 0.75,
-      "delta": 4,
-      "harm": {
-        "B1 audit-at-commit": 0.6306,
-        "B2 uniform random": 0.6261,
-        "B5 risk-score": 0.7207,
-        "SSG-full receding": 0.3108,
-        "SSG-up receding": 0.2883,
-        "SSG-G guarded": 0.3739,
-        "SentinelW window-belief": 0.5946,
-        "Sentinel": 0.6532
-      },
-      "gain_vs_b1": {
-        "B2 uniform random": 0.71,
-        "B5 risk-score": -14.29,
-        "SSG-full receding": 50.71,
-        "SSG-up receding": 54.28,
-        "SSG-G guarded": 40.71,
-        "SentinelW window-belief": 5.71,
-        "Sentinel": -3.58
-      },
-      "best_policy": "SSG-up receding",
-      "best_gain": 54.28,
-      "clears_15": true
-    },
-    {
-      "pi0": 0.1,
-      "share": 0.3205,
-      "delta": 2,
-      "harm": {
-        "B1 audit-at-commit": 0.975,
-        "B2 uniform random": 0.9292,
-        "B5 risk-score": 0.975,
-        "SSG-full receding": 0.8833,
-        "SSG-up receding": 0.9125,
-        "SSG-G guarded": 0.8792,
-        "SentinelW window-belief": 0.9333,
-        "Sentinel": 0.9583
-      },
-      "gain_vs_b1": {
-        "B2 uniform random": 4.7,
-        "B5 risk-score": 0.0,
-        "SSG-full receding": 9.41,
-        "SSG-up receding": 6.41,
-        "SSG-G guarded": 9.83,
-        "SentinelW window-belief": 4.28,
-        "Sentinel": 1.71
-      },
-      "best_policy": "SSG-G guarded",
-      "best_gain": 9.83,
-      "clears_15": false
-    },
-    {
-      "pi0": 0.1,
-      "share": 0.3205,
-      "delta": 4,
-      "harm": {
-        "B1 audit-at-commit": 0.7793,
-        "B2 uniform random": 0.7297,
-        "B5 risk-score": 0.7793,
-        "SSG-full receding": 0.6396,
-        "SSG-up receding": 0.7703,
-        "SSG-G guarded": 0.6937,
-        "SentinelW window-belief": 0.7748,
-        "Sentinel": 0.7523
-      },
-      "gain_vs_b1": {
-        "B2 uniform random": 6.36,
-        "B5 risk-score": 0.0,
-        "SSG-full receding": 17.93,
-        "SSG-up receding": 1.15,
-        "SSG-G guarded": 10.98,
-        "SentinelW window-belief": 0.58,
-        "Sentinel": 3.46
-      },
-      "best_policy": "SSG-full receding",
-      "best_gain": 17.93,
-      "clears_15": true
-    },
-    {
-      "pi0": 0.1,
-      "share": 0.75,
-      "delta": 2,
-      "harm": {
-        "B1 audit-at-commit": 0.75,
-        "B2 uniform random": 0.8625,
-        "B5 risk-score": 0.9292,
-        "SSG-full receding": 0.5417,
-        "SSG-up receding": 0.4708,
-        "SSG-G guarded": 0.6333,
-        "SentinelW window-belief": 0.875,
-        "Sentinel": 0.9125
-      },
-      "gain_vs_b1": {
-        "B2 uniform random": -15.0,
-        "B5 risk-score": -23.89,
-        "SSG-full receding": 27.77,
-        "SSG-up receding": 37.23,
-        "SSG-G guarded": 15.56,
-        "SentinelW window-belief": -16.67,
-        "Sentinel": -21.67
-      },
-      "best_policy": "SSG-up receding",
-      "best_gain": 37.23,
+      "best_gain": 44.13,
       "clears_15": true
     },
     {
@@ -333,26 +333,26 @@
       "share": 0.75,
       "delta": 4,
       "harm": {
-        "B1 audit-at-commit": 0.6306,
-        "B2 uniform random": 0.6261,
-        "B5 risk-score": 0.7207,
-        "SSG-full receding": 0.3108,
-        "SSG-up receding": 0.2883,
-        "SSG-G guarded": 0.3739,
-        "SentinelW window-belief": 0.5946,
-        "Sentinel": 0.6532
+        "B1 audit-at-commit": 0.5991,
+        "B2 uniform random": 0.7432,
+        "B5 risk-score": 0.8378,
+        "SSG-full receding": 0.3694,
+        "SSG-up receding": 0.2658,
+        "SSG-G guarded": 0.4189,
+        "SentinelW window-belief": 0.6847,
+        "Sentinel": 0.7883
       },
       "gain_vs_b1": {
-        "B2 uniform random": 0.71,
-        "B5 risk-score": -14.29,
-        "SSG-full receding": 50.71,
-        "SSG-up receding": 54.28,
-        "SSG-G guarded": 40.71,
-        "SentinelW window-belief": 5.71,
-        "Sentinel": -3.58
+        "B2 uniform random": -24.05,
+        "B5 risk-score": -39.84,
+        "SSG-full receding": 38.34,
+        "SSG-up receding": 55.63,
+        "SSG-G guarded": 30.08,
+        "SentinelW window-belief": -14.29,
+        "Sentinel": -31.58
       },
       "best_policy": "SSG-up receding",
-      "best_gain": 54.28,
+      "best_gain": 55.63,
       "clears_15": true
     },
     {
@@ -360,26 +360,26 @@
       "share": 0.3205,
       "delta": 2,
       "harm": {
-        "B1 audit-at-commit": 0.975,
-        "B2 uniform random": 0.9292,
-        "B5 risk-score": 0.975,
-        "SSG-full receding": 0.8833,
-        "SSG-up receding": 0.9125,
-        "SSG-G guarded": 0.9,
-        "SentinelW window-belief": 0.9333,
-        "Sentinel": 0.9583
+        "B1 audit-at-commit": 0.9875,
+        "B2 uniform random": 0.9708,
+        "B5 risk-score": 0.9792,
+        "SSG-full receding": 0.8958,
+        "SSG-up receding": 0.9667,
+        "SSG-G guarded": 0.9333,
+        "SentinelW window-belief": 0.9875,
+        "Sentinel": 0.9792
       },
       "gain_vs_b1": {
-        "B2 uniform random": 4.7,
-        "B5 risk-score": 0.0,
-        "SSG-full receding": 9.41,
-        "SSG-up receding": 6.41,
-        "SSG-G guarded": 7.69,
-        "SentinelW window-belief": 4.28,
-        "Sentinel": 1.71
+        "B2 uniform random": 1.69,
+        "B5 risk-score": 0.84,
+        "SSG-full receding": 9.29,
+        "SSG-up receding": 2.11,
+        "SSG-G guarded": 5.49,
+        "SentinelW window-belief": 0.0,
+        "Sentinel": 0.84
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 9.41,
+      "best_gain": 9.29,
       "clears_15": false
     },
     {
@@ -387,26 +387,26 @@
       "share": 0.3205,
       "delta": 4,
       "harm": {
-        "B1 audit-at-commit": 0.7793,
-        "B2 uniform random": 0.7297,
-        "B5 risk-score": 0.7793,
-        "SSG-full receding": 0.6396,
-        "SSG-up receding": 0.7703,
-        "SSG-G guarded": 0.7027,
-        "SentinelW window-belief": 0.7613,
-        "Sentinel": 0.7523
+        "B1 audit-at-commit": 0.8694,
+        "B2 uniform random": 0.8153,
+        "B5 risk-score": 0.8694,
+        "SSG-full receding": 0.7072,
+        "SSG-up receding": 0.8378,
+        "SSG-G guarded": 0.8108,
+        "SentinelW window-belief": 0.8288,
+        "Sentinel": 0.8514
       },
       "gain_vs_b1": {
-        "B2 uniform random": 6.36,
+        "B2 uniform random": 6.22,
         "B5 risk-score": 0.0,
-        "SSG-full receding": 17.93,
-        "SSG-up receding": 1.15,
-        "SSG-G guarded": 9.83,
-        "SentinelW window-belief": 2.31,
-        "Sentinel": 3.46
+        "SSG-full receding": 18.66,
+        "SSG-up receding": 3.63,
+        "SSG-G guarded": 6.74,
+        "SentinelW window-belief": 4.67,
+        "Sentinel": 2.07
       },
       "best_policy": "SSG-full receding",
-      "best_gain": 17.93,
+      "best_gain": 18.66,
       "clears_15": true
     },
     {
@@ -414,26 +414,26 @@
       "share": 0.75,
       "delta": 2,
       "harm": {
-        "B1 audit-at-commit": 0.75,
-        "B2 uniform random": 0.8625,
-        "B5 risk-score": 0.9292,
-        "SSG-full receding": 0.5417,
-        "SSG-up receding": 0.4708,
-        "SSG-G guarded": 0.6458,
-        "SentinelW window-belief": 0.875,
-        "Sentinel": 0.9125
+        "B1 audit-at-commit": 0.7458,
+        "B2 uniform random": 0.8958,
+        "B5 risk-score": 0.9542,
+        "SSG-full receding": 0.4958,
+        "SSG-up receding": 0.4167,
+        "SSG-G guarded": 0.5125,
+        "SentinelW window-belief": 0.8458,
+        "Sentinel": 0.9375
       },
       "gain_vs_b1": {
-        "B2 uniform random": -15.0,
-        "B5 risk-score": -23.89,
-        "SSG-full receding": 27.77,
-        "SSG-up receding": 37.23,
-        "SSG-G guarded": 13.89,
-        "SentinelW window-belief": -16.67,
-        "Sentinel": -21.67
+        "B2 uniform random": -20.11,
+        "B5 risk-score": -27.94,
+        "SSG-full receding": 33.52,
+        "SSG-up receding": 44.13,
+        "SSG-G guarded": 31.28,
+        "SentinelW window-belief": -13.41,
+        "Sentinel": -25.7
       },
       "best_policy": "SSG-up receding",
-      "best_gain": 37.23,
+      "best_gain": 44.13,
       "clears_15": true
     },
     {
@@ -441,26 +441,26 @@
       "share": 0.75,
       "delta": 4,
       "harm": {
-        "B1 audit-at-commit": 0.6306,
-        "B2 uniform random": 0.6261,
-        "B5 risk-score": 0.7207,
-        "SSG-full receding": 0.3108,
-        "SSG-up receding": 0.2883,
-        "SSG-G guarded": 0.3514,
-        "SentinelW window-belief": 0.6126,
-        "Sentinel": 0.6667
+        "B1 audit-at-commit": 0.5991,
+        "B2 uniform random": 0.7432,
+        "B5 risk-score": 0.8378,
+        "SSG-full receding": 0.3694,
+        "SSG-up receding": 0.2658,
+        "SSG-G guarded": 0.3694,
+        "SentinelW window-belief": 0.6532,
+        "Sentinel": 0.8018
       },
       "gain_vs_b1": {
-        "B2 uniform random": 0.71,
-        "B5 risk-score": -14.29,
-        "SSG-full receding": 50.71,
-        "SSG-up receding": 54.28,
-        "SSG-G guarded": 44.28,
-        "SentinelW window-belief": 2.85,
-        "Sentinel": -5.72
+        "B2 uniform random": -24.05,
+        "B5 risk-score": -39.84,
+        "SSG-full receding": 38.34,
+        "SSG-up receding": 55.63,
+        "SSG-G guarded": 38.34,
+        "SentinelW window-belief": -9.03,
+        "Sentinel": -33.83
       },
       "best_policy": "SSG-up receding",
-      "best_gain": 54.28,
+      "best_gain": 55.63,
       "clears_15": true
     }
   ],
@@ -470,10 +470,10 @@
       "best_by_pi0": [
         "SSG-full receding",
         "SSG-full receding",
-        "SSG-G guarded",
+        "SSG-full receding",
         "SSG-full receding"
       ],
-      "stable": false
+      "stable": true
     },
     "share=0.3205 delta=4": {
       "best_by_pi0": [
@@ -503,31 +503,31 @@
       "stable": true
     }
   },
-  "pi3_cells_stable": 3,
+  "pi3_cells_stable": 4,
   "pi4_cells_clearing_15_at_published_share": [
     {
       "pi0": 0.04,
       "delta": 4,
       "best": "SSG-full receding",
-      "gain": 17.93
+      "gain": 18.66
     },
     {
       "pi0": 0.0799,
       "delta": 4,
       "best": "SSG-full receding",
-      "gain": 17.93
+      "gain": 18.66
     },
     {
       "pi0": 0.1,
       "delta": 4,
       "best": "SSG-full receding",
-      "gain": 17.93
+      "gain": 18.66
     },
     {
       "pi0": 0.2,
       "delta": 4,
       "best": "SSG-full receding",
-      "gain": 17.93
+      "gain": 18.66
     }
   ]
 }

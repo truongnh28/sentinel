@@ -3,7 +3,8 @@ AuditGame-SE -- grid sweep (mock agent, no LLM spend)
 dataset=mock is_mock=True
 scope: topic_kind=exact has_hidden_tests=True instance_pool=synthetic
 oracle: kind=marker families=- reads_marker=True (hidden_ok = not patch_has_marker)
-freeze: NONE -- these numbers are not pinned to a configuration
+freeze: clean sha256:4ff1c8f72df4
+observation: M0 (every carrier's posterior at every task, free)
 40 workflows - H=12 - B=0.0238188 - 3 seeds - injection carriers: memory, skill, queue, branch
 scale=usd  chi=1.3493  kappa_commit/kbar=4.0000  eta_Q/kbar=61.5192  B/(H*sum kappa)=0.3205
   kappa order (cheap -> dear): skill 0.358 < queue 0.496 < branch 1.439 < memory 1.707
@@ -15,70 +16,70 @@ scale=usd  chi=1.3493  kappa_commit/kbar=4.0000  eta_Q/kbar=61.5192  B/(H*sum ka
   oracle: kind=marker families=- reads_marker=True (hidden_ok = not patch_has_marker)
   policy                        D=0      D=1      D=2      D=4      D=6      D=8
   ------------------------------------------------------------------------------
-  B1 audit-at-commit          0.992    0.975    0.992    0.946    0.946    1.000
-  B2 uniform random           0.983    1.000    0.988    0.921    0.919    0.977
-  B3 audit-on-insertion       0.992    1.000    1.000    0.946    0.946    1.000
-  B4 audit-on-retrieval       0.992    1.000    1.000    0.938    0.946    1.000
-  B5 risk-score               0.992    1.000    1.000    0.933    0.946    1.000
-  B6 two-stage                0.992    1.000    1.000    0.933    0.946    1.000
-  B7 minimax-lp               0.992    0.975    0.988    0.942    0.946    1.000
-  B7U minimax-lp upstream     0.992    0.988    1.000    0.908    0.932    1.000
-  SSG-full receding           0.983    0.983    0.975    0.908    0.919    1.000
-  SSG-up receding             0.992    0.988    0.967    0.917    0.946    1.000
-  SentinelW window-belief     0.992    0.992    0.975    0.912    0.932    1.000
-  SSG-G guarded               0.992    0.983    0.979    0.917    0.946    1.000
-  SSG-GU guarded upstream     0.992    0.975    0.979    0.908    0.919    1.000
-  SSG-B belief-weighted       0.983    1.000    0.975    0.925    0.932    1.000
-  Sentinel                    0.992    1.000    1.000    0.933    0.946    1.000
-  C4 blind sentinel           0.992    1.000    1.000    0.946    0.946    1.000
-  C8 deterministic sentinel    0.992    1.000    1.000    0.946    0.946    1.000
-  NC1 quarantine-everything    0.992    1.000    1.000    0.946    0.946    1.000
-  -> Sentinel vs B1           +0.0%    -2.6%    -0.8%    +1.3%    +0.0%    +0.0%
-  feasible                  40/40    40/40    40/40    40/40    37/40    22/40  
-  Q_false / wf (lambda_Q)      0.50     0.52     0.57     0.54     0.57     0.61
-  T_lost / wf  B1 (lam_T)      0.34     0.35     0.33     0.35     0.39     0.28
+  B1 audit-at-commit          1.000    0.988    0.975    0.933    0.843    0.803
+  B2 uniform random           0.988    1.000    0.967    0.912    0.824    0.803
+  B3 audit-on-insertion       1.000    1.000    0.988    0.933    0.843    0.803
+  B4 audit-on-retrieval       1.000    1.000    0.975    0.921    0.833    0.803
+  B5 risk-score               1.000    1.000    0.979    0.933    0.843    0.803
+  B6 two-stage                1.000    1.000    0.988    0.933    0.843    0.803
+  B7 minimax-lp               0.988    1.000    0.954    0.933    0.843    0.803
+  B7U minimax-lp upstream     0.988    1.000    0.929    0.908    0.833    0.803
+  SSG-full receding           0.967    0.975    0.929    0.892    0.810    0.803
+  SSG-up receding             0.979    0.975    0.912    0.883    0.843    0.803
+  SentinelW window-belief     0.975    0.988    0.954    0.883    0.815    0.803
+  SSG-G guarded               0.992    0.971    0.979    0.883    0.810    0.803
+  SSG-GU guarded upstream     0.975    0.979    0.979    0.921    0.810    0.803
+  SSG-B belief-weighted       0.988    0.975    0.942    0.879    0.833    0.803
+  Sentinel                    1.000    1.000    0.988    0.933    0.833    0.803
+  C4 blind sentinel           1.000    1.000    0.988    0.933    0.824    0.803
+  C8 deterministic sentinel    1.000    1.000    0.979    0.921    0.843    0.803
+  NC1 quarantine-everything    1.000    1.000    0.988    0.933    0.843    0.803
+  -> Sentinel vs B1           +0.0%    -1.3%    -1.3%    +0.0%    +1.1%    +0.0%
+  feasible                  40/40    40/40    40/40    40/40    36/40    22/40  
+  Q_false / wf (lambda_Q)      0.59     0.35     0.58     0.55     0.58     0.63
+  T_lost / wf  B1 (lam_T)      0.48     0.43     0.43     0.47     0.49     0.44
 
 policy                       spent (kappa_bar)      cap    used
 ---------------------------------------------------------------
 B3 audit-on-insertion                   15.367   15.386    100%
-B4 audit-on-retrieval                   14.983   15.386     97%
-B2 uniform random                       14.810   15.386     96%
-SentinelW window-belief                 14.272   15.386     93%
-C4 blind sentinel                       14.173   15.386     92%
-SSG-up receding                         13.777   15.386     90%
-Sentinel                                13.620   15.386     89%
-B7U minimax-lp upstream                 13.041   15.386     85%
-SSG-GU guarded upstream                 12.734   15.386     83%
+B2 uniform random                       14.808   15.386     96%
+B4 audit-on-retrieval                   14.702   15.386     96%
+SentinelW window-belief                 14.121   15.386     92%
+C4 blind sentinel                       13.882   15.386     90%
+Sentinel                                13.663   15.386     89%
+SSG-up receding                         13.500   15.386     88%
+B7U minimax-lp upstream                 13.311   15.386     87%
+SSG-GU guarded upstream                 12.981   15.386     84%
 B1 audit-at-commit                      12.000   15.386     78%
 SSG-full receding                       12.000   15.386     78%
-B7 minimax-lp                           11.200   15.386     73%
+B7 minimax-lp                           11.617   15.386     76%
 SSG-G guarded                           11.117   15.386     72%
-SSG-B belief-weighted                   10.555   15.386     69%
-C8 deterministic sentinel                5.483   15.386     36%
-B6 two-stage                             5.339   15.386     35%
-B5 risk-score                            3.222   15.386     21%
+SSG-B belief-weighted                   10.689   15.386     69%
+C8 deterministic sentinel                6.800   15.386     44%
+B6 two-stage                             5.774   15.386     38%
+B5 risk-score                            2.713   15.386     18%
 NC1 quarantine-everything                0.000   15.386      0%
 
   lambda_Q* = none (one policy dominates on every term)
   policy                           L(0)    L(lQ*)
-  B3 audit-on-insertion           0.992     0.992
-  NC1 quarantine-everything       0.992     0.992
-  B6 two-stage                    0.992     0.992
-  C8 deterministic sentinel       0.992     0.992
-  B5 risk-score                   0.992     0.992
-  B2 uniform random               1.044     1.044
-  SSG-GU guarded upstream         1.104     1.104
-  SSG-up receding                 1.131     1.131
-  SSG-G guarded                   1.133     1.133
-  B7U minimax-lp upstream         1.133     1.133
-  SentinelW window-belief         1.144     1.144
-  SSG-full receding               1.144     1.144
-  SSG-B belief-weighted           1.146     1.146
-  B1 audit-at-commit              1.160     1.160
-  B7 minimax-lp                   1.173     1.173
-  Sentinel                        1.017     1.017
-  C4 blind sentinel               1.017     1.017
-  B4 audit-on-retrieval           0.992     0.992
+  B3 audit-on-insertion           1.000     1.000
+  NC1 quarantine-everything       1.000     1.000
+  B6 two-stage                    1.000     1.000
+  B5 risk-score                   1.000     1.000
+  C8 deterministic sentinel       1.000     1.000
+  SSG-up receding                 1.087     1.087
+  SSG-GU guarded upstream         1.090     1.090
+  B7U minimax-lp upstream         1.104     1.104
+  SSG-full receding               1.127     1.127
+  B2 uniform random               1.129     1.129
+  B7 minimax-lp                   1.154     1.154
+  SentinelW window-belief         1.165     1.165
+  SSG-G guarded                   1.192     1.192
+  SSG-B belief-weighted           1.202     1.202
+  B1 audit-at-commit              1.242     1.242
+  C4 blind sentinel               1.035     1.035
+  Sentinel                        1.035     1.035
+  B4 audit-on-retrieval           1.000     1.000
 
   D=0
      config     sha256:f5e849cc4da5...
@@ -92,28 +93,28 @@ NC1 quarantine-everything                0.000   15.386      0%
      feasible   40/40
      survived   40/40 (100%)
      env        lock:1cb79c20f25c
-     d-harm     -0.025  CI95 [-0.062 ; +0.000]  gain -2.6%
+     d-harm     -0.012  CI95 [-0.037 ; +0.000]  gain -1.3%
 
   D=2
      config     sha256:f5e849cc4da5...
      feasible   40/40
      survived   40/40 (100%)
      env        lock:1cb79c20f25c
-     d-harm     -0.008  CI95 [-0.025 ; +0.000]  gain -0.8%
+     d-harm     -0.013  CI95 [-0.037 ; +0.000]  gain -1.3%
 
   D=4
      config     sha256:f5e849cc4da5...
      feasible   40/40
      survived   40/40 (100%)
      env        lock:1cb79c20f25c
-     d-harm     +0.013  CI95 [+0.000 ; +0.037]  gain +1.3%
+     d-harm     +0.000  CI95 [+0.000 ; +0.000]  gain +0.0%
 
   D=6
      config     sha256:f5e849cc4da5...
-     feasible   37/40
-     survived   37/37 (100%)
+     feasible   36/40
+     survived   36/36 (100%)
      env        lock:1cb79c20f25c
-     d-harm     +0.000  CI95 [+0.000 ; +0.000]  gain +0.0%
+     d-harm     +0.009  CI95 [+0.000 ; +0.028]  gain +1.1%
 
   D=8
      config     sha256:f5e849cc4da5...
@@ -127,70 +128,70 @@ NC1 quarantine-everything                0.000   15.386      0%
   oracle: kind=marker families=- reads_marker=True (hidden_ok = not patch_has_marker)
   policy                        D=0      D=1      D=2      D=4      D=6      D=8
   ------------------------------------------------------------------------------
-  B1 audit-at-commit          0.992    0.975    0.983    0.946    0.946    1.000
-  B2 uniform random           0.983    0.992    0.979    0.912    0.919    0.977
-  B3 audit-on-insertion       0.992    1.000    1.000    0.946    0.946    1.000
-  B4 audit-on-retrieval       0.992    1.000    1.000    0.929    0.946    1.000
-  B5 risk-score               0.992    1.000    0.988    0.925    0.946    1.000
-  B6 two-stage                0.992    1.000    1.000    0.933    0.946    1.000
-  B7 minimax-lp               0.992    0.975    0.971    0.942    0.946    1.000
-  B7U minimax-lp upstream     0.992    0.988    0.983    0.883    0.932    1.000
-  SSG-full receding           0.979    0.983    0.967    0.908    0.919    1.000
-  SSG-up receding             0.988    0.988    0.942    0.917    0.946    1.000
-  SentinelW window-belief     0.992    0.992    0.967    0.921    0.946    0.977
-  SSG-G guarded               0.988    0.983    0.979    0.917    0.932    1.000
-  SSG-GU guarded upstream     0.992    0.967    0.971    0.921    0.919    1.000
-  SSG-B belief-weighted       0.983    1.000    0.979    0.925    0.932    1.000
-  Sentinel                    0.992    1.000    1.000    0.912    0.937    0.977
-  C4 blind sentinel           0.992    1.000    1.000    0.925    0.946    0.977
-  C8 deterministic sentinel    0.992    0.988    1.000    0.921    0.937    1.000
-  NC1 quarantine-everything    0.992    1.000    1.000    0.946    0.946    1.000
-  -> Sentinel vs B1           +0.0%    -2.6%    -1.7%    +3.5%    +1.0%    +2.3%
-  feasible                  40/40    40/40    40/40    40/40    37/40    22/40  
-  Q_false / wf (lambda_Q)      0.42     0.44     0.46     0.43     0.41     0.52
-  T_lost / wf  B1 (lam_T)      0.20     0.21     0.21     0.20     0.25     0.17
+  B1 audit-at-commit          1.000    0.988    0.967    0.933    0.843    0.803
+  B2 uniform random           0.988    1.000    0.967    0.912    0.824    0.803
+  B3 audit-on-insertion       1.000    1.000    0.988    0.933    0.843    0.803
+  B4 audit-on-retrieval       1.000    1.000    0.975    0.921    0.833    0.803
+  B5 risk-score               1.000    1.000    0.967    0.933    0.833    0.803
+  B6 two-stage                1.000    1.000    0.988    0.933    0.843    0.803
+  B7 minimax-lp               0.988    0.992    0.946    0.933    0.829    0.803
+  B7U minimax-lp upstream     0.988    1.000    0.929    0.900    0.833    0.803
+  SSG-full receding           0.958    0.975    0.929    0.879    0.810    0.803
+  SSG-up receding             0.971    0.975    0.904    0.867    0.838    0.803
+  SentinelW window-belief     0.975    1.000    0.963    0.892    0.829    0.788
+  SSG-G guarded               0.983    0.967    0.971    0.871    0.824    0.803
+  SSG-GU guarded upstream     0.975    0.988    0.963    0.917    0.806    0.803
+  SSG-B belief-weighted       1.000    1.000    0.950    0.867    0.833    0.803
+  Sentinel                    1.000    1.000    0.979    0.912    0.801    0.780
+  C4 blind sentinel           1.000    1.000    0.979    0.912    0.801    0.780
+  C8 deterministic sentinel    1.000    1.000    0.975    0.933    0.833    0.803
+  NC1 quarantine-everything    1.000    1.000    0.988    0.933    0.843    0.803
+  -> Sentinel vs B1           +0.0%    -1.3%    -1.3%    +2.2%    +4.9%    +2.8%
+  feasible                  40/40    40/40    40/40    40/40    36/40    22/40  
+  Q_false / wf (lambda_Q)      0.52     0.25     0.45     0.41     0.44     0.58
+  T_lost / wf  B1 (lam_T)      0.27     0.23     0.20     0.24     0.29     0.32
 
 policy                       spent (kappa_bar)      cap    used
 ---------------------------------------------------------------
 B3 audit-on-insertion                   15.367   15.386    100%
-B2 uniform random                       14.810   15.386     96%
-B4 audit-on-retrieval                   14.787   15.386     96%
-SentinelW window-belief                 14.165   15.386     92%
-C4 blind sentinel                       14.115   15.386     92%
-SSG-up receding                         13.778   15.386     90%
-Sentinel                                13.692   15.386     89%
-B7U minimax-lp upstream                 13.041   15.386     85%
-SSG-GU guarded upstream                 12.702   15.386     83%
+B2 uniform random                       14.808   15.386     96%
+B4 audit-on-retrieval                   14.425   15.386     94%
+SentinelW window-belief                 14.144   15.386     92%
+C4 blind sentinel                       13.882   15.386     90%
+Sentinel                                13.773   15.386     90%
+SSG-up receding                         13.500   15.386     88%
+SSG-GU guarded upstream                 13.329   15.386     87%
+B7U minimax-lp upstream                 13.287   15.386     86%
 B1 audit-at-commit                      12.000   15.386     78%
 SSG-full receding                       12.000   15.386     78%
-B7 minimax-lp                           11.200   15.386     73%
-SSG-G guarded                           11.167   15.386     73%
-SSG-B belief-weighted                   11.073   15.386     72%
-C8 deterministic sentinel                7.476   15.386     49%
-B6 two-stage                             6.495   15.386     42%
-B5 risk-score                            6.438   15.386     42%
+B7 minimax-lp                           11.583   15.386     75%
+SSG-B belief-weighted                   11.320   15.386     74%
+SSG-G guarded                           11.217   15.386     73%
+C8 deterministic sentinel                8.068   15.386     52%
+B6 two-stage                             7.024   15.386     46%
+B5 risk-score                            5.563   15.386     36%
 NC1 quarantine-everything                0.000   15.386      0%
 
   lambda_Q* = none (one policy dominates on every term)
   policy                           L(0)    L(lQ*)
-  B3 audit-on-insertion           0.992     0.992
-  NC1 quarantine-everything       0.992     0.992
-  SentinelW window-belief         1.033     1.033
-  B6 two-stage                    0.992     0.992
-  C8 deterministic sentinel       0.992     0.992
-  SSG-GU guarded upstream         1.054     1.054
-  SSG-up receding                 1.065     1.065
-  SSG-G guarded                   1.071     1.071
-  B2 uniform random               1.021     1.021
-  SSG-full receding               1.079     1.079
-  SSG-B belief-weighted           1.081     1.081
-  B5 risk-score                   0.992     0.992
-  B7U minimax-lp upstream         1.083     1.083
-  B1 audit-at-commit              1.090     1.090
-  B7 minimax-lp                   1.104     1.104
-  Sentinel                        1.010     1.010
-  C4 blind sentinel               1.010     1.010
-  B4 audit-on-retrieval           0.992     0.992
+  B3 audit-on-insertion           1.000     1.000
+  NC1 quarantine-everything       1.000     1.000
+  SSG-up receding                 1.044     1.044
+  SSG-GU guarded upstream         1.035     1.035
+  B6 two-stage                    1.000     1.000
+  SSG-full receding               1.054     1.054
+  SentinelW window-belief         1.054     1.054
+  B7U minimax-lp upstream         1.056     1.056
+  B7 minimax-lp                   1.075     1.075
+  B2 uniform random               1.073     1.073
+  C8 deterministic sentinel       1.000     1.000
+  B5 risk-score                   1.000     1.000
+  SSG-G guarded                   1.110     1.110
+  SSG-B belief-weighted           1.117     1.117
+  B1 audit-at-commit              1.135     1.135
+  C4 blind sentinel               1.023     1.023
+  Sentinel                        1.023     1.023
+  B4 audit-on-retrieval           1.000     1.000
 
   D=0
      config     sha256:45dc3bbe76c6...
@@ -204,152 +205,168 @@ NC1 quarantine-everything                0.000   15.386      0%
      feasible   40/40
      survived   40/40 (100%)
      env        lock:1cb79c20f25c
-     d-harm     -0.025  CI95 [-0.062 ; +0.000]  gain -2.6%
+     d-harm     -0.012  CI95 [-0.037 ; +0.000]  gain -1.3%
 
   D=2
      config     sha256:45dc3bbe76c6...
      feasible   40/40
      survived   40/40 (100%)
      env        lock:1cb79c20f25c
-     d-harm     -0.017  CI95 [-0.042 ; +0.000]  gain -1.7%
+     d-harm     -0.013  CI95 [-0.050 ; +0.017]  gain -1.3%
 
   D=4
      config     sha256:45dc3bbe76c6...
      feasible   40/40
      survived   40/40 (100%)
      env        lock:1cb79c20f25c
-     d-harm     +0.033  CI95 [+0.000 ; +0.075]  gain +3.5%
+     d-harm     +0.021  CI95 [+0.000 ; +0.054]  gain +2.2%
 
   D=6
      config     sha256:45dc3bbe76c6...
-     feasible   37/40
-     survived   37/37 (100%)
+     feasible   36/40
+     survived   36/36 (100%)
      env        lock:1cb79c20f25c
-     d-harm     +0.009  CI95 [+0.000 ; +0.027]  gain +1.0%
+     d-harm     +0.042  CI95 [+0.009 ; +0.083]  gain +4.9%
 
   D=8
      config     sha256:45dc3bbe76c6...
      feasible   22/40
      survived   22/22 (100%)
      env        lock:1cb79c20f25c
-     d-harm     +0.023  CI95 [+0.000 ; +0.068]  gain +2.3%
+     d-harm     +0.023  CI95 [+0.000 ; +0.068]  gain +2.8%
 
 [detector = strong]  psi=0.92 phi=0.06
   dataset declares a hidden suite: yes
   oracle: kind=marker families=- reads_marker=True (hidden_ok = not patch_has_marker)
   policy                        D=0      D=1      D=2      D=4      D=6      D=8
   ------------------------------------------------------------------------------
-  B1 audit-at-commit          0.983    0.967    0.983    0.946    0.946    1.000
-  B2 uniform random           0.983    0.971    0.979    0.900    0.905    0.977
-  B3 audit-on-insertion       0.992    1.000    1.000    0.946    0.946    1.000
-  B4 audit-on-retrieval       0.992    1.000    1.000    0.921    0.946    1.000
-  B5 risk-score               0.992    0.979    0.979    0.875    0.910    1.000
-  B6 two-stage                0.992    1.000    1.000    0.933    0.946    1.000
-  B7 minimax-lp               0.983    0.967    0.971    0.942    0.946    1.000
-  B7U minimax-lp upstream     0.992    0.988    0.983    0.883    0.932    1.000
-  SSG-full receding           0.963    0.975    0.963    0.908    0.919    1.000
-  SSG-up receding             0.988    0.988    0.942    0.917    0.946    1.000
-  SentinelW window-belief     0.992    0.992    0.975    0.921    0.946    1.000
-  SSG-G guarded               0.988    0.983    0.988    0.917    0.932    1.000
-  SSG-GU guarded upstream     0.992    0.963    0.971    0.921    0.932    1.000
-  SSG-B belief-weighted       0.992    1.000    1.000    0.946    0.946    1.000
-  Sentinel                    0.992    1.000    0.988    0.871    0.932    0.977
-  C4 blind sentinel           0.992    1.000    1.000    0.908    0.946    0.977
-  C8 deterministic sentinel    0.992    1.000    0.988    0.863    0.923    1.000
-  NC1 quarantine-everything    0.992    1.000    1.000    0.946    0.946    1.000
-  -> Sentinel vs B1           -0.8%    -3.4%    -0.4%    +7.9%    +1.4%    +2.3%
-  feasible                  40/40    40/40    40/40    40/40    37/40    22/40  
-  Q_false / wf (lambda_Q)      0.28     0.23     0.25     0.21     0.23     0.26
-  T_lost / wf  B1 (lam_T)      0.10     0.11     0.12     0.10     0.12     0.08
+  B1 audit-at-commit          0.975    0.988    0.967    0.933    0.843    0.803
+  B2 uniform random           0.988    0.992    0.967    0.912    0.824    0.803
+  B3 audit-on-insertion       1.000    1.000    0.988    0.933    0.843    0.803
+  B4 audit-on-retrieval       1.000    1.000    0.975    0.896    0.833    0.803
+  B5 risk-score               1.000    1.000    0.967    0.887    0.833    0.780
+  B6 two-stage                1.000    1.000    0.988    0.933    0.843    0.803
+  B7 minimax-lp               0.975    0.971    0.946    0.933    0.829    0.803
+  B7U minimax-lp upstream     0.988    1.000    0.929    0.900    0.833    0.803
+  SSG-full receding           0.958    0.963    0.929    0.879    0.810    0.803
+  SSG-up receding             0.971    0.975    0.896    0.850    0.838    0.803
+  SentinelW window-belief     0.975    1.000    0.979    0.912    0.824    0.803
+  SSG-G guarded               0.983    0.967    0.971    0.871    0.829    0.803
+  SSG-GU guarded upstream     0.979    0.975    0.933    0.896    0.833    0.803
+  SSG-B belief-weighted       1.000    1.000    0.979    0.892    0.833    0.803
+  Sentinel                    1.000    0.988    0.971    0.887    0.801    0.758
+  C4 blind sentinel           1.000    1.000    0.971    0.887    0.801    0.780
+  C8 deterministic sentinel    1.000    1.000    0.975    0.929    0.819    0.803
+  NC1 quarantine-everything    1.000    1.000    0.988    0.933    0.843    0.803
+  -> Sentinel vs B1           -2.6%    +0.0%    -0.4%    +4.9%    +4.9%    +5.7%
+  feasible                  40/40    40/40    40/40    40/40    36/40    22/40  
+  Q_false / wf (lambda_Q)      0.23     0.16     0.17     0.23     0.20     0.22
+  T_lost / wf  B1 (lam_T)      0.22     0.17     0.13     0.19     0.26     0.32
 
 policy                       spent (kappa_bar)      cap    used
 ---------------------------------------------------------------
 B3 audit-on-insertion                   15.367   15.386    100%
-B2 uniform random                       14.714   15.386     96%
-B4 audit-on-retrieval                   14.556   15.386     95%
-SentinelW window-belief                 14.284   15.386     93%
-Sentinel                                13.871   15.386     90%
-SSG-up receding                         13.800   15.386     90%
-C4 blind sentinel                       13.787   15.386     90%
-B7U minimax-lp upstream                 12.997   15.386     84%
-SSG-GU guarded upstream                 12.734   15.386     83%
+B2 uniform random                       14.763   15.386     96%
+SentinelW window-belief                 14.430   15.386     94%
+B4 audit-on-retrieval                   14.223   15.386     92%
+C4 blind sentinel                       13.612   15.386     88%
+SSG-up receding                         13.512   15.386     88%
+Sentinel                                13.492   15.386     88%
+B7U minimax-lp upstream                 13.231   15.386     86%
+SSG-GU guarded upstream                 13.179   15.386     86%
+SSG-B belief-weighted                   12.013   15.386     78%
 B1 audit-at-commit                      12.000   15.386     78%
 SSG-full receding                       12.000   15.386     78%
-SSG-B belief-weighted                   11.757   15.386     76%
-SSG-G guarded                           11.317   15.386     74%
-B7 minimax-lp                           11.200   15.386     73%
-B5 risk-score                            8.838   15.386     57%
-C8 deterministic sentinel                8.482   15.386     55%
-B6 two-stage                             7.626   15.386     50%
+B7 minimax-lp                           11.483   15.386     75%
+SSG-G guarded                           11.367   15.386     74%
+B5 risk-score                            9.122   15.386     59%
+C8 deterministic sentinel                9.111   15.386     59%
+B6 two-stage                             8.890   15.386     58%
 NC1 quarantine-everything                0.000   15.386      0%
 
   lambda_Q* = none (one policy dominates on every term)
   policy                           L(0)    L(lQ*)
-  B3 audit-on-insertion           0.992     0.992
-  NC1 quarantine-everything       0.992     0.992
-  SentinelW window-belief         1.010     1.010
-  SSG-full receding               1.015     1.015
-  SSG-up receding                 1.015     1.015
-  B7U minimax-lp upstream         1.021     1.021
-  B2 uniform random               1.004     1.004
-  SSG-B belief-weighted           1.027     1.027
-  B7 minimax-lp                   1.029     1.029
-  B1 audit-at-commit              1.033     1.033
-  SSG-GU guarded upstream         1.027     1.027
-  B6 two-stage                    0.992     0.992
-  SSG-G guarded                   1.044     1.044
-  C8 deterministic sentinel       0.992     0.992
-  B5 risk-score                   0.992     0.992
-  C4 blind sentinel               1.004     1.004
-  Sentinel                        1.004     1.004
-  B4 audit-on-retrieval           0.992     0.992
+  B3 audit-on-insertion           1.000     1.000
+  NC1 quarantine-everything       1.000     1.000
+  B7U minimax-lp upstream         1.025     1.025
+  SSG-up receding                 1.027     1.027
+  B7 minimax-lp                   1.031     1.031
+  SSG-GU guarded upstream         1.031     1.031
+  SSG-full receding               1.038     1.038
+  SentinelW window-belief         1.038     1.038
+  B2 uniform random               1.067     1.067
+  B6 two-stage                    1.000     1.000
+  C8 deterministic sentinel       1.000     1.000
+  B1 audit-at-commit              1.085     1.085
+  SSG-G guarded                   1.088     1.088
+  SSG-B belief-weighted           1.085     1.085
+  B5 risk-score                   1.000     1.000
+  C4 blind sentinel               1.023     1.023
+  B4 audit-on-retrieval           1.000     1.000
+  Sentinel                        1.023     1.023
 
   D=0
      config     sha256:ee43ae662e23...
      feasible   40/40
      survived   40/40 (100%)
      env        lock:1cb79c20f25c
-     d-harm     -0.008  CI95 [-0.025 ; +0.000]  gain -0.8%
+     d-harm     -0.025  CI95 [-0.075 ; +0.000]  gain -2.6%
 
   D=1
      config     sha256:ee43ae662e23...
      feasible   40/40
      survived   40/40 (100%)
      env        lock:1cb79c20f25c
-     d-harm     -0.033  CI95 [-0.075 ; +0.000]  gain -3.4%
+     d-harm     +0.000  CI95 [-0.037 ; +0.037]  gain +0.0%
 
   D=2
      config     sha256:ee43ae662e23...
      feasible   40/40
      survived   40/40 (100%)
      env        lock:1cb79c20f25c
-     d-harm     -0.004  CI95 [-0.038 ; +0.029]  gain -0.4%
+     d-harm     -0.004  CI95 [-0.042 ; +0.033]  gain -0.4%
 
   D=4
      config     sha256:ee43ae662e23...
      feasible   40/40
      survived   40/40 (100%)
      env        lock:1cb79c20f25c
-     d-harm     +0.075  CI95 [+0.029 ; +0.129]  gain +7.9%
+     d-harm     +0.046  CI95 [+0.000 ; +0.108]  gain +4.9%
 
   D=6
      config     sha256:ee43ae662e23...
-     feasible   37/40
-     survived   37/37 (100%)
+     feasible   36/40
+     survived   36/36 (100%)
      env        lock:1cb79c20f25c
-     d-harm     +0.014  CI95 [+0.000 ; +0.041]  gain +1.4%
+     d-harm     +0.042  CI95 [+0.009 ; +0.083]  gain +4.9%
 
   D=8
      config     sha256:ee43ae662e23...
      feasible   22/40
      survived   22/22 (100%)
      env        lock:1cb79c20f25c
-     d-harm     +0.023  CI95 [+0.000 ; +0.068]  gain +2.3%
+     d-harm     +0.045  CI95 [+0.000 ; +0.114]  gain +5.7%
+
+==============================================================================
+RQ2 -- chi axis  [detector = mid, anchor = mean]
+==============================================================================
+  anchor=mean: kappa_bar fixed, so the budget buys the same share at every chi
+  chi=0.0    kappa/kappa_bar = memory:1.000  skill:1.000  queue:1.000  branch:1.000   (kappa_bar=0.00154811)
+  chi=0.5    kappa/kappa_bar = memory:1.262  skill:0.762  queue:0.813  branch:1.163   (kappa_bar=0.00154811)
+  chi=1.349  kappa/kappa_bar = memory:1.707  skill:0.358  queue:0.496  branch:1.439   (kappa_bar=0.00154811)
+
+     chi      D=0      D=1      D=2      D=4      D=6      D=8     <- Sentinel vs B1, worst-case harm
+  ------------------------------------------------------------
+   0.000    +1.2%    +0.0%    -0.9%    +1.3%    +6.6%    +5.7%
+   0.500    +1.2%    -1.3%    -1.3%    +1.3%    +3.8%    +2.8%
+   1.349    +0.0%    -1.3%    -1.3%    +2.2%    +4.9%    +2.8%
+
+  chi moves the gain: YES
 
 ==============================================================================
 READING THE TABLE
 ==============================================================================
-  Gain by Delta (detector mid): D=0:+0% - D=1:-3% - D=2:-2% - D=4:+4% - D=6:+1% - D=8:+2%
+  Gain by Delta (detector mid): D=0:+0% - D=1:-1% - D=2:-1% - D=4:+2% - D=6:+5% - D=8:+3%
   Monotone increasing in Delta: NO   <- this is RQ1 / Corollary 5
-  Gain at Delta=4:  WEAK detector +1%  -  STRONG detector +8%
+  Gain at Delta=4:  WEAK detector +0%  -  STRONG detector +5%
   Largest advantage when the detector is weakest: NO   <- RQ4, allocation COMPENSATES for detection quality
