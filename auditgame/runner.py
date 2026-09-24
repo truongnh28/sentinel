@@ -43,6 +43,53 @@ import checkpoints as audit_checks
 #: see runner.run_once's docstring and tests/gate1_integrity/test_audit_stages.py.
 STAGES = ("insertion", "retrieval", "delegation", "commit")
 
+#: WHAT THE DEFENDER GETS TO SEE, and whether the budget pays for it.
+#: docs/preregistration/TIEN-DANG-KY-mo-hinh-quan-sat-MA.md.
+#:
+#:   M0  free, total observation: the posterior of all four carriers at every
+#:       task, whatever the policy audited.  The budget buys ACTIONS only, which
+#:       is why tools/measure_c.py found the posterior flat from B = 2 to 200 and
+#:       Theorem 4 had no left-hand side here.
+#:   MA  pay to see: a policy sees the posterior of the carrier it paid to audit
+#:       at the previous task -- the reading that audit took -- and nothing else.
+#:       Every other carrier reads p = pi0 (NO evidence, not "clean") with its
+#:       real item count, which is metadata, not a detector signal.  A commit
+#:       audit reveals no carrier: it inspects the patch.
+#:
+#: Module-level, like policies.KAPPA, and printed in every results header by
+#: experiment.py.  M0 is the default, so every number recorded before MA existed
+#: still holds.
+OBSERVATION_MODELS = ("M0", "MA")
+OBSERVATION = "M0"
+
+
+def visible_signals(signals: dict, seen: dict, model: str | None = None) -> dict:
+    """The signals a policy is allowed to read at this task, under `model`.
+
+    `seen` is {carrier: CarrierSignal} that the previous task's audit bought.
+    Returns a dict with EVERY carrier present: policies index signals[c], and a
+    missing key would be an error where the model means "no evidence".
+    """
+    model = OBSERVATION if model is None else model
+    if model not in OBSERVATION_MODELS:
+        raise ValueError(f"unknown observation model {model!r}; declare it in "
+                         f"runner.OBSERVATION_MODELS first")
+    if model == "M0":
+        return signals
+    return {c: seen[c] if c in seen else P.CarrierSignal(p=scoring.PI0, n=s.n)
+            for c, s in signals.items()}
+
+
+def bought_sight(act, signals: dict) -> dict:
+    """What an EXECUTED action lets the defender see at the next task (MA).
+
+    Only an upstream audit of a carrier reveals that carrier.  Commit audits and
+    direct quarantines reveal nothing."""
+    if act is None or act.startswith("commit") or act.startswith(P.QUARANTINE_PREFIX):
+        return {}
+    carrier, _ = P.split_action(act)
+    return {carrier: signals[carrier]} if carrier in signals else {}
+
 
 def _act_carrier(act: str) -> str:
     """The carrier (or pseudo-carrier) one action string targets.
@@ -317,6 +364,7 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
     payload_id = None                  # set at iota; drives the P1..P5 checkpoints
 
     manifest = None
+    seen: dict = {}                    # MA: what last task's audit paid to look at
     for t, task in enumerate(wf.tasks):
         # THE RESET GOES HERE, before anything reads the store.  M3's hook does
         # `git clean -xfd && git checkout --force <base_commit>` and then reopens
@@ -403,7 +451,9 @@ def run_once(wf, ps, pol, det, ag, seed, do_inject=True,
 
         topic_counts[task.topic] = topic_counts.get(task.topic, 0) + 1
 
-        act = pol.choose(t, sorted({i.carrier for i in o.retrieved}), signals)
+        act = pol.choose(t, sorted({i.carrier for i in o.retrieved}),
+                         visible_signals(signals, seen))
+        seen = bought_sight(act, signals)
         # SPEC-P1b Part 1 "chi phi" row: seconds MEASURED, per audit kind.  The
         # field used to be filled with {act: 0.0} -- a made-up number sitting in a
         # slot whose own comment says MEASURED, and the slot kappa is supposed to

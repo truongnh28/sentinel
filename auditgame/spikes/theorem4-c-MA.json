@@ -1,0 +1,362 @@
+{
+  "precondition": {
+    "budget_ladder": [
+      2.0,
+      8.0,
+      17.95,
+      60.0,
+      200.0
+    ],
+    "mass_curves": [
+      [
+        0.008010892831921636,
+        0.024154170859089864,
+        0.021572005414852543,
+        0.021572005414852543,
+        0.021572005414852543
+      ],
+      [
+        0.006491146137444275,
+        0.008409587794736313,
+        0.008536718145873222,
+        0.008536718145873222,
+        0.008536718145873222
+      ],
+      [
+        9.123467277954427e-05,
+        0.005624030008583677,
+        0.007467544230412136,
+        0.007467544230412136,
+        0.007467544230412136
+      ],
+      [
+        0.007519766643741902,
+        0.008489021473381231,
+        0.007174272205792288,
+        0.0073334108949734,
+        0.0073334108949734
+      ]
+    ],
+    "max_spread_over_ladder": 0.01614327802716823,
+    "budget_moves_the_posterior": true
+  },
+  "belief_ceiling": {
+    "budget": 1000.0,
+    "detector_d_prime": 2.9598,
+    "cells": {
+      "M0/B7 minimax-lp/delta=2": {
+        "median_mass_on_truth": 0.005,
+        "max_mass_on_truth": 0.8923,
+        "reaches_1_minus_alpha": 0,
+        "n": 8
+      },
+      "M0/B7 minimax-lp/delta=4": {
+        "median_mass_on_truth": 0.5597,
+        "max_mass_on_truth": 0.9727,
+        "reaches_1_minus_alpha": 1,
+        "n": 8
+      },
+      "M0/B2 uniform random/delta=2": {
+        "median_mass_on_truth": 0.0053,
+        "max_mass_on_truth": 0.8923,
+        "reaches_1_minus_alpha": 0,
+        "n": 8
+      },
+      "M0/B2 uniform random/delta=4": {
+        "median_mass_on_truth": 0.1211,
+        "max_mass_on_truth": 0.7833,
+        "reaches_1_minus_alpha": 0,
+        "n": 8
+      },
+      "MA/B2 uniform random/delta=2": {
+        "median_mass_on_truth": 0.0074,
+        "max_mass_on_truth": 0.0689,
+        "reaches_1_minus_alpha": 0,
+        "n": 8
+      },
+      "MA/B2 uniform random/delta=4": {
+        "median_mass_on_truth": 0.0068,
+        "max_mass_on_truth": 0.164,
+        "reaches_1_minus_alpha": 0,
+        "n": 8
+      }
+    },
+    "prior_mass_per_window": 0.0069
+  },
+  "refused": null,
+  "observation_model": "MA",
+  "c": null,
+  "c_cell_spread": null,
+  "cells": [
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 0,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 0,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 0,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 2,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 2,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 2,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 4,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 4,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 1.5161,
+      "gamma": 0.55,
+      "delta": 4,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 0,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 0,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 0,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 2,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 2,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 2,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 4,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 4,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.2114,
+      "gamma": 0.73,
+      "delta": 4,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 0,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 0,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 0,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 2,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 2,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 2,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 4,
+      "chi": 0.0,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 4,
+      "chi": 0.5,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    },
+    {
+      "d_prime": 2.9598,
+      "gamma": 0.86,
+      "delta": 4,
+      "chi": 2.1142857142857143,
+      "b_min": null,
+      "c_cell": null,
+      "reason": "no budget on the ladder reached 1 - alpha"
+    }
+  ],
+  "cells_fitted": 0,
+  "cells_total": 27,
+  "non_monotone_episodes": 150,
+  "provenance": {
+    "left_hand_side": "smallest budget whose posterior puts >= 1 - alpha on the true (k, iota, sigma) at sigma",
+    "alpha": 0.05,
+    "budget_ladder": [
+      2.0,
+      4.0,
+      8.0,
+      12.0,
+      17.95,
+      26.0,
+      40.0,
+      60.0,
+      90.0
+    ],
+    "policy": "B2 uniform random",
+    "observation_model": "MA",
+    "belief_beta": 0.314,
+    "kappa_bar": 1.75,
+    "K": 4,
+    "H": 8,
+    "n_workflows": 8,
+    "date": "2026-09-24",
+    "commit": "df1168e8853d683c36bfb6f6ec5908dac2cd7e69"
+  }
+}

@@ -61,6 +61,7 @@ from core import CARRIERS, CarrierStore, item_from_record
 import oracle
 import policies as P
 import scoring
+import runner
 from runner import expected_harm
 
 
@@ -193,6 +194,8 @@ def rescore(traces: list, det, pol) -> ReplayResult:
     seconds: dict = {}
     payload_id = None
 
+    seen: dict = {}                    # MA, mirrored from runner.run_once
+
     for tr in traces:
         if tr.seed is None:
             return _invalid("the trace does not record the run seed, so no "
@@ -228,7 +231,13 @@ def rescore(traces: list, det, pol) -> ReplayResult:
 
         topic_counts[tr.topic] = topic_counts.get(tr.topic, 0) + 1
 
-        act = pol.choose(tr.t, sorted({i.carrier for i in retrieved}), signals)
+        # SAME OBSERVATION MODEL AS THE RUN, through the same two functions:
+        # a replay that let the policy see all four carriers would re-decide under
+        # M0 a run that was made under MA, and I9 would report a spend mismatch
+        # without saying why.
+        act = pol.choose(tr.t, sorted({i.carrier for i in retrieved}),
+                         runner.visible_signals(signals, seen))
+        seen = runner.bought_sight(act, signals)
         marker_t = tr.agent_marker
         if act is not None:
             pol.charge(P.cost_of(act))

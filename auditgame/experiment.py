@@ -200,6 +200,11 @@ def main():
                     help="generate the mock corpus at H_GEN tasks and truncate each "
                          "workflow to --H, so grids at two horizons share the same "
                          "workflows (issue #15). Default: generate at --H.")
+    ap.add_argument("--observation", choices=runner.OBSERVATION_MODELS, default="M0",
+                    help="what the defender sees: M0 = every carrier's posterior "
+                         "at every task, free; MA = only the carrier it paid to "
+                         "audit at the previous task. See runner.OBSERVATION_MODELS "
+                         "and docs/preregistration/TIEN-DANG-KY-mo-hinh-quan-sat-MA.md.")
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--deltas", type=int, nargs="+", default=[0, 1, 2, 4],
                     help="the trigger delays to sweep. Every value must be < H, "
@@ -240,6 +245,7 @@ def main():
     # (chi 2.114 vs 1.349, kappa_commit/kbar 2.343 vs 4.000, eta_Q/kbar 1.143 vs
     # 61.519) and they REVERSE the carrier ordering, which chi does not
     # constrain.  See docs/preregistration/TIEN-DANG-KY-thang-van-hanh-USD.md.
+    runner.OBSERVATION = a.observation
     if a.scale == "usd":
         costs.install(P, eta_q_over_kappa_ratio=a.eta_q_over_kappa)
     elif a.eta_q_over_kappa is not None:
@@ -308,6 +314,10 @@ def main():
     # rather than left to a reader to check, because the state nobody checks is
     # the one that goes wrong.
     print(freeze.header_line())
+    print(f"observation: {runner.OBSERVATION} ("
+          + ("every carrier's posterior at every task, free" if runner.OBSERVATION == "M0"
+             else "only the carrier audited at the previous task; others read pi0")
+          + ")")
     if grouping is not None:
         # The step-4 drop belongs beside the feasibility numbers: "N workflows"
         # means nothing without how many were thrown out to get there.

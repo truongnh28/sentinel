@@ -60,6 +60,17 @@ from core import CARRIERS, CarrierStore, seed_of   # noqa: E402
 ALPHA = 0.05
 K = len(CARRIERS)
 
+import runner           # noqa: E402
+
+#: The observation model and the probe policy, set from the command line.
+#: M0 + B7 reproduces every number this script has published.  Under MA the
+#: probe is B2 uniform random, declared BEFORE the run in
+#: docs/preregistration/TIEN-DANG-KY-mo-hinh-quan-sat-MA.md SS4: B7's LP puts
+#: zero coverage on carriers, so under MA it never buys a single look and the
+#: premise would be flat by the choice of probe, not by the model.
+OBSERVATION = "M0"
+PROBE = "B7 minimax-lp"
+
 
 def _posterior_mass_on_truth(budget: float, wf, ps, det, ag, seed: int,
                              deltas, h: int) -> float:
@@ -72,9 +83,10 @@ def _posterior_mass_on_truth(budget: float, wf, ps, det, ag, seed: int,
     """
     b = belief.WindowBelief(list(CARRIERS), H=h, deltas=deltas,
                             beta=costs.BETA_DEFAULT)
-    pol = P.make_policy("B7 minimax-lp", budget, seed_of("c", seed), "mid")
+    pol = P.make_policy(PROBE, budget, seed_of("c", seed), "mid")
     store = CarrierStore()
     truth = (ps.carrier, ps.iota, ps.sigma)
+    seen: dict = {}
     for t, task in enumerate(wf.tasks):
         if t == ps.iota:
             build.inject(store, wf, ps)
@@ -85,10 +97,13 @@ def _posterior_mass_on_truth(budget: float, wf, ps, det, ag, seed: int,
             raw = [det.score(x, t, seed) for x in items]
             signals[c] = P.CarrierSignal(p=scoring.carrier_score(raw, det.d_prime),
                                          n=len(items))
-        b.update(t, signals)
-        act = pol.choose(t, sorted({x.carrier for x in out.retrieved}), signals)
+        visible = runner.visible_signals(signals, seen, OBSERVATION)
+        b.update(t, visible)
+        act = pol.choose(t, sorted({x.carrier for x in out.retrieved}), visible)
+        seen = {}
         if act is not None and pol.can(P.cost_of(act)):
             pol.charge(P.cost_of(act))
+            seen = runner.bought_sight(act, signals)
             carrier, _ = P.split_action(act)
             if carrier in CARRIERS:
                 for it in store.live(carrier):
@@ -145,6 +160,47 @@ def budget_buys_information(n_wf: int, h: int) -> dict:
     }
 
 
+def belief_ceiling(n_wf: int, h: int, budget: float = 1000.0) -> dict:
+    """How far can the posterior concentrate on the truth AT ALL?
+
+    Asked at a budget far above the ladder, under BOTH observation models, with
+    the strong detector.  If even M0 -- every carrier seen for free at every
+    task -- leaves the median mass on the true window far below 1 - alpha, then
+    Theorem 4's left-hand side does not exist at this alpha for a reason that is
+    neither the budget nor the observation model: it is the ceiling of the
+    belief mechanism itself.  Reported so a refusal says WHICH of the three it is.
+    """
+    ag = agent.MockAgent()
+    det = detector.Detector(d_prime=2.9598, tau_det=1.17498679206609)
+    global OBSERVATION, PROBE
+    saved = (OBSERVATION, PROBE)
+    out = {}
+    try:
+        for model, probe in (("M0", "B7 minimax-lp"), ("M0", "B2 uniform random"),
+                             ("MA", "B2 uniform random")):
+            OBSERVATION, PROBE = model, probe
+            for delta in (2, 4):
+                masses = []
+                for i in range(n_wf):
+                    wf = build.make_workflow(f"c-{i:03d}", "django", h,
+                                             random.Random(seed_of("c-wf", i)))
+                    ps = build.plan_poison(wf, "memory", delta,
+                                           random.Random(seed_of("c-ps", i)))
+                    if ps is None:
+                        continue
+                    masses.append(_posterior_mass_on_truth(budget, wf, ps, det, ag,
+                                                           i, (0, 2, 4), h))
+                out[f"{model}/{probe}/delta={delta}"] = {
+                    "median_mass_on_truth": round(statistics.median(masses), 4),
+                    "max_mass_on_truth": round(max(masses), 4),
+                    "reaches_1_minus_alpha": sum(m >= 1 - ALPHA for m in masses),
+                    "n": len(masses)}
+    finally:
+        OBSERVATION, PROBE = saved
+    return {"budget": budget, "detector_d_prime": 2.9598, "cells": out,
+            "prior_mass_per_window": round(0.5 / sum(4 * (h - d) for d in (0, 2, 4)), 4)}
+
+
 def measure(n_wf: int = 8, h: int = 8) -> dict:
     ag = agent.MockAgent()
     deltas = (0, 2, 4)
@@ -190,15 +246,18 @@ def measure(n_wf: int = 8, h: int = 8) -> dict:
 
     fitted = [c for c in cells if c.get("c_cell") is not None]
     precondition = budget_buys_information(min(n_wf, 4), h)
+    ceiling = belief_ceiling(n_wf, h) if not fitted else None
     return {
         "precondition": precondition,
+        "belief_ceiling": ceiling,
         "refused": None if precondition["budget_moves_the_posterior"] else (
-            "c is NOT fitted: the posterior at sigma is identical across the whole "
-            "budget ladder, so budget buys no information in this harness and "
-            "Theorem 4's left-hand side has nothing to measure.  Cause: "
-            "belief.WindowBelief.update is fed the signals of ALL carriers every "
-            "task, whatever the policy audited -- observations are free.  Fitting "
-            "c before that is fixed would report a property of the ladder."),
+            f"c is NOT fitted under observation model {OBSERVATION}: the posterior "
+            "at sigma is identical across the whole budget ladder, so budget buys "
+            "no information and Theorem 4's left-hand side has nothing to "
+            "measure." + (" Cause: under M0 belief.WindowBelief.update is fed the "
+            "signals of ALL carriers every task, whatever the policy audited -- "
+            "observations are free." if OBSERVATION == "M0" else "")),
+        "observation_model": OBSERVATION,
         "c": max((c["c_cell"] for c in fitted), default=None),
         "c_cell_spread": ({"min": min(c["c_cell"] for c in fitted),
                            "median": statistics.median([c["c_cell"] for c in fitted]),
@@ -211,7 +270,8 @@ def measure(n_wf: int = 8, h: int = 8) -> dict:
             "left_hand_side": "smallest budget whose posterior puts >= 1 - alpha "
                               "on the true (k, iota, sigma) at sigma",
             "alpha": ALPHA, "budget_ladder": budgets,
-            "policy": "B7 minimax-lp", "belief_beta": costs.BETA_DEFAULT,
+            "policy": PROBE, "observation_model": OBSERVATION,
+            "belief_beta": costs.BETA_DEFAULT,
             "kappa_bar": kappa_bar, "K": K, "H": h, "n_workflows": n_wf,
             "date": datetime.date.today().isoformat(),
             "commit": subprocess.run(["git", "rev-parse", "HEAD"],
@@ -223,5 +283,10 @@ def measure(n_wf: int = 8, h: int = 8) -> dict:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--n-wf", type=int, default=8)
+    ap.add_argument("--observation", choices=runner.OBSERVATION_MODELS, default="M0")
+    ap.add_argument("--probe", default=None,
+                    help="probe policy; default B7 under M0, B2 under MA (declared)")
     a = ap.parse_args()
+    OBSERVATION = a.observation
+    PROBE = a.probe or ("B7 minimax-lp" if a.observation == "M0" else "B2 uniform random")
     print(json.dumps(measure(a.n_wf), indent=2, ensure_ascii=False))
