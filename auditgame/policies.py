@@ -119,6 +119,17 @@ class Policy:
     #: They are SWEPT and reported, not assigned -- the same treatment as eps* and
     #: lambda_Q*.  Picking a value here would be inventing a constant the
     #: manuscript never published.
+    #:
+    #: `eta_Q` HERE IS A HARM THRESHOLD, NOT A PRICE, despite the shared symbol.
+    #: It is compared against `runner.expected_harm(...)`, a quantity in [0, 1];
+    #: the PRICE of a quarantine is `ETA_Q_COST` (USD, ~61.5 kbar), charged to the
+    #: budget.  README issue #14 once proposed wiring this field to ETA_Q_COST --
+    #: that compares a probability to a currency amount, and the threshold would
+    #: then move with the UNIT: 0.095 on the USD scale (a cut at 9.5% expected
+    #: harm, chosen by nobody), 2.0 on the legacy scale (never satisfiable, so
+    #: quarantine silently off).  It would be the one quantity in the game that
+    #: breaks the invariance under a common rescaling of (kappa, kappa_commit,
+    #: eta_Q, B) -- so the field stays a swept threshold, as declared above.
     tau_quarantine: float = 0.0
     eta_Q: float = 0.0
 
