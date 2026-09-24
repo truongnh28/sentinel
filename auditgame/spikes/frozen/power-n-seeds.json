@@ -1,0 +1,876 @@
+{
+  "generated": "2026-09-24T23:22:02",
+  "commit": "b406ce8",
+  "gate_pct": 15.0,
+  "n_needed_by_cell": [
+    {
+      "source": "certified-power-share-0.5.json",
+      "share": 0.5,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "SSG-full receding",
+      "gain": 6.38,
+      "ci": [
+        -0.21,
+        12.75
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.5.json",
+      "share": 0.5,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "SSG-up receding",
+      "gain": 4.73,
+      "ci": [
+        -1.11,
+        10.57
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.5.json",
+      "share": 0.5,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "SSG-G guarded",
+      "gain": 0.21,
+      "ci": [
+        -6.07,
+        6.25
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.5.json",
+      "share": 0.5,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "SSG-full receding",
+      "gain": 10.13,
+      "ci": [
+        2.36,
+        17.44
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.5.json",
+      "share": 0.5,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "SSG-up receding",
+      "gain": 6.54,
+      "ci": [
+        -0.46,
+        13.29
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.5.json",
+      "share": 0.5,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "SSG-G guarded",
+      "gain": 4.22,
+      "ci": [
+        -2.6,
+        10.84
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.5.json",
+      "share": 0.5,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "SSG-full receding",
+      "gain": 11.75,
+      "ci": [
+        3.72,
+        19.38
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.5.json",
+      "share": 0.5,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "SSG-up receding",
+      "gain": 8.12,
+      "ci": [
+        0.61,
+        15.32
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.5.json",
+      "share": 0.5,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "SSG-G guarded",
+      "gain": 9.19,
+      "ci": [
+        1.55,
+        16.29
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.75.json",
+      "share": 0.75,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "SSG-full receding",
+      "gain": 16.52,
+      "ci": [
+        8.02,
+        24.48
+      ],
+      "n_ref": 100,
+      "n_needed": 2932
+    },
+    {
+      "source": "certified-power-share-0.75.json",
+      "share": 0.75,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "SSG-up receding",
+      "gain": 22.17,
+      "ci": [
+        13.75,
+        30.49
+      ],
+      "n_ref": 100,
+      "n_needed": 137
+    },
+    {
+      "source": "certified-power-share-0.75.json",
+      "share": 0.75,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "SSG-G guarded",
+      "gain": 7.69,
+      "ci": [
+        -1.45,
+        16.03
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.75.json",
+      "share": 0.75,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "SSG-full receding",
+      "gain": 22.38,
+      "ci": [
+        12.05,
+        31.51
+      ],
+      "n_ref": 100,
+      "n_needed": 174
+    },
+    {
+      "source": "certified-power-share-0.75.json",
+      "share": 0.75,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "SSG-up receding",
+      "gain": 35.71,
+      "ci": [
+        26.39,
+        44.34
+      ],
+      "n_ref": 100,
+      "n_needed": 19
+    },
+    {
+      "source": "certified-power-share-0.75.json",
+      "share": 0.75,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "SSG-G guarded",
+      "gain": 8.81,
+      "ci": [
+        -2.9,
+        19.18
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power-share-0.75.json",
+      "share": 0.75,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "SSG-full receding",
+      "gain": 26.96,
+      "ci": [
+        16.42,
+        36.14
+      ],
+      "n_ref": 100,
+      "n_needed": 68
+    },
+    {
+      "source": "certified-power-share-0.75.json",
+      "share": 0.75,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "SSG-up receding",
+      "gain": 47.06,
+      "ci": [
+        37.5,
+        55.85
+      ],
+      "n_ref": 100,
+      "n_needed": 9
+    },
+    {
+      "source": "certified-power-share-0.75.json",
+      "share": 0.75,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "SSG-G guarded",
+      "gain": 16.42,
+      "ci": [
+        3.69,
+        27.36
+      ],
+      "n_ref": 100,
+      "n_needed": 6947
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 0,
+      "policy": "SSG-full receding",
+      "gain": 1.9,
+      "ci": [
+        -0.71,
+        4.67
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 0,
+      "policy": "SSG-G guarded",
+      "gain": -1.38,
+      "ci": [
+        -4.11,
+        1.19
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 0,
+      "policy": "SSG-GU guarded upstream",
+      "gain": -1.21,
+      "ci": [
+        -4.04,
+        1.53
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 0,
+      "policy": "B7U minimax-lp upstream",
+      "gain": -2.59,
+      "ci": [
+        -5.08,
+        -0.51
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 0,
+      "policy": "SentinelW window-belief",
+      "gain": -1.38,
+      "ci": [
+        -3.75,
+        0.85
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 0,
+      "policy": "Sentinel",
+      "gain": -2.94,
+      "ci": [
+        -5.3,
+        -1.01
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "SSG-full receding",
+      "gain": 6.74,
+      "ci": [
+        3.63,
+        10.25
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "SSG-G guarded",
+      "gain": 6.03,
+      "ci": [
+        3.02,
+        9.54
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "SSG-GU guarded upstream",
+      "gain": 3.19,
+      "ci": [
+        1.25,
+        5.41
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "B7U minimax-lp upstream",
+      "gain": 5.32,
+      "ci": [
+        2.44,
+        8.81
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "SentinelW window-belief",
+      "gain": 2.3,
+      "ci": [
+        0.71,
+        4.33
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "weak",
+      "delta": 2,
+      "policy": "Sentinel",
+      "gain": 0.71,
+      "ci": [
+        0.0,
+        1.64
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 0,
+      "policy": "SSG-full receding",
+      "gain": 3.13,
+      "ci": [
+        0.0,
+        6.37
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 0,
+      "policy": "SSG-G guarded",
+      "gain": 0.87,
+      "ci": [
+        -2.98,
+        4.85
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 0,
+      "policy": "SSG-GU guarded upstream",
+      "gain": -0.52,
+      "ci": [
+        -3.78,
+        2.74
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 0,
+      "policy": "B7U minimax-lp upstream",
+      "gain": -3.13,
+      "ci": [
+        -5.86,
+        -0.68
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 0,
+      "policy": "SentinelW window-belief",
+      "gain": -2.43,
+      "ci": [
+        -5.3,
+        0.17
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 0,
+      "policy": "Sentinel",
+      "gain": -3.3,
+      "ci": [
+        -5.92,
+        -1.02
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "SSG-full receding",
+      "gain": 8.51,
+      "ci": [
+        5.09,
+        12.28
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "SSG-G guarded",
+      "gain": 7.98,
+      "ci": [
+        4.4,
+        12.06
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "SSG-GU guarded upstream",
+      "gain": 6.03,
+      "ci": [
+        2.98,
+        9.49
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "B7U minimax-lp upstream",
+      "gain": 5.32,
+      "ci": [
+        2.44,
+        8.81
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "SentinelW window-belief",
+      "gain": 2.66,
+      "ci": [
+        0.89,
+        4.75
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "mid",
+      "delta": 2,
+      "policy": "Sentinel",
+      "gain": 1.06,
+      "ci": [
+        0.17,
+        2.3
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 0,
+      "policy": "SSG-full receding",
+      "gain": 2.64,
+      "ci": [
+        -0.88,
+        6.14
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 0,
+      "policy": "SSG-G guarded",
+      "gain": 1.94,
+      "ci": [
+        -2.87,
+        6.93
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 0,
+      "policy": "SSG-GU guarded upstream",
+      "gain": -1.23,
+      "ci": [
+        -5.0,
+        2.44
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 0,
+      "policy": "B7U minimax-lp upstream",
+      "gain": -4.4,
+      "ci": [
+        -7.55,
+        -1.56
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 0,
+      "policy": "SentinelW window-belief",
+      "gain": -4.4,
+      "ci": [
+        -7.4,
+        -1.91
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 0,
+      "policy": "Sentinel",
+      "gain": -4.58,
+      "ci": [
+        -7.61,
+        -1.9
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "SSG-full receding",
+      "gain": 9.57,
+      "ci": [
+        6.02,
+        13.5
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "SSG-G guarded",
+      "gain": 10.64,
+      "ci": [
+        6.55,
+        15.16
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "SSG-GU guarded upstream",
+      "gain": 10.64,
+      "ci": [
+        6.84,
+        14.86
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "B7U minimax-lp upstream",
+      "gain": 5.67,
+      "ci": [
+        2.74,
+        9.19
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "SentinelW window-belief",
+      "gain": 2.48,
+      "ci": [
+        0.72,
+        4.54
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    },
+    {
+      "source": "certified-power.json",
+      "share": 0.3205,
+      "detector": "strong",
+      "delta": 2,
+      "policy": "Sentinel",
+      "gain": 1.06,
+      "ci": [
+        0.17,
+        2.3
+      ],
+      "n_ref": 100,
+      "n_needed": null
+    }
+  ],
+  "headline": {
+    "share": 0.75,
+    "delta": 2,
+    "detector": "mid",
+    "policy": "SSG-up receding"
+  },
+  "seeds": [
+    {
+      "seeds": 1,
+      "seed_ids": [
+        1
+      ],
+      "gain": 44.26,
+      "lo": 29.69,
+      "hi": 58.18,
+      "n_workflows": 96,
+      "half_width": 14.24
+    },
+    {
+      "seeds": 3,
+      "seed_ids": [
+        1,
+        2,
+        3
+      ],
+      "gain": 35.71,
+      "lo": 26.39,
+      "hi": 44.34,
+      "n_workflows": 100,
+      "half_width": 8.98
+    },
+    {
+      "seeds": 5,
+      "seed_ids": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "gain": 32.45,
+      "lo": 25.81,
+      "hi": 39.1,
+      "n_workflows": 100,
+      "half_width": 6.65
+    },
+    {
+      "seeds": 10,
+      "seed_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "gain": 40.42,
+      "lo": 35.33,
+      "hi": 45.29,
+      "n_workflows": 100,
+      "half_width": 4.98
+    },
+    {
+      "seeds": 1,
+      "seed_ids": [
+        2
+      ],
+      "gain": -56.25,
+      "lo": -125.0,
+      "hi": -21.74,
+      "n_workflows": 91,
+      "half_width": 51.63
+    },
+    {
+      "seeds": 1,
+      "seed_ids": [
+        3
+      ],
+      "gain": 36.47,
+      "lo": 25.93,
+      "hi": 47.13,
+      "n_workflows": 99,
+      "half_width": 10.6
+    },
+    {
+      "seeds": 1,
+      "seed_ids": [
+        4
+      ],
+      "gain": 23.08,
+      "lo": 9.52,
+      "hi": 36.36,
+      "n_workflows": 96,
+      "half_width": 13.42
+    },
+    {
+      "seeds": 1,
+      "seed_ids": [
+        5
+      ],
+      "gain": 50.91,
+      "lo": 35.85,
+      "hi": 65.08,
+      "n_workflows": 97,
+      "half_width": 14.61
+    }
+  ],
+  "S1_half_width_change_3_to_5_pct": 25.9,
+  "S2_headline_n_needed": 19
+}

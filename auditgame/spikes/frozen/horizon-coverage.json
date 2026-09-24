@@ -1,0 +1,112 @@
+{
+  "source": "spikes/delta-swebench.json",
+  "criterion": "Delta <= H-1 for >= 90% of instances in every repo with n >= 10",
+  "coverage_by_repo": {
+    "astropy/astropy": {
+      "4": 0.95,
+      "6": 1.0,
+      "8": 1.0,
+      "10": 1.0,
+      "12": 1.0,
+      "13": 1.0,
+      "16": 1.0
+    },
+    "django/django": {
+      "4": 0.45,
+      "6": 0.55,
+      "8": 0.65,
+      "10": 0.8,
+      "12": 0.9,
+      "13": 1.0,
+      "16": 1.0
+    },
+    "matplotlib/matplotlib": {
+      "4": 0.95,
+      "6": 0.95,
+      "8": 0.95,
+      "10": 0.95,
+      "12": 1.0,
+      "13": 1.0,
+      "16": 1.0
+    },
+    "pydata/xarray": {
+      "4": 1.0,
+      "6": 1.0,
+      "8": 1.0,
+      "10": 1.0,
+      "12": 1.0,
+      "13": 1.0,
+      "16": 1.0
+    },
+    "pylint-dev/pylint": {
+      "4": 1.0,
+      "6": 1.0,
+      "8": 1.0,
+      "10": 1.0,
+      "12": 1.0,
+      "13": 1.0,
+      "16": 1.0
+    },
+    "pytest-dev/pytest": {
+      "4": 1.0,
+      "6": 1.0,
+      "8": 1.0,
+      "10": 1.0,
+      "12": 1.0,
+      "13": 1.0,
+      "16": 1.0
+    },
+    "scikit-learn/scikit-learn": {
+      "4": 1.0,
+      "6": 1.0,
+      "8": 1.0,
+      "10": 1.0,
+      "12": 1.0,
+      "13": 1.0,
+      "16": 1.0
+    },
+    "sphinx-doc/sphinx": {
+      "4": 0.9,
+      "6": 0.95,
+      "8": 0.95,
+      "10": 1.0,
+      "12": 1.0,
+      "13": 1.0,
+      "16": 1.0
+    },
+    "sympy/sympy": {
+      "4": 0.85,
+      "6": 0.85,
+      "8": 0.9,
+      "10": 0.95,
+      "12": 0.95,
+      "13": 0.95,
+      "16": 0.95
+    }
+  },
+  "worst_repo_coverage": {
+    "4": 0.45,
+    "6": 0.55,
+    "8": 0.65,
+    "10": 0.8,
+    "12": 0.9,
+    "13": 0.95,
+    "16": 0.95
+  },
+  "smallest_H_per_repo": {
+    "astropy/astropy": 3,
+    "django/django": 12,
+    "matplotlib/matplotlib": 3,
+    "pydata/xarray": 1,
+    "pylint-dev/pylint": 1,
+    "pytest-dev/pytest": 3,
+    "scikit-learn/scikit-learn": 3,
+    "sphinx-doc/sphinx": 4,
+    "sympy/sympy": 8
+  },
+  "smallest_H_meeting_criterion": 12,
+  "H8_meets_criterion": false,
+  "repos_H8_fails": [
+    "django/django"
+  ]
+}
