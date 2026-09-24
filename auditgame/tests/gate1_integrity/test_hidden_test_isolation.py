@@ -689,6 +689,65 @@ class HiddenTestIsolation(unittest.TestCase):
                       f"the reason given does not name the label: {said!r}")
 
 
+class DockerThatListsTheImageIsNeverASkip(unittest.TestCase):
+    """Issue #9, pinned without Docker: these run on any machine.
+
+    On 2026-09-24 three full gate-1 runs skipped all 13 container tests with
+    "image auditgame:latest not built" while the image was present -- Docker
+    Desktop's inspect-by-tag answers "No such image" in bursts.  A readiness check
+    that turns that answer into a skip makes the isolation tier UNKNOWN on exactly
+    the machine that can run it.  The two halves pinned here: a flake is retried,
+    and a persistent disagreement between `ls` and `inspect` RAISES.
+    """
+
+    def _fake(self, inspect_rcs, listed):
+        import subprocess as sp
+        calls = {"inspect": 0}
+
+        def run(argv, **kw):
+            if argv[:2] == ["docker", "info"]:
+                return sp.CompletedProcess(argv, 0, "29.5.3\n", "")
+            if argv[:3] == ["docker", "image", "inspect"]:
+                i = min(calls["inspect"], len(inspect_rcs) - 1)
+                calls["inspect"] += 1
+                rc = inspect_rcs[i]
+                return sp.CompletedProcess(
+                    argv, rc, harness.IMAGE_LABEL_VALUE + "\n" if rc == 0 else "",
+                    "" if rc == 0 else "Error response from daemon: No such image")
+            if argv[:3] == ["docker", "image", "ls"]:
+                return sp.CompletedProcess(argv, 0, listed, "")
+            raise AssertionError(f"unexpected docker call {argv}")
+        return run, calls
+
+    def _with(self, run):
+        from unittest import mock
+        return (mock.patch.object(harness.subprocess, "run", run),
+                mock.patch.object(harness.shutil, "which", lambda _: "/usr/bin/docker"),
+                mock.patch.object(harness.time, "sleep", lambda _: None))
+
+    def test_a_transient_no_such_image_is_retried_to_ready(self):
+        run, calls = self._fake([1, 1, 0], listed="717ca182bd01\n")
+        a, b, c = self._with(run)
+        with a, b, c:
+            self.assertEqual(harness.container_ready(), "")
+        self.assertEqual(calls["inspect"], 3)
+
+    def test_listed_but_never_inspectable_raises_instead_of_skipping(self):
+        run, _ = self._fake([1], listed="717ca182bd01\n")
+        a, b, c = self._with(run)
+        with a, b, c, self.assertRaises(harness.DockerInconsistent) as cm:
+            harness.container_ready()
+        self.assertIn("717ca182bd01", str(cm.exception))
+
+    def test_an_image_that_truly_is_absent_is_still_a_skip_reason(self):
+        """The other side: a machine without the image is a legitimate skip, and
+        this fix must not turn it into an error on every fresh clone."""
+        run, _ = self._fake([1], listed="")
+        a, b, c = self._with(run)
+        with a, b, c:
+            self.assertIn("not built", harness.container_ready())
+
+
 class HiddenPathsDoNotTravelInTheCarriers(unittest.TestCase):
     """TIER 2 -- the indirect path, the one the benchmark installed itself.
 

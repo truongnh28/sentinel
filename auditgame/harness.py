@@ -128,6 +128,7 @@ from __future__ import annotations
 import pathlib
 import shutil
 import subprocess
+import time
 from typing import Optional
 
 import carrier_store_fs
@@ -154,6 +155,25 @@ IMAGE_LABEL_VALUE = "auditgame-se-1"
 #: "is the daemon there" is answered in a moment or not at all.
 DOCKER_PROBE_TIMEOUT = 30
 DOCKER_RUN_TIMEOUT = 900
+
+#: How many times `docker image inspect` is asked before its "No such image" is
+#: believed.  MEASURED, not defensive: on Docker Desktop 29.5 (containerd image
+#: store) inspect-by-tag intermittently answers "No such image" for an image that
+#: `docker image ls` lists in the same second, and three full gate-1 runs on
+#: 2026-09-24 skipped all 13 container tests on exactly that answer -- which the
+#: status report first misread as CPU contention.  The failures come in BURSTS of
+#: several seconds, so the backoff is linear (0.5 s, 1 s, ... ~7.5 s in total);
+#: a burst longer than that is reported by DockerInconsistent, not skipped.
+DOCKER_INSPECT_ATTEMPTS = 6
+
+
+class DockerInconsistent(RuntimeError):
+    """Docker lists the image and refuses to describe it.
+
+    Raised, not returned as a skip reason: a skip here turns 13 isolation tests
+    into UNKNOWN on a machine where the image IS present, and a gate that
+    silently degrades to UNKNOWN is the failure gate 1 exists to prevent.
+    """
 
 #: Where every mount lands inside the container.  Fixed here rather than spelled
 #: out at each call site: the agent's view of its own filesystem is part of the
@@ -310,20 +330,46 @@ def container_ready() -> str:
     # is baked in by ../Dockerfile, so asking for it is asking whether THIS image is
     # the one the harness is written against.
     try:
-        img = subprocess.run(
-            ["docker", "image", "inspect", "--format",
-             '{{index .Config.Labels "' + IMAGE_LABEL + '"}}', IMAGE],
-            capture_output=True, text=True, timeout=DOCKER_PROBE_TIMEOUT)
+        img = _inspect_label()
     except subprocess.TimeoutExpired:
         return f"docker did not answer within {DOCKER_PROBE_TIMEOUT}s"
     if img.returncode != 0:
-        return f"image {IMAGE} not built (docker build -t {IMAGE} ..)"
+        # "No such image" is only believed once `docker image ls` agrees.  If the
+        # listing names the image, the inspect answer was the flake above, and the
+        # honest outcome is an error, not a skip.
+        listed = subprocess.run(["docker", "image", "ls", "-q", IMAGE],
+                                capture_output=True, text=True,
+                                timeout=DOCKER_PROBE_TIMEOUT).stdout.strip()
+        if not listed:
+            return f"image {IMAGE} not built (docker build -t {IMAGE} ..)"
+        raise DockerInconsistent(
+            f"docker lists {IMAGE} (id {listed.splitlines()[0]}) but `docker image "
+            f"inspect` refused it {DOCKER_INSPECT_ATTEMPTS} times: "
+            f"{img.stderr.strip()!r}. Refusing to skip the container tests on a "
+            f"machine where the image exists -- restart Docker Desktop and rerun")
     got = img.stdout.strip()
     if got != IMAGE_LABEL_VALUE:
         return (f"image {IMAGE} is not this harness's image: {IMAGE_LABEL}="
                 f"{got!r}, expected {IMAGE_LABEL_VALUE!r} (rebuild it from "
                 f"../Dockerfile with docker build -t {IMAGE} ..)")
     return ""
+
+
+def _inspect_label():
+    """`docker image inspect` for the harness label, retried on a non-zero answer.
+
+    Retries only the answer, never a timeout: a daemon that does not reply within
+    DOCKER_PROBE_TIMEOUT is a different condition and is reported as such.
+    """
+    for attempt in range(DOCKER_INSPECT_ATTEMPTS):
+        img = subprocess.run(
+            ["docker", "image", "inspect", "--format",
+             '{{index .Config.Labels "' + IMAGE_LABEL + '"}}', IMAGE],
+            capture_output=True, text=True, timeout=DOCKER_PROBE_TIMEOUT)
+        if img.returncode == 0:
+            return img
+        time.sleep(0.5 * (attempt + 1))
+    return img
 
 
 def run_in_container(task, cmd: list):
