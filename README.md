@@ -326,13 +326,13 @@ Xếp theo mức ưu tiên cho mốc đóng băng 30/09.
 
 | Cổng | Kết quả |
 |---|---|
-| Gate 1 — Integrity | **593/593 xanh**; trước đó 580/593 (+39 test mới: nguồn gốc chi phí, 4 checkpoint, trục $\chi$, marker, thư viện 28 policy, manifest đóng băng), 13 bỏ qua nên vẫn tính là *UNKNOWN* |
+| Gate 1 — Integrity | **593/593 xanh.** 13 test container cuối cùng đã chạy sau khi dựng image; trước đó gate bị tính là *UNKNOWN* dù 580 test kia xanh |
 | Gate 2 — Validity | 203/205, **đỏ** |
 | Gate 3 — Power | 15/15 |
 
 - Không đạt: `test_benign_corpus…test_one_split_cannot_decide_a_delta_of_the_certify_corpus`, một phát hiện đã ghi nhận: corpus đủ mạnh khiến tiêu chí đa phân hoạch mất tác dụng.
 - Không đạt: `…some_epsilon_makes_the_payload_indistinguishable_at_every_delta` (pipeline `matched`, pha `screen`). Không $\varepsilon \in \{0;\ 0{,}2;\ 0{,}4;\ 0{,}7;\ 1{,}0\}$ nào đưa trung vị AUC ở $\Delta = 4$ xuống dưới trần (0,608 / 0,607 / 0,642 / 1,0 / 1,0). Liên quan trực tiếp tới điểm rẽ ngày 6.
-- 13 bỏ qua: Docker daemon không chạy, cần image `auditgame:latest` (`docker build -t auditgame:latest .`).
+- Không còn test nào bị bỏ qua. 13 test container chạy được sau `docker build -t auditgame:latest .`; chúng kiểm rằng agent **không** với tới được test ẩn hay đáp án từ trong sandbox của nó.
 
 ---
 
