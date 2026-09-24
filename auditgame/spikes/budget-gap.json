@@ -1,0 +1,49 @@
+{
+  "rows": [
+    {
+      "scale": "legacy",
+      "H": 8,
+      "reps": 1000,
+      "deltas": [
+        0,
+        2,
+        4
+      ],
+      "budget": 17.95,
+      "value_lp": 0.5473,
+      "value_executed": 0.239,
+      "value_gap_pct": -56.33,
+      "actions_per_task_lp": 0.5473,
+      "actions_per_task_executed": 0.4545,
+      "carrier_coverage_lp": 0.0,
+      "spend_lp_share": 1.0,
+      "spend_executed_share": 0.8305,
+      "dropped_draws_per_episode": 0.727
+    },
+    {
+      "scale": "usd",
+      "H": 8,
+      "reps": 1000,
+      "deltas": [
+        0,
+        2,
+        4
+      ],
+      "budget": 0.01587921107142857,
+      "value_lp": 0.3205,
+      "value_executed": 0.109,
+      "value_gap_pct": -65.99,
+      "actions_per_task_lp": 0.3205,
+      "actions_per_task_executed": 0.2221,
+      "carrier_coverage_lp": 0.0,
+      "spend_lp_share": 1.0,
+      "spend_executed_share": 0.693,
+      "dropped_draws_per_episode": 0.771
+    }
+  ],
+  "reading": "value_gap_pct: the LP promises catch probability value_lp on the attacker's best window, budgeting in EXPECTATION; an episode that obeys the budget draw by draw catches the worst window with probability value_executed. Any figure read off the LP value is optimistic by about this much.",
+  "provenance": {
+    "date": "2026-09-24",
+    "commit": "26cddc9ea80f3900cbf933e6b7d9e8a45b09dab0"
+  }
+}
