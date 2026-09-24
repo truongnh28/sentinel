@@ -189,6 +189,12 @@ def manifest() -> dict:
         "policies": sorted(P.REGISTRY),
         "policy_library": sorted(L.LIBRARY),
         "attackers": sorted(attackers.REGISTRY),
+        #: THE HELD-OUT SPLIT, not just the names.  The methodology's tuning table
+        #: forbids "changing the held-out set after looking"; the split is a hash
+        #: of each name against attackers.HELD_OUT_SHARE, so moving the share or
+        #: the hash moves WHICH attackers are held out without renaming any of
+        #: them -- invisible to the `attackers` list above.
+        "held_out_attackers": sorted(attackers.held_out()),
     }
 
 
@@ -250,9 +256,9 @@ def drift(path: pathlib.Path = MANIFEST_PATH) -> list:
             out.append(f"pins/{key}: removed")
         else:
             out.append(f"pins/{key}: {a[:12]} -> {b[:12]}")
-    for section in ("policies", "policy_library", "attackers"):
-        extra = set(live[section]) - set(frozen[section])
-        gone = set(frozen[section]) - set(live[section])
+    for section in ("policies", "policy_library", "attackers", "held_out_attackers"):
+        extra = set(live.get(section, [])) - set(frozen.get(section, []))
+        gone = set(frozen.get(section, [])) - set(live.get(section, []))
         if extra:
             out.append(f"{section}: added {sorted(extra)}")
         if gone:

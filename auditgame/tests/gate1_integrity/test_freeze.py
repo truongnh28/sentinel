@@ -61,6 +61,24 @@ class TheManifestReactsToWhatItCovers(unittest.TestCase):
         self.assertIn("reference/score_table.json", freeze.TABLES)
 
 
+class TheHeldOutSplitIsFrozen(unittest.TestCase):
+
+    def test_moving_the_held_out_share_is_detected(self):
+        """The split is hash(name) < HELD_OUT_SHARE, so changing the share
+        changes WHICH attackers are held out while every name stays the same.
+        Only a manifest that records the split itself can see that."""
+        import attackers
+        tmp = pathlib.Path(tempfile.mkdtemp()) / "MANIFEST.json"
+        freeze.write(tmp)
+        old = attackers.HELD_OUT_SHARE
+        try:
+            attackers.HELD_OUT_SHARE = 0.9
+            d = freeze.drift(tmp)
+        finally:
+            attackers.HELD_OUT_SHARE = old
+        self.assertTrue(any("held_out_attackers" in x for x in d), d)
+
+
 class TheScatteredDigestsAreInTheCell(unittest.TestCase):
     """Three configurations used to be pinned by three separate digests, and the
     run-level manifest covered none of them.
