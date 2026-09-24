@@ -1,11 +1,10 @@
 # Related Work
 
-> **Draft status.** Claims about four papers are grounded in a direct read of
-> their front matter: Kim et al. (AAMAS 2026), Zhang et al. (HarnessSafe),
-> Chen et al. (MemSecBench) and Nasr et al. (USENIX Sec 2026). Entries marked
-> **[verify]** are positioned from title, venue and the internal catalogue only,
-> and must be read before the camera-ready. See §7.7 for three citation errors
-> found in our own reading list.
+> **Draft status.** Every claim about a cited paper is now grounded in a direct
+> read of its title page and abstract (the PDFs under `docs/paper/`). The seven
+> entries previously marked **[verify]** were checked on 24/09: five held as
+> written, two were reworded (MemPoison [15] and the harness-scaling paper [22]).
+> See §7.7 for the citation errors found in our own reading list.
 
 Our work sits at the junction of three literatures that have not yet been
 joined: attacks that persist inside an agent harness, benchmarks that measure
@@ -22,7 +21,8 @@ Poisoning an agent's durable state is now a well-established attack class.
 AgentPoison [5] red-teams LLM agents by corrupting memory or knowledge bases,
 and shows that a small number of injected records suffices to steer later
 retrievals. MINJA [8] demonstrates a memory-injection attack mounted entirely
-through ordinary interaction, without privileged access **[verify]**. At web
+through ordinary interaction: the attacker only issues queries and observes
+outputs, and never writes to the memory bank directly. At web
 scale, Carlini et al. [4] establish that poisoning real training corpora is
 practical and cheap, which is the background condition that makes agent-level
 persistence worth worrying about.
@@ -38,11 +38,18 @@ median is 0 tasks in eight of the ten, with only 19% of instances at
 $\Delta \ge 2$. Work that assumes long dormancy is describing a minority of the
 workload.
 
-MemPoison [15] and the memory-lifecycle line [17] study persistence and repair
-of agent memory specifically **[verify]**; dependency-guided rollback [7]
-addresses recovery once compromise is known **[verify]**. These are
-complementary to us: they act after detection, whereas our defender must decide
-where to spend inspection effort before it knows anything.
+MemPoison [15] is the closest measurement of the dormancy we model: a
+1,227-case benchmark whose third tier is *context-triggered dormant
+corruption*, and whose finding is that write-time defences suppress direct
+single-record attacks but fail on compositional and trigger-conditioned ones.
+That is the regime in which inspecting at write time is not enough and
+inspection has to be spread over the window between write and trigger — the
+allocation problem this paper studies. The repair line acts later:
+MemTxn [17] puts a transaction boundary around memory updates and restores the
+complete application-visible state after a fault, and dependency-guided
+rollback [7] repairs downstream state given memories already diagnosed as
+faulty. Both are complementary to us: they act after detection, whereas our
+defender must decide where to spend inspection effort before it knows anything.
 
 ## 7.2 Benchmarks for persistent-carrier safety
 
@@ -74,8 +81,9 @@ committed policy. Their carrier taxonomies and lifecycle staging are, in our
 view, the right substrate for that question, and our four carriers
 (memory, skill, queue, branch) are a coarser cut of the same structure.
 
-Colosseum [6] audits collusion among language-model agents **[verify]**, a
-different failure mode in the same harness setting.
+Colosseum [6] audits collusion in cooperative multi-agent systems, measuring
+collusive behaviour as regret against the cooperative optimum — a different
+failure mode, and a regret-based audit metric close in spirit to ours.
 
 ## 7.3 Stackelberg security games
 
@@ -110,8 +118,8 @@ routinely evaluated against static attack sets or weak optimisers, and that this
 evaluation process is flawed: by scaling general optimisation techniques and
 human-guided exploration they bypass 12 recent defences with attack success
 above 90%, most of which had originally reported near-zero rates. Related, [24]
-shows adaptive attacks breaking defences against indirect prompt injection
-**[verify]**.
+bypasses all eight defences it evaluates against indirect prompt injection on
+LLM agents, with attack success above 50% under adaptive attacks.
 
 We take this as a methodological requirement rather than a related result, and
 we report having failed it ourselves. Our harness originally *sampled* the
@@ -136,10 +144,12 @@ treat it as conservative and certify on the permutation result.
 
 Our workflows are built from SWE-bench Verified instances and the agent-harness
 design follows the open agent platforms, of which OpenHands [21] is
-representative. Two lines in the harness-engineering literature [22, 23] argue
-for treating the harness as the unit of security engineering rather than the
-model **[verify]**; our defender is a harness-level control in exactly that
-sense. To measure the real trigger delay $\Delta$ we need to know which files
+representative. Two recent papers move attention from the model to the harness
+around it: [22] argues that the execution layer — memory, retrieval, skill
+routing, verification — should be a first-class object of design and
+evaluation, and [23] shows that security controls for coding agents can be
+distributed through the harness itself. Our defender is a harness-level
+control in exactly that sense. To measure the real trigger delay $\Delta$ we need to know which files
 change together, for which we use the conceptual- and logical-coupling and
 co-change literature from empirical software engineering.
 
@@ -161,4 +171,19 @@ bibliography:
 
 Two further entries (arXiv:2512.21794 and arXiv:2604.23374) were catalogued
 under titles that appear to be system names used *inside* those papers rather
-than the paper titles. All five are corrected before submission.
+than the paper titles.
+
+The 24/09 read of the remaining PDFs adds three more title mismatches, all
+entries whose catalogue name is not the title on the paper:
+
+- arXiv:2503.03704 (MINJA) is, in the version on file (v5, NeurIPS 2025),
+  *Memory Injection Attacks on LLM Agents via Query-Only Interaction*; "A
+  practical memory injection attack against LLM agents" is the v1 title. The
+  bibliography must cite the published version.
+- arXiv:2602.15198 is *Colosseum: Auditing Collusion in **Cooperative
+  Multi-Agent Systems***, not "…among language-model agents".
+- The dependency-guided rollback entry [7] (arXiv:2608.10502) is *From Faulty
+  Memories to Corrected Actions: Dependency-Guided Rollback Repair for
+  Memory-Augmented Agents*.
+
+All eight are corrected before submission.
