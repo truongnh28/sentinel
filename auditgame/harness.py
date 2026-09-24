@@ -342,9 +342,22 @@ def container_ready() -> str:
                                 timeout=DOCKER_PROBE_TIMEOUT).stdout.strip()
         if not listed:
             return f"image {IMAGE} not built (docker build -t {IMAGE} ..)"
+        # THE TAG IS WHAT FLAKES, NOT THE IMAGE.  Measured on 2026-09-24: while
+        # inspect-by-tag answered "No such image", inspect-by-ID of the id that
+        # `ls` resolved answered normally.  So resolve the tag ourselves and ask
+        # again; only if the ID is refused too is Docker really inconsistent.
+        image_id = listed.splitlines()[0]
+        img = _inspect_label(image_id)
+        if img.returncode == 0:
+            got = img.stdout.strip()
+            if got != IMAGE_LABEL_VALUE:
+                return (f"image {IMAGE} is not this harness's image: {IMAGE_LABEL}="
+                        f"{got!r}, expected {IMAGE_LABEL_VALUE!r} (rebuild it from "
+                        f"../Dockerfile with docker build -t {IMAGE} ..)")
+            return ""
         raise DockerInconsistent(
-            f"docker lists {IMAGE} (id {listed.splitlines()[0]}) but `docker image "
-            f"inspect` refused it {DOCKER_INSPECT_ATTEMPTS} times: "
+            f"docker lists {IMAGE} (id {image_id}) but `docker image inspect` "
+            f"refused both the tag and the id {DOCKER_INSPECT_ATTEMPTS} times each: "
             f"{img.stderr.strip()!r}. Refusing to skip the container tests on a "
             f"machine where the image exists -- restart Docker Desktop and rerun")
     got = img.stdout.strip()
@@ -355,8 +368,11 @@ def container_ready() -> str:
     return ""
 
 
-def _inspect_label():
+def _inspect_label(ref: str | None = None):
     """`docker image inspect` for the harness label, retried on a non-zero answer.
+
+    `ref` is the tag by default; container_ready passes the resolved image ID
+    when the tag keeps being refused.
 
     Retries only the answer, never a timeout: a daemon that does not reply within
     DOCKER_PROBE_TIMEOUT is a different condition and is reported as such.
@@ -364,7 +380,7 @@ def _inspect_label():
     for attempt in range(DOCKER_INSPECT_ATTEMPTS):
         img = subprocess.run(
             ["docker", "image", "inspect", "--format",
-             '{{index .Config.Labels "' + IMAGE_LABEL + '"}}', IMAGE],
+             '{{index .Config.Labels "' + IMAGE_LABEL + '"}}', ref or IMAGE],
             capture_output=True, text=True, timeout=DOCKER_PROBE_TIMEOUT)
         if img.returncode == 0:
             return img

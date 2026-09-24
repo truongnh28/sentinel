@@ -700,13 +700,18 @@ class DockerThatListsTheImageIsNeverASkip(unittest.TestCase):
     and a persistent disagreement between `ls` and `inspect` RAISES.
     """
 
-    def _fake(self, inspect_rcs, listed):
+    def _fake(self, inspect_rcs, listed, id_ok=False):
         import subprocess as sp
         calls = {"inspect": 0}
 
         def run(argv, **kw):
             if argv[:2] == ["docker", "info"]:
                 return sp.CompletedProcess(argv, 0, "29.5.3\n", "")
+            if argv[:3] == ["docker", "image", "inspect"] and argv[-1] != harness.IMAGE:
+                rc = 0 if id_ok else 1           # inspect by the resolved ID
+                return sp.CompletedProcess(
+                    argv, rc, harness.IMAGE_LABEL_VALUE + "\n" if rc == 0 else "",
+                    "" if rc == 0 else "Error response from daemon: No such image")
             if argv[:3] == ["docker", "image", "inspect"]:
                 i = min(calls["inspect"], len(inspect_rcs) - 1)
                 calls["inspect"] += 1
@@ -738,6 +743,14 @@ class DockerThatListsTheImageIsNeverASkip(unittest.TestCase):
         with a, b, c, self.assertRaises(harness.DockerInconsistent) as cm:
             harness.container_ready()
         self.assertIn("717ca182bd01", str(cm.exception))
+
+    def test_a_tag_that_keeps_flaking_is_resolved_through_the_image_id(self):
+        """The measured shape of the flake: the TAG is refused while the ID the
+        listing resolved is not.  That is a ready machine, not an error."""
+        run, _ = self._fake([1], listed="717ca182bd01\n", id_ok=True)
+        a, b, c = self._with(run)
+        with a, b, c:
+            self.assertEqual(harness.container_ready(), "")
 
     def test_an_image_that_truly_is_absent_is_still_a_skip_reason(self):
         """The other side: a machine without the image is a legitimate skip, and
