@@ -49,7 +49,13 @@ def main() -> int:
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--deltas", type=int, nargs="+", default=[2, 4])
     ap.add_argument("--detector", default="mid")
+    ap.add_argument("--policies", nargs="+", default=POLICIES,
+                    help="policies to sweep; B1 must be among them, since every "
+                         "gain is measured against it. Default: the published set.")
     a = ap.parse_args()
+    if "B1 audit-at-commit" not in a.policies:
+        ap.error("--policies must include 'B1 audit-at-commit': every gain is vs B1")
+    POLICIES[:] = a.policies
 
     wfs = experiment.make_corpus(a.n, a.H, seed=2026)
     det, ag = detector.Detector.from_setting(a.detector), agent.MockAgent()
