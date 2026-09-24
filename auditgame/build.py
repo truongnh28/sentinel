@@ -296,9 +296,45 @@ def plan_poison(wf: Workflow, carrier: str, delta: int,
     if not cands:
         return None
     s_ = rng.choice(cands)
-    return PoisonSpec(carrier=carrier, iota=s_ - delta, sigma=s_, epsilon=epsilon,
+    return _spec(wf, carrier, delta, s_, epsilon)
+
+
+def _spec(wf: Workflow, carrier: str, delta: int, sigma: int,
+          epsilon: float) -> PoisonSpec:
+    """One PoisonSpec at a named sigma.  Shared so the sampled path and the
+    enumerated path cannot build their markers differently."""
+    return PoisonSpec(carrier=carrier, iota=sigma - delta, sigma=sigma,
+                      epsilon=epsilon,
                       marker=marker_for(getattr(wf, "repo", "?"), wf.wf_id,
-                                        carrier, s_ - delta, s_, delta))
+                                        carrier, sigma - delta, sigma, delta))
+
+
+def plan_poison_all(wf: Workflow, carrier: str, delta: int,
+                    epsilon: float = 0.6,
+                    theta: float | None = None) -> list:
+    """EVERY feasible (iota, sigma) at this delta, not one drawn from them.
+
+    WHY THIS EXISTS.  The model says the attacker best-responds to the committed
+    policy; plan_poison ends in `rng.choice(cands)`, which is the attacker
+    playing blind.  runner.worst_case then maxes over (Delta, k) with ONE sigma
+    already fixed per cell, so what it reports is max_k E_sigma and not
+    max_{k,sigma} -- at H=8, Delta=2 that is one placement out of six.
+
+    Takes no rng, and that is the point: there is nothing left to draw.  The
+    feasibility filter is character-for-character the one in plan_poison, and
+    `_spec` builds the record, so the enumerated set is a superset of whatever
+    plan_poison would have returned for the same arguments.
+
+    See docs/preregistration/TIEN-DANG-KY-attacker-best-response.md.
+    """
+    theta = retrieval.THETA if theta is None else theta
+    tp = [retrieval.as_topic(t.topic) for t in wf.tasks]
+    pay = [retrieval.as_topic(retrieval.payload_topic_like(t.topic, epsilon))
+           for t in wf.tasks]
+    cands = [s_ for s_ in range(delta, wf.H)
+             if all(not retrieval.retrieved(pay[s_], tp[j], theta)
+                    for j in range(s_ - delta, s_))]
+    return [_spec(wf, carrier, delta, s_, epsilon) for s_ in cands]
 
 def inject(store: CarrierStore, wf: Workflow = None, ps: PoisonSpec = None,
            length_reasons: dict | None = None) -> Item:
