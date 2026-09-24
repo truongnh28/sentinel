@@ -316,3 +316,33 @@ def header_line(path: pathlib.Path = MANIFEST_PATH) -> str:
     return (f"freeze: DRIFTED from sha256:{frozen['digest'][:12]} "
             f"in {len(d)} place(s): {'; '.join(d[:3])}"
             + (" ..." if len(d) > 3 else "") + tail)
+
+
+def write_operating(path: pathlib.Path = MANIFEST_PATH) -> str:
+    """Write THE manifest: from the configuration a run actually uses.
+
+    MEASURED MISTAKE, 2026-09-24.  The first freeze was written from a bare
+    interpreter, where policies.KAPPA is still the draft placeholder; every run
+    calls costs.install() first and moves to the USD table, so the very first
+    run after freezing reported DRIFTED in kappa, kappa_commit and eta_q_cost.
+    A manifest has to be written through the SAME installation step the harness
+    runs, or it pins a configuration nothing executes.
+
+    The installation is undone afterwards (costs.restore), so calling this from
+    a test or a notebook leaves the module state as it found it.
+    """
+    import costs
+    import policies as P
+    old = costs.install(P)
+    try:
+        return write(path)
+    finally:
+        costs.restore(P, old)
+
+
+if __name__ == "__main__":
+    import sys
+    if sys.argv[1:] != ["--write"]:
+        raise SystemExit("usage: python3 freeze.py --write   "
+                         "(writes frozen/MANIFEST.json from the operating configuration)")
+    print(write_operating())

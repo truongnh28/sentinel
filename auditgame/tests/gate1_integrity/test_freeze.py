@@ -61,6 +61,35 @@ class TheManifestReactsToWhatItCovers(unittest.TestCase):
         self.assertIn("reference/score_table.json", freeze.TABLES)
 
 
+class TheManifestPinsTheOperatingConfiguration(unittest.TestCase):
+    """The first real freeze was written from a bare interpreter -- the draft
+    placeholder table -- and the first run after it reported DRIFTED in three
+    constants, because every run installs the USD table first.  Pinned here:
+    the canonical manifest is clean exactly where a run executes, and drifted
+    where one does not."""
+
+    def test_the_operating_manifest_is_clean_under_the_installed_scale(self):
+        import costs
+        tmp = pathlib.Path(tempfile.mkdtemp()) / "MANIFEST.json"
+        freeze.write_operating(tmp)
+        old = costs.install(P)
+        try:
+            self.assertEqual(freeze.drift(tmp), [])
+        finally:
+            costs.restore(P, old)
+
+    def test_the_operating_manifest_sees_the_placeholder_as_drift(self):
+        tmp = pathlib.Path(tempfile.mkdtemp()) / "MANIFEST.json"
+        freeze.write_operating(tmp)
+        d = freeze.drift(tmp)
+        self.assertTrue(any("kappa" in x for x in d), d)
+
+    def test_writing_it_leaves_the_module_state_as_it_was(self):
+        before = (dict(P.KAPPA), P.KAPPA_COMMIT, P.ETA_Q_COST)
+        freeze.write_operating(pathlib.Path(tempfile.mkdtemp()) / "MANIFEST.json")
+        self.assertEqual((dict(P.KAPPA), P.KAPPA_COMMIT, P.ETA_Q_COST), before)
+
+
 class TheHeldOutSplitIsFrozen(unittest.TestCase):
 
     def test_moving_the_held_out_share_is_detected(self):
