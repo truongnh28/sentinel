@@ -121,9 +121,13 @@ class OracleSolver(unittest.TestCase):
         `oracle_anchors` is allowed to withhold a family from the oracle, and a
         withholding nobody can see is how "the real oracle scores almost nothing"
         turns into "harm 0" without a test going red.  4 of the 5 instances H1
-        anchors are rejected here, so H1 can legitimately score exactly ONE
+        anchors are rejected here, so H1 alone can legitimately score exactly ONE
         instance in 500 -- and that one passes only because the literal
         `autoescape=self.autoescape` contains the substring "escape".
+
+        EVERY reject is still an H1 reject.  R1 contributes none, which is not
+        luck: its fifteen properties were written against these gold patches and
+        EveryR1TestClearsTheThreeGates has pinned V1 on them since Task 10b.
 
         Thesis claim (vi): "bo bot instance phai dem duoc, khong duoc lang le".
         """
@@ -131,8 +135,50 @@ class OracleSolver(unittest.TestCase):
         for row in self.rows:
             got += [(row["instance_id"], f) for f, _ in registry.v1_failures(row)]
         self.assertEqual(sorted(got), sorted(V1_FAILURES))
-        scorable = [r["instance_id"] for r in self.rows if registry.oracle_anchors(r)]
-        self.assertEqual(scorable, ["django__django-11119"])
+        self.assertEqual({f for _, f in got}, {"H1"},
+                         "an R1 property rejects its own gold patch: the PROPERTY "
+                         "is wrong there, and its instance must be dropped from "
+                         "per_instance.TESTS rather than excused here")
+
+    def test_the_oracle_can_reach_every_instance_a_hidden_test_was_written_for(self):
+        """WHAT REGISTERING R1 BOUGHT, as the number it actually is.
+
+        The fifteen per-instance properties cleared V1/V2/V3 on real gold patch
+        text in Task 10b and then scored NOTHING, because `registry.FAMILIES` held
+        only H1: `HiddenTestOracle.for_row` returned None on fourteen of the
+        fifteen instances those properties were written for.  That was missing
+        wiring, not a measurement, and `hidden_tests/r1_tier.py` closes it.
+
+        THE TWO NUMBERS PINNED HERE ARE NOT THE SAME KIND OF NUMBER, and this test
+        keeps them apart on purpose:
+
+          15 of 15   the wiring claim.  Every instance a hidden test exists for is
+                     now scoreable.  This is the one that went from 1 to 15.
+          15 of 500  NOT a coverage rate.  It is how many properties were
+                     hand-written, so it extrapolates to nothing -- unlike H1's
+                     5 of 500, which is a property of the corpus and is what Task
+                     10's decision gate rejected.
+
+        Thesis claim (vi): "test an da viet ra thi oracle phai cham duoc".
+        """
+        from hidden_tests import per_instance
+        written = {t.instance_id for t in per_instance.TESTS}
+        scorable = {r["instance_id"] for r in self.rows if registry.oracle_anchors(r)}
+        self.assertEqual(scorable & written, written,
+                         f"a hidden test exists for these instances and the oracle "
+                         f"still cannot score them: {sorted(written - scorable)}")
+        self.assertEqual(scorable, written,
+                         f"the oracle scores an instance no hidden test was written "
+                         f"for: {sorted(scorable - written)}")
+        self.assertEqual(len(scorable), 15)
+
+        both = sorted(i for i in scorable
+                      if len(registry.oracle_anchors(
+                          next(r for r in self.rows if r["instance_id"] == i))) > 1)
+        self.assertEqual(both, ["django__django-11119"],
+                         "the set of instances scored by BOTH families moved. The "
+                         "oracle takes the CONJUNCTION, so this is the only place "
+                         "where two properties must hold at once")
 
     def test_anchoring_is_deterministic(self):
         """Anchors feed the sealed manifest, so an unstable anchor breaks replay.

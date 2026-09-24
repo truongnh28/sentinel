@@ -27,6 +27,9 @@ The package holds two tiers, and they answer different questions:
                         by the seeded rule in r1_subset.py.  Not a replacement
                         for the proxy -- the YARDSTICK the proxy is measured
                         against, in agreement.py.
+    r1_tier.py          the adapter that makes those fifteen a REGISTRY FAMILY,
+                        so the oracle can reach them.  Until it existed they were
+                        measured against the proxy and scored nothing.
 
 registry.py is now the door into oracle.py: `oracle.HiddenTestOracle` scores
 through `registry.oracle_anchors(row)`, and `oracle.OracleScope` makes the results
@@ -43,6 +46,12 @@ Two measured reasons, both worth reading before quoting anything from here:
       hand-written app/io.py fixture; on the corpus, H1 is V1-clean on ONE
       instance in 500, and that one passes only because the literal
       `autoescape=self.autoescape` contains the substring "escape".
+
+Registering R1 (`r1_tier.py`) moves the second of those two: the real oracle is
+V1-clean on 15 instances rather than 1.  It does NOT move the first, and it does
+not raise a coverage rate -- 15 is how many properties were hand-written, not a
+measurement about SWE-bench.  See registry.py on why the two families' rates are
+not the same kind of number.
 
 So this package still exists to say, with a number, how far the proxy is from a
 real hidden test -- not yet to replace it.  See docs/reports/do_khop_voi_marker.md.

@@ -181,7 +181,14 @@ class HiddenTestOracle:
         """The oracle for one SWE-bench instance, or None if it cannot be scored.
 
         None is the N3 answer: the instance leaves the denominator.  On SWE-bench
-        Verified that is 499 rows in 500 -- see hidden_tests/registry.py.
+        Verified that is 485 rows in 500 -- the 15 that can be scored are the
+        seeded R1 subset, plus H1 on the one instance where it survives V1.  That
+        was 499 in 500 until `hidden_tests/r1_tier.py` registered the fifteen
+        hand-written properties, which had been V1/V2/V3-green and unreachable.
+
+        The 15 is NOT a coverage rate to extrapolate from -- it is how many
+        properties were hand-written.  registry.py says why the two families'
+        numbers are not the same kind of number.
         """
         from hidden_tests import registry
         anchors = registry.oracle_anchors(row)

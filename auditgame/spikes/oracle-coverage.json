@@ -1,0 +1,65 @@
+{
+  "corpus": {
+    "path": "/Users/truong.nh/Me/obsidian/HCMUT/code/Sentinel/auditgame/data/swebench_verified.jsonl",
+    "instances": 500
+  },
+  "per_family": {
+    "H1": {
+      "anchored": 5,
+      "anchored_pct": 1.0,
+      "v1_failures": 4,
+      "scorable": 1,
+      "scorable_pct": 0.2,
+      "extrapolates": "yes -- one template asked of every instance; the rate is about the corpus"
+    },
+    "R1": {
+      "anchored": 15,
+      "anchored_pct": 3.0,
+      "v1_failures": 0,
+      "scorable": 15,
+      "scorable_pct": 3.0,
+      "extrapolates": "no -- one property per instance, hand-written; the rate is about the authors"
+    }
+  },
+  "union": {
+    "anchored": 15,
+    "scorable": 15,
+    "scorable_pct": 3.0,
+    "scored_by_both_families": [
+      "django__django-11119"
+    ],
+    "v1_failures": [
+      [
+        "astropy__astropy-14182",
+        "H1"
+      ],
+      [
+        "django__django-13809",
+        "H1"
+      ],
+      [
+        "pytest-dev__pytest-7205",
+        "H1"
+      ],
+      [
+        "sphinx-doc__sphinx-11510",
+        "H1"
+      ]
+    ]
+  },
+  "reachable": {
+    "hidden_tests_written_for": 15,
+    "oracle_can_score_now": 15,
+    "oracle_could_score_before_r1_was_registered": 1,
+    "still_unreachable": []
+  },
+  "reading": "The claim that moved is REACHABLE, 1/15 -> 15/15: every instance a hidden test was written for can now be scored by the oracle. The corpus rate did NOT meaningfully move and must not be quoted as though it had: H1's 5/500 is a measurement about SWE-bench, R1's 15/500 is a count of hand-written properties. The live grid is still MarkerOracle-scored (no patch text in the pipeline), which the results header states.",
+  "provenance": {
+    "families": [
+      "H1",
+      "R1"
+    ],
+    "date": "2026-09-24",
+    "commit": "d9023f6b608211d307a346655c380644c76deae5"
+  }
+}

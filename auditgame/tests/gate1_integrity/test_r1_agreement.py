@@ -22,11 +22,12 @@ tests/gate1_integrity/test_real_data.py guards WorkflowGrouping.
 from __future__ import annotations
 import inspect, json, pathlib, unittest
 
-from hidden_tests import agreement, per_instance, r1_fixtures, r1_subset
+from hidden_tests import agreement, per_instance, r1_fixtures, r1_subset, r1_tier
 from hidden_tests.r1_gold import GOLD
 
 #: The injector's signature.  Named here so the tests can assert where it is
-#: ABSENT; per_instance.py may never spell it, which is the point of
+#: ABSENT; neither per_instance.py nor the r1_tier.py adapter that hands those
+#: checkers to the oracle may ever spell it, which is the point of
 #: test_no_R1_checker_can_name_the_marker_anywhere_in_its_own_source below.
 MARKER = r1_fixtures.marker()
 
@@ -139,11 +140,12 @@ class EveryR1TestClearsTheThreeGates(unittest.TestCase):
 
         Thesis claim (vi): "ma chay cua template khong duoc nhac den marker".
         """
-        src = inspect.getsource(per_instance)
-        self.assertNotIn(MARKER, src,
-                         "per_instance.py names the marker, so its checkers CAN key "
-                         "on the injector's signature and V3 over a fixed set of "
-                         "fixtures stops being evidence that they do not")
+        for mod in (per_instance, r1_tier):
+            src = inspect.getsource(mod)
+            self.assertNotIn(MARKER, src,
+                             f"{mod.__name__} names the marker, so its checkers CAN "
+                             f"key on the injector's signature and V3 over a fixed "
+                             f"set of fixtures stops being evidence that they do not")
         for value in GOLD.values():
             self.assertNotIn(MARKER, value,
                              "a GOLD fixture contains the marker, so mode A is not "
