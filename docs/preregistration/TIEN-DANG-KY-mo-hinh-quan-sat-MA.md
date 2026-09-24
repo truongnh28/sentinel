@@ -44,3 +44,22 @@ quan sát (tỉ lệ cặp carrier × task được nhìn).
 
 Chọn bảng nào làm headline vẫn là **quyết định của thầy** (issue #13, T1); tài liệu
 này chỉ khai việc đo.
+
+---
+
+## 4. Phụ lục (24/09, trước khi chạy `measure_c` dưới MA) — chính sách thăm dò
+
+`tools/measure_c.py` đo tiền đề bằng **B7 minimax-lp**. Dưới MA, B7 là probe vô
+dụng, và lý do đã **đo được trước**, không suy ra từ $c$: LP của nó đặt **0 độ phủ
+lên carrier** (`spikes/budget-gap.json`, `carrier_coverage_lp = 0`), và trên 6
+workflow nó chọn `commit` 24 lần, `none` 24 lần, **không một** lượt audit carrier.
+Dưới MA nó không bao giờ mua được một lần nhìn, nên tiền đề sẽ phẳng vì **cách chọn
+probe**, không phải vì mô hình quan sát.
+
+**Probe dưới MA: `B2 uniform random`.** Nó audit carrier (24 queue, 18 memory,
+6 commit trên cùng 6 workflow) và **không thích nghi**, nên nó đo đúng câu Định lý 4
+hỏi — ngân sách mua quan sát thì posterior có hội tụ không — mà không trộn vào
+chất lượng của một luật chọn thông minh.
+
+Dưới M0 giữ B7 như cũ, để số M0 đã công bố không đổi. Báo cả hai probe dưới MA nếu
+cần, nhưng **B2 là số chính, khai ở đây trước khi chạy**.
