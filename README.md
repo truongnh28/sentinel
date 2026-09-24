@@ -26,17 +26,17 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 | **Mốc kế tiếp** | **Trước 29/09:** chốt issue [#13](#34-issue-cần-xử-lý) với thầy. Bằng chứng nay đủ để đề xuất một phương án cụ thể: **giữ A′**, đổi trục chế độ sang **ngân sách**, đổi chính sách chủ đạo từ `Sentinel` sang **`SSG-full receding`**. Kèm theo: bảng chứng nhận cổng v2 chạy một lần, rồi `freeze.write()`. |
 | **Thang chi phí** | Chốt **USD** (23/09). Trò chơi bất biến khi nhân cả $(\kappa, \kappa_{\text{commit}}, \eta_Q, B)$ với một hệ số chung, nên đơn vị không phải lựa chọn mô hình — chỉ bốn tỉ số không thứ nguyên sống sót, và USD là đơn vị duy nhất cả bốn cùng đo được. CPU-time giữ làm đối chứng cho $\chi$. Xem [§3.2](#32-trạng-thái-từng-tham-số). |
 | **Rủi ro lớn nhất** | **(1) Trục ngân sách chưa ai định giá.** Mức 0,3205 kế thừa từ con số 17,95 của draft. Luận điểm nay phát biểu được, nhưng phát biểu **trên một trục chưa neo**, nên bắt buộc trình bày là *bản đồ*, không phải một điểm. **(2) Agent thật làm theo payload 0/7**, detector thật chỉ đạt $d' \le 0{,}50$ so với $d'^{*} = 2{,}85$ ⇒ mọi số harm là harm **dưới mô hình tiếp nhận của MockAgent**. **(3) Kết quả không bền theo chân trời:** cùng $\Delta = 4$, SSG-full +17,8% ở $H=8$ nhưng +4,0% ở $H=12$ — nhưng $H$ và corpus đang lẫn nhau, xem issue #15. **(4) Ô $\Delta = 4$ của cổng v2 đỏ** và nó là ô có độ lợi lớn nhất; permutation test xác nhận tách được thật ($p = 0{,}010$). **(5)** $\lambda_T = 0{,}5$ nằm gần mép trên vùng SSG-G thắng; khai 0,6 là B1 thắng. |
-| **Kiểm thử** | `tests/run_all.py --all` ngày **24/09**: **798 đạt · 2 không đạt · 13 bỏ qua** (813 test) — đúng hai lỗi cũ, không hồi quy. Cổng 1 *UNKNOWN* (580/593, 13 test cần Docker), cổng 2 đỏ 203/205, cổng 3 xanh 15/15 (chi tiết ở [§3.5](#35-kiểm-thử)). |
+| **Kiểm thử** | `tests/run_all.py --all` ngày **24/09**: **811 đạt · 2 không đạt · 0 bỏ qua** (813 test). **Cổng 1 xanh hết 593/593** — image `auditgame:latest` đã dựng nên 13 test container chạy được, gate không còn *UNKNOWN*. Cổng 2 đỏ 203/205 (hai lỗi cũ), cổng 3 xanh 15/15 ([§3.5](#35-kiểm-thử)). |
 
 ## Được bao nhiêu phần trăm
 
 Đếm theo **hạng mục bàn giao được**: 51 hạng mục, chia tám nhóm. Quy ước: **✅ xong = 1 · 🟡 một phần = 0,5 · ❌ chưa làm = 0**.
 
-**Tổng: 47 / 51 = 92%.**
+**Tổng: 47,5 / 51 = 93%.**
 
 | Nhóm | Tiến độ | Hạng mục |
 |---|---|---|
-| **A. Hạ tầng benchmark** | **89%** (8/9) | ✅ CarrierStore bốn carrier · ✅ Workflow từ SWE-bench Verified · ✅ Retrieval Jaccard với $\theta$ · ✅ MockAgent · ✅ Agent LLM thật (P2) · ✅ Oracle marker · 🟡 Oracle test ẩn (neo được 5/500 = 1,0%) · ✅ Replay và sealed trace · 🟡 Harness Docker (13 test chưa chạy) |
+| **A. Hạ tầng benchmark** | **94%** (8,5/9) | ✅ CarrierStore bốn carrier · ✅ Workflow từ SWE-bench Verified · ✅ Retrieval Jaccard với $\theta$ · ✅ MockAgent · ✅ Agent LLM thật (P2) · ✅ Oracle marker · 🟡 Oracle test ẩn (neo được 5/500 = 1,0%) · ✅ Replay và sealed trace · ✅ Harness Docker: image `auditgame:latest` dựng xong, **13 test container chạy và xanh** |
 | **B. Tấn công và ground truth** | **100%** (7/7) | ✅ Sinh $(\iota,\sigma)$ có lọc nổ sớm · ✅ Payload đóng băng và bộ sinh · ✅ Thư viện attacker kịch bản **18/18** (6 luật mới đọc workflow; cổng 2 bác 2 bản đầu vì trùng hành vi luật cũ) · ✅ Attacker best-response **tối ưu tự do trên $(k,\iota,\sigma)$** (`build.plan_poison_all` + `tools/best_response.py`): attacker cũ chỉ dùng **1/8 vị trí** ở $\Delta=0$ và 1/3,9 ở $\Delta=2$. Đúng mô hình rồi thì ở $\Delta=0$ **mọi chính sách về harm 1,0000** · ✅ Marker duy nhất mỗi lần chạy: `build.marker_for` băm (repo, workflow, carrier, $\iota$, $\sigma$, $\Delta$) — 16/16 cấu hình ra 16 marker khác nhau, tất định để replay được · ✅ Đo $\Delta$ thực trên 10 repo SWE-bench · ✅ Validate harm trên tập con: 15 instance chọn có seed, test ẩn **viết tay**, 4 chế độ × 15 = 60 phán quyết |
 | **C. Corpus lành tính và cổng** | **90%** (4,5/5) | ✅ Corpus từ item SWE-bench thật · ✅ Ghép theo 5 đặc trưng bề mặt · 🟡 Cổng AUC v2, 20 split ($\Delta = 4$ còn đỏ) · ✅ Permutation test (200 hoán vị): $\Delta=4$ **tách được** ($p = 0{,}010$) — xác nhận độc lập ô đỏ; $\Delta \in \{0,2\}$ **không** ($p = 0{,}28$ / $0{,}25$) · ✅ $\beta_k$: hai luật lệch 10× ở skill ⇒ chuyển M2 và **đã quét** — $L$ **không đổi một chữ số** qua $\beta \in [0{,}013;\ 1{,}0]$, vì $\beta$ chỉ chạm hypothesis NULL nên triệt tiêu chính xác khi so carrier; chốt bằng test |
 | **D. Detector và tín hiệu** | **90%** (4,5/5) | ✅ Detector mô phỏng theo $d'$ · 🟡 Ba mức $(\psi,\varphi)$ của draft chạy như lưới riêng · ✅ CarrierSignal mean và bảng $\tau_{\text{sel}}$ · ✅ Sweep $d'$ liên tục, ra $d'^{*}$ · ✅ Detector nội dung $D_{\text{lex}}$, $D_{\text{llm}}$ |
@@ -46,7 +46,7 @@ Khung stage theo [tài liệu phương pháp luận](docs/AuditGame-SE_Sentinel_
 | **H. Tài liệu** | **88%** (3,5/4) | ✅ Phương pháp luận · ✅ Parameter Estimation Report · ✅ Reports và báo cáo tiến độ · 🟡 Bản thảo ACM: **mục Evaluation đã có bản nháp** ([docs/manuscript/Evaluation.md](docs/manuscript/Evaluation.md), kèm Hình 1 sinh từ dữ liệu); còn Intro, Related Work, Model, Design |
 
 **Đọc các con số này thế nào.**
-1. **92% là công đã bỏ ra, không phải bài đã viết.** Câu trả lời cho "bài viết được bao nhiêu" là **35–40%** sau khi có mục Evaluation, không phải 92%. Cỗ máy đo nay chạy đúng thang, đúng giá và đúng attacker — và nó cho ra **một kết quả dương có phạm vi**: phân bổ audit đáng giá trong dải ngân sách 0,5–0,75 (+41,6% … +50,7%), vô nghĩa ở hai đầu. Ở đúng mức ngân sách cũ thì không ô nào vượt 15%.
+1. **93% là công đã bỏ ra, không phải bài đã viết.** Câu trả lời cho "bài viết được bao nhiêu" là **35–40%** sau khi có mục Evaluation, không phải 93%. Cỗ máy đo nay chạy đúng thang, đúng giá và đúng attacker — và nó cho ra **một kết quả dương có phạm vi**: phân bổ audit đáng giá trong dải ngân sách 0,5–0,75 (+41,6% … +50,7%), vô nghĩa ở hai đầu. Ở đúng mức ngân sách cũ thì không ô nào vượt 15%.
 2. **Nút thắt là viết, không phải đo.** Phần đo đã cạn: thư viện 28 policy, manifest đóng băng, 18/18 attacker, $\Delta = 8$, $N = 100$ kèm CI, ablation đủ bốn arm, attacker best-response, quét ngân sách — đều xong. Còn **bốn mục bài** chưa viết (Intro, Related Work, Model, Design) và **một quyết định** phải chốt với thầy: đổi chính sách chủ đạo sang họ SSG và đổi trục chế độ sang ngân sách (issue #13). Xem thêm #15 ở [§3.4](#34-issue-cần-xử-lý).
 3. **Một phần công đã bỏ ra không nằm trong 51 hạng mục này:** hơn 60 spike, arm P2, detector nội dung, năm biến thể SSG. Chúng cho ra các phát hiện dưới đây, nhưng trong bản nộp nhiều thứ chỉ còn một dòng ở mục Threats.
 
@@ -309,7 +309,7 @@ Xếp theo mức ưu tiên cho mốc đóng băng 30/09.
 | 6 | ✅ **Xong** — `build.marker_for` băm toạ độ của chính đòn tấn công | Cổng 2 chứng nhận được thứ nó tuyên bố: không còn token nào phủ mọi payload | Không gian pool là 576; quá vài trăm payload thì marker lặp, lúc đó phải nới pool |
 | 7 | $\lambda_T$, $\pi_0$, quy ước $\chi$ chưa neo | Ba lựa chọn này đổi thứ hạng chính sách | Neo trên dev theo §1.3, đóng băng trước khi chạy held-out |
 | 8 | $\rho$ đã đo đúng không gian nhưng **cận Mệnh đề 6 rỗng** (4,06); 240 game nhỏ vẫn chưa có | Mệnh đề 6 hiện không ràng buộc được gì | Hoặc chấp nhận và báo cận rỗng kèm lý do, hoặc thêm một họ phủ được hành vi two-stage — thêm thành viên cho ba họ hiện có **không** giúp, đường bão hoà đã phẳng từ 4 |
-| 9 | Gate 1 có 13 test chưa chạy (Docker) | Gate 1 ở trạng thái UNKNOWN | Dựng image `auditgame:latest`, chạy lại |
+| 9 | ✅ **Xong** — image `auditgame:latest` đã dựng, 13 test container chạy và xanh | Gate 1 thoát trạng thái UNKNOWN: **593/593** | Image phải dựng lại khi `Dockerfile` đổi; nhãn `org.auditgame.harness` là thứ `container_ready()` kiểm |
 | 10 | Chỗ draft chưa chốt: $\chi = 1{,}34$; dòng ablation "bỏ benign-drift" (0,264) thấp hơn Sentinel đầy đủ (0,272); 15 repo so với 12 của SWE-bench | Ảnh hưởng cách trình bày phần so sánh | Hỏi thầy ý định thiết kế |
 | 11 | Số tiền đăng ký của cổng v2 (0,519 / 0,529) khác giá trị cận in ra trong test hôm nay (0,5117 / 0,5247) | Có thể là thống kê khác nhau; cần xác nhận cổng đã đóng băng tái lập được | Chạy lại phép chứng nhận và đối chiếu **trước mốc đóng băng 29/09** |
 | 12 | ✅ **Xong** — `costs.install()` dùng giá $\eta_Q$ đo được; `experiment.py` có `--scale` và mặc định `usd` | Hoá ra lớn hơn issue đã ghi: lưới chính **chưa bao giờ gọi** `install()`, nên chạy trên bảng placeholder chứ không phải "USD với $\eta_Q$ sai" | Mọi lượt chạy nay in bốn tỉ số không thứ nguyên và thứ tự carrier trong header |
@@ -322,11 +322,11 @@ Xếp theo mức ưu tiên cho mốc đóng băng 30/09.
 
 ### 3.5 Kiểm thử
 
-`tests/run_all.py --all` chạy lại cuối ngày **24/09/2026**: **798 đạt · 2 không đạt · 13 bỏ qua** (813 test). Hai lỗi là **đúng hai lỗi cũ** — không hồi quy nào qua bốn đợt sửa của hai ngày (thang chi phí, giá cách ly, ngân sách theo chân trời, cờ $\Delta$). Cổng 1 bắt được một lỗi thật giữa đường: `spent` của `replay.rescore` lệch với chạy trực tiếp vì tôi mới tính tiền cách ly ở một trong hai đường — đúng việc test I9 sinh ra để làm.
+`tests/run_all.py --all` chạy lại cuối ngày **24/09/2026**: **811 đạt · 2 không đạt · 0 bỏ qua** (813 test). Hai lỗi là **đúng hai lỗi cũ** — không hồi quy nào qua bốn đợt sửa của hai ngày (thang chi phí, giá cách ly, ngân sách theo chân trời, cờ $\Delta$). Cổng 1 bắt được một lỗi thật giữa đường: `spent` của `replay.rescore` lệch với chạy trực tiếp vì tôi mới tính tiền cách ly ở một trong hai đường — đúng việc test I9 sinh ra để làm.
 
 | Cổng | Kết quả |
 |---|---|
-| Gate 1 — Integrity | 580/593 (+39 test mới: nguồn gốc chi phí, 4 checkpoint, trục $\chi$, marker, thư viện 28 policy, manifest đóng băng), 13 bỏ qua nên vẫn tính là *UNKNOWN* |
+| Gate 1 — Integrity | **593/593 xanh**; trước đó 580/593 (+39 test mới: nguồn gốc chi phí, 4 checkpoint, trục $\chi$, marker, thư viện 28 policy, manifest đóng băng), 13 bỏ qua nên vẫn tính là *UNKNOWN* |
 | Gate 2 — Validity | 203/205, **đỏ** |
 | Gate 3 — Power | 15/15 |
 

@@ -262,6 +262,8 @@ average-case/worst-case frontier (does not exist, §6.6 item 1); the ablation
 magnitudes (belief 0.099 measured as 0.000); and the claim that the advantage is
 largest at the weakest detector (§6.5).
 
-**Environment.** Thirteen container-isolation tests did not run for want of a
-built image, so the integrity gate is reported as unknown rather than green.
-Two validity-gate tests are red by design and are discussed in §6.6.
+**Environment.** The integrity gate passes in full (593 of 593), including the
+thirteen container-isolation tests that check an agent cannot reach the hidden
+suites or the answer key from inside its sandbox. Two validity-gate tests are
+red and are discussed in §6.6: they encode the benign-corpus gate, and the
+$\Delta = 4$ cell genuinely fails it.
