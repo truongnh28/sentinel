@@ -68,8 +68,20 @@ LEGACY_BUDGET = 17.95
 LEGACY_TOTAL_PER_STEP = sum(KAPPA_PLACEHOLDER.values())
 
 
+#: The share of one task's full audit bill that the legacy budget bought, fixed
+#: at the horizon it was defined on.  It is a CONSTANT, and that is the point:
+#: B/(H*sum kappa) is one of the four dimensionless quantities the game depends
+#: on, so a sweep that moves H must hold it still or the new column measures the
+#: horizon and the budget at once.
+BUDGET_SHARE = LEGACY_BUDGET / (8 * LEGACY_TOTAL_PER_STEP)
+
+
 def budget_fraction(H: int = 8) -> float:
-    """The share of a full audit bill the legacy budget bought."""
+    """The share of a full audit bill the legacy budget bought AT HORIZON H.
+
+    Kept for callers that want the legacy ABSOLUTE budget re-expressed at some
+    other H.  It is not what a sweep over H should use -- see budget_for_table.
+    """
     return LEGACY_BUDGET / (H * LEGACY_TOTAL_PER_STEP)
 
 
@@ -85,8 +97,17 @@ def budget_for_table(kappa: dict, H: int = 8) -> float:
     one either: LEGACY_TOTAL_PER_STEP is the four carriers, and KAPPA_COMMIT was
     a separate number beside them.  Putting it in here would change what "the
     same share" means, which is the one thing this function exists to hold fixed.
+
+    IT ALSO HAS TO HOLD THE SHARE FIXED ACROSS H, and it did not.  This read
+    `budget_fraction(H) * H * sum(kappa)`, in which the H cancels: the budget
+    came out as the same absolute number at every horizon, so the share per task
+    fell as 1/H.  Measured at H=12 that is 0.2137 against 0.3205, a third less
+    audit per task -- and the whole grid collapsed, every policy at 0.99..1.00
+    harm, because a Delta=8 column run that way measures starvation and calls it
+    delay.  Same class of error as sweeping chi with kappa_commit left behind.
+    At H = 8 the value is unchanged, so no published number moves.
     """
-    return budget_fraction(H) * H * sum(kappa.values())
+    return BUDGET_SHARE * H * sum(kappa.values())
 
 
 def budget_for(H: int = 8) -> float:
