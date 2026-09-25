@@ -96,6 +96,15 @@ D29 Thế giới phụ (cổng theo giai đoạn, bản 24/09): bốn baseline B
 D30 Sai lệch đã khai: 25/09 một lượt smoke của công cụ eval chạm tập eval
     (chi tiết ở Q12 và spikes/v2-pilot/eval-touch-2509/README.md). Mọi smoke về sau dùng --split dev.
 D31 Pilot thiết kế trên dev: spikes/v2-pilot/ (pilot 1, 2, 2b; bản chụp code 24/09).
+D32 Sai lệch đã khai (25/09, sau lượt tinh chỉnh đầu trên dev, trước đóng băng):
+    LP của D26 có thể có nhiều nghiệm tối ưu, vì ở Δ = 0 nhiều policy cùng đạt harm tệ nhất,
+    và khi đó HiGHS trả một đỉnh tuỳ ý.
+    - Thêm bước 2: giữ harm tệ nhất tối ưu, lấy FQ% nhỏ nhất. Đây là cùng thứ tự với η_Q.
+    - `pure` (dùng cho "A1 −randomization") theo cùng thứ tự: harm tệ nhất, rồi FQ%, rồi tên.
+    - Động cơ chỉ từ dev: spikes/v2/lp-degeneracy-pre-D32.txt.
+      - Đổi thật 2/72 ô (ρ = 0, strong, Δ = 0 và all): FQ 5,3% và 7,5% về 0%.
+      - Ô endpoint (mid, Δ ∈ {4, 8}) không suy biến.
+    - Học viên quyết định ngày 25/09, trước khi đóng băng; tập eval không được dùng.
 
 ## Endpoint chính
 Đường endpoint theo ρ_patch (curve_rho):
@@ -120,7 +129,8 @@ P5 Dưới best response cross-fit, "A1 −randomization" có V_BR lớn hơn Se
 P6 Thế giới phụ đúng như D29.
 
 ## Hoà khi tinh chỉnh
-η_Q: FQ% nhỏ hơn. Các tham số khác: giá trị nhỏ hơn.
+η_Q: FQ% nhỏ hơn. Mixture và `pure` (D32): cùng harm tệ nhất thì FQ% nhỏ hơn, rồi tên.
+Các tham số khác: giá trị nhỏ hơn.
 
 ## Luật cắt
 Như plan: tinh chỉnh (T1)→(T3), eval (a)→(c).

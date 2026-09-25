@@ -9,7 +9,9 @@
      c. at that eta_Q, per (detector, regime), regime in DELTAS + ["all"] (line 1, D9b):
         M[pi, col] = max over 3 kernels of dev harm, F_pi = FQ% (max over kernels);
         LP  min z  s.t.  sum_pi x_pi M[pi,col] <= z (every col),  sum_pi x_pi F_pi <= cap,
-        sum x = 1, x >= 0   (SS4 objective, D26); the nominal-kernel LP; the pure argmin
+        sum x = 1, x >= 0   (SS4 objective, D26); the nominal-kernel LP; the pure argmin.
+        Among mixtures that keep the optimal worst case, a second LP takes the lowest FQ%;
+        the pure argmin breaks ties the same way, then by name (D32)
 Columns are attackers.tuning_attack_names() (D18): no behaviour a held-out attacker can show.
 Other ties go to the smaller parameter.
 
@@ -88,9 +90,15 @@ def run_jobs(jobs, n):
         return list(ex.map(member_cell, jobs, chunksize=1))
 
 
+#: Numerical slack for "the same worst case" in D32's second LP: a tie, not a trade.
+TIE_TOL = 1e-9
+
+
 def constrained_minimax(M, F, names, cols, cap):
     """min_x max_col x.M[:, col]  s.t.  x.F <= cap (D26).  Falls back to the unconstrained
-    LP, flagged, if no mixture meets the cap."""
+    LP, flagged, if no mixture meets the cap.  Among mixtures that keep the optimal worst
+    case, a second LP takes the lowest FQ% (D32); `pure` breaks ties the same way, then by
+    name."""
     from scipy.optimize import linprog
     cols = [c for c in cols if all(c in M[n] for n in names)]
     P = len(names)
@@ -103,11 +111,16 @@ def constrained_minimax(M, F, names, cols, cap):
     if not cap_ok:
         res = linprog(c=[0.0] * P + [1.0], A_ub=A_ub, b_ub=b_ub, A_eq=[[1.0] * P + [0.0]],
                       b_eq=[1.0], bounds=[(0, None)] * P + [(None, None)], method="highs")
-    x = {n: round(float(v), 6) for n, v in zip(names, res.x[:P]) if v > 1e-6}
+    z = float(res.x[-1])
+    tie = linprog(c=[F[n] for n in names], A_ub=[row[:P] for row in A_ub],
+                  b_ub=[z + TIE_TOL] * len(cols), A_eq=[[1.0] * P], b_eq=[1.0],
+                  bounds=[(0, None)] * P, method="highs")
+    xs = tie.x if tie.status == 0 else res.x[:P]
+    x = {n: round(float(v), 6) for n, v in zip(names, xs) if v > 1e-6}
     ok = [n for n in names if F[n] <= cap] or list(names)
-    pure = min(ok, key=lambda n: (max(M[n][c] for c in cols), n))
+    pure = min(ok, key=lambda n: (max(M[n][c] for c in cols), F[n], n))
     fq = sum(w * F[n] for n, w in x.items())
-    return {"robust": x, "pure": pure, "value": round(float(res.x[-1]), 6),
+    return {"robust": x, "pure": pure, "value": round(z, 6),
             "fq_pct": round(fq, 3), "cap_ok": cap_ok}
 
 

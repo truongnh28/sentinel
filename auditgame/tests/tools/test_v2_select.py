@@ -1,4 +1,4 @@
-"""GATE 1 -- v2 tuning: the constrained minimax of SS4's objective (D9, D26).  Needs scipy:
+"""GATE 1 -- v2 tuning: the constrained minimax of SS4's objective (D9, D26, D32).  Needs scipy:
 run with ../.venv/bin/python."""
 import unittest
 
@@ -33,6 +33,15 @@ class TestConstrainedMinimax(unittest.TestCase):
         cell = constrained_minimax(M, F, NAMES, ["x", "y"], cap=10.0)
         self.assertFalse(cell["cap_ok"])
         self.assertAlmostEqual(cell["value"], 0.5, places=6)
+
+    def test_a_tied_worst_case_goes_to_the_lower_fq(self):
+        # D32: a and b reach the same worst case (column x); only b quarantines nothing
+        Mt = {"a": {"x": 1.0, "y": 0.2}, "b": {"x": 1.0, "y": 0.5}}
+        cell = constrained_minimax(Mt, {"a": 5.0, "b": 0.0}, ["a", "b"], ["x", "y"], cap=10.0)
+        self.assertAlmostEqual(cell["value"], 1.0, places=6)
+        self.assertEqual(cell["robust"], {"b": 1.0})
+        self.assertEqual(cell["fq_pct"], 0.0)
+        self.assertEqual(cell["pure"], "b")
 
     def test_reduce_kernels_takes_the_worst_kernel(self):
         rows = [("a", "mid", "nominal", 0.25, 0.1, {"x": 0.2}, 1.0),
