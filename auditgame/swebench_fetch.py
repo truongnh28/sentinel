@@ -16,6 +16,7 @@ PAGE = 100                                   # datasets-server ceiling (verified
 DATASETS = {
     "verified": ("princeton-nlp/SWE-bench_Verified", "test"),
     "full":     ("princeton-nlp/SWE-bench", "test"),
+    "multilingual": ("SWE-bench/SWE-bench_Multilingual", "test"),
 }
 
 HERE = pathlib.Path(__file__).resolve().parent
