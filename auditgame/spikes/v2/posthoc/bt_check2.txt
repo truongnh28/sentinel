@@ -1,0 +1,13 @@
+H= 6 windows= 68 uninformable= 35 f=0.5147 floor f/(1+f)=0.3398
+H= 7 windows= 84 uninformable= 42 f=0.5000 floor f/(1+f)=0.3333
+H= 8 windows=100 uninformable= 49 f=0.4900 floor f/(1+f)=0.3289
+H= 9 windows=120 uninformable= 57 f=0.4750 floor f/(1+f)=0.3220
+H=10 windows=140 uninformable= 65 f=0.4643 floor f/(1+f)=0.3171
+H=11 windows=160 uninformable= 73 f=0.4562 floor f/(1+f)=0.3133
+H=12 windows=180 uninformable= 81 f=0.4500 floor f/(1+f)=0.3103
+H=13 windows=200 uninformable= 89 f=0.4450 floor f/(1+f)=0.3080
+H=14 windows=220 uninformable= 97 f=0.4409 floor f/(1+f)=0.3060
+lowest p_attack under maximally quiet sweeps, H 6..14: 0.306
+library size 28 commit-only: 10 distinct behaviours <= 19
+BT tau<0.5: ['L-BT-0.3-f0', 'L-BT-0.3-f1', 'L-BT-0.3-f2']
+tuned cells: 72  cells weighting a belief-reading member: [('1', 'weak|8', 'nominal'), ('1', 'weak|8', 'nominal')]
