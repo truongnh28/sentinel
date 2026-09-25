@@ -136,7 +136,8 @@ def _main_summary_incomplete() -> str | None:
         rk = f"{rho:g}"
         table2 = by_rho.get(rk, {}).get("table2", {})
         for name in (B1, SA1):
-            if table2.get(name, {}).get("worst_case_harm") is None:
+            v = table2.get(name, {}).get("worst_case_harm")
+            if not isinstance(v, (int, float)) or not math.isfinite(v):
                 return (f"the main summary {MAIN_SUMMARY} lacks by_rho[{rk!r}][\"table2\"]"
                         f"[{name!r}][\"worst_case_harm\"]")
     return None
@@ -274,6 +275,12 @@ def _completeness_reasons(by, brs, split, out_dir) -> list:
 
 def summarise(split, out_dir, meta) -> dict:
     ho, hd = A.held_out(), list(D.HEADLINE_DELTAS)
+    if split == "eval":
+        bad = _pin_reasons(out_dir)            # before parsing: a corrupt file withholds, not crashes
+        if bad:
+            out = {"run": meta, "withheld": f"D35: incomplete records: {'; '.join(bad)}"}
+            _write(out_dir / SUMMARY, out)
+            return out
     with open(out_dir / MAIN) as fh:
         recs = [json.loads(line) for line in fh]
     with open(out_dir / BR) as fh:
@@ -295,7 +302,8 @@ def summarise(split, out_dir, meta) -> dict:
     for rk, rs in by.items():
         vb, vs = _v(rs, B1), _v(rs, SA1)
         out["reproduction"][rk] = {B1: vb, SA1: vs, "checked": main is not None,
-                                   "mismatches": reproduces(vb, vs, main[rk]) if main else []}
+                                   "mismatches": (reproduces(vb, vs, main[rk])
+                                                  if main is not None else [])}
     if any(v["mismatches"] for v in out["reproduction"].values()):
         out["withheld"] = "D35: B1 or Sentinel-A1 does not reproduce the main run; no addendum number"
         _write(out_dir / SUMMARY, out)
