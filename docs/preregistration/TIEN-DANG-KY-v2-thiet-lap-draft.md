@@ -117,6 +117,19 @@ D33 Sai lệch đã khai (25/09, sau đóng băng, TRƯỚC lượt eval; review
       3 trong 11 attacker development có khoá hành vi trùng held-out.
     - Record thô (≈ 5 GB) không commit; commit tóm tắt và sha256 của từng file record.
     - Học viên quyết định ngày 25/09; tập eval chưa được chạy.
+D34 Sai lệch đã khai (25/09, SAU lượt eval). Plan các phần đến hạn (§5) yêu cầu ghi ánh xạ
+    "kết cục v2 → khung bài" TRƯỚC khi chạy eval. Việc đó chưa làm: trợ lý chạy eval mà
+    không đọc plan đó. Xử lý: không chọn khung mới sau khi thấy số.
+    - Bài giữ khung "bản đồ regime" (khung B/A′), khung đã chốt từ 18–19/09, trước mọi số v2.
+    - Headline là endpoint đã đăng ký trước: đường gain theo ρ_patch ở b1 (mục Endpoint chính).
+      Trục phụ giữ như trên: Δ (RQ1), detector (RQ4), η_Q (phép quét); ngân sách là
+      EXPLORATORY (D4b). Issue #13 đóng theo cách này. Kết quả trục ngân sách của v1 không
+      đưa vào bài.
+    - Số trong bài lấy từ v2, theo luật cắt của plan các phần đến hạn: v2 đóng băng kịp thì
+      dùng v2. v1 (sha256:4ff1c8f72df4) chỉ là hồ sơ và bản dự phòng.
+    - #19 (G4): mức 3 không dùng, vì nhãn tay cần người và không thay bằng nhãn máy; khai
+      ở Threats. #20 là lỗi của v1, v2 đã sửa bằng D19; khai một dòng ở Threats.
+    - Học viên giao trợ lý chốt ngày 25/09. Song ánh §8 (D2) vẫn chờ thầy xác nhận.
 
 ## Endpoint chính
 Đường endpoint theo ρ_patch (curve_rho):
