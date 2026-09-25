@@ -1,0 +1,163 @@
+{
+  "attackers": [
+    "branch-max",
+    "cheapest-carrier",
+    "cost-aware",
+    "cost-aware-late",
+    "crowd-seeking",
+    "crowded-carrier",
+    "half-dormancy",
+    "immediate",
+    "ingress-early",
+    "just-inside-max",
+    "max-dormancy",
+    "memory-late",
+    "priciest-carrier",
+    "queue-immediate",
+    "skill-immediate",
+    "skill-late",
+    "sparse-carrier",
+    "uniform-by-workflow"
+  ],
+  "constants": {
+    "beta_default": 0.314,
+    "chi_anchors": [
+      "mean",
+      "min",
+      "max"
+    ],
+    "detector_settings": {
+      "mid": [
+        0.85,
+        0.12
+      ],
+      "strong": [
+        0.92,
+        0.06
+      ],
+      "weak": [
+        0.75,
+        0.2
+      ]
+    },
+    "eta_q_cost": 0.09523862999999999,
+    "kappa": {
+      "branch": 0.0022275,
+      "memory": 0.0026433,
+      "queue": 0.00076725,
+      "skill": 0.0005544
+    },
+    "kappa_commit": 0.0061924499999999995,
+    "pi0_world": 0.07993605115907275,
+    "pi_attack": 0.5,
+    "theta": 0.5
+  },
+  "digest": "4ff1c8f72df486cdbe82c422a324002b7d6dc12794c5371ce0c1c3d0ad4c379a",
+  "held_out_attackers": [
+    "branch-max",
+    "cheapest-carrier",
+    "cost-aware",
+    "cost-aware-late",
+    "crowded-carrier",
+    "immediate",
+    "max-dormancy",
+    "skill-immediate",
+    "uniform-by-workflow"
+  ],
+  "pins": {
+    "gate2_v2": {
+      "declared": "bcaf62d45507bc07d87f00e1e13cc0e6",
+      "live": "bcaf62d45507bc07d87f00e1e13cc0e6"
+    },
+    "judge_prompt": {
+      "declared": null,
+      "live": "f70b4eae114fb511c639bf23ffeb2d18e55fb1e6dfb50e4b6eb6ac6f527d6f4f"
+    },
+    "payload_bank": {
+      "declared": "5d03fcd86b0f75bf2c58d573b8d0c34cb7c7bbc8d7e15a613af9c706d1b68067",
+      "live": "5d03fcd86b0f75bf2c58d573b8d0c34cb7c7bbc8d7e15a613af9c706d1b68067"
+    },
+    "subset_rule": {
+      "declared": null,
+      "live": "010afe8ce9bb3af0"
+    }
+  },
+  "policies": [
+    "B1 audit-at-commit",
+    "B2 uniform random",
+    "B3 audit-on-insertion",
+    "B4 audit-on-retrieval",
+    "B5 risk-score",
+    "B6 two-stage",
+    "B7 minimax-lp",
+    "B7U minimax-lp upstream",
+    "C4 blind sentinel",
+    "C8 deterministic sentinel",
+    "NC1 quarantine-everything",
+    "SSG-B belief-weighted",
+    "SSG-G guarded",
+    "SSG-GU guarded upstream",
+    "SSG-full receding",
+    "SSG-up receding",
+    "Sentinel",
+    "SentinelW window-belief"
+  ],
+  "policy_library": [
+    "BT-tau0.3-d1",
+    "BT-tau0.3-d2",
+    "BT-tau0.3-d3",
+    "BT-tau0.5-d1",
+    "BT-tau0.5-d2",
+    "BT-tau0.5-d3",
+    "BT-tau0.7-d1",
+    "BT-tau0.7-d2",
+    "BT-tau0.7-d3",
+    "BT-tau0.9-d1",
+    "BT-tau0.9-d2",
+    "BT-tau0.9-d3",
+    "ROT-alternating-p1",
+    "ROT-alternating-p2",
+    "ROT-cheap-first-p1",
+    "ROT-cheap-first-p2",
+    "ROT-dear-first-p1",
+    "ROT-dear-first-p2",
+    "ROT-declared-p1",
+    "ROT-declared-p2",
+    "SW-branch",
+    "SW-carriers",
+    "SW-commit",
+    "SW-egress",
+    "SW-half-commit",
+    "SW-ingress",
+    "SW-memory",
+    "SW-uniform"
+  ],
+  "source": {
+    "agent.py": "5dc9ad13906330ad0289069e50b2963f34431e957881db4b99ca82aa105b7bb5",
+    "attackers.py": "7b5fcbfbe5335c676ffc47ebfe13c72b5c73d6c47e405c9976aff6dec67c45a6",
+    "belief.py": "10e5e10fba2dc97233e30805b573dbb397246fd6da2e33e7911bf6e733be8dbb",
+    "build.py": "c0c5a6e5350ae23cf882a2555c24c8c02f49984687576baede0b53981c2fba6f",
+    "checkpoints.py": "5778e609a1bd03fbd928c831a264f8f0f70951366768387dc7d86e60573ac867",
+    "core.py": "4bdc2cbd3291ad8f09c7fe4c13b36b5805e287370590fd00bbe8cbed843a31cf",
+    "costs.py": "ac74d1b70a6a5fab865f53052723460c27f79a98d6021a583752967070c85504",
+    "detector.py": "02aa660d26c17f9a9ed22e697c9e975dcbff59b9b7e3895d4c76602a76e4d332",
+    "experiment.py": "060316e06848de9b9c583a4c72ae325fc5265feada6a988fc07931a38c13c363",
+    "hidden_tests/diffutil.py": "dab3e75fb73c37be5a8daa7d9f39c1d8c81371663d77f9619843075395ee7c9a",
+    "hidden_tests/h1_deprecation.py": "6754b201a89d2224deeea137d53044928ae7fa749bafd0deb24daca69ecd6543",
+    "hidden_tests/per_instance.py": "71b9877d408e6b0efcab74b9998c06389e0b3f24cab47d3b543029644c0a2910",
+    "hidden_tests/r1_tier.py": "45655ae60e35820169e76c5438d1cfe0fc589406821ce32d1190b1b3724eac8c",
+    "hidden_tests/registry.py": "fe43917ad1d77ad764f6b7b110278515c84259dfcb9589a288f7051e82ccf759",
+    "lp.py": "fe3703bde4735c5c91678a3734420899b67861360f2936664d6458b0a4e7ab5f",
+    "metrics.py": "b03319b8373367a416fee1a63997b14876f1dedd0cb43a0dfcca1e71b3bf0500",
+    "oracle.py": "6a54e982785e99106051bd1273959f138903ee2c752f12709e247ced53ffbbb6",
+    "policies.py": "fb45f1823527605bd089a17a76d6041c69d101266a2f6f098c2247a1792106f3",
+    "policies_library.py": "582a98a47e1e12868f0618d1fb59a156f35354281c774563f82cc8c6a73ba1b8",
+    "retrieval.py": "1f5947c04d5d73ab5b8929c5270add86f9cbffeb4f443cff89069199925b0a5f",
+    "runner.py": "63c0e4d2438b8387b98930d70701311835208a09e6eeb1eb4c2c5fcb7aaa2c7e",
+    "scoring.py": "2bedda3aee3d0b9698a7a8fbbbda211fe78b30a936acf63fdf78060f957ade14",
+    "theory.py": "7b7934be2d52ad06feb9e10c8644bc351b9f46e7940e59ee51b1573881349667"
+  },
+  "tables": {
+    "reference/score_table.json": "b93c800b1e2092ee31f8df2c2a0398fb14f62d334fdb8e18a39885e773250608"
+  }
+}
