@@ -1,0 +1,755 @@
+{
+  "freeze": "freeze: SCRATCH (not frozen)",
+  "controls": {
+    "positive_ok": true,
+    "negative_ok": true,
+    "ok": true,
+    "v_oracle_headline": 0.0,
+    "v_b1_delta0": 0.6242424242424243,
+    "v_sweepers_delta0": {
+      "B3 audit-on-insertion": 0.8636363636363636,
+      "B4 audit-on-retrieval": 0.8636363636363636
+    }
+  },
+  "family_alpha": 0.025,
+  "curve_rho": {
+    "0.25": {
+      "gain": 43.0,
+      "lo": 17.1233,
+      "hi": 52.0138,
+      "abs_diff": 0.2867,
+      "abs_lo": 0.0983,
+      "abs_hi": 0.3804,
+      "alpha": 0.025,
+      "v_base": 0.6667,
+      "v_cand": 0.38,
+      "n_zero_base": 0,
+      "base_events": 32,
+      "rel_reliable": true,
+      "n_repos": 16,
+      "n_workflows": 57,
+      "meets_margin": true
+    },
+    "1": {
+      "gain": -67.43,
+      "lo": -329.4643,
+      "hi": -5.0,
+      "abs_diff": -0.1319,
+      "abs_lo": -0.2614,
+      "abs_hi": -0.0123,
+      "alpha": 0.025,
+      "v_base": 0.1957,
+      "v_cand": 0.3276,
+      "n_zero_base": 2,
+      "base_events": 8,
+      "rel_reliable": false,
+      "n_repos": 16,
+      "n_workflows": 57,
+      "meets_margin": false
+    }
+  },
+  "curve_rho_vs_best": {
+    "0.25": {
+      "best_baseline": "B1 audit-at-commit",
+      "v_best": 0.6667,
+      "v_cand": 0.38,
+      "abs_diff": 0.2867,
+      "abs_lo": 0.0968,
+      "abs_hi": 0.3589,
+      "n_repos": 16,
+      "n_workflows": 57
+    },
+    "1": {
+      "best_baseline": "B1 audit-at-commit",
+      "v_best": 0.1957,
+      "v_cand": 0.3276,
+      "abs_diff": -0.1319,
+      "abs_lo": -0.2614,
+      "abs_hi": -0.0123,
+      "n_repos": 16,
+      "n_workflows": 57
+    }
+  },
+  "by_rho": {
+    "0.25": {
+      "table2": {
+        "B1 audit-at-commit": {
+          "worst_case_harm": 0.6666666666666667,
+          "v_br_crossfit": 0.517,
+          "exploitability": -0.14966666666666673,
+          "clean_completion": 90.33960221891489,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.443458980044346
+        },
+        "B2 uniform random": {
+          "worst_case_harm": 0.75,
+          "v_br_crossfit": 0.6087,
+          "exploitability": -0.14129999999999998,
+          "clean_completion": 97.18576647273711,
+          "false_quarantine_pct": 14.022103148024113,
+          "false_removed_per_ep": 3.8237442922374427,
+          "detection_delay": 2.509289617486339
+        },
+        "B3 audit-on-insertion": {
+          "worst_case_harm": 0.907051282051282,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 18.92017294105241,
+          "false_removed_per_ep": 8.192694063926941,
+          "detection_delay": 0.0
+        },
+        "B4 audit-on-retrieval": {
+          "worst_case_harm": 0.907051282051282,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 14.946309974551548,
+          "false_removed_per_ep": 2.1990867579908677,
+          "detection_delay": 0.0
+        },
+        "B5 risk-score": {
+          "worst_case_harm": 0.8275862068965517,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 98.22757407657963,
+          "false_quarantine_pct": 14.55884031503253,
+          "false_removed_per_ep": 4.659360730593607,
+          "detection_delay": 2.1627906976744184
+        },
+        "B6 two-stage": {
+          "worst_case_harm": 0.907051282051282,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 16.068107400130977,
+          "false_removed_per_ep": 5.6018264840182646,
+          "detection_delay": 2.0050314465408805
+        },
+        "Sentinel-A1": {
+          "worst_case_harm": 0.38,
+          "v_br_crossfit": 0.2614,
+          "exploitability": -0.11859999999999998,
+          "clean_completion": 94.3850629143553,
+          "false_quarantine_pct": 1.8792259267894613,
+          "false_removed_per_ep": 0.3680365296803653,
+          "detection_delay": 3.583565459610028
+        },
+        "A1 -randomization": {
+          "worst_case_harm": 0.8188405797101449,
+          "v_br_crossfit": 0.7216,
+          "exploitability": -0.09724057971014488,
+          "clean_completion": 95.83276958462996,
+          "false_quarantine_pct": 2.6541117388575017,
+          "false_removed_per_ep": 0.965296803652968,
+          "detection_delay": 2.291079812206573
+        },
+        "A1 -alarm memory": {
+          "worst_case_harm": 0.38,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 94.3850629143553,
+          "false_quarantine_pct": 1.846928781306842,
+          "false_removed_per_ep": 0.36164383561643837,
+          "detection_delay": 3.550139275766017
+        },
+        "A1 -transition uncertainty": {
+          "worst_case_harm": 0.4066666666666666,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 94.16858341225816,
+          "false_quarantine_pct": 1.8607273752466873,
+          "false_removed_per_ep": 0.36164383561643837,
+          "detection_delay": 3.5668073136427565
+        },
+        "A1 -benign-drift": {
+          "worst_case_harm": 0.38,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 94.3850629143553,
+          "false_quarantine_pct": 2.708538703468995,
+          "false_removed_per_ep": 0.5269406392694064,
+          "detection_delay": 3.5048275862068965
+        },
+        "A1 -regime estimate": {
+          "worst_case_harm": 0.6666666666666667,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 90.33960221891489,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.443458980044346
+        },
+        "Oracle (control)": {
+          "worst_case_harm": 0.0,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 98.7146529562982,
+          "false_quarantine_pct": 17.166059927191263,
+          "false_removed_per_ep": 4.478538812785388,
+          "detection_delay": 0.7479147358665431
+        }
+      },
+      "table3_ablations": {
+        "A1 -randomization": {
+          "gain": 53.59,
+          "lo": 33.8041,
+          "hi": 60.4167,
+          "abs_diff": 0.4388,
+          "abs_lo": 0.25,
+          "abs_hi": 0.5195,
+          "alpha": 0.05,
+          "v_base": 0.8188,
+          "v_cand": 0.38,
+          "n_zero_base": 0,
+          "base_events": 37,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "A1 -alarm memory": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.38,
+          "v_cand": 0.38,
+          "n_zero_base": 0,
+          "base_events": 43,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "A1 -transition uncertainty": {
+          "gain": 6.56,
+          "lo": 0.0,
+          "hi": 12.0,
+          "abs_diff": 0.0267,
+          "abs_lo": 0.0,
+          "abs_hi": 0.05,
+          "alpha": 0.05,
+          "v_base": 0.4067,
+          "v_cand": 0.38,
+          "n_zero_base": 0,
+          "base_events": 46,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "A1 -benign-drift": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.38,
+          "v_cand": 0.38,
+          "n_zero_base": 0,
+          "base_events": 43,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "A1 -regime estimate": {
+          "gain": 43.0,
+          "lo": 21.0526,
+          "hi": 50.3036,
+          "abs_diff": 0.2867,
+          "abs_lo": 0.125,
+          "abs_hi": 0.3667,
+          "alpha": 0.05,
+          "v_base": 0.6667,
+          "v_cand": 0.38,
+          "n_zero_base": 0,
+          "base_events": 32,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        }
+      },
+      "figure3_gain_by_delta": {
+        "0": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.6242,
+          "v_cand": 0.6242,
+          "n_zero_base": 0,
+          "base_events": 68,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "4": {
+          "gain": 39.36,
+          "lo": 18.3962,
+          "hi": 46.9565,
+          "abs_diff": 0.2467,
+          "abs_lo": 0.1081,
+          "abs_hi": 0.3056,
+          "alpha": 0.05,
+          "v_base": 0.6267,
+          "v_cand": 0.38,
+          "n_zero_base": 0,
+          "base_events": 66,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "8": {
+          "gain": 50.86,
+          "lo": 17.0213,
+          "hi": 59.3075,
+          "abs_diff": 0.3391,
+          "abs_lo": 0.0926,
+          "abs_hi": 0.4483,
+          "alpha": 0.05,
+          "v_base": 0.6667,
+          "v_cand": 0.3276,
+          "n_zero_base": 0,
+          "base_events": 32,
+          "rel_reliable": true,
+          "n_repos": 12,
+          "n_workflows": 34
+        }
+      },
+      "transfer_dev_vs_heldout": {
+        "dev_attackers": {
+          "gain": NaN,
+          "lo": NaN,
+          "hi": NaN,
+          "abs_diff": NaN,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": NaN,
+          "v_cand": NaN,
+          "n_zero_base": 10000,
+          "base_events": 0,
+          "rel_reliable": false,
+          "n_repos": 0,
+          "n_workflows": 0
+        },
+        "heldout_attackers": {
+          "gain": 43.0,
+          "lo": 21.0526,
+          "hi": 50.3036,
+          "abs_diff": 0.2867,
+          "abs_lo": 0.125,
+          "abs_hi": 0.3667,
+          "alpha": 0.05,
+          "v_base": 0.6667,
+          "v_cand": 0.38,
+          "n_zero_base": 0,
+          "base_events": 32,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        }
+      },
+      "verified_only": {
+        "gain": 40.27,
+        "lo": 17.6379,
+        "hi": 46.9262,
+        "abs_diff": 0.2987,
+        "abs_lo": 0.1429,
+        "abs_hi": 0.362,
+        "alpha": 0.05,
+        "v_base": 0.7417,
+        "v_cand": 0.443,
+        "n_zero_base": 0,
+        "base_events": 31,
+        "rel_reliable": true,
+        "n_repos": 7,
+        "n_workflows": 42
+      },
+      "rq4_detectors": {
+        "mid": {
+          "gain": 43.0,
+          "lo": 21.0526,
+          "hi": 50.3036,
+          "abs_diff": 0.2867,
+          "abs_lo": 0.125,
+          "abs_hi": 0.3667,
+          "alpha": 0.05,
+          "v_base": 0.6667,
+          "v_cand": 0.38,
+          "n_zero_base": 0,
+          "base_events": 32,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        }
+      }
+    },
+    "1": {
+      "table2": {
+        "B1 audit-at-commit": {
+          "worst_case_harm": 0.1956521739130435,
+          "v_br_crossfit": 0.0213,
+          "exploitability": -0.17435217391304347,
+          "clean_completion": 90.33960221891489,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.408320493066256
+        },
+        "B2 uniform random": {
+          "worst_case_harm": 0.75,
+          "v_br_crossfit": 0.6141,
+          "exploitability": -0.13590000000000002,
+          "clean_completion": 97.18576647273711,
+          "false_quarantine_pct": 14.022103148024113,
+          "false_removed_per_ep": 3.8237442922374427,
+          "detection_delay": 2.52319309600863
+        },
+        "B3 audit-on-insertion": {
+          "worst_case_harm": 0.907051282051282,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 18.92017294105241,
+          "false_removed_per_ep": 8.192694063926941,
+          "detection_delay": 0.0
+        },
+        "B4 audit-on-retrieval": {
+          "worst_case_harm": 0.907051282051282,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 14.946309974551548,
+          "false_removed_per_ep": 2.1990867579908677,
+          "detection_delay": 0.0
+        },
+        "B5 risk-score": {
+          "worst_case_harm": 0.8275862068965517,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 98.22757407657963,
+          "false_quarantine_pct": 14.55884031503253,
+          "false_removed_per_ep": 4.659360730593607,
+          "detection_delay": 2.1673387096774195
+        },
+        "B6 two-stage": {
+          "worst_case_harm": 0.907051282051282,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 16.068107400130977,
+          "false_removed_per_ep": 5.6018264840182646,
+          "detection_delay": 2.0050314465408805
+        },
+        "Sentinel-A1": {
+          "worst_case_harm": 0.3275862068965517,
+          "v_br_crossfit": 0.2222,
+          "exploitability": -0.1053862068965517,
+          "clean_completion": 94.3850629143553,
+          "false_quarantine_pct": 1.878875472049979,
+          "false_removed_per_ep": 0.3680365296803653,
+          "detection_delay": 3.7937649880095923
+        },
+        "A1 -randomization": {
+          "worst_case_harm": 0.5217391304347826,
+          "v_br_crossfit": 0.6534,
+          "exploitability": 0.1316608695652174,
+          "clean_completion": 95.83276958462996,
+          "false_quarantine_pct": 2.6541117388575017,
+          "false_removed_per_ep": 0.965296803652968,
+          "detection_delay": 2.4929270946681177
+        },
+        "A1 -alarm memory": {
+          "worst_case_harm": 0.3275862068965517,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 94.3850629143553,
+          "false_quarantine_pct": 1.8465842853812078,
+          "false_removed_per_ep": 0.36164383561643837,
+          "detection_delay": 3.7649880095923263
+        },
+        "A1 -transition uncertainty": {
+          "worst_case_harm": 0.3448275862068966,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 94.16858341225816,
+          "false_quarantine_pct": 1.8603777130508314,
+          "false_removed_per_ep": 0.36164383561643837,
+          "detection_delay": 3.750906892382104
+        },
+        "A1 -benign-drift": {
+          "worst_case_harm": 0.3275862068965517,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 94.3850629143553,
+          "false_quarantine_pct": 2.7080302248087484,
+          "false_removed_per_ep": 0.5269406392694064,
+          "detection_delay": 3.7241379310344827
+        },
+        "A1 -regime estimate": {
+          "worst_case_harm": 0.1956521739130435,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 90.33960221891489,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.408320493066256
+        },
+        "Oracle (control)": {
+          "worst_case_harm": 0.0,
+          "v_br_crossfit": NaN,
+          "exploitability": NaN,
+          "clean_completion": 98.7146529562982,
+          "false_quarantine_pct": 17.166059927191263,
+          "false_removed_per_ep": 4.478538812785388,
+          "detection_delay": 0.7518518518518519
+        }
+      },
+      "table3_ablations": {
+        "A1 -randomization": {
+          "gain": 37.21,
+          "lo": 22.8387,
+          "hi": 60.0,
+          "abs_diff": 0.1942,
+          "abs_lo": 0.1069,
+          "abs_hi": 0.4191,
+          "alpha": 0.05,
+          "v_base": 0.5217,
+          "v_cand": 0.3276,
+          "n_zero_base": 0,
+          "base_events": 20,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "A1 -alarm memory": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.3276,
+          "v_cand": 0.3276,
+          "n_zero_base": 0,
+          "base_events": 19,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "A1 -transition uncertainty": {
+          "gain": 5.0,
+          "lo": 0.0,
+          "hi": 15.3846,
+          "abs_diff": 0.0172,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0536,
+          "alpha": 0.05,
+          "v_base": 0.3448,
+          "v_cand": 0.3276,
+          "n_zero_base": 0,
+          "base_events": 20,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "A1 -benign-drift": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.3276,
+          "v_cand": 0.3276,
+          "n_zero_base": 0,
+          "base_events": 19,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "A1 -regime estimate": {
+          "gain": -67.43,
+          "lo": -235.9335,
+          "hi": -12.2383,
+          "abs_diff": -0.1319,
+          "abs_lo": -0.2353,
+          "abs_hi": -0.0308,
+          "alpha": 0.05,
+          "v_base": 0.1957,
+          "v_cand": 0.3276,
+          "n_zero_base": 2,
+          "base_events": 8,
+          "rel_reliable": false,
+          "n_repos": 16,
+          "n_workflows": 57
+        }
+      },
+      "figure3_gain_by_delta": {
+        "0": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.1727,
+          "v_cand": 0.1727,
+          "n_zero_base": 0,
+          "base_events": 19,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "4": {
+          "gain": -22.68,
+          "lo": -338.3838,
+          "hi": 43.4891,
+          "abs_diff": -0.0438,
+          "abs_lo": -0.2485,
+          "abs_hi": 0.1095,
+          "alpha": 0.05,
+          "v_base": 0.1933,
+          "v_cand": 0.2372,
+          "n_zero_base": 1,
+          "base_events": 19,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57
+        },
+        "8": {
+          "gain": -67.43,
+          "lo": -285.9903,
+          "hi": -8.2126,
+          "abs_diff": -0.1319,
+          "abs_lo": -0.2396,
+          "abs_hi": -0.0201,
+          "alpha": 0.05,
+          "v_base": 0.1957,
+          "v_cand": 0.3276,
+          "n_zero_base": 23,
+          "base_events": 8,
+          "rel_reliable": false,
+          "n_repos": 12,
+          "n_workflows": 34
+        }
+      },
+      "transfer_dev_vs_heldout": {
+        "dev_attackers": {
+          "gain": NaN,
+          "lo": NaN,
+          "hi": NaN,
+          "abs_diff": NaN,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": NaN,
+          "v_cand": NaN,
+          "n_zero_base": 10000,
+          "base_events": 0,
+          "rel_reliable": false,
+          "n_repos": 0,
+          "n_workflows": 0
+        },
+        "heldout_attackers": {
+          "gain": -67.43,
+          "lo": -235.9335,
+          "hi": -12.2383,
+          "abs_diff": -0.1319,
+          "abs_lo": -0.2353,
+          "abs_hi": -0.0308,
+          "alpha": 0.05,
+          "v_base": 0.1957,
+          "v_cand": 0.3276,
+          "n_zero_base": 2,
+          "base_events": 8,
+          "rel_reliable": false,
+          "n_repos": 16,
+          "n_workflows": 57
+        }
+      },
+      "verified_only": {
+        "gain": -45.28,
+        "lo": -106.25,
+        "hi": 1.2266,
+        "abs_diff": -0.1152,
+        "abs_lo": -0.1901,
+        "abs_hi": 0.0035,
+        "alpha": 0.05,
+        "v_base": 0.2544,
+        "v_cand": 0.3696,
+        "n_zero_base": 0,
+        "base_events": 19,
+        "rel_reliable": true,
+        "n_repos": 7,
+        "n_workflows": 42
+      },
+      "rq4_detectors": {
+        "mid": {
+          "gain": -67.43,
+          "lo": -235.9335,
+          "hi": -12.2383,
+          "abs_diff": -0.1319,
+          "abs_lo": -0.2353,
+          "abs_hi": -0.0308,
+          "alpha": 0.05,
+          "v_base": 0.1957,
+          "v_cand": 0.3276,
+          "n_zero_base": 2,
+          "base_events": 8,
+          "rel_reliable": false,
+          "n_repos": 16,
+          "n_workflows": 57
+        }
+      }
+    }
+  },
+  "gate_world": {
+    "0.25": {
+      "B1g commit": {
+        "worst_case_harm": 0.6666666666666667,
+        "false_blocks_per_ep": 0.0
+      },
+      "B2g uniform": {
+        "worst_case_harm": 0.5817610062893082,
+        "false_blocks_per_ep": 2.787214611872146
+      },
+      "B3g insertion": {
+        "worst_case_harm": 0.7987421383647799,
+        "false_blocks_per_ep": 5.553424657534246
+      },
+      "B4g retrieval": {
+        "worst_case_harm": 0.028846153846153848,
+        "false_blocks_per_ep": 4.678538812785388
+      }
+    },
+    "1": {
+      "B1g commit": {
+        "worst_case_harm": 0.1956521739130435,
+        "false_blocks_per_ep": 0.0
+      },
+      "B2g uniform": {
+        "worst_case_harm": 0.5062893081761006,
+        "false_blocks_per_ep": 2.787214611872146
+      },
+      "B3g insertion": {
+        "worst_case_harm": 0.7987421383647799,
+        "false_blocks_per_ep": 5.553424657534246
+      },
+      "B4g retrieval": {
+        "worst_case_harm": 0.028846153846153848,
+        "false_blocks_per_ep": 4.678538812785388
+      }
+    }
+  }
+}

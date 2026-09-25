@@ -1,0 +1,320 @@
+# Tiền đăng ký v2 — dựng đúng mô hình hình thức của draft (§4)
+
+Ngày khai: 25/09/2026, trước mọi dòng mã v2 trong repo. Thay bản 24/09 (thế giới cổng),
+bản đó được giữ làm thế giới phụ (D29).
+v1: manifest sha256:4ff1c8f72df4 (sau fix #20, commit 81d0d7d), giữ nguyên làm hồ sơ và bản dự phòng.
+
+## Quyết định
+D1  Một hành động mỗi task (§4, a_t ∈ A). Bỏ chế độ multi.
+D2  Hành động = (đích, độ sâu), đích ∈ {memory, queue, skill, commit}; độ sâu ∈ {1, 2, 3}.
+    κ theo song ánh §8 → carrier: memory 0,4 (insertion), queue 0,9 (retrieval),
+    skill 1,6 (delegation), commit/branch 4,1 (commit). Chờ thầy xác nhận song ánh.
+    Nhãn χ = 2·MAD/κ̄ (1,3429 trên bảng draft); κ(λ) = κ̄ + λ(κ − κ̄), λ = χ/1,34;
+    báo kèm range/κ̄ = 1,574·χ.
+D3  Audit quan sát; gỡ là quyết định của policy.
+    - Commit: xem patch của task t; patch nổ bị chặn (patch có marker mất marker,
+      patch sạch đã giải → T_lost).
+    - Audit carrier k ∈ {memory, queue, skill}: chấm MỌI item đang sống của k ở cuối task t.
+    - Baseline gỡ mọi item nổ. Sentinel gỡ theo dòng 8 (D11).
+    - Thứ tự trong task: mua hành động → chèn payload ở ι (cả hai kênh vào store) →
+      agent chạy → thực thi hành động.
+D4  BudgetSpec: b1 = H·3·4,1, NEO trên bảng draft, giữ nguyên ở mọi χ.
+    Mọi policy chi theo nhịp spent ≤ B·(t+1)/H. Runner mua độ sâu sâu nhất còn đủ tiền,
+    không quá mức yêu cầu.
+D4b Ở b1 một hành động không bao giờ vượt B/H: lưới chính đo "nhìn vào đâu".
+    χ và phần phụ thuộc ngân sách của Định lý 4 chỉ đọc ở phép quét share × χ, EXPLORATORY.
+D4c (sửa) ρ = 1 KHÔNG phải sàn. Patch uỷ quyền không được lợi từ độ sâu, nên V(B1) ở ρ = 1
+    do cột skill/queue quyết định, ≈ 0,85·(1 − ψ₁) ≈ 0,13 ở mid.
+    Mọi gain in kèm hiệu tuyệt đối; khả đọc theo D21.
+D5  Chỉ thấy tín hiệu của carrier đã trả tiền; commit không cho tín hiệu carrier (D17).
+D6  Drift là sự kiện: mỗi task, carrier k có sự kiện với xác suất
+    β_world = {memory 0,314; skill 0,058; queue 0,033; branch 0}.
+    Item drift có trung bình match·d′ CHỈ trong task nó xảy ra (DRIFT_VISIBLE_TASKS = 1),
+    sau đó 0. match headline = 1; quét {0; 0,5; 1}; kiểm độ nhạy: drift vĩnh viễn.
+    β̂ ước bằng mô-men trên alarm quan sát được ở dev, không đọc nhãn drift.
+    Test bề mặt: payload và drift so ở CÙNG recency, AUC ≤ 0,56.
+D7  18 luật attacker (k, luật ι, kênh, ε); Δ là tham số của ô.
+    Held-out = 7 tên có seed_of("heldout-v2", tên) nhỏ nhất.
+    BR: 4 carrier × 2 kênh × {σ sớm, σ muộn}. Kênh không đổi hành vi trong thế giới carrier.
+D8  Corpus: Verified + Multilingual; H theo repo seed_of(2027, repo, offset); hai lượt cắt
+    (offset 0 và 3); reuse ≤ 2; 100 workflow / 17 repo.
+    Dev = họ repo lớn nhất (django, 43); eval 57 workflow / 16 repo, Kish 8,1.
+    "Dev so với held-out" là chuyển giao django → 16 repo.
+    Kiểm độ nhạy: endpoint chỉ trên Verified (9 repo).
+D9  Dòng 5: mixture minimax CÓ RÀNG BUỘC trên 28 policy theo carrier
+    (SW 8 + BT 12 + RO 8, định nghĩa ở Q9).
+    M = harm dev tệ nhất trên 3 kernel (adoption, skill ± ζ, ζ = 0,10); F = FQ% tệ nhất.
+    Rút một member mỗi workflow.
+D9b Dòng 1: regime (Δ, χ) của ô được cho trước (bộ ước lượng hoàn hảo).
+    Ablation "A1 −regime estimate" dùng mixture tinh chỉnh gộp mọi Δ.
+D10 Dòng 7: DriftBelief cập nhật từ tín hiệu carrier đã mua (scoring.carrier_score).
+D11 Dòng 8, mức item: gỡ một item nổ khi P(payload | điểm) > η_Q.
+    Hậu nghiệm dùng tiên nghiệm p_k/n_k, đối thủ drift tươi β̂_k/n_fresh (chỉ item sinh
+    trong task), và item sạch.
+    η_Q ∈ {0; 0,01; 0,02; 0,05; 0,1; 0,2; 0,3543; 0,5}, chọn trên dev ở ô headline:
+    harm tệ nhất nhỏ nhất; hoà (4 chữ số) thì FQ% nhỏ nhất.
+D12 B5: τ₅ ∈ {0; 0,1; 0,2; 0,3; 0,5; 0,7}, chọn trên dev theo harm tệ nhất (hoà → nhỏ hơn).
+D13 V(π) = max theo attacker held-out của E_wf[harm]. V_BR = best response cross-fit (D27).
+    Exploitability = V_BR − V.
+D14 CI: bootstrap theo họ repo eval, 10.000 lần, max lại theo attacker ở mỗi lần.
+D15 FQ% = item lành tính bị gỡ / đối tượng lành tính đã xem; T_lost = patch sạch đã giải
+    bị chặn. L = harm + λ_Q·FQ + λ_T·T_lost báo kèm, không dùng để tinh chỉnh.
+D16 Mỗi lần xem một item cho một điểm detector độc lập (seed gồm cả t).
+D17 Alarm ở commit không phải bằng chứng cho carrier nào.
+D18 Cột tinh chỉnh = dev + BR có tập khoá hành vi (k, luật ι, ε) KHÔNG giao với khoá của
+    attacker held-out nào, trên bất kỳ workflow nào; mỗi tập hành vi một tên.
+    Hiện tại 6 cột: branch-last, branch-mid, memory-first, queue-first, skill-first,
+    skill-last (ε = 0,6).
+D19 rs = seed_of(wf_id, seed) cho mọi lượt rút trong episode.
+D20 ρ_patch ∈ {0; 0,25; 0,5; 1}.
+    - Patch uỷ quyền (chỉ qua skill/queue): trung bình ρ·d′(độ sâu 1).
+    - Patch trực tiếp: d′(độ sâu).
+    - Defender biết ρ và được tinh chỉnh riêng cho từng ρ. KHÔNG hiệu chỉnh ρ để V(B1) ra 0,412.
+    - HEADLINE_RHO do thầy chọn trước Task 10, không xem số v2 nào; chưa có thì kết quả
+      chính là cả đường.
+    - Phạm vi: chỉ tấn công đặt thẳng vào skill/queue.
+D21 Gain tương đối chỉ đọc khi V(B1) > 0, B1 có ≥ 10 sự kiện harm ở cột tệ nhất, và
+    ≤ 1% lượt bootstrap có V(B1) = 0. Ngược lại in "không đọc được", chỉ đọc hiệu tuyệt đối.
+D22 Dòng thứ cấp cùng mức báo cáo: hiệu tuyệt đối giữa baseline TỐT NHẤT trong B1–B6 và
+    Sentinel, baseline chọn lại trong mỗi lượt bootstrap.
+D23 ρ tham chiếu (cho luật cắt (a) và đối chứng D28) = HEADLINE_RHO nếu có, không thì 0,25.
+D24 10 seed eval (1..10); 2 seed tinh chỉnh (1, 2).
+D25 Phát biểu 15% trên đường ρ: CI hai phía mức 1 − 0,05/|ρ| (98,75% với 4 điểm, Bonferroni).
+    Nếu có HEADLINE_RHO: điểm đó dùng CI 95%.
+D26 Mục tiêu tinh chỉnh (§4 Objectives): tối thiểu harm tệ nhất với FQ% ≤ 10%.
+    LP có ràng buộc; không khả thi thì cap_ok = False, dùng LP không ràng buộc, và báo ra.
+D27 Best response Stackelberg: menu = mọi (k, ι, σ) khả thi ở Δ trên 4 carrier.
+    Chọn vị trí trên seed lẻ, chấm trên seed chẵn, và ngược lại (cross-fit).
+D28 Đối chứng, kiểm TRƯỚC khi đọc số Sentinel:
+    (+) Oracle (biết carrier bị tấn công) có V ≤ 0,05 ở ô headline tại ρ tham chiếu;
+    (−) ở Δ = 0, B3 và B4 không thắng B1.
+    Hỏng thì dừng, tìm lỗi, không đọc số.
+D29 Thế giới phụ (cổng theo giai đoạn, bản 24/09): bốn baseline B1g–B4g.
+    Dự đoán khai trước (pilot 1, dev): ở mọi ρ, Δ ∈ {4, 8}:
+    - B4g có V ≤ 0,05 và bác nhầm ≥ 2 đối tượng mỗi episode;
+    - B1g có V ≥ 0,1 khi ρ ≤ 0,5.
+D30 Sai lệch đã khai: 25/09 một lượt smoke của công cụ eval chạm tập eval
+    (chi tiết ở Q12 và spikes/v2-pilot/eval-touch-2509/README.md). Mọi smoke về sau dùng --split dev.
+D31 Pilot thiết kế trên dev: spikes/v2-pilot/ (pilot 1, 2, 2b; bản chụp code 24/09).
+
+## Endpoint chính
+Đường endpoint theo ρ_patch (curve_rho):
+- gain = 1 − V(Sentinel-A1)/V(B1); lớp = 7 attacker held-out;
+- Δ ∈ {4, 8}, χ = 1,34, detector mid, b1, drift tạm thời, match 1.
+Đạt biên 15% ở một ρ ⇔ cận dưới CI (D25) ≥ 15% VÀ gain tương đối đọc được (D21).
+Báo cùng mức ưu tiên:
+- hiệu tuyệt đối V(B1) − V(S) và CI;
+- V(B1), V(S), N workflow, N repo;
+- D22 (so với baseline tốt nhất);
+- V_BR và exploitability;
+- kết quả hai đối chứng.
+Không chọn ρ sau khi xem số.
+
+## Dự đoán khai trước (từ lý thuyết và pilot trên dev; không từ tập eval)
+P1 Hai đối chứng D28 đạt.
+P2 Ở Δ = 0, Sentinel ≈ B1: mixture của regime Δ = 0 là commit.
+P3 Gain so với B1 giảm khi ρ tăng, vì B1 yếu nhất với patch uỷ quyền; ở ρ = 1 gain có
+   thể ≈ 0 hoặc âm.
+P4 "A1 −regime estimate" ≈ B1: mixture gộp mọi Δ co về commit.
+P5 Dưới best response cross-fit, "A1 −randomization" có V_BR lớn hơn Sentinel.
+P6 Thế giới phụ đúng như D29.
+
+## Hoà khi tinh chỉnh
+η_Q: FQ% nhỏ hơn. Các tham số khác: giá trị nhỏ hơn.
+
+## Luật cắt
+Như plan: tinh chỉnh (T1)→(T3), eval (a)→(c).
+
+## Trước đóng băng
+In kích thước cụm eval và Kish; không đổi chia dev/eval sau khi in.
+
+## Quyết định đã chốt và biện luận
+
+Q1–Q12 dưới đây là nội dung của tiền đăng ký (Task 0). Hai chỗ cần thầy xác nhận:
+- song ánh ở Q2;
+- `HEADLINE_RHO` ở Q7.
+
+### Q1 — Một hành động mỗi task
+
+§4: "At each task the defender chooses an audit action a_t ∈ A". Chế độ `multi` của bản 24/09 (n_t slot do môi trường rút) không có trong draft, nên **bỏ**. Việc này cũng giảm một nửa lượng tính toán.
+
+### Q2 — Hành động theo carrier; κ và χ
+
+- §4: A = {none} ∪ {(audit, k, depth)}, chi phí κ(k, depth), và χ = max|κ(k) − κ(k′)|/κ̄ lấy **trên các carrier**.
+- §8 định giá bốn loại audit là 0,4 / 0,9 / 1,6 / 4,1 "giving χ = 1.34". Vậy bốn loại audit **chính là** audit của bốn carrier. Song ánh được lấy từ chính mô tả của §8:
+  - insertion ("content and provenance check on **new memory records**") → **memory**, 0,4;
+  - delegation ("contract and evidence check") → **skill**, 1,6;
+  - commit ("patch review, differential testing, provenance of contributing skills") → **branch**, 4,1;
+  - retrieval ("consistency check of retrieved records against sources"), loại còn lại → **queue**, 0,9.
+- χ chỉ phụ thuộc tập bốn giá, nên song ánh không làm đổi χ. Ở ngân sách b1 một hành động không bao giờ vượt B/H (D4b), nên song ánh chỉ có tác dụng ở phép quét ngân sách. **Cần thầy xác nhận.**
+- Nhãn χ giữ như bản 24/09 (2·MAD/κ̄), đã kiểm trên bảng draft:
+
+  | Độ đo | Giá trị |
+  |---|---|
+  | range/κ̄ (công thức §4) | 2,114 |
+  | **2·MAD/κ̄** | **1,3429** |
+  | CV tổng thể / mẫu | 0,813 / 0,938 |
+
+  Trên đường nội suy κ(λ) = κ̄ + λ(κ − κ̄), mọi độ đo phân tán tỉ lệ với λ, và range/κ̄ = 1,574 × 2·MAD/κ̄. Mỗi ô báo cả hai.
+
+### Q3 — Audit đọc trạng thái đang tồn tại của một carrier; thế giới cổng là thế giới phụ
+
+**Bằng chứng từ draft và từ pilot:**
+1. §4 định nghĩa hành động là `(audit, k, depth)`, nhắm **một carrier**.
+2. Chứng minh Định lý 4: "An observation is informative only if it inspects the carrier that holds the poison … The belief concentrates only from observations taken **after insertion and before the harm** is realised — a window of length Δ".
+   - Ràng buộc ngủ yên cấm payload bị retrieve trong [ι, σ).
+   - Vì vậy chỉ một audit **đọc trạng thái của carrier** mới quan sát được payload trong cửa sổ đó.
+3. §5.3: "the attacker seeds the carrier the defender is not currently inspecting".
+4. §5.2: thư viện có họ "**carrier-rotation**".
+5. v1 đã làm như vậy: `runner.py` audit một carrier bằng cách chấm mọi item đang sống của carrier đó.
+6. Các pilot trên dev (`spikes/v2-pilot/`):
+   - thế giới cổng của bản 24/09 không thể hiện được cơ chế nào (bảng "Bản 25/09 thay đổi gì", dòng 1);
+   - mô hình §4 cho đúng cấu trúc draft mô tả: B1 phẳng theo Δ, audit carrier tốt lên theo Δ, điểm giao nằm quanh Δ ≈ 1–4 tuỳ ρ.
+
+**Ngữ nghĩa**, theo thứ tự trong task t:
+1. Policy chọn một hành động. Runner mua độ sâu **sâu nhất còn đủ tiền** không quá mức yêu cầu (một thang độ sâu chung cho mọi policy).
+2. Payload được chèn ở ι. Cả hai kênh đều ghi vào store, vì audit đọc store.
+3. Agent chạy task t.
+4. Hành động được thực thi:
+   - **commit:** xem patch của task t (độ lộ theo D20).
+     - Patch nổ thì bị chặn: patch có marker mất marker, patch sạch đã giải thì tính một T_lost.
+     - Alarm ở commit **không** là bằng chứng cho carrier nào (D17).
+     - Commit là audit carrier branch **tại một thời điểm**, đúng như chứng minh Định lý 4 nói về B1.
+   - **audit k**, với k ∈ {memory, queue, skill}: chấm **mọi** item đang sống của k ở độ sâu d. Mỗi lần xem cho một điểm độc lập (D16). Policy thấy tín hiệu của carrier đã trả tiền (D5), cập nhật belief, rồi quyết định gỡ item nổ nào.
+5. Carrier branch không quét được: nó chính là carrier của audit commit.
+
+**Gỡ:** §4 viết "It observes o_t … and **may additionally quarantine**", tức audit chỉ quan sát, còn gỡ là quyết định của policy.
+- Baseline B1–B6 gỡ **mọi item nổ**. Đây chính là luật "quarantine on any anomaly" mà §4 nói drift làm cho không tối ưu.
+- Sentinel gỡ theo dòng 8 (Q5).
+
+**Thế giới phụ (D29):** đọc §8 như cổng theo giai đoạn nhìn mọi carrier (bản 24/09), chỉ với bốn baseline cố định B1g–B4g, có dự đoán khai trước. Thế giới này dùng để trả lời câu hỏi "vì sao không đọc §8 như cổng", không dùng để so Sentinel.
+
+### Q4 — Ngân sách
+
+- `b1` = H·3·4,1, **neo** trên bảng draft, giữ nguyên ở mọi χ. Mọi policy chi theo nhịp spent ≤ B·(t+1)/H.
+- **D4b:** ở b1, B/H = 12,3 bằng giá của hành động đắt nhất, nên một hành động mỗi task không bao giờ bị ngân sách chặn. Lưới chính vì thế đo câu hỏi "**nhìn vào đâu**", không đo "bao nhiêu tiền là đủ". χ và phần phụ thuộc ngân sách của Định lý 4 chỉ đọc ở phép quét **share × χ** (share ∈ {0,25; 0,5; 0,75; 1}), gắn nhãn **EXPLORATORY**.
+
+### Q5 — Dòng 8 ở mức item; η_Q tinh chỉnh theo mục tiêu của §4
+
+- **Gỡ ở mức item.** v1 đã áp dòng 8 cho từng item (khối "Algorithm 1 line 8 -- BOTH conditions" trong `runner.py`). §4 và Bảng 2 tính false quarantine theo đối tượng.
+- **Hậu nghiệm của một item nổ**, `belief_v2.item_posterior`, so ba giả thuyết (likelihood Gauss, Giả định 2):
+  - item là payload: tiên nghiệm p_k/n_k, tức khối cửa sổ sống của carrier k chia cho số item sống;
+  - item là một sự kiện drift tươi: tiên nghiệm β̂_k/n_fresh, **chỉ** với item sinh ra trong task này;
+  - item sạch: phần còn lại.
+- **Gỡ khi P(payload | điểm) > η_Q.** Lưới η_Q = {0; 0,01; 0,02; 0,05; 0,1; 0,2; 0,3543; 0,5}:
+  - 0 là luật ngây thơ (gỡ mọi item nổ);
+  - 0,3543 = λ_Q/(1+λ_Q), giá trị Bayes khi harm nhị phân.
+- **Mục tiêu tinh chỉnh**, lấy nguyên văn §4: "Minimise worst-case verified harm at fixed budget … while keeping clean completion and false quarantine acceptable".
+  - Tức là tối thiểu harm tệ nhất, với ràng buộc **FQ% ≤ 10%**. Mức 10% gấp đôi mức FQ cao nhất trong Bảng 2 của draft (5,1%) và được khai trước khi tinh chỉnh.
+  - Chọn η_Q: harm tệ nhất nhỏ nhất; hoà (tới 4 chữ số) thì chọn FQ% nhỏ nhất.
+  - Lưới trải từ luật ngây thơ tới trên mức Bayes, để **trần FQ**, chứ không phải mép lưới, giới hạn dòng 8.
+- **Vì sao bỏ việc tinh chỉnh trên L** như bản 24/09: mỗi đối tượng bác nhầm tốn λ_Q, trong khi harm ≤ 1. Pilot 1 cho thấy L bị FQ áp đảo, và minimax trên L co về B1. L vẫn được báo cạnh harm.
+- **Quét §11** ("as quarantine becomes cheap"): Sentinel chạy ở mọi η_Q trong lưới.
+- **Ablation "−benign-drift":** β̂ = 0, cả trong belief lẫn trong hậu nghiệm dòng 8.
+- Biến thể "tính tiền 61,5·κ̄" của v1 **bỏ**: dòng 8 không tiêu ngân sách audit (L của §4 không có số hạng η_Q), và giờ không còn gì để so với nó.
+
+### Q6 — Corpus: SWE-bench Verified + Multilingual, 17 repo, 100 workflow
+
+Quyết định này giữ nguyên từ bản 24/09, đã kiểm lại ngày 25/09:
+- **Nguồn:** Verified có 12 repo; seaborn (2 instance) và flask (1 instance) quá ngắn, nên 10 repo dùng được. Multilingual (`SWE-bench/SWE-bench_Multilingual`, split `test`) có 300 instance, 41 repo, 9 ngôn ngữ.
+- **Cắt workflow:** sort theo `created_at` trong từng repo, cắt cửa sổ liên tiếp với H ~ U{6..14}.
+  - H được seed theo từng repo (`seed_of(2027, repo, offset)`), nên thêm hay bớt một pool không làm đổi workflow của pool kia.
+  - Hai lượt cắt (offset 0 và 3) nên mỗi instance nằm trong tối đa 2 workflow, không nâng `MAX_INSTANCE_REUSE`.
+- **Kết quả dựng:** **100 workflow trên 17 repo** (85 Verified, 15 Multilingual).
+- **Lọc:** bỏ bước 4 của SPEC-P1a, vì draft không đòi, và `build.plan_poison_all` đã kiểm ràng buộc ngủ yên. Khả thi: 100/100 ở Δ ≤ 4, 58 ở Δ = 8.
+- **Chia dev/eval:** dev là họ repo lớn nhất (django, 43 workflow); eval có 57 workflow trên 16 repo, **Kish 8,1**. Nếu để django ở eval thì Kish chỉ còn 2,5.
+  - Draft đòi held-out theo repo: §5.5 "held-out repositories", §8 "Repository families are also held out".
+  - Hệ quả: toàn bộ tinh chỉnh chạy trên một repo, nên "dev so với held-out" là **chuyển giao từ django sang 16 repo khác**. Ô Δ = 8 trong eval chỉ có 30 workflow. Mọi con số in kèm N workflow và N repo.
+- **Kiểm độ nhạy "chỉ Verified":** 9 repo Python trong eval.
+- Agent vẫn là MockAgent chạy trên metadata và topic thật, harm chấm bằng oracle marker (khai ở Threats).
+
+### Q7 — ρ_patch: độ lộ của patch theo đường lan truyền
+
+Giữ D20 của bản 24/09, sửa phần đã cũ:
+- **Draft nói gì:** dòng 275–279, "cannot distinguish 'this patch is the product of a poisoned skill' from 'this patch is ordinary', because the distinguishing evidence is the skill's provenance"; dòng 292–293, "It is small, plausible, passes tests. Accepted."
+- **Mô hình:**
+  - patch mang marker qua payload được retrieve **trực tiếp**: trung bình d′, tăng theo √độ sâu;
+  - patch mang marker **chỉ qua skill hoặc queue**: trung bình ρ_patch·d′ ở độ sâu 1, không tăng theo độ sâu.
+- **Lưới:** ρ_patch ∈ {0; 0,25; 0,5; 1}. Defender biết ρ (Giả định 2) và được tinh chỉnh riêng cho từng ρ.
+- **Sửa D4c/D23:** ρ = 1 **không còn là sàn**. Patch uỷ quyền không được lợi từ độ sâu, nên V(B1) ở ρ = 1 do cột skill/queue quyết định, cỡ 0,85·(1 − ψ₁) ≈ 0,13 ở detector mid (pilot 1: 0,158).
+- **Phạm vi:** ρ chỉ tác động lên tấn công đặt payload thẳng vào skill hoặc queue. Chuỗi memory → skill → patch của Hình 1 không tạo patch uỷ quyền tại σ, vì ràng buộc ngủ yên. Khai ở Threats.
+- **Không hiệu chỉnh ρ** để V(B1) ra 0,412 như Bảng 2.
+- **`HEADLINE_RHO`:** thầy chọn trước Task 10, **không xem số v2 nào** (xem D30). Nếu không chọn, kết quả chính là cả đường. ρ tham chiếu cho luật cắt là 0,25 (D23).
+
+### Q8 — Benign drift là **sự kiện tạm thời**
+
+- **Draft nói gì:**
+  - §4: "A latent process independently **modifies** carriers benignly **at rate β**, with observation statistics matched to poisoning events";
+  - §5.1: belief "with the benign-drift process as a competing **transition**".
+  - `belief_v2.DriftBelief` mô hình drift là một sự kiện theo từng task.
+- **Thế giới:** mỗi task, carrier k có một sự kiện drift với xác suất β_k.
+  - Item drift "giống poison" (trung bình match·d′) **chỉ trong task nó xảy ra** (`DRIFT_VISIBLE_TASKS = 1`); sau đó chấm như item sạch.
+  - Payload giống poison suốt đời.
+- **Lý do:**
+  - Nếu drift bất thường vĩnh viễn, không số lần nhìn nào phân biệt được poison với drift, và Định lý 4 (cần biên giữa trạng thái nhiễm và trạng thái lành) không kiểm được.
+  - Thế giới vĩnh viễn cũng làm belief của §5 sai đặc tả theo cấu tạo.
+  - Bản vĩnh viễn giữ làm kiểm độ nhạy.
+- **Hệ quả, chính là cơ chế của Định lý 4:** lần quét ngay lúc payload vừa chèn không phân biệt được payload với một sự kiện drift. Lần nhìn thứ hai, khi payload vẫn nổ còn drift thì không, mới phân biệt được.
+- **Tham số:** match headline = 1 (§4 "matched"); quét {0; 0,5; 1}. β̂ ước bằng phương pháp mô-men trên alarm quan sát được ở dev, không đọc nhãn drift.
+- **Test bề mặt (AUC ≤ 0,56):** so payload và drift **ở cùng recency** (Δ = 2).
+  - Bản 24/09 chấm drift tại min(t + 2, H − 1), tức cắt recency ở cuối workflow, nên đo phải chính sự cắt đó: 0,570.
+  - So đúng cách thì AUC là 0,51 (60 workflow) và 0,47 (120 workflow). Đây là sửa test, không phải nới ngưỡng.
+
+### Q9 — Sentinel = Algorithm 1, dòng 1, 5, 7, 8
+
+- **Dòng 1:** Sentinel được cho regime (Δ, χ) của ô, tức một **bộ ước lượng hoàn hảo** (khai rõ). Ablation mới **"A1 −regime estimate"** dùng mixture tinh chỉnh gộp mọi Δ. Trên dev, mixture gộp co về commit.
+- **Dòng 5:** mixture minimax **có ràng buộc FQ** trên thư viện 28 policy theo carrier, giải trên dev cho từng (ρ, detector, Δ); rút **một member mỗi workflow**. Thư viện:
+  - **SW (8), "stage-weighted":** mỗi task rút đích theo trọng số trên (memory, queue, skill, commit), độ sâu 3. Trọng số: chỉ commit (≡ B1), đều, chỉ quét, nghiêng memory, nghiêng queue, nghiêng skill, nghiêng commit, bỏ memory.
+  - **BT (12), "belief-threshold":** commit khi p_attack ≤ τ; trên τ thì **lấy mẫu** carrier từ floor·đều + (1 − floor)·khối hậu nghiệm. τ ∈ {0,3; 0,5; 0,7; 0,9}, floor ∈ {0; 1/3; 2/3}.
+    - Lấy mẫu chứ không lấy argmax, vì §5.3 đòi phân bổ ngẫu nhiên.
+    - Floor giữ mọi carrier trong tầm, vì belief đi theo drift có thể bị attacker Stackelberg khai thác.
+  - **RO (8), "carrier-rotation":** vòng quay qua (memory, queue, skill) hoặc (memory, queue, skill, commit), chu kỳ giữ 1 hoặc 2 task, độ sâu 2 hoặc 3, **pha ngẫu nhiên** mỗi workflow. Pilot 2b: pha ngẫu nhiên giữ bảo đảm phủ khi Δ ≥ độ dài vòng và gỡ tính dễ bị khai thác khi Δ nhỏ hơn.
+- **Dòng 7:** belief cửa sổ có drift của member.
+- **Dòng 8:** gỡ item theo Q5.
+- **Ablation:** bốn arm của draft, cộng một arm mới:
+  - "−randomization": member thuần, một lịch duy nhất cho mọi workflow;
+  - "−alarm memory": belief không nhớ;
+  - "−transition uncertainty": mixture của kernel danh nghĩa;
+  - "−benign-drift": β̂ = 0;
+  - "−regime estimate" (mới).
+
+### Q10 — Attacker và best response
+
+- **Lớp attacker:** 18 luật, 7 held-out theo hash, 16 cột BR (giữ nguyên).
+- **Kênh trơ:** write/ingress không đổi hành vi trong thế giới carrier, nên vệ sinh held-out làm trên **khoá hành vi (k, luật ι, ε)**.
+  - Một cột tinh chỉnh không được có khả năng thể hiện khoá của attacker held-out nào **trên bất kỳ workflow nào**. Luật `uniform` mang cả bốn khoá.
+  - Kết quả: 6 cột tinh chỉnh (`branch-last`, `branch-mid`, `memory-first`, `queue-first`, `skill-first`, `skill-last`, đều ε = 0,6), phủ đủ bốn carrier.
+- **Best response Stackelberg (D27):** attacker biết policy nhưng không biết lượt rút.
+  - Menu là mọi (k, ι, σ) khả thi ở Δ trên cả bốn carrier.
+  - **Cross-fit:** chọn vị trí trên seed lẻ, chấm trên seed chẵn, rồi làm ngược lại.
+  - Lấy max trực tiếp trên cùng các seed thì thổi phồng V: pilot 2b cho V(B1) = 0,25, trong khi cross-fit cho 0,125 và giải tích là 0,1275.
+- **Exploitability** = V_BR (cross-fit) − V (held-out).
+
+### Q11 — Thống kê và đối chứng
+
+- **Endpoint:** gain = 1 − V(Sentinel)/V(B1) trên 7 attacker held-out, Δ ∈ {4, 8}, cho từng ρ. Luôn báo kèm hiệu tuyệt đối.
+- **Hiệu chỉnh đa kiểm định (D25):** phát biểu 15% trên đường 4 điểm ρ dùng CI hai phía mức **1 − 0,05/4** (98,75%, Bonferroni).
+  - Nếu thầy chọn `HEADLINE_RHO` trước Task 10, điểm đó là endpoint một điểm với CI 95%, và đường còn lại là thứ cấp.
+- **Khả đọc (D21):** gain tương đối chỉ đọc khi B1 có ≥ 10 sự kiện harm ở cột tệ nhất và ≤ 1% lượt bootstrap có V(B1) = 0.
+- **So với baseline tốt nhất (D22):** hiệu tuyệt đối giữa Sentinel và baseline tốt nhất trong B1–B6, baseline chọn lại ở mỗi lượt bootstrap.
+- **Đối chứng (D28), kiểm trước khi đọc số Sentinel:**
+  - (+) Oracle, được cho biết carrier bị tấn công, có V ≤ 0,05 ở ô headline tại ρ tham chiếu;
+  - (−) ở Δ = 0, B3 và B4 (chỉ quét) không thắng B1, vì lần quét chạy sau agent.
+  - Nếu một đối chứng hỏng thì dừng, tìm lỗi, và không đọc số.
+- **10 seed eval, 2 seed tinh chỉnh.** Một run tốn khoảng 1 ms.
+
+### Q12 — Pilot và sai lệch đã khai
+
+- **Pilot thiết kế** (chỉ dev) ở `auditgame/spikes/v2-pilot/`: pilot 1 (thế giới cổng), pilot 2 và 2b (mô hình §4), cùng bản chụp code của bản 24/09 để chạy lại.
+- **Sai lệch D30:** ngày 25/09, khi dựng plan này, trợ lý (Claude) chạy một lượt smoke của công cụ eval **trên tập eval**, với cấu hình chưa đóng băng.
+  - Cấu hình đó: tinh chỉnh rút gọn 1 seed, ρ ∈ {0,25; 1}, 3 seed eval.
+  - Mọi quyết định thiết kế đã được viết thành code **trước** lượt chạy.
+  - **Sau** lượt chạy mới có ba thay đổi. Động cơ của cả ba đến từ các lượt tinh chỉnh **trên dev**, trong đó lượt đầu chạy trước smoke:
+    - lưới η_Q và τ₅ nới xuống tới 0, vì điểm tối ưu trên dev nằm ở mép lưới;
+    - η_Q hoà thì chọn FQ% thấp nhất;
+    - phép quét η_Q đổi sang giá trị tuyệt đối.
+  - Số chỉ trợ lý đã xem; không đưa cho học viên hay thầy. Hồ sơ ở `spikes/v2-pilot/eval-touch-2509/`, **đừng mở trước khi chọn `HEADLINE_RHO`**.
+  - Công cụ eval nay có `--split dev`, và mọi smoke trong plan chạy trên dev.
+
+---
+
