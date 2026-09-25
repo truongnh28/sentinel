@@ -131,6 +131,63 @@ D34 Sai lệch đã khai (25/09, SAU lượt eval). Plan các phần đến hạ
       ở Threats. #20 là lỗi của v1, v2 đã sửa bằng D19; khai một dòng ở Threats.
     - Học viên giao trợ lý chốt ngày 25/09. Song ánh §8 (D2) vẫn chờ thầy xác nhận.
 
+D35 Addendum (26/09; SAU lượt eval chính, TRƯỚC mọi số của addendum). Sau hai vòng phản biện
+    bài báo, học viên quyết định chạy thêm ba arm phụ, đúng một lần trên tập eval, dưới một
+    freeze riêng. Không số nào của lượt chính thay đổi; endpoint chính giữ nguyên.
+    - Phạm vi: ô headline (detector mid, Δ ∈ {4, 8}, 7 attacker held-out, χ = 1,34, b1, drift
+      tạm thời, match 1); 57 workflow eval; seed 1–10; ρ ∈ {0; 0,25; 0,5; 1}. Kèm best response
+      cross-fit (D27) cho mọi hệ của addendum.
+    - Arm A, Δ̂ sai (line 1 kém): Sentinel-A1 nhưng dùng mixture đã đóng băng của một Δ khác
+      trên lưới. "A1 dhat-swap": 4→8, 8→4. "A1 dhat-down1": 4→2, 8→4. "A1 dhat-down2": 4→1,
+      8→2. Không tinh chỉnh gì mới.
+    - Arm B, "B2 FQ-matched":
+      - Mỗi task: commit review độ sâu 3 với xác suất p; còn lại sweep độ sâu 3 một carrier
+        rút đều trong {memory, queue, skill}. Cách ly mọi item fire (luật baseline).
+      - p tinh chỉnh trên dev (seed 1, 2) theo từng (ρ, Δ), tức có cùng oracle line 1 như
+        Sentinel. p* = argmin harm tệ nhất trên dev (max qua 3 kernel, trên 6 cột tinh chỉnh
+        ở Δ đó), với ràng buộc FQ% trên dev (max qua kernel, gộp mọi Δ) ≤ fq_pct của mixture
+        Sentinel ở ô đó (v2_tuned.json).
+      - Lưới p = 0,25; 0,30; …; 1,00. Hoà (4 chữ số): FQ% nhỏ hơn, rồi p nhỏ hơn.
+    - Arm C, "A1 fixed interleave":
+      - Lịch tất định, pha cố định: pha 0, giống nhau ở mọi workflow và seed. Chạy line 7–8
+        với η_Q đã tinh chỉnh, như member thư viện.
+      - Họ 11 lịch: FI-{c3,c4}-p{1,2}-d{2,3} (RO với pha 0); FI-alt-m{2,3,4} (commit review
+        độ sâu 3 ở task t với t mod m = m − 1; các task khác sweep lần lượt memory → queue →
+        skill, độ sâu 3).
+      - Chọn trên dev theo từng (ρ, Δ), cùng mục tiêu với `pure`: harm tệ nhất nhỏ nhất với
+        FQ% ≤ 10. Hoà: FQ%, rồi tên.
+    - Không chạy: commit review đọc provenance, vì phải bịa chi phí và ρ của nó.
+    - Tái lập trước mọi số: B1 và Sentinel-A1 được chạy lại trong lượt addendum. V của hai hệ
+      phải trùng eval-summary.json đến 4 chữ số ở mọi ρ. Nếu không, tool giữ lại mọi số
+      addendum (như D28).
+    - Thống kê, mỗi arm ở mỗi ρ:
+      - V, FQ%, L tệ nhất, V_BR cross-fit, N.
+      - Hiệu V(arm) − V(Sentinel-A1) và gain so với B1, mỗi cái kèm CI bootstrap cụm repo
+        10.000 lượt ở mức 98,75% (Bonferroni qua 4 ρ). Mỗi arm là một họ riêng; không hiệu
+        chỉnh giữa các arm.
+      - Arm A báo thêm tỉ lệ gain giữ lại (V(B1) − V(arm)) / (V(B1) − V(S)).
+    - Cách đọc, khai trước:
+      - (A) "Giá trị của oracle chịu được sai một bậc" ⇔ ở mọi ρ ≤ 0,5, CI 98,75% của
+        V(B1) − V(arm) nằm trên 0 cho cả dhat-swap lẫn dhat-down1.
+      - (B) "Sentinel hơn một phép trộn ngẫu nhiên một tham số ở cùng FQ" ở một ρ ⇔ CI 98,75%
+        của V(B2 FQ-matched) − V(S) nằm trên 0 ở ρ đó.
+      - (C) Lớp scripted: nếu ở một ρ CI 98,75% của V(fixed) − V(S) chứa 0 hoặc nằm dưới 0,
+        thì phần gain ở ρ đó không quy được cho ngẫu nhiên hoá. Best response: so V_BR điểm
+        (không có CI, như P5).
+    - Dự đoán P7–P9: khai sau pilot addendum trên dev, trước freeze D35 (mục Dự đoán).
+    - Code mới nằm ở module và tool mới: addendum_d35.py, freeze_d35.py, tools/tune_d35.py,
+      tools/run_d35.py.
+      - Không file nào trong freeze.SOURCE hay TABLES bị sửa, nên c789fa7362e0 vẫn sạch.
+      - Freeze riêng ở frozen/MANIFEST-D35.json: digest gốc, sha256 của addendum_d35.py và
+        reference/d35_tuned.json, tên arm, họ lịch, bảng Δ̂, lưới p.
+      - Record ở spikes/v2-addendum/: không commit, ghim sha256.
+    - Trong bài:
+      - Addendum là kết quả secondary, gắn nhãn D35.
+      - Đóng góp "đánh giá một lần" viết lại thành "endpoint chính đánh giá một lần; một
+        addendum khai trước chạy một lần".
+    - Học viên quyết định ngày 26/09 (chọn "Addendum D35, chạy một lần"); chi tiết thiết kế do
+      trợ lý chốt. Lúc khai, chưa có số addendum nào, trên dev hay eval.
+
 ## Endpoint chính
 Đường endpoint theo ρ_patch (curve_rho):
 - gain = 1 − V(Sentinel-A1)/V(B1); lớp = 7 attacker held-out;

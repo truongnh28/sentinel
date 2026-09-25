@@ -133,6 +133,68 @@ D34 Declared deviation (25/09, AFTER the eval run). The due-items plan (§5) req
       label; declared in Threats. #20 is a v1 bug, fixed in v2 by D19; declared in one line in Threats.
     - The student assigned the assistant to finalise it on 25/09. The §8 bijection (D2) is still awaiting the advisor's confirmation.
 
+D35 Addendum (26/09; AFTER the main eval run, BEFORE any addendum number). After two review
+    rounds on the paper, the student decided to run three secondary arms, exactly once on the
+    eval split, under a separate freeze. No number of the main run changes; the primary endpoint
+    stands.
+    - Scope: the headline cell (mid detector, Δ ∈ {4, 8}, the 7 held-out attackers, χ = 1.34,
+      b1, transient drift, match 1); the 57 eval workflows; seeds 1–10; ρ ∈ {0, 0.25, 0.5, 1}.
+      The cross-fitted best response (D27) runs for every system of the addendum.
+    - Arm A, a wrong Δ̂ (a degraded line 1): Sentinel-A1 playing the frozen mixture of another
+      Δ on the grid. "A1 dhat-swap": 4→8, 8→4. "A1 dhat-down1": 4→2, 8→4. "A1 dhat-down2":
+      4→1, 8→2. Nothing new is tuned.
+    - Arm B, "B2 FQ-matched":
+      - Each task: a depth-3 commit review with probability p; otherwise a depth-3 sweep of a
+        carrier drawn uniformly from {memory, queue, skill}. It quarantines every firing item
+        (the baseline rule).
+      - p is tuned on dev (seeds 1, 2) per (ρ, Δ), i.e. with the same line-1 oracle as
+        Sentinel. p* = argmin of the dev worst-case harm (max over the 3 kernels, over the 6
+        tuning columns at that Δ), subject to dev FQ% (max over kernels, pooled over every Δ)
+        ≤ the fq_pct of Sentinel's mixture in that cell (v2_tuned.json).
+      - Grid p = 0.25, 0.30, …, 1.00. Ties (4 decimals): lower FQ%, then smaller p.
+    - Arm C, "A1 fixed interleave":
+      - A deterministic schedule with a fixed phase: phase 0, the same for every workflow and
+        seed. It runs lines 7–8 with the tuned η_Q, like a library member.
+      - A family of 11 schedules: FI-{c3,c4}-p{1,2}-d{2,3} (RO with phase 0); FI-alt-m{2,3,4}
+        (a depth-3 commit review at task t with t mod m = m − 1; the other tasks sweep memory →
+        queue → skill in turn, at depth 3).
+      - Chosen on dev per (ρ, Δ), by the same objective as `pure`: the lowest worst-case harm
+        with FQ% ≤ 10. Ties: FQ%, then name.
+    - Not run: a commit review that reads provenance, since its cost and ρ would be invented.
+    - Reproduction before any number: B1 and Sentinel-A1 are re-simulated in the addendum run.
+      Their V must equal eval-summary.json to 4 decimals at every ρ. Otherwise the tool
+      withholds every addendum number (as D28 does).
+    - Statistics, per arm and per ρ:
+      - V, FQ%, worst-case L, cross-fitted V_BR, N.
+      - V(arm) − V(Sentinel-A1) and the gain over B1, each with a 10,000-resample repo-cluster
+        bootstrap interval at 98.75% (Bonferroni over the 4 ρ). Each arm is its own family;
+        there is no correction across arms.
+      - Arm A also reports the share of the gain retained, (V(B1) − V(arm)) / (V(B1) − V(S)).
+    - Readings, declared in advance:
+      - (A) "The oracle's value survives a one-step error" ⇔ at every ρ ≤ 0.5 the 98.75%
+        interval of V(B1) − V(arm) lies above 0, for both dhat-swap and dhat-down1.
+      - (B) "Sentinel beats a one-knob random mix at the same FQ" at a ρ ⇔ the 98.75% interval
+        of V(B2 FQ-matched) − V(S) lies above 0 there.
+      - (C) Scripted class: if at a ρ the 98.75% interval of V(fixed) − V(S) contains 0 or
+        lies below 0, the gain there is not attributable to randomisation. Best response:
+        point estimates of V_BR are compared (no interval, as in P5).
+    - Predictions P7–P9: declared after the addendum's dev pilot and before the D35 freeze
+      (Predictions section).
+    - New code lives in new modules and tools: addendum_d35.py, freeze_d35.py,
+      tools/tune_d35.py, tools/run_d35.py.
+      - No file in freeze.SOURCE or TABLES is edited, so c789fa7362e0 stays clean.
+      - A separate freeze, frozen/MANIFEST-D35.json, holds the base digest, the sha256 of
+        addendum_d35.py and reference/d35_tuned.json, the arm names, the schedule family, the
+        Δ̂ table and the p grid.
+      - Records go to spikes/v2-addendum/: not committed, pinned by sha256.
+    - In the paper:
+      - The addendum is a secondary result, labelled D35.
+      - The contribution "evaluated once" becomes "primary endpoint evaluated once; one
+        pre-declared addendum run once".
+    - The student decided on 26/09 (chose "Addendum D35, run once"); the design details were
+      settled by the assistant. When this was declared, no addendum number existed, on dev or
+      eval.
+
 ## Primary endpoint
 The endpoint curve over ρ_patch (curve_rho):
 - gain = 1 − V(Sentinel-A1)/V(B1); class = 7 held-out attackers;
