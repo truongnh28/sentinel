@@ -33,10 +33,10 @@
       "A1 fixed interleave"
     ],
     "header_start": "freeze-d35: NONE  |  base freeze: clean sha256:c789fa7362e0",
-    "git_head": "38d42f1",
+    "git_head": "dcad94d",
     "git_clean": false,
     "sha256": {
-      "tools/run_d35.py": "5df58c5727e5b5a95685a62c431075487e1894f15207ebc2fa6d7bc71cea8b64",
+      "tools/run_d35.py": "1e8a672998c6f68357c1b290cba2aa5bc87f104e802aa4f62544d48bd38830bc",
       "tools/tune_d35.py": "93ff133cf5034c657aae079422629a29cd5b569061212d69576874001b5a19ac",
       "freeze_d35.py": "90538fcee81d3c738775a2dc702544ce9900aa5131d6ac0883aaa24623ae0513"
     },
@@ -1172,7 +1172,7 @@
       "0.5": true,
       "1": false
     },
-    "C_scripted_gain_attributable_to_randomisation": {
+    "C_fixed_worse_than_sentinel": {
       "0": true,
       "0.25": true,
       "0.5": true,

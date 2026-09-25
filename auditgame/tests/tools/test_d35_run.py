@@ -145,7 +145,7 @@ class TestReadings(unittest.TestCase):
     def test_b_and_c_per_rho(self):
         r = RD.readings(_rows(b2_lo=-0.01, fixed_lo=0.02, vbr_fixed=0.3))
         self.assertEqual(r["B_beats_fq_matched_mix"], {"0": False, "0.25": False, "0.5": False, "1": False})
-        self.assertTrue(all(r["C_scripted_gain_attributable_to_randomisation"].values()))
+        self.assertTrue(all(r["C_fixed_worse_than_sentinel"].values()))
         self.assertFalse(any(r["C_br_fixed_above_sentinel"].values()))
 
 
@@ -161,7 +161,7 @@ class TestReadingsMissingEvidence(unittest.TestCase):
     def test_nan_abs_lo_gives_none_for_b_and_c(self):
         r = RD.readings(_rows(b2_lo=float("nan"), fixed_lo=float("nan")))
         self.assertTrue(all(v is None for v in r["B_beats_fq_matched_mix"].values()))
-        self.assertTrue(all(v is None for v in r["C_scripted_gain_attributable_to_randomisation"].values()))
+        self.assertTrue(all(v is None for v in r["C_fixed_worse_than_sentinel"].values()))
 
     def test_nan_v_br_gives_none_in_c_br_fixed_above_sentinel(self):
         r = RD.readings(_rows(vbr_fixed=float("nan")))

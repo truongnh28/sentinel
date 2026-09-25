@@ -174,7 +174,10 @@ def _finite(v) -> bool:
 def readings(rows) -> dict:
     """The declared readings (A), (B), (C) of D35, mechanically.  F2: a comparison whose input
     is NaN or None never becomes False -- it is None instead, so an incomplete or NaN run
-    cannot be summarised into a definite reading."""
+    cannot be summarised into a definite reading.  (C) as declared licenses one direction
+    only: where C_fixed_worse_than_sentinel is False (the interval of V(fixed) - V(S) contains 0
+    or lies below it), the gain at that rho is NOT attributable to randomisation; True licenses
+    no claim that it is."""
     low = [rk for rk in rows if float(rk) <= 0.5]
     a = {}
     for arm in ("A1 dhat-swap", "A1 dhat-down1"):
@@ -196,7 +199,7 @@ def readings(rows) -> dict:
 
     return {"A_oracle_survives_one_step": a_survives, "A_by_arm": a,
             "B_beats_fq_matched_mix": _per_rho_vs_sentinel(X.B2_FQ),
-            "C_scripted_gain_attributable_to_randomisation": _per_rho_vs_sentinel(X.FIXED),
+            "C_fixed_worse_than_sentinel": _per_rho_vs_sentinel(X.FIXED),
             "C_br_fixed_above_sentinel": c_br}
 
 
