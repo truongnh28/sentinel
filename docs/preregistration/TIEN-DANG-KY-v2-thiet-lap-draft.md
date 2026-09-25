@@ -348,3 +348,6 @@ Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết 
     - không đổi `pure` ở ô nào;
     - không đổi τ₅ hay η_Q được chọn.
   - Ba dòng η_Q của ρ = 1 in FQ% nhỏ hơn lượt đầu, vì bước 2 của D32; η_Q chọn vẫn là 0,3543.
+- Task 11 (cụm eval, trước khi ghi manifest, D8): `[('sympy/sympy', 15), ('sphinx-doc/sphinx', 8), ('scikit-learn/scikit-learn', 6), ('matplotlib/matplotlib', 5), ('projectlombok/lombok', 3), ('pydata/xarray', 3), ('pytest-dev/pytest', 3), ('astropy/astropy', 2), ('caddyserver/caddy', 2), ('laravel/framework', 2), ('preactjs/preact', 2), ('rubocop/rubocop', 2), ('fastlane/fastlane', 1), ('fluent/fluentd', 1), ('phpoffice/phpspreadsheet', 1), ('sharkdp/bat', 1)] 8.1`
+- Task 11 (đóng băng v2): manifest `sha256:c789fa7362e0`; header `freeze: clean sha256:c789fa7362e0`
+- Task 11 (bộ test): gate 1 710/710; gate 2 203/205 (hai lỗi đã biết: some_epsilon_makes_the_payload_indistinguishable_at_every_delta (pipeline='matched', phase='screen'), one_split_cannot_decide_a_delta_of_the_certify_corpus); gate 3 15/15; test_v2_select 5 OK
