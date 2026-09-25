@@ -1,0 +1,1097 @@
+{
+  "betas": {
+    "branch": 0.014095249717789882,
+    "memory": 0.30582420599810833,
+    "queue": 0.0325838240229429,
+    "skill": 0.06535070323702594
+  },
+  "rho": {
+    "0": {
+      "eta_q": 0.0,
+      "mix": {
+        "mid|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.892857
+        },
+        "mid|1": {
+          "cap_ok": true,
+          "fq_pct": 10.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.043289,
+            "L-SW-nomemory": 0.683365,
+            "L-SW-queue": 0.273346
+          },
+          "pure": "L-SW-nomemory",
+          "robust": {
+            "L-BT-0.5-f0": 0.027693,
+            "L-SW-nomemory": 0.765265,
+            "L-SW-queue": 0.107189,
+            "L-SW-sweeps": 0.099853
+          },
+          "value": 0.60145
+        },
+        "mid|2": {
+          "cap_ok": true,
+          "fq_pct": 7.402,
+          "nominal": {
+            "L-BT-0.5-f0": 0.243995,
+            "L-SW-nomemory": 0.703866,
+            "L-SW-queue": 0.052138
+          },
+          "pure": "L-SW-nomemory",
+          "robust": {
+            "L-BT-0.5-f0": 0.300615,
+            "L-RO-c3-p1-d3": 0.158747,
+            "L-SW-nomemory": 0.539487,
+            "L-SW-skill": 0.001152
+          },
+          "value": 0.514208
+        },
+        "mid|4": {
+          "cap_ok": true,
+          "fq_pct": 6.365,
+          "nominal": {
+            "L-BT-0.5-f0": 0.513771,
+            "L-RO-c4-p1-d3": 0.486229
+          },
+          "pure": "L-SW-nomemory",
+          "robust": {
+            "L-BT-0.5-f0": 0.485299,
+            "L-RO-c4-p1-d3": 0.514701
+          },
+          "value": 0.411271
+        },
+        "mid|8": {
+          "cap_ok": true,
+          "fq_pct": 6.701,
+          "nominal": {
+            "L-BT-0.5-f0": 0.11988,
+            "L-SW-commit3": 0.583934,
+            "L-SW-nomemory": 0.296186
+          },
+          "pure": "L-SW-nomemory",
+          "robust": {
+            "L-BT-0.5-f0": 0.348325,
+            "L-RO-c4-p2-d3": 0.158214,
+            "L-SW-nomemory": 0.493461
+          },
+          "value": 0.321422
+        },
+        "mid|all": {
+          "cap_ok": true,
+          "fq_pct": 0.078,
+          "nominal": {
+            "L-BT-0.5-f0": 0.480255,
+            "L-SW-commit3": 0.519745
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.992357,
+            "L-SW-commit3": 0.007643
+          },
+          "value": 0.892994
+        },
+        "strong|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.964286
+        },
+        "strong|1": {
+          "cap_ok": true,
+          "fq_pct": 5.673,
+          "nominal": {
+            "L-BT-0.5-f0": 0.055332,
+            "L-SW-nomemory": 0.644092,
+            "L-SW-queue": 0.300576
+          },
+          "pure": "L-SW-nomemory",
+          "robust": {
+            "L-SW-nomemory": 0.784898,
+            "L-SW-queue": 0.178901,
+            "L-SW-skill": 0.036201
+          },
+          "value": 0.599141
+        },
+        "strong|2": {
+          "cap_ok": true,
+          "fq_pct": 4.295,
+          "nominal": {
+            "L-BT-0.5-f0": 0.236544,
+            "L-SW-nomemory": 0.710804,
+            "L-SW-queue": 0.052652
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.307723,
+            "L-RO-c3-p1-d2": 0.211448,
+            "L-SW-nomemory": 0.460888,
+            "L-SW-skill": 0.019942
+          },
+          "value": 0.526234
+        },
+        "strong|4": {
+          "cap_ok": true,
+          "fq_pct": 4.078,
+          "nominal": {
+            "L-BT-0.5-f0": 0.490052,
+            "L-RO-c4-p1-d2": 0.509948
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.461167,
+            "L-RO-c4-p1-d2": 0.538832
+          },
+          "value": 0.422085
+        },
+        "strong|8": {
+          "cap_ok": true,
+          "fq_pct": 3.822,
+          "nominal": {
+            "L-BT-0.5-f0": 0.124106,
+            "L-SW-commit3": 0.549933,
+            "L-SW-nomemory": 0.325961
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.32611,
+            "L-RO-c4-p2-d2": 0.115159,
+            "L-RO-c4-p2-d3": 0.034121,
+            "L-SW-nomemory": 0.524611
+          },
+          "value": 0.319885
+        },
+        "strong|all": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.829714,
+            "L-SW-nomemory": 0.158542,
+            "L-SW-queue": 0.011744
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.964286
+        },
+        "weak|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.821429
+        },
+        "weak|1": {
+          "cap_ok": true,
+          "fq_pct": 10.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.353546,
+            "L-SW-nomemory": 0.440764,
+            "L-SW-queue": 0.20569
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.372273,
+            "L-SW-nomemory": 0.415972,
+            "L-SW-queue": 0.188877,
+            "L-SW-skill": 0.022878
+          },
+          "value": 0.655233
+        },
+        "weak|2": {
+          "cap_ok": true,
+          "fq_pct": 10.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.331306,
+            "L-SW-nomemory": 0.591537,
+            "L-SW-queue": 0.077157
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.348829,
+            "L-SW-nomemory": 0.578819,
+            "L-SW-queue": 0.072352
+          },
+          "value": 0.549115
+        },
+        "weak|4": {
+          "cap_ok": true,
+          "fq_pct": 8.856,
+          "nominal": {
+            "L-BT-0.5-f0": 0.506505,
+            "L-RO-c4-p1-d3": 0.328996,
+            "L-SW-nomemory": 0.164498
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.501039,
+            "L-RO-c4-p1-d3": 0.498961
+          },
+          "value": 0.407554
+        },
+        "weak|8": {
+          "cap_ok": true,
+          "fq_pct": 9.562,
+          "nominal": {
+            "L-BT-0.5-f0": 0.387513,
+            "L-RO-c4-p2-d2": 0.242589,
+            "L-SW-nomemory": 0.369898
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.392035,
+            "L-RO-c4-p2-d3": 0.179463,
+            "L-SW-nomemory": 0.428503
+          },
+          "value": 0.309981
+        },
+        "weak|all": {
+          "cap_ok": true,
+          "fq_pct": 0.09,
+          "nominal": {
+            "L-BT-0.5-f0": 0.680059,
+            "L-SW-commit3": 0.105458,
+            "L-SW-nomemory": 0.141445,
+            "L-SW-queue": 0.073038
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.994135,
+            "L-SW-nomemory": 0.005214,
+            "L-SW-queue": 0.000652
+          },
+          "value": 0.82208
+        }
+      },
+      "tau5": 0.1
+    },
+    "0.25": {
+      "eta_q": 0.0,
+      "mix": {
+        "mid|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.767857
+        },
+        "mid|1": {
+          "cap_ok": true,
+          "fq_pct": 9.717,
+          "nominal": {
+            "L-BT-0.5-f0": 0.072431,
+            "L-SW-nomemory": 0.618379,
+            "L-SW-queue": 0.30919
+          },
+          "pure": "L-SW-nomemory",
+          "robust": {
+            "L-BT-0.5-f0": 0.087209,
+            "L-SW-nomemory": 0.504406,
+            "L-SW-queue": 0.328915,
+            "L-SW-skill": 0.07947
+          },
+          "value": 0.58409
+        },
+        "mid|2": {
+          "cap_ok": true,
+          "fq_pct": 6.955,
+          "nominal": {
+            "L-BT-0.5-f0": 0.298055,
+            "L-RO-c3-p1-d3": 0.032995,
+            "L-SW-nomemory": 0.604347,
+            "L-SW-queue": 0.064603
+          },
+          "pure": "L-SW-nomemory",
+          "robust": {
+            "L-BT-0.5-f0": 0.361965,
+            "L-RO-c3-p1-d3": 0.207962,
+            "L-SW-nomemory": 0.423176,
+            "L-SW-skill": 0.006897
+          },
+          "value": 0.487225
+        },
+        "mid|4": {
+          "cap_ok": true,
+          "fq_pct": 5.96,
+          "nominal": {
+            "L-BT-0.5-f0": 0.547003,
+            "L-RO-c4-p1-d3": 0.452997
+          },
+          "pure": "L-SW-nomemory",
+          "robust": {
+            "L-BT-0.5-f0": 0.517931,
+            "L-RO-c4-p1-d3": 0.482069
+          },
+          "value": 0.386253
+        },
+        "mid|8": {
+          "cap_ok": true,
+          "fq_pct": 6.114,
+          "nominal": {
+            "L-BT-0.5-f0": 0.330392,
+            "L-RO-c4-p2-d3": 0.16297,
+            "L-SW-commit3": 0.155845,
+            "L-SW-nomemory": 0.350793
+          },
+          "pure": "L-SW-nomemory",
+          "robust": {
+            "L-BT-0.5-f0": 0.404972,
+            "L-RO-c4-p2-d3": 0.143956,
+            "L-SW-nomemory": 0.451071
+          },
+          "value": 0.295922
+        },
+        "mid|all": {
+          "cap_ok": true,
+          "fq_pct": 0.072,
+          "nominal": {
+            "L-BT-0.5-f0": 0.761062,
+            "L-SW-nomemory": 0.159292,
+            "L-SW-queue": 0.079646
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.992833,
+            "L-SW-nomemory": 0.006426,
+            "L-SW-queue": 0.000741
+          },
+          "value": 0.768921
+        },
+        "strong|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.785714
+        },
+        "strong|1": {
+          "cap_ok": true,
+          "fq_pct": 5.659,
+          "nominal": {
+            "L-BT-0.5-f0": 0.083482,
+            "L-SW-nomemory": 0.583239,
+            "L-SW-queue": 0.333279
+          },
+          "pure": "L-SW-nomemory",
+          "robust": {
+            "L-BT-0.5-f0": 0.14302,
+            "L-SW-nomemory": 0.209012,
+            "L-SW-queue": 0.441557,
+            "L-SW-skill": 0.206411
+          },
+          "value": 0.59479
+        },
+        "strong|2": {
+          "cap_ok": true,
+          "fq_pct": 4.065,
+          "nominal": {
+            "L-BT-0.5-f0": 0.270957,
+            "L-SW-nomemory": 0.628486,
+            "L-SW-queue": 0.100558
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.336643,
+            "L-RO-c3-p1-d2": 0.188737,
+            "L-SW-nomemory": 0.455376,
+            "L-SW-queue": 0.019244
+          },
+          "value": 0.500439
+        },
+        "strong|4": {
+          "cap_ok": true,
+          "fq_pct": 3.777,
+          "nominal": {
+            "L-BT-0.5-f0": 0.526676,
+            "L-RO-c4-p1-d2": 0.473324
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.501175,
+            "L-RO-c4-p1-d2": 0.498825
+          },
+          "value": 0.390746
+        },
+        "strong|8": {
+          "cap_ok": true,
+          "fq_pct": 3.554,
+          "nominal": {
+            "L-BT-0.5-f0": 0.354633,
+            "L-RO-c4-p2-d2": 0.174811,
+            "L-SW-commit3": 0.066351,
+            "L-SW-nomemory": 0.404205
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.373215,
+            "L-RO-c4-p2-d2": 0.107109,
+            "L-RO-c4-p2-d3": 0.031736,
+            "L-SW-nomemory": 0.48794
+          },
+          "value": 0.297525
+        },
+        "strong|all": {
+          "cap_ok": true,
+          "fq_pct": 0.352,
+          "nominal": {
+            "L-BT-0.5-f0": 0.716066,
+            "L-SW-nomemory": 0.188971,
+            "L-SW-queue": 0.094963
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.936275,
+            "L-SW-nomemory": 0.055228,
+            "L-SW-queue": 0.008497
+          },
+          "value": 0.795121
+        },
+        "weak|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.75
+        },
+        "weak|1": {
+          "cap_ok": true,
+          "fq_pct": 10.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.35327,
+            "L-SW-nomemory": 0.440952,
+            "L-SW-queue": 0.205778
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.364633,
+            "L-SW-nomemory": 0.462085,
+            "L-SW-queue": 0.173282
+          },
+          "value": 0.623519
+        },
+        "weak|2": {
+          "cap_ok": true,
+          "fq_pct": 10.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.326864,
+            "L-SW-nomemory": 0.619285,
+            "L-SW-queue": 0.053851
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.344938,
+            "L-SW-nomemory": 0.604672,
+            "L-SW-queue": 0.050389
+          },
+          "value": 0.516584
+        },
+        "weak|4": {
+          "cap_ok": true,
+          "fq_pct": 8.09,
+          "nominal": {
+            "L-BT-0.5-f0": 0.578874,
+            "L-RO-c4-p1-d3": 0.421126
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.544205,
+            "L-RO-c4-p1-d3": 0.455795
+          },
+          "value": 0.375179
+        },
+        "weak|8": {
+          "cap_ok": true,
+          "fq_pct": 8.452,
+          "nominal": {
+            "L-BT-0.5-f0": 0.433334,
+            "L-RO-c4-p2-d2": 0.227236,
+            "L-RO-c4-p2-d3": 0.00458,
+            "L-SW-nomemory": 0.334849
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.463872,
+            "L-RO-c4-p2-d3": 0.168778,
+            "L-SW-nomemory": 0.36735
+          },
+          "value": 0.278209
+        },
+        "weak|all": {
+          "cap_ok": true,
+          "fq_pct": 0.127,
+          "nominal": {
+            "L-BT-0.5-f0": 0.76913,
+            "L-SW-nomemory": 0.205285,
+            "L-SW-queue": 0.025585
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.991691,
+            "L-SW-nomemory": 0.00767,
+            "L-SW-queue": 0.000639
+          },
+          "value": 0.75137
+        }
+      },
+      "tau5": 0.1
+    },
+    "0.5": {
+      "eta_q": 0.0,
+      "mix": {
+        "mid|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.625
+        },
+        "mid|1": {
+          "cap_ok": true,
+          "fq_pct": 8.877,
+          "nominal": {
+            "L-BT-0.5-f0": 0.301348,
+            "L-SW-queue": 0.459114,
+            "L-SW-skill": 0.239538
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.150849,
+            "L-SW-nomemory": 0.525665,
+            "L-SW-queue": 0.323486
+          },
+          "value": 0.533468
+        },
+        "mid|2": {
+          "cap_ok": true,
+          "fq_pct": 6.149,
+          "nominal": {
+            "L-BT-0.5-f0": 0.380617,
+            "L-SW-nomemory": 0.550563,
+            "L-SW-queue": 0.06882
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.388003,
+            "L-SW-nomemory": 0.546426,
+            "L-SW-queue": 0.065571
+          },
+          "value": 0.419429
+        },
+        "mid|4": {
+          "cap_ok": true,
+          "fq_pct": 4.453,
+          "nominal": {
+            "L-BT-0.5-f0": 0.667983,
+            "L-RO-c4-p1-d3": 0.332017
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.639825,
+            "L-RO-c4-p1-d3": 0.360175
+          },
+          "value": 0.292801
+        },
+        "mid|8": {
+          "cap_ok": true,
+          "fq_pct": 4.798,
+          "nominal": {
+            "L-BT-0.5-f0": 0.475023,
+            "L-RO-c4-p2-d3": 0.201098,
+            "L-SW-nomemory": 0.323879
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.532953,
+            "L-RO-c4-p2-d3": 0.111745,
+            "L-SW-nomemory": 0.355302
+          },
+          "value": 0.238312
+        },
+        "mid|all": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.939726,
+            "L-SW-nomemory": 0.045714,
+            "L-SW-queue": 0.01456
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.625
+        },
+        "strong|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.625
+        },
+        "strong|1": {
+          "cap_ok": true,
+          "fq_pct": 4.974,
+          "nominal": {
+            "L-BT-0.5-f0": 0.185558,
+            "L-SW-nomemory": 0.444241,
+            "L-SW-queue": 0.370201
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.160042,
+            "L-SW-nomemory": 0.496339,
+            "L-SW-queue": 0.343619
+          },
+          "value": 0.53184
+        },
+        "strong|2": {
+          "cap_ok": true,
+          "fq_pct": 3.355,
+          "nominal": {
+            "L-BT-0.5-f0": 0.380617,
+            "L-SW-nomemory": 0.550563,
+            "L-SW-queue": 0.06882
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.388003,
+            "L-SW-nomemory": 0.546426,
+            "L-SW-queue": 0.065571
+          },
+          "value": 0.419429
+        },
+        "strong|4": {
+          "cap_ok": true,
+          "fq_pct": 2.792,
+          "nominal": {
+            "L-BT-0.5-f0": 0.657765,
+            "L-RO-c4-p1-d2": 0.342235
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.631231,
+            "L-RO-c4-p1-d2": 0.368768
+          },
+          "value": 0.288869
+        },
+        "strong|8": {
+          "cap_ok": true,
+          "fq_pct": 2.759,
+          "nominal": {
+            "L-BT-0.5-f0": 0.470161,
+            "L-RO-c4-p2-d2": 0.17162,
+            "L-SW-nomemory": 0.358218
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.512965,
+            "L-RO-c4-p2-d2": 0.083228,
+            "L-RO-c4-p2-d3": 0.02466,
+            "L-SW-nomemory": 0.379148
+          },
+          "value": 0.231188
+        },
+        "strong|all": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.889233,
+            "L-SW-nomemory": 0.060418,
+            "L-SW-queue": 0.050349
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.625
+        },
+        "weak|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.625
+        },
+        "weak|1": {
+          "cap_ok": true,
+          "fq_pct": 10.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.42885,
+            "L-SW-queue": 0.355039,
+            "L-SW-skill": 0.216111
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.374701,
+            "L-SW-nomemory": 0.390812,
+            "L-SW-queue": 0.234487
+          },
+          "value": 0.567581
+        },
+        "weak|2": {
+          "cap_ok": true,
+          "fq_pct": 9.682,
+          "nominal": {
+            "L-BT-0.5-f0": 0.356595,
+            "L-SW-nomemory": 0.589788,
+            "L-SW-queue": 0.053617
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.366436,
+            "L-SW-nomemory": 0.582878,
+            "L-SW-queue": 0.050685
+          },
+          "value": 0.438452
+        },
+        "weak|4": {
+          "cap_ok": true,
+          "fq_pct": 6.416,
+          "nominal": {
+            "L-BT-0.5-f0": 0.673281,
+            "L-RO-c4-p1-d3": 0.326719
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.638508,
+            "L-RO-c4-p1-d3": 0.361492
+          },
+          "value": 0.304452
+        },
+        "weak|8": {
+          "cap_ok": true,
+          "fq_pct": 7.129,
+          "nominal": {
+            "L-BT-0.5-f0": 0.508494,
+            "L-RO-c4-p2-d2": 0.214146,
+            "L-SW-nomemory": 0.27736
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.547211,
+            "L-RO-c4-p2-d2": 0.156384,
+            "L-SW-nomemory": 0.296406
+          },
+          "value": 0.241351
+        },
+        "weak|all": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.818966,
+            "L-SW-nomemory": 0.105603,
+            "L-SW-queue": 0.075431
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.625
+        }
+      },
+      "tau5": 0.0
+    },
+    "1": {
+      "eta_q": 0.3543,
+      "mix": {
+        "mid|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.160714
+        },
+        "mid|1": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.111111
+        },
+        "mid|2": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.210526
+        },
+        "mid|4": {
+          "cap_ok": true,
+          "fq_pct": 0.081,
+          "nominal": {
+            "L-BT-0.5-f0": 0.886834,
+            "L-RO-c3-p1-d3": 0.09902,
+            "L-SW-queue": 0.014146
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.860208,
+            "L-RO-c3-p1-d3": 0.109402,
+            "L-SW-queue": 0.03039
+          },
+          "value": 0.144404
+        },
+        "mid|8": {
+          "cap_ok": true,
+          "fq_pct": 0.192,
+          "nominal": {
+            "L-BT-0.5-f0": 0.647883,
+            "L-RO-c4-p2-d3": 0.152924,
+            "L-SW-nomemory": 0.199193
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.765226,
+            "L-RO-c4-p2-d3": 0.234774
+          },
+          "value": 0.149312
+        },
+        "mid|all": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 0.990222,
+            "L-SW-nomemory": 0.007556,
+            "L-SW-queue": 0.002222
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.210526
+        },
+        "strong|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.038462
+        },
+        "strong|1": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.037037
+        },
+        "strong|2": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.140351
+        },
+        "strong|4": {
+          "cap_ok": true,
+          "fq_pct": 0.062,
+          "nominal": {
+            "L-BT-0.5-f0": 0.92629,
+            "L-RO-c4-p1-d3": 0.07371
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.918727,
+            "L-RO-c4-p1-d3": 0.081273
+          },
+          "value": 0.063664
+        },
+        "strong|8": {
+          "cap_ok": true,
+          "fq_pct": 0.186,
+          "nominal": {
+            "L-BT-0.5-f0": 0.669778,
+            "L-RO-c4-p2-d3": 0.106962,
+            "L-SW-nomemory": 0.223259
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.76161,
+            "L-RO-c4-p2-d3": 0.23839
+          },
+          "value": 0.130031
+        },
+        "strong|all": {
+          "cap_ok": true,
+          "fq_pct": 0.106,
+          "nominal": {
+            "L-BT-0.5-f0": 0.888013,
+            "L-RO-c3-p1-d3": 0.061084,
+            "L-SW-nomemory": 0.050903
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.890754,
+            "L-RO-c3-p1-d3": 0.049657,
+            "L-SW-nomemory": 0.059589
+          },
+          "value": 0.154987
+        },
+        "weak|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.269231
+        },
+        "weak|1": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.265306
+        },
+        "weak|2": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.298246
+        },
+        "weak|4": {
+          "cap_ok": true,
+          "fq_pct": 0.289,
+          "nominal": {
+            "L-BT-0.5-f0": 0.618605,
+            "L-SW-nomemory": 0.381395
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.580485,
+            "L-SW-nomemory": 0.402036,
+            "L-SW-queue": 0.01748
+          },
+          "value": 0.301357
+        },
+        "weak|8": {
+          "cap_ok": true,
+          "fq_pct": 0.184,
+          "nominal": {
+            "L-BT-0.3-f0": 0.010953,
+            "L-BT-0.3-f1": 0.14928,
+            "L-BT-0.5-f0": 0.70144,
+            "L-SW-nomemory": 0.138327
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.690519,
+            "L-RO-c3-p2-d3": 0.10316,
+            "L-RO-c4-p1-d3": 0.010733,
+            "L-SW-nomemory": 0.195588
+          },
+          "value": 0.215193
+        },
+        "weak|all": {
+          "cap_ok": true,
+          "fq_pct": 0.1,
+          "nominal": {
+            "L-BT-0.5-f0": 0.945887,
+            "L-SW-nomemory": 0.054113
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.854782,
+            "L-SW-nomemory": 0.139167,
+            "L-SW-queue": 0.006051
+          },
+          "value": 0.325959
+        }
+      },
+      "tau5": 0.0
+    }
+  }
+}

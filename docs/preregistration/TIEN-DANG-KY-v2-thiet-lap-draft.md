@@ -339,3 +339,8 @@ Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết 
   - cột tinh chỉnh: `['branch-last-ingress-e0.6', 'branch-mid-ingress-e0.6', 'memory-first-write-e0.6', 'queue-first-write-e0.6', 'skill-first-write-e0.6', 'skill-last-ingress-e0.6']`
 - Task 10, Step 0: HEADLINE_RHO = None (thầy chưa chọn); kết quả chính là đường theo ρ.
 - Task 10, Step 1 (gate thời gian): 0.99 ms/run over 516 runs; tuning: 3.1e+06 runs -> 0.09 h on 10 cores (cap 8 h); eval: 1.15e+07 runs -> 0.32 h on 10 cores (cap 8 h)
+- Task 10, Step 5–6 (tinh chỉnh trên dev, sau D32; log ở `auditgame/spikes/v2/select-log.txt`):
+  - β̂: `{'memory': 0.3058, 'skill': 0.0654, 'queue': 0.0326, 'branch': 0.0141}`; thế giới `{'memory': 0.314, 'skill': 0.058, 'queue': 0.033, 'branch': 0.0}`
+  - ρ = 0 / 0,25 / 0,5 / 1: τ₅ = `0.1 / 0.1 / 0.0 / 0.0`, η_Q = `0.0 / 0.0 / 0.0 / 0.3543`
+  - Mỗi ρ có 18 ô mixture, tổng trọng số bằng 1, `cap_ok` đều True: D26 không có ô nào phải khai.
+  - D32 đổi 2/72 ô mixture (ρ = 0, strong, Δ = 0 và all), không đổi `pure` ở ô nào, và không đổi τ₅ hay η_Q.
