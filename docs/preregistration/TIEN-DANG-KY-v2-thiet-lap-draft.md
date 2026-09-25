@@ -327,3 +327,5 @@ Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết 
 - Task 5 (attacker, D7/D18):
   - held-out: `['branch-first-write-e0.6', 'memory-last-ingress-e0.3', 'memory-last-write-e0.6', 'memory-mid-write-e0.3', 'queue-last-ingress-e0.6', 'queue-mid-write-e0.6', 'skill-last-write-e1.0']`
   - cột tinh chỉnh: `['branch-last-ingress-e0.6', 'branch-mid-ingress-e0.6', 'memory-first-write-e0.6', 'queue-first-write-e0.6', 'skill-first-write-e0.6', 'skill-last-ingress-e0.6']`
+- Task 10, Step 0: HEADLINE_RHO = None (thầy chưa chọn); kết quả chính là đường theo ρ.
+- Task 10, Step 1 (gate thời gian): 0.99 ms/run over 516 runs; tuning: 3.1e+06 runs -> 0.09 h on 10 cores (cap 8 h); eval: 1.15e+07 runs -> 0.32 h on 10 cores (cap 8 h)
