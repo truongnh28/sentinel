@@ -25,6 +25,14 @@ def pool_of(wf) -> str:
     return _POOL_OF[wf.repo]
 
 
+def _family_sizes(wfs: list) -> dict:
+    """Workflows per repo family."""
+    size: dict = {}
+    for w in wfs:
+        size[w.repo] = size.get(w.repo, 0) + 1
+    return size
+
+
 def make_corpus_v2(n: int = D.N_WORKFLOWS, seed: int = 2027, pools=D.POOLS) -> list:
     key = (n, seed, tuple(pools))
     if key in _CACHE:
@@ -36,7 +44,10 @@ def make_corpus_v2(n: int = D.N_WORKFLOWS, seed: int = 2027, pools=D.POOLS) -> l
         for repo, rows in ds._by_repo().items():
             if repo in by_repo:
                 raise ValueError(f"repo {repo!r} appears in two pools")
-            by_repo[repo], _POOL_OF[repo] = rows, pool
+            if _POOL_OF.setdefault(repo, pool) != pool:
+                raise ValueError(f"repo {repo!r} was built from pool {_POOL_OF[repo]!r} "
+                                 f"earlier and from {pool!r} now")
+            by_repo[repo] = rows
             for r in rows:
                 topic_of[r["instance_id"]] = ds._topic(r)
     wfs = []
@@ -65,16 +76,14 @@ def dev_repos(wfs: list) -> set:
     """D8: the LARGEST families (by workflow count, ties by name) until dev holds
     >= DEV_SHARE.  Decided from counts only: django holds 43% of workflows, and left
     in eval it would make the cluster bootstrap a one-repo interval (Kish ~2.5)."""
-    size = {}
-    for w in wfs:
-        size[w.repo] = size.get(w.repo, 0) + 1
+    size = _family_sizes(wfs)
     fams = sorted(size, key=lambda r: (-size[r], r))
     dev, count = set(), 0
     for r in fams:
         if count >= D.DEV_SHARE * len(wfs):
             break
         dev.add(r)
-        count += sum(1 for w in wfs if w.repo == r)
+        count += size[r]
     return dev
 
 
@@ -85,8 +94,5 @@ def split(wfs: list) -> tuple:
 
 def kish(wfs: list) -> float:
     """Effective number of repo clusters, (sum n)^2 / sum n^2."""
-    size = {}
-    for w in wfs:
-        size[w.repo] = size.get(w.repo, 0) + 1
-    n = list(size.values())
+    n = list(_family_sizes(wfs).values())
     return sum(n) ** 2 / sum(x * x for x in n) if n else 0.0

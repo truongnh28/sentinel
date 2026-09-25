@@ -44,6 +44,18 @@ class TestCorpusV2(unittest.TestCase):
         both_v = [w for w in self.wfs if C.pool_of(w) == "verified"]
         self.assertTrue(set(key(both_v)) <= set(key(only_v)))
 
+    def test_a_repo_cannot_change_pool_between_builds(self):
+        """A repo's pool is fixed the first time it is built; a later build that sees it in
+        another pool must fail loudly, not overwrite pool_of() for earlier workflows."""
+        saved = dict(C._POOL_OF)
+        try:
+            C._POOL_OF["django/django"] = "multilingual"
+            with self.assertRaises(ValueError):
+                C.make_corpus_v2(n=99)            # a fresh cache key forces a rebuild
+        finally:
+            C._POOL_OF.clear()
+            C._POOL_OF.update(saved)
+
 
 if __name__ == "__main__":
     unittest.main()
