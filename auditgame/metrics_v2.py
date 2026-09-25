@@ -54,6 +54,11 @@ def gain_ci(recs, base, cand, attacks, deltas, n_boot=10000, seed=2026, alpha=0.
     that re-maxes over attackers in every resample (D14).  `alpha` is the TWO-SIDED level;
     the 15% statement over the rho curve passes alpha = FAMILY_ALPHA / len(RHO grid) (D25)."""
     tb, tc = harm_table(recs, base, attacks, deltas), harm_table(recs, cand, attacks, deltas)
+    if not tb or not tc:          # a policy with no record in this cell: nothing to resample
+        nan = float("nan")
+        return {"gain": nan, "lo": nan, "hi": nan, "abs_diff": nan, "abs_lo": nan, "abs_hi": nan,
+                "alpha": alpha, "v_base": nan, "v_cand": nan, "n_zero_base": 0, "base_events": 0,
+                "rel_reliable": False, "n_repos": 0, "n_workflows": 0}
     wfs, repos, by_repo = _clusters(recs, tb)
     vb, vc = value(tb), value(tc)
     point = 100.0 * (vb - vc) / vb if vb else float("nan")
@@ -87,7 +92,12 @@ def gain_vs_best(recs, baselines, cand, attacks, deltas, n_boot=10000, seed=2026
     difference (positive = candidate better).  The best baseline is re-chosen inside every
     resample, so the interval pays for the selection."""
     tabs = {b: harm_table(recs, b, attacks, deltas) for b in baselines}
+    tabs = {b: t for b, t in tabs.items() if t}      # a baseline with no record here cannot be best
     tc = harm_table(recs, cand, attacks, deltas)
+    if not tabs or not tc:
+        nan = float("nan")
+        return {"best_baseline": None, "v_best": nan, "v_cand": nan, "abs_diff": nan,
+                "abs_lo": nan, "abs_hi": nan, "n_repos": 0, "n_workflows": 0}
     wfs, repos, by_repo = _clusters(recs, tc)
     vals = {b: value(t) for b, t in tabs.items()}
     best = min(vals, key=lambda b: (vals[b], b))

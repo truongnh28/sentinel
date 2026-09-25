@@ -84,6 +84,14 @@ class TestMetricsV2(unittest.TestCase):
         self.assertFalse(M.controls(0.2, 0.6, {"B3": 0.8})["positive_ok"])
         self.assertFalse(M.controls(0.01, 0.6, {"B3": 0.5})["negative_ok"])
 
+    def test_a_policy_without_records_gives_nan_not_a_fake_interval(self):
+        g = M.gain_ci(self.recs, "B1", "NOPE", ["a", "b"], [4], n_boot=50)
+        for k in ("gain", "lo", "hi", "abs_diff", "abs_lo", "abs_hi"):
+            self.assertNotEqual(g[k], g[k], k)                  # NaN
+        self.assertFalse(g["rel_reliable"])
+        v = M.gain_vs_best(self.recs, ["B1", "NOPE"], "S", ["a", "b"], [4], n_boot=50)
+        self.assertEqual(v["best_baseline"], "B1")               # an empty baseline cannot win
+
 
 if __name__ == "__main__":
     unittest.main()
