@@ -274,8 +274,10 @@ def _completeness_reasons(by, brs, split, out_dir) -> list:
 
 def summarise(split, out_dir, meta) -> dict:
     ho, hd = A.held_out(), list(D.HEADLINE_DELTAS)
-    recs = [json.loads(line) for line in open(out_dir / MAIN)]
-    brs = [json.loads(line) for line in open(out_dir / BR)]
+    with open(out_dir / MAIN) as fh:
+        recs = [json.loads(line) for line in fh]
+    with open(out_dir / BR) as fh:
+        brs = [json.loads(line) for line in fh]
     d35 = X.load_d35()
     out = {"run": meta, "alpha": ALPHA, "n_boot": N_BOOT, "reproduction": {}, "rows": {}}
     by = {f"{rho:g}": [r for r in recs if r["rho_patch"] == rho] for rho in D.RHO_PATCH_GRID}
