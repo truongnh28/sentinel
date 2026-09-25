@@ -91,6 +91,12 @@ class TestMetricsV2(unittest.TestCase):
         self.assertFalse(g["rel_reliable"])
         v = M.gain_vs_best(self.recs, ["B1", "NOPE"], "S", ["a", "b"], [4], n_boot=50)
         self.assertEqual(v["best_baseline"], "B1")               # an empty baseline cannot win
+        # ... not even inside a resample: before the fix NOPE's 0.0 won every draw (-0.5 here)
+        self.assertAlmostEqual(v["abs_lo"], 0.5)
+        self.assertAlmostEqual(v["abs_hi"], 0.5)
+        none = M.gain_vs_best(self.recs, ["NOPE"], "S", ["a", "b"], [4], n_boot=50)
+        self.assertIsNone(none["best_baseline"])
+        self.assertNotEqual(none["abs_diff"], none["abs_diff"])  # NaN
 
 
 if __name__ == "__main__":
