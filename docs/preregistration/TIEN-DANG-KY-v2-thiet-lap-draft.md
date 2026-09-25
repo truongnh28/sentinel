@@ -105,6 +105,18 @@ D32 Sai lệch đã khai (25/09, sau lượt tinh chỉnh đầu trên dev, trư
       - Đổi thật 2/72 ô (ρ = 0, strong, Δ = 0 và all): FQ 5,3% và 7,5% về 0%.
       - Ô endpoint (mid, Δ ∈ {4, 8}) không suy biến.
     - Học viên quyết định ngày 25/09, trước khi đóng băng; tập eval không được dùng.
+D33 Sai lệch đã khai (25/09, sau đóng băng, TRƯỚC lượt eval; review công cụ eval):
+    Code của plan cho `tools/run_draft_eval.py` chưa khớp vài quyết định ở trên. Sửa cho khớp;
+    không record mô phỏng nào đổi.
+    - D14: mọi CI dùng 10.000 lượt (plan để 2.000 ở hình Δ và các phép quét); mỗi CI ghi n_boot.
+    - D15: báo L tệ nhất cạnh V.
+    - D28: đối chứng hỏng thì không tính, không in số Sentinel nào.
+    - N3/Q6: mọi dòng ghi N workflow, N repo, N episode; ghi số cấu hình bị loại và lý do.
+    - Chạy tập eval chỉ khi header freeze sạch, kiểm lại trước khi tóm tắt.
+    - Dòng chuyển giao: giữ dòng 11 attacker development, thêm dòng 6 cột tinh chỉnh (D18).
+      3 trong 11 attacker development có khoá hành vi trùng held-out.
+    - Record thô (≈ 5 GB) không commit; commit tóm tắt và sha256 của từng file record.
+    - Học viên quyết định ngày 25/09; tập eval chưa được chạy.
 
 ## Endpoint chính
 Đường endpoint theo ρ_patch (curve_rho):
