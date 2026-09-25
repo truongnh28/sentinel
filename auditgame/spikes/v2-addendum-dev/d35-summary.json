@@ -32,14 +32,15 @@
       "B2 FQ-matched",
       "A1 fixed interleave"
     ],
-    "header": "freeze-d35: NONE  |  base freeze: clean sha256:c789fa7362e0",
-    "git_head": "a43e99a",
+    "header_start": "freeze-d35: NONE  |  base freeze: clean sha256:c789fa7362e0",
+    "git_head": "71421cd",
     "git_clean": false,
     "sha256": {
-      "tools/run_d35.py": "cd6056642dbc5ed5f39fee10b5a7952e386f1243420e25f224491f66667ed5d7",
+      "tools/run_d35.py": "b0bcae3bf94ec9b458132f72638507a98cf942ebe847f209b35e5fa86d32c906",
       "tools/tune_d35.py": "93ff133cf5034c657aae079422629a29cd5b569061212d69576874001b5a19ac",
-      "freeze_d35.py": "18242717b3e2c5ba726634c88fb527c9536b64fbc9becf7e5c976d72c09ae081"
-    }
+      "freeze_d35.py": "90538fcee81d3c738775a2dc702544ce9900aa5131d6ac0883aaa24623ae0513"
+    },
+    "header_summary": "freeze-d35: NONE  |  base freeze: clean sha256:c789fa7362e0"
   },
   "alpha": 0.0125,
   "n_boot": 10000,
@@ -79,6 +80,11 @@
         "false_removed_per_ep": 0.0,
         "detection_delay": 5.610099337748345,
         "v_br": 0.7472,
+        "v_br_by_delta": {
+          "4": 0.6961,
+          "8": 0.7472
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115
@@ -91,6 +97,11 @@
         "false_removed_per_ep": 1.7804173354735153,
         "detection_delay": 3.15547520661157,
         "v_br": 0.3105,
+        "v_br_by_delta": {
+          "4": 0.2971,
+          "8": 0.3105
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115
@@ -103,6 +114,11 @@
         "false_removed_per_ep": 1.6321027287319423,
         "detection_delay": 3.1674958540630183,
         "v_br": 0.3479,
+        "v_br_by_delta": {
+          "4": 0.3479,
+          "8": 0.2957
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -123,18 +139,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 7.25,
-          "lo": 7.247,
-          "hi": 7.247,
           "abs_diff": 0.0293,
           "abs_lo": 0.0293,
           "abs_hi": 0.0293,
           "alpha": 0.0125,
-          "v_base": 0.4049,
-          "v_cand": 0.3756,
-          "n_zero_base": 0,
-          "base_events": 68,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -148,6 +156,11 @@
         "false_removed_per_ep": 1.859390048154093,
         "detection_delay": 2.9017857142857144,
         "v_br": 0.3864,
+        "v_br_by_delta": {
+          "4": 0.3864,
+          "8": 0.2957
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -168,18 +181,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 15.91,
-          "lo": 15.9126,
-          "hi": 15.9126,
           "abs_diff": 0.0711,
           "abs_lo": 0.0711,
           "abs_hi": 0.0711,
           "alpha": 0.0125,
-          "v_base": 0.4467,
-          "v_cand": 0.3756,
-          "n_zero_base": 0,
-          "base_events": 119,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -193,6 +198,11 @@
         "false_removed_per_ep": 1.9839486356340288,
         "detection_delay": 2.7362880886426595,
         "v_br": 0.5769,
+        "v_br_by_delta": {
+          "4": 0.5769,
+          "8": 0.3923
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -213,18 +223,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 31.78,
-          "lo": 31.7778,
-          "hi": 31.7778,
           "abs_diff": 0.175,
           "abs_lo": 0.175,
           "abs_hi": 0.175,
           "alpha": 0.0125,
-          "v_base": 0.5506,
-          "v_cand": 0.3756,
-          "n_zero_base": 0,
-          "base_events": 148,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -238,6 +240,11 @@
         "false_removed_per_ep": 0.6812199036918138,
         "detection_delay": 4.760126582278481,
         "v_br": 0.6213,
+        "v_br_by_delta": {
+          "4": 0.6213,
+          "8": 0.5574
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -258,18 +265,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 42.95,
-          "lo": 42.9549,
-          "hi": 42.9549,
           "abs_diff": 0.2828,
           "abs_lo": 0.2828,
           "abs_hi": 0.2828,
           "alpha": 0.0125,
-          "v_base": 0.6584,
-          "v_cand": 0.3756,
-          "n_zero_base": 0,
-          "base_events": 175,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -296,6 +295,11 @@
         "false_removed_per_ep": 3.2186195826645263,
         "detection_delay": 2.354862385321101,
         "v_br": 0.8506,
+        "v_br_by_delta": {
+          "4": 0.8196,
+          "8": 0.8506
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -316,18 +320,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 48.62,
-          "lo": 48.617,
-          "hi": 48.617,
           "abs_diff": 0.3554,
           "abs_lo": 0.3554,
           "abs_hi": 0.3554,
           "alpha": 0.0125,
-          "v_base": 0.731,
-          "v_cand": 0.3756,
-          "n_zero_base": 0,
-          "base_events": 132,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -356,6 +352,11 @@
         "false_removed_per_ep": 0.0,
         "detection_delay": 5.590007347538575,
         "v_br": 0.5938,
+        "v_br_by_delta": {
+          "4": 0.5938,
+          "8": 0.5636
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115
@@ -368,6 +369,11 @@
         "false_removed_per_ep": 1.6731942215088282,
         "detection_delay": 3.3189522342064715,
         "v_br": 0.2769,
+        "v_br_by_delta": {
+          "4": 0.2597,
+          "8": 0.2769
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115
@@ -380,6 +386,11 @@
         "false_removed_per_ep": 1.5396468699839487,
         "detection_delay": 3.374108612177729,
         "v_br": 0.3504,
+        "v_br_by_delta": {
+          "4": 0.3504,
+          "8": 0.2769
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -400,18 +411,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 6.2,
-          "lo": 6.1967,
-          "hi": 6.1967,
           "abs_diff": 0.0229,
           "abs_lo": 0.0229,
           "abs_hi": 0.0229,
           "alpha": 0.0125,
-          "v_base": 0.3689,
-          "v_cand": 0.346,
-          "n_zero_base": 0,
-          "base_events": 95,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -425,6 +428,11 @@
         "false_removed_per_ep": 1.7720706260032102,
         "detection_delay": 3.062694300518135,
         "v_br": 0.3888,
+        "v_br_by_delta": {
+          "4": 0.3888,
+          "8": 0.2769
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -445,18 +453,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 16.16,
-          "lo": 16.1613,
-          "hi": 16.1613,
           "abs_diff": 0.0667,
           "abs_lo": 0.0667,
           "abs_hi": 0.0667,
           "alpha": 0.0125,
-          "v_base": 0.4127,
-          "v_cand": 0.346,
-          "n_zero_base": 0,
-          "base_events": 111,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -470,6 +470,11 @@
         "false_removed_per_ep": 1.9322632423756019,
         "detection_delay": 2.8285714285714287,
         "v_br": 0.5996,
+        "v_br_by_delta": {
+          "4": 0.5996,
+          "8": 0.3367
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -490,18 +495,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 35.05,
-          "lo": 35.0539,
-          "hi": 35.0539,
           "abs_diff": 0.1868,
           "abs_lo": 0.1868,
           "abs_hi": 0.1868,
           "alpha": 0.0125,
-          "v_base": 0.5328,
-          "v_cand": 0.346,
-          "n_zero_base": 0,
-          "base_events": 143,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -515,6 +512,11 @@
         "false_removed_per_ep": 0.6812199036918138,
         "detection_delay": 4.786943620178041,
         "v_br": 0.5161,
+        "v_br_by_delta": {
+          "4": 0.5161,
+          "8": 0.442
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -535,18 +537,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 40.15,
-          "lo": 40.1462,
-          "hi": 40.1462,
           "abs_diff": 0.2321,
           "abs_lo": 0.2321,
           "abs_hi": 0.2321,
           "alpha": 0.0125,
-          "v_base": 0.5781,
-          "v_cand": 0.346,
-          "n_zero_base": 0,
-          "base_events": 151,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -573,6 +567,11 @@
         "false_removed_per_ep": 3.2186195826645263,
         "detection_delay": 2.3541284403669724,
         "v_br": 0.8506,
+        "v_br_by_delta": {
+          "4": 0.8196,
+          "8": 0.8506
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -593,18 +592,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 52.66,
-          "lo": 52.662,
-          "hi": 52.662,
           "abs_diff": 0.3849,
           "abs_lo": 0.3849,
           "abs_hi": 0.3849,
           "alpha": 0.0125,
-          "v_base": 0.731,
-          "v_cand": 0.346,
-          "n_zero_base": 0,
-          "base_events": 132,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -633,6 +624,11 @@
         "false_removed_per_ep": 0.0,
         "detection_delay": 5.595663265306122,
         "v_br": 0.4154,
+        "v_br_by_delta": {
+          "4": 0.3952,
+          "8": 0.4154
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115
@@ -645,6 +641,11 @@
         "false_removed_per_ep": 1.2815409309791332,
         "detection_delay": 3.8080703569580963,
         "v_br": 0.2432,
+        "v_br_by_delta": {
+          "4": 0.2432,
+          "8": 0.2151
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115
@@ -657,6 +658,11 @@
         "false_removed_per_ep": 1.1858747993579455,
         "detection_delay": 3.8509695290858725,
         "v_br": 0.2407,
+        "v_br_by_delta": {
+          "4": 0.2384,
+          "8": 0.2407
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -677,18 +683,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 16.06,
-          "lo": 16.0559,
-          "hi": 16.0559,
           "abs_diff": 0.0561,
           "abs_lo": 0.0561,
           "abs_hi": 0.0561,
           "alpha": 0.0125,
-          "v_base": 0.3495,
-          "v_cand": 0.2934,
-          "n_zero_base": 0,
-          "base_events": 89,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -702,6 +700,11 @@
         "false_removed_per_ep": 1.2664526484751204,
         "detection_delay": 3.688248095756257,
         "v_br": 0.3293,
+        "v_br_by_delta": {
+          "4": 0.3293,
+          "8": 0.2407
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -722,18 +725,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 10.95,
-          "lo": 10.9465,
-          "hi": 10.9465,
           "abs_diff": 0.0361,
           "abs_lo": 0.0361,
           "abs_hi": 0.0361,
           "alpha": 0.0125,
-          "v_base": 0.3295,
-          "v_cand": 0.2934,
-          "n_zero_base": 0,
-          "base_events": 87,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -747,6 +742,11 @@
         "false_removed_per_ep": 1.552166934189406,
         "detection_delay": 3.3000560852495795,
         "v_br": 0.5384,
+        "v_br_by_delta": {
+          "4": 0.5384,
+          "8": 0.2509
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -767,18 +767,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 40.57,
-          "lo": 40.5749,
-          "hi": 40.5749,
           "abs_diff": 0.2003,
           "abs_lo": 0.2003,
           "abs_hi": 0.2003,
           "alpha": 0.0125,
-          "v_base": 0.4937,
-          "v_cand": 0.2934,
-          "n_zero_base": 0,
-          "base_events": 132,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -792,6 +784,11 @@
         "false_removed_per_ep": 0.32423756019261635,
         "detection_delay": 5.172373766686013,
         "v_br": 0.3837,
+        "v_br_by_delta": {
+          "4": 0.3837,
+          "8": 0.3074
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -812,18 +809,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 33.59,
-          "lo": 33.5861,
-          "hi": 33.5861,
           "abs_diff": 0.1484,
           "abs_lo": 0.1484,
           "abs_hi": 0.1484,
           "alpha": 0.0125,
-          "v_base": 0.4418,
-          "v_cand": 0.2934,
-          "n_zero_base": 0,
-          "base_events": 115,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -850,6 +839,11 @@
         "false_removed_per_ep": 3.2186195826645263,
         "detection_delay": 2.3541284403669724,
         "v_br": 0.8506,
+        "v_br_by_delta": {
+          "4": 0.8196,
+          "8": 0.8506
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -870,18 +864,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 59.86,
-          "lo": 59.8619,
-          "hi": 59.8619,
           "abs_diff": 0.4376,
           "abs_lo": 0.4376,
           "abs_hi": 0.4376,
           "alpha": 0.0125,
-          "v_base": 0.731,
-          "v_cand": 0.2934,
-          "n_zero_base": 0,
-          "base_events": 132,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -910,6 +896,11 @@
         "false_removed_per_ep": 0.0,
         "detection_delay": 5.576357179096905,
         "v_br": 0.1205,
+        "v_br_by_delta": {
+          "4": 0.1205,
+          "8": 0.112
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115
@@ -922,6 +913,11 @@
         "false_removed_per_ep": 0.0507223113964687,
         "detection_delay": 4.808703969392635,
         "v_br": 0.1836,
+        "v_br_by_delta": {
+          "4": 0.1153,
+          "8": 0.1836
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115
@@ -934,6 +930,11 @@
         "false_removed_per_ep": 0.04943820224719101,
         "detection_delay": 4.930827067669173,
         "v_br": 0.1655,
+        "v_br_by_delta": {
+          "4": 0.1655,
+          "8": 0.1272
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -954,18 +955,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 25.21,
-          "lo": 25.2101,
-          "hi": 25.2101,
           "abs_diff": 0.0465,
           "abs_lo": 0.0465,
           "abs_hi": 0.0465,
           "alpha": 0.0125,
-          "v_base": 0.1846,
-          "v_cand": 0.1381,
-          "n_zero_base": 0,
-          "base_events": 50,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -979,6 +972,11 @@
         "false_removed_per_ep": 0.018940609951845908,
         "detection_delay": 5.152929493545184,
         "v_br": 0.1272,
+        "v_br_by_delta": {
+          "4": 0.1205,
+          "8": 0.1272
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -999,18 +997,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": -10.99,
-          "lo": -10.9934,
-          "hi": -10.9934,
           "abs_diff": -0.0137,
           "abs_lo": -0.0137,
           "abs_hi": -0.0137,
           "alpha": 0.0125,
-          "v_base": 0.1244,
-          "v_cand": 0.1381,
-          "n_zero_base": 0,
-          "base_events": 24,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -1024,6 +1014,11 @@
         "false_removed_per_ep": 0.0,
         "detection_delay": 5.576357179096905,
         "v_br": 0.1205,
+        "v_br_by_delta": {
+          "4": 0.1205,
+          "8": 0.112
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -1044,18 +1039,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": -17.77,
-          "lo": -17.7683,
-          "hi": -17.7683,
           "abs_diff": -0.0208,
           "abs_lo": -0.0208,
           "abs_hi": -0.0208,
           "alpha": 0.0125,
-          "v_base": 0.1172,
-          "v_cand": 0.1381,
-          "n_zero_base": 0,
-          "base_events": 32,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -1069,6 +1056,11 @@
         "false_removed_per_ep": 0.0,
         "detection_delay": 5.576357179096905,
         "v_br": 0.1205,
+        "v_br_by_delta": {
+          "4": 0.1205,
+          "8": 0.112
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -1089,18 +1081,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": -17.77,
-          "lo": -17.7683,
-          "hi": -17.7683,
           "abs_diff": -0.0208,
           "abs_lo": -0.0208,
           "abs_hi": -0.0208,
           "alpha": 0.0125,
-          "v_base": 0.1172,
-          "v_cand": 0.1381,
-          "n_zero_base": 0,
-          "base_events": 32,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },
@@ -1127,6 +1111,11 @@
         "false_removed_per_ep": 0.185553772070626,
         "detection_delay": 3.010902747492368,
         "v_br": 0.8506,
+        "v_br_by_delta": {
+          "4": 0.8196,
+          "8": 0.8506
+        },
+        "v_br_nan_deltas": [],
         "n_workflows": 43,
         "n_repos": 1,
         "n_episodes": 3115,
@@ -1147,18 +1136,10 @@
           "n_workflows": 43
         },
         "vs_sentinel": {
-          "gain": 81.11,
-          "lo": 81.1102,
-          "hi": 81.1102,
           "abs_diff": 0.5929,
           "abs_lo": 0.5929,
           "abs_hi": 0.5929,
           "alpha": 0.0125,
-          "v_base": 0.731,
-          "v_cand": 0.1381,
-          "n_zero_base": 0,
-          "base_events": 132,
-          "rel_reliable": true,
           "n_repos": 1,
           "n_workflows": 43
         },

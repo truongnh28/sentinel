@@ -33,7 +33,7 @@ import metrics as M
 import metrics_v2 as MV
 import policies as P
 import sentinel as S
-from tools.run_draft_eval import _write, workflows
+from tools.run_draft_eval import N_BOOT, _write, workflows
 from tools.select_mixture import make_world
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -44,6 +44,9 @@ SYSTEMS = [B1, SA1] + X.ARMS
 ALPHA = D.FAMILY_ALPHA / len(D.RHO_PATCH_GRID)           # 98.75%, per arm (D35)
 MAIN, BR, PIN, SUMMARY = "d35-main.jsonl", "d35-br.jsonl", "d35-records.sha256", "d35-summary.json"
 FIELDS = ("harm", "detected_at", "iota", "n_solved", "t_lost", "false_removed", "benign_inspected")
+#: F6: vs_sentinel = V(arm) - V(Sentinel-A1) is not a gain declared by D35 (D35 declares the gain
+#: over B1 only); the fields that are relative to the arm's own V are dropped.
+VS_SENTINEL_KEYS = ("abs_diff", "abs_lo", "abs_hi", "alpha", "n_repos", "n_workflows")
 
 
 def work(args):
@@ -118,10 +121,36 @@ def pin(out_dir, names) -> pathlib.Path:
     return path
 
 
+def _main_summary_incomplete() -> str | None:
+    """F4 pre-flight: on eval, refuse before any simulation if there is nothing complete to
+    reproduce against -- MAIN_SUMMARY missing, unreadable, or missing worst_case_harm for B1 or
+    Sentinel-A1 at any rho of the grid.  A module attribute (not a parameter) so tests can point
+    it at a temp file without touching the real spikes/v2/eval-summary.json."""
+    if not MAIN_SUMMARY.exists():
+        return f"the main summary is missing: {MAIN_SUMMARY}"
+    try:
+        by_rho = json.loads(MAIN_SUMMARY.read_text()).get("by_rho", {})
+    except json.JSONDecodeError as e:
+        return f"the main summary {MAIN_SUMMARY} could not be parsed: {e}"
+    for rho in D.RHO_PATCH_GRID:
+        rk = f"{rho:g}"
+        table2 = by_rho.get(rk, {}).get("table2", {})
+        for name in (B1, SA1):
+            if table2.get(name, {}).get("worst_case_harm") is None:
+                return (f"the main summary {MAIN_SUMMARY} lacks by_rho[{rk!r}][\"table2\"]"
+                        f"[{name!r}][\"worst_case_harm\"]")
+    return None
+
+
 def refusal(split, header, out_dir, summarise_only) -> str | None:
-    """D35: eval only on a clean D35 freeze over a clean base, and only once."""
+    """D35: eval only on a clean D35 freeze over a clean base, only with a complete main summary
+    to reproduce against (F4), and only once."""
     if split == "eval" and not freeze_d35.clean(header):
         return f"the D35 freeze is not clean: {header}"
+    if split == "eval":
+        why = _main_summary_incomplete()
+        if why:
+            return why
     if not summarise_only and (pathlib.Path(out_dir) / MAIN).exists():
         return f"{pathlib.Path(out_dir) / MAIN} exists: the addendum runs once (D35)"
     return None
@@ -137,18 +166,37 @@ def reproduces(v_b1, v_s, main_rho) -> list:
     return out
 
 
+def _finite(v) -> bool:
+    return v is not None and isinstance(v, (int, float)) and math.isfinite(v)
+
+
 def readings(rows) -> dict:
-    """The declared readings (A), (B), (C) of D35, mechanically."""
+    """The declared readings (A), (B), (C) of D35, mechanically.  F2: a comparison whose input
+    is NaN or None never becomes False -- it is None instead, so an incomplete or NaN run
+    cannot be summarised into a definite reading."""
     low = [rk for rk in rows if float(rk) <= 0.5]
-    a = {arm: all(rows[rk][arm]["vs_b1"]["abs_lo"] > 0 for rk in low)
-         for arm in ("A1 dhat-swap", "A1 dhat-down1")}
-    return {"A_oracle_survives_one_step": all(a.values()), "A_by_arm": a,
-            "B_beats_fq_matched_mix": {rk: rows[rk][X.B2_FQ]["vs_sentinel"]["abs_lo"] > 0
-                                       for rk in rows},
-            "C_scripted_gain_attributable_to_randomisation":
-                {rk: rows[rk][X.FIXED]["vs_sentinel"]["abs_lo"] > 0 for rk in rows},
-            "C_br_fixed_above_sentinel": {rk: rows[rk][X.FIXED]["v_br"] > rows[rk][SA1]["v_br"]
-                                          for rk in rows}}
+    a = {}
+    for arm in ("A1 dhat-swap", "A1 dhat-down1"):
+        los = [rows[rk][arm]["vs_b1"]["abs_lo"] for rk in low]
+        a[arm] = None if not all(_finite(lo) for lo in los) else all(lo > 0 for lo in los)
+    a_survives = None if any(v is None for v in a.values()) else all(a.values())
+
+    def _per_rho_vs_sentinel(arm):
+        out = {}
+        for rk in rows:
+            lo = rows[rk][arm]["vs_sentinel"]["abs_lo"]
+            out[rk] = None if not _finite(lo) else lo > 0
+        return out
+
+    c_br = {}
+    for rk in rows:
+        v_fixed, v_sa1 = rows[rk][X.FIXED]["v_br"], rows[rk][SA1]["v_br"]
+        c_br[rk] = None if not (_finite(v_fixed) and _finite(v_sa1)) else v_fixed > v_sa1
+
+    return {"A_oracle_survives_one_step": a_survives, "A_by_arm": a,
+            "B_beats_fq_matched_mix": _per_rho_vs_sentinel(X.B2_FQ),
+            "C_scripted_gain_attributable_to_randomisation": _per_rho_vs_sentinel(X.FIXED),
+            "C_br_fixed_above_sentinel": c_br}
 
 
 def _v(rs, p, loss=False):
@@ -157,14 +205,91 @@ def _v(rs, p, loss=False):
     return MV.value(MV.harm_table(rs, p, A.held_out(), list(D.HEADLINE_DELTAS)))
 
 
+def _pin_reasons(out_dir) -> list:
+    """F1: the pin check (eval only) -- d35-main.jsonl and d35-br.jsonl must hash to the lines
+    of d35-records.sha256, the same file `pin` wrote at run time."""
+    out_dir = pathlib.Path(out_dir)
+    pin_path = out_dir / PIN
+    if not pin_path.exists():
+        return [f"{pin_path} is missing"]
+    want = {}
+    for line in pin_path.read_text().splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        h, _, name = line.partition("  ")
+        want[name.strip()] = h.strip()
+    reasons = []
+    for name in (MAIN, BR):
+        if name not in want:
+            reasons.append(f"{pin_path} has no line for {name}")
+            continue
+        path = out_dir / name
+        if not path.exists():
+            reasons.append(f"{path} is missing")
+            continue
+        h = hashlib.sha256()
+        with open(path, "rb") as fh:
+            while chunk := fh.read(1 << 20):
+                h.update(chunk)
+        if h.hexdigest() != want[name]:
+            reasons.append(f"{name}: sha256 does not match {pin_path}")
+    return reasons
+
+
+def _completeness_reasons(by, brs, split, out_dir) -> list:
+    """F1: withhold on any incompleteness, BEFORE the reproduction check or any row.
+    Main records: every rho x every system has records, and each system's episode set
+    (wf, attack, delta, seed) equals B1's at that rho.  BR records: exactly one row per
+    (policy, delta, rho) over SYSTEMS x HEADLINE_DELTAS x RHO_PATCH_GRID (56 rows).  Pins
+    (eval only): d35-main.jsonl and d35-br.jsonl hash to d35-records.sha256."""
+    reasons = []
+    for rk, rs in by.items():
+        by_p = {}
+        for r in rs:
+            by_p.setdefault(r["policy"], set()).add((r["wf"], r["attack"], r["delta"], r["seed"]))
+        b1_set = by_p.get(B1, set())
+        if not b1_set:
+            reasons.append(f"no main records for {B1} at rho {rk}")
+        for p in SYSTEMS:
+            eps = by_p.get(p)
+            if not eps:
+                reasons.append(f"no main records for {p} at rho {rk}")
+            elif eps != b1_set:
+                reasons.append(f"{p} at rho {rk}: episodes differ from {B1}")
+    counts = {}
+    for b in brs:
+        key = (b["policy"], b["delta"], b["rho_patch"])
+        counts[key] = counts.get(key, 0) + 1
+    for p in SYSTEMS:
+        for d in D.HEADLINE_DELTAS:
+            for rho in D.RHO_PATCH_GRID:
+                n = counts.get((p, d, rho), 0)
+                if n != 1:
+                    reasons.append(f"d35-br.jsonl has {n} row(s) for ({p}, delta {d}, "
+                                   f"rho {rho:g}), want 1")
+    if split == "eval":
+        reasons.extend(_pin_reasons(out_dir))
+    return reasons
+
+
 def summarise(split, out_dir, meta) -> dict:
     ho, hd = A.held_out(), list(D.HEADLINE_DELTAS)
     recs = [json.loads(line) for line in open(out_dir / MAIN)]
     brs = [json.loads(line) for line in open(out_dir / BR)]
     d35 = X.load_d35()
-    main = json.loads(MAIN_SUMMARY.read_text())["by_rho"] if split == "eval" else None
-    out = {"run": meta, "alpha": ALPHA, "n_boot": 10000, "reproduction": {}, "rows": {}}
+    out = {"run": meta, "alpha": ALPHA, "n_boot": N_BOOT, "reproduction": {}, "rows": {}}
     by = {f"{rho:g}": [r for r in recs if r["rho_patch"] == rho] for rho in D.RHO_PATCH_GRID}
+
+    # F1: completeness before any number -- checked first, in this order (completeness, then
+    # reproduction, then rows), so an incomplete or NaN run cannot be summarised into a
+    # definite reading.
+    incomplete = _completeness_reasons(by, brs, split, out_dir)
+    if incomplete:
+        out["withheld"] = f"D35: incomplete records: {'; '.join(incomplete)}"
+        _write(out_dir / SUMMARY, out)
+        return out
+
+    main = json.loads(MAIN_SUMMARY.read_text())["by_rho"] if split == "eval" else None
     for rk, rs in by.items():
         vb, vs = _v(rs, B1), _v(rs, SA1)
         out["reproduction"][rk] = {B1: vb, SA1: vs, "checked": main is not None,
@@ -179,15 +304,26 @@ def summarise(split, out_dir, meta) -> dict:
         rows = {}
         for p in SYSTEMS:
             prs = [r for r in rs if r["policy"] == p]
-            vbr = [b["v_br"] for b in brs if b["policy"] == p and b["rho_patch"] == rho
-                   and b["v_br"] is not None and math.isfinite(b["v_br"])]
+            # F3: v_br_by_delta / v_br_nan_deltas mirror run_draft_eval._v_br; v_br stays the
+            # max over the finite deltas, NaN if none.
+            by_delta = {b["delta"]: b["v_br"] for b in brs
+                       if b["policy"] == p and b["rho_patch"] == rho}
+            finite_vbr = [v for v in by_delta.values() if v is not None and math.isfinite(v)]
             row = {"V": _v(prs, p), "worst_case_L": _v(prs, p, loss=True),
-                   **MV.side(prs, p, ho, hd), "v_br": max(vbr) if vbr else float("nan"),
+                   **MV.side(prs, p, ho, hd),
+                   "v_br": max(finite_vbr) if finite_vbr else float("nan"),
+                   "v_br_by_delta": {str(d): (v if (v is not None and math.isfinite(v)) else None)
+                                     for d, v in sorted(by_delta.items())},
+                   "v_br_nan_deltas": sorted(d for d, v in by_delta.items()
+                                             if v is None or not math.isfinite(v)),
                    "n_workflows": len({r["wf"] for r in prs}),
                    "n_repos": len({r["repo"] for r in prs}), "n_episodes": len(prs)}
             if p in X.ARMS:
                 row["vs_b1"] = MV.gain_ci(rs, B1, p, ho, hd, alpha=ALPHA)
-                row["vs_sentinel"] = MV.gain_ci(rs, p, SA1, ho, hd, alpha=ALPHA)
+                # F6: vs_sentinel keeps only what D35 defines; the relative-to-V(arm) fields
+                # are dropped (D35 does not declare a gain over Sentinel-A1's V).
+                full = MV.gain_ci(rs, p, SA1, ho, hd, alpha=ALPHA)
+                row["vs_sentinel"] = {k: full[k] for k in VS_SENTINEL_KEYS}
             if p in X.DHAT:
                 row["retained"] = (vb - row["V"]) / (vb - vs) if vb > vs else None
             if p == X.B2_FQ:
@@ -230,7 +366,7 @@ def main(argv=None) -> int:
         print(f"refused (D35): {why}", flush=True)
         return 2
     meta = {"split": a.split, "seeds": list(D.SEEDS), "rhos": list(D.RHO_PATCH_GRID),
-            "deltas": list(D.HEADLINE_DELTAS), "systems": SYSTEMS, "header": header,
+            "deltas": list(D.HEADLINE_DELTAS), "systems": SYSTEMS, "header_start": header,
             **provenance()}
     if not a.summarise_only:
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -242,6 +378,13 @@ def main(argv=None) -> int:
                for d in D.HEADLINE_DELTAS for rho in D.RHO_PATCH_GRID]
         print("br", run(br_work, brs, a.jobs, out_dir / BR), flush=True)
         print("records", pin(out_dir, [MAIN, BR]), flush=True)
+    # F4: the freeze, re-checked just before summarising (after the simulation, or with
+    # --summarise-only) -- an eval run whose freeze drifted mid-run is refused, not summarised.
+    header_summary = freeze_d35.header_line()
+    meta["header_summary"] = header_summary
+    if a.split == "eval" and not freeze_d35.clean(header_summary):
+        print(f"refused (D35): the freeze changed during the run: {header_summary}", flush=True)
+        return 2
     s = summarise(a.split, out_dir, meta)
     return 1 if "withheld" in s else 0
 

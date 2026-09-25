@@ -14,7 +14,7 @@ import freeze
 
 ROOT = pathlib.Path(__file__).resolve().parent
 PATH = ROOT / "frozen" / "MANIFEST-D35.json"
-FILES = ("addendum_d35.py", "reference/d35_tuned.json")
+FILES = ("addendum_d35.py", "reference/d35_tuned.json", "tools/run_d35.py")
 KEYS = ("base_digest", "arms", "fixed_library", "dhat", "p_grid")
 
 
