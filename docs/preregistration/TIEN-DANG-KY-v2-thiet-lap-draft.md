@@ -318,3 +318,12 @@ Giữ D20 của bản 24/09, sửa phần đã cũ:
 
 ---
 
+
+## Ghi nhận khi thực thi
+
+Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết định ở phía trên giữ nguyên.
+
+- Task 2 (corpus, D8): `100 {'verified': 85, 'multilingual': 15} 17 ['django/django'] 43 57 16 8.1`
+- Task 5 (attacker, D7/D18):
+  - held-out: `['branch-first-write-e0.6', 'memory-last-ingress-e0.3', 'memory-last-write-e0.6', 'memory-mid-write-e0.3', 'queue-last-ingress-e0.6', 'queue-mid-write-e0.6', 'skill-last-write-e1.0']`
+  - cột tinh chỉnh: `['branch-last-ingress-e0.6', 'branch-mid-ingress-e0.6', 'memory-first-write-e0.6', 'queue-first-write-e0.6', 'skill-first-write-e0.6', 'skill-last-ingress-e0.6']`
