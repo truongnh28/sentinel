@@ -209,6 +209,23 @@ P3 Gain so với B1 giảm khi ρ tăng, vì B1 yếu nhất với patch uỷ qu
 P4 "A1 −regime estimate" ≈ B1: mixture gộp mọi Δ co về commit.
 P5 Dưới best response cross-fit, "A1 −randomization" có V_BR lớn hơn Sentinel.
 P6 Thế giới phụ đúng như D29.
+P7–P9 (D35; khai 26/09 sau pilot addendum trên dev `auditgame/spikes/v2-addendum-dev/d35-summary.json`,
+   trước freeze D35; dev là một repo nên pilot không có khoảng tin cậy, và mixture của Sentinel
+   được tinh chỉnh trên chính dev):
+P7 Sai Δ̂ một bậc giữ phần lớn gain: ở mọi ρ ≤ 0,5, CI của V(B1) − V(arm) nằm trên 0 cho
+   dhat-swap và dhat-down1 (cách đọc A đạt). Sai hai bậc (dhat-down2) giữ ít hơn và có thể mất
+   gain ở ρ = 0,5. Lý do: mixture của Δ ∈ {2, 4, 8} dùng chung các member sweep, còn mixture
+   Δ = 1 tinh chỉnh cho trigger sớm. Trên dev, một bậc giữ 69–92% gain; hai bậc giữ 53%, 37%, −11%.
+P8 Sentinel hơn B2 FQ-matched ở mọi ρ ≤ 0,5 (cách đọc B đạt ở ba ρ đó); B2 FQ-matched nằm sát
+   B1 vì cap FQ đẩy p* lên 0,9–0,95; ở ρ = 1, p* = 1 nên B2 FQ-matched chính là B1. Lý do: cách
+   ly mọi item fire trên sweep đều ngẫu nhiên tốn FQ nhanh, nên ở cùng FQ chỉ còn khoảng 10% task
+   được sweep.
+P9 Lịch cố định tệ hơn Sentinel ở mọi ρ trên lớp scripted, tệ hơn cả B1 ở ρ ≥ 0,25, V gần như
+   không đổi theo ρ; V_BR của nó lớn hơn của Sentinel ở mọi ρ. Lý do: lịch được chọn
+   (FI-alt-m3 ở Δ = 4, FI-alt-m2 ở Δ = 8) chỉ review commit ở 1/3 hoặc 1/2 số task, ở vị trí cố
+   định; tấn công qua carrier branch trigger ở task khác thoát review dù ρ là bao nhiêu. Kết quả
+   này tự nó không chứng minh rằng ngẫu nhiên hoá (chứ không phải độ phủ commit theo từng
+   workflow) mang gain; D35 (C) chỉ cho phép chiều "không quy được".
 
 ## Hoà khi tinh chỉnh
 η_Q: FQ% nhỏ hơn. Mixture và `pure` (D32): cùng harm tệ nhất thì FQ% nhỏ hơn, rồi tên.
@@ -461,3 +478,6 @@ Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết 
   - Bỏ từng repo: gain 47,46–51,33 / 47,16–51,02 / 40,95–44,72 / 5,23–11,42 % ở ρ 0 / 0,25 / 0,5 / 1. Bỏ sympy: cận dưới 98,75% là 37,89 / 32,63 / 17,96 % ở ρ ≤ 0,5.
   - Mặt (V, FQ): ở mọi ρ, B2–B6 đều có V và FQ cùng cao hơn Sentinel-A1; không baseline nào được tinh chỉnh lại về cùng FQ.
   - D30 ở mức họ 98,75%: cận dưới thấp nhất trên lưới η_Q là 35,02 / 29,84 / 21,46 % ở ρ ≤ 0,5 (thay các cận 95% đã báo).
+- 26/09, D35 trước freeze (ghi nhận, không phải dòng D mới):
+  - Tinh chỉnh dev của addendum (`tools/tune_d35.py`, 67 giây): B2 FQ-matched p* = 0,9 (ρ 0; 0,25), 0,95 (ρ 0,5), 1 (ρ 1). Lịch cố định: ở ρ ≤ 0,5 không lịch nào giữ FQ ≤ 10% trên dev (10,2–11,5%), nên theo luật của `pure` (đã khai ở D35) lịch được chọn là lịch có harm tệ nhất nhỏ nhất, cờ `cap_ok = false`; ở ρ = 1 cap đạt.
+  - Review Task 3 thêm các chốt chặn (không đổi số nào của một lượt chạy đủ, pilot dev chạy lại trùng từng byte): kiểm đủ record trước mọi số, NaN không thành False, kiểm pin trước khi đọc record, kiểm lại freeze lúc tóm tắt, pre-flight tóm tắt chính. Manifest D35 ghim thêm `tools/run_d35.py` (chặt hơn danh sách D35 nêu) để luật đọc không đổi được sau freeze. Trường (C) đổi tên thành `C_fixed_worse_than_sentinel` vì D35 chỉ cho phép chiều "không quy được cho ngẫu nhiên hoá".

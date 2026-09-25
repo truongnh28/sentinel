@@ -216,6 +216,25 @@ P3 Gain over B1 falls as ρ rises, because B1 is weakest against delegated patch
 P4 "A1 −regime estimate" ≈ B1: the mixture pooled over every Δ collapses to commit.
 P5 Under the cross-fitted best response, "A1 −randomization" has a larger V_BR than Sentinel.
 P6 The secondary world behaves as D29 predicts.
+P7–P9 (D35; declared 26/09 after the addendum's dev pilot `auditgame/spikes/v2-addendum-dev/d35-summary.json`,
+   before the D35 freeze; dev is one repository, so the pilot has no intervals, and Sentinel's
+   mixtures were tuned on that same split):
+P7 A one-step error in Δ̂ keeps most of the gain: at every ρ ≤ 0.5 the interval of
+   V(B1) − V(arm) lies above 0 for dhat-swap and dhat-down1 (reading A holds). A two-step error
+   (dhat-down2) keeps less and may lose the gain at ρ = 0.5. Reason: the mixtures of Δ ∈ {2, 4, 8}
+   share sweep members, while the Δ = 1 mixture is tuned for early triggers. On dev one step kept
+   69–92% of the gain; two steps kept 53%, 37%, −11%.
+P8 Sentinel beats B2 FQ-matched at every ρ ≤ 0.5 (reading B holds there); B2 FQ-matched sits
+   close to B1, since the FQ cap pushes p* to 0.9–0.95; at ρ = 1, p* = 1 and B2 FQ-matched is B1.
+   Reason: quarantining every firing item on uniform sweeps spends FQ fast, so at the same FQ
+   only about 10% of tasks are swept.
+P9 The fixed interleave is worse than Sentinel at every ρ on the scripted class, worse than B1
+   at ρ ≥ 0.25, with V nearly flat in ρ; its V_BR exceeds Sentinel's at every ρ. Reason: the
+   chosen schedules (FI-alt-m3 at Δ = 4, FI-alt-m2 at Δ = 8) review the commit on only a third or
+   a half of the tasks, at fixed positions; an attack through the branch carrier triggered on
+   another task escapes review whatever ρ is. That outcome does not by itself show that
+   randomisation (rather than per-workflow commit coverage) carries the gain; D35 (C) licenses
+   only the "not attributable" direction.
 
 ## Ties when tuning
 η_Q: the smaller FQ%. Mixture and `pure` (D32): the same worst-case harm then goes to the smaller FQ%, then to name.
@@ -468,3 +487,6 @@ This section only records values measured while executing the plan; every decisi
   - Leaving out one repository: gain 47.46–51.33 / 47.16–51.02 / 40.95–44.72 / 5.23–11.42 % at ρ 0 / 0.25 / 0.5 / 1. Without sympy: 98.75% lower bounds 37.89 / 32.63 / 17.96 % at ρ ≤ 0.5.
   - The (V, FQ) plane: at every ρ, each of B2–B6 has both a higher V and a higher FQ than Sentinel-A1; no baseline was re-tuned to the same FQ.
   - D30 at the 98.75% family level: the lowest lower bound over the η_Q grid is 35.02 / 29.84 / 21.46 % at ρ ≤ 0.5 (replacing the 95% bounds reported earlier).
+- 26/09, D35 before the freeze (a note, not a new D line):
+  - The addendum's dev tuning (`tools/tune_d35.py`, 67 seconds): B2 FQ-matched p* = 0.9 (ρ 0, 0.25), 0.95 (ρ 0.5), 1 (ρ 1). Fixed schedules: at ρ ≤ 0.5 no schedule keeps dev FQ ≤ 10% (10.2–11.5%), so by the rule of `pure` (declared in D35) the schedule with the lowest worst case was chosen, flagged `cap_ok = false`; at ρ = 1 the cap is met.
+  - The Task 3 review added guards (no number of a complete run changes; the redone dev pilot is byte-identical): completeness before any number, NaN never becomes False, pins checked before records are parsed, the freeze re-checked at summary time, a pre-flight of the main summary. The D35 manifest also pins `tools/run_d35.py` (stricter than the list in D35), so the reading rules cannot change after the freeze. Reading (C)'s field was renamed `C_fixed_worse_than_sentinel`, since D35 licenses only the "not attributable to randomisation" direction.
