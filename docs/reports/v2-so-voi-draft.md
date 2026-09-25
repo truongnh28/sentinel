@@ -19,7 +19,8 @@
   - `main` 8.501.064 dòng, trong đó 4.512.456 dòng vào tóm tắt; 16 cột BR của lưới chính không nuôi số nào nên bị bỏ khi đọc;
   - `br` 260, `sweep-eta` 122.528, `sweep-match` 91.896, `sweep-persistent-drift` 30.632, `sweep-budget-EXPLORATORY` 605.760, `gate` 61.264.
 - **Ký hiệu:**
-  - V = harm tệ nhất: max theo attacker của trung bình theo workflow (D13). S = Sentinel-A1.
+  - V = harm tệ nhất: max theo 14 cột (attacker, Δ), tức 7 attacker held-out × Δ ∈ {4, 8}; mỗi cột là trung bình theo các workflow khả thi của cột đó (D13). S = Sentinel-A1.
+  - N in cạnh mỗi dòng là hợp trên mọi cột. Cột quyết định V có ít workflow hơn; bảng post hoc ở §2.2 ghi N của nó.
   - Hiệu tuyệt đối = V(baseline) − V(S); dương nghĩa là Sentinel ít harm hơn. Gain = 1 − V(S)/V(baseline), tính bằng %.
 - **Quy tắc trình bày** (plan, Task 12 Step 6):
   - mỗi dòng in N workflow và N repo;
@@ -30,6 +31,9 @@
   - Banner trang 1: "All numeric results in this manuscript are projected values … no experiment has yet been executed" (tr. 1). Bảng 2 và Bảng 3 ghi "projected" (tr. 8).
   - Mỗi số draft dưới đây ghi trang của `docs/FSE-2027-15-paper.pdf`.
   - Báo cáo đặt số v2 cạnh số draft, không chấm bên nào đúng hay sai.
+- **Phần post hoc.** Rà soát cuối của nhánh (25/09, sau lượt eval) nêu một số điểm phải khai. Mọi đoạn thêm vì rà soát đó được đánh dấu **[post hoc]** và tách khỏi kết quả khai trước.
+  - Không đoạn post hoc nào chạy mô phỏng. Chúng chỉ đọc lại record đã ghim: `eval-br.jsonl` được đọc trọn (260 dòng); `eval-main.jsonl` được đọc một lượt streamed, chỉ giữ các dòng của ô headline, và sha256 của lượt đọc khớp `eval-records.sha256`.
+  - Các sự kiện về thư viện BT được đọc từ code và từ `reference/v2_tuned.json`.
 
 ## 1. Đối chứng (D28) và thế giới phụ (D29)
 
@@ -132,26 +136,59 @@ Draft, để đặt cạnh (draft không có trục ρ_patch):
 - Bảng 2 của draft ghi ô là Δ > 2, χ = 1,34, attacker held-out (tr. 8). Nhưng §10.3 gọi 34,1% là số trên attacker development, và 27,6% là số held-out (tr. 7). Endpoint của v2 là lớp held-out, nên cả hai số draft được đặt cạnh ở §5.2.
 - D20 đã khai trước: không hiệu chỉnh ρ để V(B1) ra 0,412.
 
+### 2.1 Điều kiện phải đọc cùng headline
+
+Biên 15% đạt ở ρ ≤ 0,5 chỉ với các điều kiện sau.
+- **Dòng 1 là bộ ước lượng regime hoàn hảo** (D9b): Sentinel được cho Δ của ô. Khi bỏ điều đó ("−regime estimate"), V bằng đúng V(B1) ở cả bốn ρ (Bảng 3). Toàn bộ gain dựa vào bộ ước lượng này.
+- **Gain có giá.** Ở ba ρ đạt biên, FQ của Sentinel là 8,58 / 8,40 / 6,98%, còn của B1 là 0%. L tệ nhất của Sentinel cao hơn B1 ở đúng ba ρ đó, ví dụ 1,5592 so với 1,1839 ở ρ = 0 (§8).
+- **[post hoc] Cơ chế.** Mỗi workflow, Sentinel rút một member. Với xác suất bằng trọng số của `L-BT-0.5-f0` (0,3483–0,8602 ở các ô headline), nó chơi đúng B1; còn lại là một lịch quét RO hoặc SW không đọc bằng chứng nào (§4.1). Gain đến từ việc trộn B1 với các lịch quét đó, không đến từ belief hay mô hình drift.
+- **Baseline tốt nhất của D22 không bị giữ dưới trần FQ.** B2, baseline tốt nhất ở ρ ≤ 0,25, có FQ 14,37%; B5, baseline tốt nhất ở ρ = 0,5, có 12,32%. Cả hai trên trần 10% mà tinh chỉnh Sentinel phải giữ (D26).
+- **FQ(B1) = 0 theo cấu tạo.** Audit commit không gỡ item nào; patch sạch bị chặn được tính vào T_lost, không vào FQ. Vì vậy FQ 3,2% của B1 trong draft (tr. 8) không so được với 0% của v2.
+- **[post hoc] Độ phủ của CI.** CI là bootstrap percentile trên 16 họ repo không cân bằng: sympy có 15 trong 57 workflow (ghi nhận Task 11), và ở Δ = 8 chỉ còn 12 repo. Độ phủ thật của CI có thể thấp hơn mức danh nghĩa.
+
+### 2.2 [post hoc] Cột nào quyết định V
+
+V là max theo 14 cột (7 attacker held-out × Δ ∈ {4, 8}); mỗi cột là trung bình theo các workflow khả thi của nó. N = 57 / 16 in ở mọi dòng là hợp trên 14 cột. Bảng dưới đọc từ một lượt streamed của `eval-main.jsonl` đã ghim, không chạy mô phỏng. V tính lại trùng đến mọi chữ số với V trong tóm tắt, ở cả tám dòng.
+
+<!-- tbl:decide -->
+| ρ_patch | Hệ thống | Cột quyết định V (attacker@Δ) | V | N của cột (workflow / repo / episode) | Số cột cách max ≤ 0,05 / tổng số cột |
+| --- | --- | --- | --- | --- | --- |
+| 0 | B1 audit-at-commit | `skill-last-write-e1.0@8` | 0,7981 | 26 / 10 / 160 | 4 / 14 |
+| 0 | Sentinel-A1 | `branch-first-write-e0.6@8` | 0,4054 | 30 / 11 / 200 | 4 / 14 |
+| 0,25 | B1 audit-at-commit | `skill-last-write-e1.0@8` | 0,7154 | 26 / 10 / 160 | 3 / 14 |
+| 0,25 | Sentinel-A1 | `branch-first-write-e0.6@8` | 0,3638 | 30 / 11 / 200 | 3 / 14 |
+| 0,5 | B1 audit-at-commit | `queue-mid-write-e0.6@8` | 0,5387 | 30 / 11 / 187 | 3 / 14 |
+| 0,5 | Sentinel-A1 | `queue-last-ingress-e0.6@4` | 0,3069 | 57 / 16 / 355 | 7 / 14 |
+| 1 | B1 audit-at-commit | `skill-last-write-e1.0@4` | 0,1943 | 53 / 14 / 334 | 3 / 14 |
+| 1 | Sentinel-A1 | `skill-last-write-e1.0@4` | 0,1772 | 53 / 14 / 334 | 4 / 14 |
+
+Đọc:
+- **Ở ρ ≤ 0,25, trường hợp tệ nhất của Sentinel là carrier branch** (`branch-first-write-e0.6@8`). Chỉ audit commit bắt được carrier này, vì branch không bao giờ được quét. Ở ρ = 0,5 cột quyết định V(S) là `queue-last-ingress-e0.6@4`, ở ρ = 1 là `skill-last-write-e1.0@4`.
+- V(B1) do `skill-last-write-e1.0` (ε = 1,0) quyết định ở ρ = 0; 0,25 (Δ = 8) và ρ = 1 (Δ = 4). Ở ρ = 0,5 là `queue-mid-write-e0.6@8`.
+- Các cột quyết định ở Δ = 8 chỉ có 26 workflow / 10 repo (B1, ρ ≤ 0,25) hoặc 30 / 11 (Sentinel ở ρ ≤ 0,25; B1 ở ρ = 0,5).
+- **Thiên lệch của phép max không nghiêng về Sentinel.** V là max của 14 cột có nhiễu nên lệch lên, và lệch nhiều hơn khi có nhiều cột sát max. Số cột cách max không quá 0,05 là 4 / 3 / 3 / 3 với B1 và 4 / 3 / 7 / 4 với Sentinel (ρ = 0 / 0,25 / 0,5 / 1). Ở mọi ρ, Sentinel có ít nhất bằng B1.
+
 ## 3. Bảng 2 theo ρ_patch
 
 Ô headline: mid, Δ ∈ {4, 8}, 7 attacker held-out. Mỗi dòng có N = 57 workflow / 16 repo / 3.829 episode.
 
 Cột:
 - **V**: harm tệ nhất (D13).
-- **V_BR cross-fit**: best response Stackelberg trên menu mọi (k, ι, σ) khả thi. Vị trí được chọn trên seed lẻ và chấm trên seed chẵn, rồi làm ngược lại (D27). Lấy max theo Δ ∈ {4, 8}.
+- **V_BR cross-fit**: best response Stackelberg trên menu mọi (k, ι, σ) khả thi. Vị trí được chọn trên seed lẻ và chấm trên seed chẵn, rồi làm ngược lại (D27). Lấy max theo Δ ∈ {4, 8}. [post hoc] Việc chọn trên tối đa 5 seed mỗi nửa, giữa hàng chục vị trí, làm V_BR lệch xuống: đọc nó là **cận dưới** của giá trị best response.
 - **Exploitability** = V_BR − V (D13).
-- **FQ %**: item lành tính bị gỡ, chia cho số đối tượng lành tính đã xem (D15).
+- **FQ %**: item lành tính bị gỡ, chia cho số đối tượng lành tính đã xem (D15). FQ(B1) = 0 theo cấu tạo: audit commit không gỡ item nào, và patch sạch bị chặn được tính vào T_lost.
 - **Clean completion %** = 100·(1 − T_lost / số task đã giải). T_lost là patch sạch đã giải mà bị chặn.
-- **Độ trễ phát hiện**: trung bình (lúc phát hiện − ι), chỉ tính trên các episode có phát hiện; đơn vị là task.
+- **Độ trễ phát hiện**: trung bình (lúc phát hiện − ι), chỉ tính trên các episode có phát hiện; đơn vị là task. [post hoc] Lúc phát hiện có thể là lần commit chặn patch mang marker ở σ hoặc sau σ, không chỉ lần quét trước σ.
 - **L tệ nhất**: L = harm + λ_Q·(số item gỡ nhầm) + λ_T·T_lost, với λ_Q = 0,54865 và λ_T = 0,5 (`run.lambda_Q`, `run.lambda_T`); lấy max theo attacker held-out (D15).
 - Tóm tắt không có CI cho V của từng hệ thống, cho V_BR, hay cho L.
 
 Hai điều phải nói thẳng:
-- **Exploitability có thể âm theo cấu tạo.**
-  - Menu best response cố định ε = 0,6 (`attackers_v2.placements`). Lớp held-out có cả ε ∈ {0,3; 1,0}: `memory-last-ingress-e0.3`, `memory-mid-write-e0.3`, `skill-last-write-e1.0`.
-  - Vì vậy V (max trên lớp held-out) có thể lớn hơn V_BR. Trong lượt này exploitability âm với B1–B4, Sentinel và Oracle ở cả bốn ρ.
-  - Con số này vì thế **không cùng nghĩa** với cột Exploitability của draft.
-- **V_BR không có N riêng.** Tóm tắt chỉ giữ giá trị V_BR. Số vị trí của menu nằm ở khối `denominators.br`: ở Δ = 4 thử 9.160 bộ (workflow, vị trí, seed), còn 5.772 sau lọc N4; ở Δ = 8 thử 2.800, còn 1.804.
+- **Không đọc dấu của exploitability, và không so cột này với cột Exploitability của draft.**
+  - [post hoc] V_BR (cross-fit) lệch xuống; V lệch lên, vì nó là max của 14 cột có nhiễu (§2.2).
+  - Hai số không đo trên cùng một thứ. Menu best response cố định ε = 0,6 (`attackers_v2.placements`), còn lớp held-out có cả ε ∈ {0,3; 1,0}: `memory-last-ingress-e0.3`, `memory-mid-write-e0.3`, `skill-last-write-e1.0`. [post hoc] V(B1) do `skill-last-write-e1.0` (ε = 1,0) quyết định ở ρ = 0; 0,25; 1 (§2.2).
+  - [post hoc] Hai số cũng không đo trên cùng các workflow: best response ở Δ = 8 trung bình trên 29 workflow / 11 repo, còn các cột held-out ở Δ = 8 có 26–34 workflow.
+  - Trong lượt này exploitability âm với B1–B4, Sentinel và Oracle ở cả bốn ρ. Dấu âm đó không có nghĩa là "khó khai thác hơn".
+- **V_BR không có N trong tóm tắt.** Tóm tắt chỉ giữ giá trị V_BR. Số vị trí của menu nằm ở khối `denominators.br`: ở Δ = 4 thử 9.160 bộ (workflow, vị trí, seed), còn 5.772 sau lọc N4; ở Δ = 8 thử 2.800, còn 1.804. [post hoc] N của chính best response, đọc từ `eval-br.jsonl`: 57 workflow / 16 repo ở Δ = 4 và 29 / 11 ở Δ = 8, như nhau cho mọi hệ thống.
 
 ### ρ_patch = 0
 
@@ -209,6 +246,26 @@ Hai điều phải nói thẳng:
 | **Sentinel-A1** | **0,1772** | **0,1477** | **−0,0295** | **0,36** | **91,34** | **4,80** | **0,4903** | 57 / 16 |
 | Oracle (đối chứng) | 0,0054 | 0,0051 | −0,0003 | 16,92 | 98,59 | 0,72 | 5,2067 | 57 / 16 |
 
+### [post hoc] Khoảng của best response: cross-fit và naive
+
+Đọc từ `eval-br.jsonl`, max theo Δ ∈ {4, 8}. "Cross-fit" chính là V_BR của Bảng 2 và lệch xuống. "Naive" chọn và chấm vị trí trên cùng các seed, nên lệch lên. Trong kỳ vọng, giá trị best response thật nằm giữa hai số.
+
+<!-- tbl:br -->
+| Hệ thống | ρ = 0: cross-fit · naive | ρ = 0,25: cross-fit · naive | ρ = 0,5: cross-fit · naive | ρ = 1: cross-fit · naive | N của best response (workflow / repo), Δ = 4 · 8 |
+| --- | --- | --- | --- | --- | --- |
+| B1 audit-at-commit | 0,7928 · 0,8833 | 0,6560 · 0,7867 | 0,4839 · 0,6388 | 0,1175 · 0,2739 | 57 / 16 · 29 / 11 |
+| B2 uniform random | 0,5848 · 0,7918 | 0,5848 · 0,7918 | 0,5879 · 0,7876 | 0,5879 · 0,7861 | 57 / 16 · 29 / 11 |
+| B3 audit-on-insertion | 0,8672 · 0,9531 | 0,8672 · 0,9531 | 0,8672 · 0,9531 | 0,8672 · 0,9531 | 57 / 16 · 29 / 11 |
+| B4 audit-on-retrieval | 0,8672 · 0,9531 | 0,8672 · 0,9531 | 0,8672 · 0,9531 | 0,8672 · 0,9531 | 57 / 16 · 29 / 11 |
+| B5 risk-score | 0,7828 · 0,8617 | 0,7828 · 0,8582 | 0,5006 · 0,7374 | 0,5109 · 0,6956 | 57 / 16 · 29 / 11 |
+| B6 two-stage | 0,8672 · 0,9531 | 0,8672 · 0,9531 | 0,8672 · 0,9531 | 0,8672 · 0,9531 | 57 / 16 · 29 / 11 |
+| Sentinel-A1 | 0,3709 · 0,6070 | 0,3621 · 0,5697 | 0,2911 · 0,5045 | 0,1477 · 0,3120 | 57 / 16 · 29 / 11 |
+| A1 -randomization | 0,8672 · 0,9404 | 0,8672 · 0,9404 | 0,4839 · 0,6388 | 0,1175 · 0,2739 | 57 / 16 · 29 / 11 |
+| Oracle (đối chứng) | 0,0051 · 0,0084 | 0,0051 · 0,0084 | 0,0051 · 0,0084 | 0,0051 · 0,0084 | 57 / 16 · 29 / 11 |
+
+- Khoảng rất rộng: với Sentinel ở ρ = 0 là 0,3709 đến 0,6070; với B1 ở ρ = 1 là 0,1175 đến 0,2739.
+- Thứ tự mà P5 dựa vào giữ nguyên dưới cả hai ước lượng: "−randomization" cao hơn Sentinel ở ρ ≤ 0,5 và thấp hơn ở ρ = 1.
+
 ### Draft, Bảng 2 (tr. 8), để đặt cạnh
 
 Draft ghi: "Δ > 2, χ = 1.34, against held-out attacker policies … All values projected" (tr. 8). Quy mô của draft là 4.500 instance × 8 hệ thống × 3 seed (tr. 6).
@@ -238,30 +295,31 @@ Draft ghi: "Δ > 2, χ = 1.34, against held-out attacker policies … All values
 - Hiệu = V(ablation) − V(S). Dương nghĩa là bỏ thành phần đó thì harm tệ nhất tăng.
 - Gain = 1 − V(S)/V(ablation). CI 95%, không Bonferroni.
 - FQ % và exploitability của ablation lấy từ Bảng 2 ở cùng ρ.
+- [post hoc] Cột "Ghi chú" nói dòng đó đo được gì. "không được thử": arm không đổi được quyết định nào (§4.1). "= B1 ở mọi cột": arm trùng B1 ở mọi cột Bảng 2. "V = V(B1)": arm có V bằng đúng V(B1).
 
 <!-- tbl:t3 -->
-| Ablation | ρ_patch | V(ablation) | V(S) | Hiệu V(ablation) − V(S) [CI 95%] | Gain = 1 − V(S)/V(ablation), % [CI 95%] | FQ % (ablation) | Exploitability (ablation) | N (workflow / repo / episode) |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A1 -randomization | 0 | 0,8471 | 0,4054 | 0,4416 [0,3808; 0,5004] | 52,14 [46,58; 57,96] | 12,75 | 0,0201 | 57 / 16 / 3.829 |
-| A1 -randomization | 0,25 | 0,8471 | 0,3638 | 0,4833 [0,4204; 0,5360] | 57,05 [51,80; 61,85] | 12,75 | 0,0201 | 57 / 16 / 3.829 |
-| A1 -randomization | 0,5 | 0,5387 | 0,3069 | 0,2318 [0,1465; 0,2629] | 43,03 [30,06; 45,98] | 0,00 | −0,0548 | 57 / 16 / 3.829 |
-| A1 -randomization | 1 | 0,1943 | 0,1772 | 0,0171 [−0,0200; 0,0333] | 8,79 [−13,60; 16,70] | 0,00 | −0,0768 | 57 / 16 / 3.829 |
-| A1 -alarm memory | 0 | 0,4054 | 0,4054 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 8,58 | −0,0345 | 57 / 16 / 3.829 |
-| A1 -alarm memory | 0,25 | 0,3638 | 0,3638 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 8,40 | −0,0017 | 57 / 16 / 3.829 |
-| A1 -alarm memory | 0,5 | 0,3069 | 0,3069 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 6,98 | −0,0158 | 57 / 16 / 3.829 |
-| A1 -alarm memory | 1 | 0,1725 | 0,1772 | −0,0047 [−0,0147; 0,0000] | −2,73 [−9,77; 0,00] | 0,38 | −0,0248 | 57 / 16 / 3.829 |
-| A1 -transition uncertainty | 0 | 0,4460 | 0,4054 | 0,0406 [0,0025; 0,0714] | 9,09 [0,57; 15,36] | 8,71 | −0,0529 | 57 / 16 / 3.829 |
-| A1 -transition uncertainty | 0,25 | 0,4085 | 0,3638 | 0,0448 [0,0062; 0,0639] | 10,96 [1,68; 14,53] | 8,41 | −0,0819 | 57 / 16 / 3.829 |
-| A1 -transition uncertainty | 0,5 | 0,3285 | 0,3069 | 0,0216 [−0,0298; 0,0420] | 6,59 [−9,48; 11,94] | 7,25 | −0,0052 | 57 / 16 / 3.829 |
-| A1 -transition uncertainty | 1 | 0,1750 | 0,1772 | −0,0022 [−0,0206; 0,0595] | −1,23 [−12,48; 27,79] | 0,47 | −0,0247 | 57 / 16 / 3.829 |
-| A1 -benign-drift | 0 | 0,4054 | 0,4054 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 8,58 | −0,0345 | 57 / 16 / 3.829 |
-| A1 -benign-drift | 0,25 | 0,3638 | 0,3638 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 8,40 | −0,0017 | 57 / 16 / 3.829 |
-| A1 -benign-drift | 0,5 | 0,3069 | 0,3069 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 6,98 | −0,0158 | 57 / 16 / 3.829 |
-| A1 -benign-drift | 1 | 0,1725 | 0,1772 | −0,0047 [−0,0147; 0,0000] | −2,73 [−9,77; 0,00] | 1,56 | −0,0305 | 57 / 16 / 3.829 |
-| A1 -regime estimate | 0 | 0,7981 | 0,4054 | 0,3927 [0,3267; 0,4350] | 49,20 [42,87; 53,86] | 0,27 | −0,0053 | 57 / 16 / 3.829 |
-| A1 -regime estimate | 0,25 | 0,7154 | 0,3638 | 0,3517 [0,2515; 0,4067] | 49,15 [39,97; 52,97] | 0,09 | −0,0507 | 57 / 16 / 3.829 |
-| A1 -regime estimate | 0,5 | 0,5387 | 0,3069 | 0,2318 [0,1465; 0,2629] | 43,03 [30,06; 45,98] | 0,00 | −0,0548 | 57 / 16 / 3.829 |
-| A1 -regime estimate | 1 | 0,1943 | 0,1772 | 0,0171 [−0,0200; 0,0333] | 8,79 [−13,60; 16,70] | 0,00 | −0,0768 | 57 / 16 / 3.829 |
+| Ablation | ρ_patch | V(ablation) | V(S) | Hiệu V(ablation) − V(S) [CI 95%] | Gain = 1 − V(S)/V(ablation), % [CI 95%] | FQ % (ablation) | Exploitability (ablation) | N (workflow / repo / episode) | Ghi chú (post hoc) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| A1 -randomization | 0 | 0,8471 | 0,4054 | 0,4416 [0,3808; 0,5004] | 52,14 [46,58; 57,96] | 12,75 | 0,0201 | 57 / 16 / 3.829 |  |
+| A1 -randomization | 0,25 | 0,8471 | 0,3638 | 0,4833 [0,4204; 0,5360] | 57,05 [51,80; 61,85] | 12,75 | 0,0201 | 57 / 16 / 3.829 |  |
+| A1 -randomization | 0,5 | 0,5387 | 0,3069 | 0,2318 [0,1465; 0,2629] | 43,03 [30,06; 45,98] | 0,00 | −0,0548 | 57 / 16 / 3.829 | = B1 ở mọi cột |
+| A1 -randomization | 1 | 0,1943 | 0,1772 | 0,0171 [−0,0200; 0,0333] | 8,79 [−13,60; 16,70] | 0,00 | −0,0768 | 57 / 16 / 3.829 | = B1 ở mọi cột |
+| A1 -alarm memory | 0 | 0,4054 | 0,4054 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 8,58 | −0,0345 | 57 / 16 / 3.829 | không được thử |
+| A1 -alarm memory | 0,25 | 0,3638 | 0,3638 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 8,40 | −0,0017 | 57 / 16 / 3.829 | không được thử |
+| A1 -alarm memory | 0,5 | 0,3069 | 0,3069 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 6,98 | −0,0158 | 57 / 16 / 3.829 | không được thử |
+| A1 -alarm memory | 1 | 0,1725 | 0,1772 | −0,0047 [−0,0147; 0,0000] | −2,73 [−9,77; 0,00] | 0,38 | −0,0248 | 57 / 16 / 3.829 |  |
+| A1 -transition uncertainty | 0 | 0,4460 | 0,4054 | 0,0406 [0,0025; 0,0714] | 9,09 [0,57; 15,36] | 8,71 | −0,0529 | 57 / 16 / 3.829 |  |
+| A1 -transition uncertainty | 0,25 | 0,4085 | 0,3638 | 0,0448 [0,0062; 0,0639] | 10,96 [1,68; 14,53] | 8,41 | −0,0819 | 57 / 16 / 3.829 |  |
+| A1 -transition uncertainty | 0,5 | 0,3285 | 0,3069 | 0,0216 [−0,0298; 0,0420] | 6,59 [−9,48; 11,94] | 7,25 | −0,0052 | 57 / 16 / 3.829 |  |
+| A1 -transition uncertainty | 1 | 0,1750 | 0,1772 | −0,0022 [−0,0206; 0,0595] | −1,23 [−12,48; 27,79] | 0,47 | −0,0247 | 57 / 16 / 3.829 |  |
+| A1 -benign-drift | 0 | 0,4054 | 0,4054 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 8,58 | −0,0345 | 57 / 16 / 3.829 | không được thử |
+| A1 -benign-drift | 0,25 | 0,3638 | 0,3638 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 8,40 | −0,0017 | 57 / 16 / 3.829 | không được thử |
+| A1 -benign-drift | 0,5 | 0,3069 | 0,3069 | 0,0000 [0,0000; 0,0000] | 0,00 [0,00; 0,00] | 6,98 | −0,0158 | 57 / 16 / 3.829 | không được thử |
+| A1 -benign-drift | 1 | 0,1725 | 0,1772 | −0,0047 [−0,0147; 0,0000] | −2,73 [−9,77; 0,00] | 1,56 | −0,0305 | 57 / 16 / 3.829 |  |
+| A1 -regime estimate | 0 | 0,7981 | 0,4054 | 0,3927 [0,3267; 0,4350] | 49,20 [42,87; 53,86] | 0,27 | −0,0053 | 57 / 16 / 3.829 | V = V(B1) |
+| A1 -regime estimate | 0,25 | 0,7154 | 0,3638 | 0,3517 [0,2515; 0,4067] | 49,15 [39,97; 52,97] | 0,09 | −0,0507 | 57 / 16 / 3.829 | V = V(B1) |
+| A1 -regime estimate | 0,5 | 0,5387 | 0,3069 | 0,2318 [0,1465; 0,2629] | 43,03 [30,06; 45,98] | 0,00 | −0,0548 | 57 / 16 / 3.829 | = B1 ở mọi cột |
+| A1 -regime estimate | 1 | 0,1943 | 0,1772 | 0,0171 [−0,0200; 0,0333] | 8,79 [−13,60; 16,70] | 0,00 | −0,0768 | 57 / 16 / 3.829 | = B1 ở mọi cột |
 
 Draft, Bảng 3 (tr. 8, "Projected"). "−regime estimate" là arm mới của v2 (Q9), draft không có.
 
@@ -279,15 +337,19 @@ Cột "Exploit." của Bảng 3 draft đè lên chữ của cột bên cạnh tr
 Đọc:
 - **"−randomization":**
   - Ở ρ ≤ 0,25 hiệu lớn: 0,4416 và 0,4833. Member thuần ở đó là `L-SW-nomemory`, chạy một lịch cho mọi workflow (bảng mixture ở §4.1).
-  - Ở ρ ≥ 0,5 ablation này trùng B1 ở mọi cột Bảng 2, nên hiệu của nó bằng đúng hiệu của Sentinel so với B1. Member thuần ở đó là `L-BT-0.5-f0` (xem diễn giải ở §4.1).
+  - Ở ρ ≥ 0,5 ablation này trùng B1 ở mọi cột Bảng 2, nên hiệu của nó bằng đúng hiệu của Sentinel so với B1. Member thuần ở đó là `L-BT-0.5-f0`, một bản sao của B1 (§4.1).
   - Draft: bỏ randomization làm V lên 0,456 và exploitability lên 0,51, tức "costs 0,184" (tr. 7).
-- **"−transition uncertainty":** hiệu dương với CI nằm trên 0 ở ρ = 0 và 0,25 (0,0406 và 0,0448); CI chứa 0 ở ρ = 0,5 và 1. Draft: V 0,318 (tr. 8).
+  - [post hoc] Arm này chơi member `pure` với seed 0, tức một lịch cho mọi workflow. Member đó được chọn trên dev khi nó còn được ngẫu nhiên hoá theo từng workflow (`tools/select_mixture.py`), nên arm này không phải "policy tất định tốt nhất". Đóng băng về một lịch, `L-SW-nomemory` còn tệ hơn B1 ở ρ = 0 (0,8471 so với 0,7981).
+  - [post hoc] Ở ρ ≥ 0,5 arm này là B1, nên P5 ở ρ = 0,5 thực chất so Sentinel với B1.
+- **"−transition uncertainty":** hiệu dương với CI nằm trên 0 ở ρ = 0 và 0,25 (0,0406 và 0,0448); CI chứa 0 ở ρ = 0,5 và 1. Draft: V 0,318 (tr. 8). [post hoc] Thế giới eval luôn là kernel danh nghĩa (`tools/run_draft_eval.py` gọi `make_world(..., "nominal", ...)`), nên arm này không kiểm độ bền trước một kernel sai. Nó chỉ so mixture robust với mixture danh nghĩa trên chính kernel danh nghĩa.
 - **"−regime estimate":** V bằng đúng V(B1) ở cả bốn ρ. Ở ρ ≥ 0,5 mọi cột Bảng 2 của nó trùng B1.
-- **"−alarm memory" và "−benign-drift":** xem §4.1.
+- **"−alarm memory" và "−benign-drift":** không được thử ở ρ ≤ 0,5; xem §4.1.
 
-### 4.1 Hai ablation bằng đúng 0 ở ρ ≤ 0,5
+### 4.1 Hai ablation không được thử ở ρ ≤ 0,5
 
-Ở ρ = 0; 0,25 và 0,5, cả hai cho hiệu **0,0000 với CI [0,0000; 0,0000]**. Ở ba ρ đó, mọi cột Bảng 2 của chúng trùng Sentinel đến mọi chữ số: V, V_BR, exploitability, FQ %, clean completion, độ trễ, L. Ở ρ = 1 chúng **không** bằng 0.
+Ở ρ = 0; 0,25 và 0,5, "−alarm memory" và "−benign-drift" cho hiệu **0,0000 với CI [0,0000; 0,0000]**. Ở ba ρ đó, mọi cột Bảng 2 của chúng trùng Sentinel đến mọi chữ số: V, V_BR, exploitability, FQ %, clean completion, độ trễ, L.
+- **Đọc đúng: hai arm này không được thử ở ba ρ đó.** Số 0 không phải bằng chứng rằng trí nhớ alarm hay mô hình drift vô dụng. Nó chỉ nói rằng, trong cấu hình này, không quyết định nào đi qua chúng (lý do ở dưới).
+- Ở ρ = 1 hai arm này khác Sentinel (cuối mục).
 
 Mixture đã tinh chỉnh trên dev ở detector mid (`auditgame/reference/v2_tuned.json`, cùng số với `spikes/v2/select-log.txt`):
 
@@ -299,19 +361,26 @@ Mixture đã tinh chỉnh trên dev ở detector mid (`auditgame/reference/v2_tu
 | 0,5 | 0 | `L-BT-0.5-f0` 1,0000 | `L-BT-0.5-f0` 0,6398; `L-RO-c4-p1-d3` 0,3602 | `L-BT-0.5-f0` 0,5330; `L-RO-c4-p2-d3` 0,1117; `L-SW-nomemory` 0,3553 | `L-BT-0.5-f0` 1,0000 | `L-BT-0.5-f0` · `L-BT-0.5-f0` |
 | 1 | 0,3543 | `L-BT-0.5-f0` 1,0000 | `L-BT-0.5-f0` 0,8602; `L-RO-c3-p1-d3` 0,1094; `L-SW-queue` 0,0304 | `L-BT-0.5-f0` 0,7652; `L-RO-c4-p2-d3` 0,2348 | `L-BT-0.5-f0` 1,0000 | `L-BT-0.5-f0` · `L-BT-0.5-f0` |
 
-> **Diễn giải (từ code và bảng tinh chỉnh; không kiểm trên record thô).**
-> 1. η_Q tinh chỉnh là 0 ở ρ ≤ 0,5 và 0,3543 ở ρ = 1 (ghi nhận Task 10; bảng trên). Với η_Q = 0, dòng 8 gỡ mọi item nổ có hậu nghiệm dương, bất kể belief ở dòng 7 nói gì.
-> 2. Khi đó belief chỉ còn đổi được quyết định qua việc chọn hành động. Nhưng không member nào trong các mixture trên dùng belief để chọn hành động:
->    - RO và SW không đọc belief;
->    - `L-BT-0.5-f0` commit khi p_attack ≤ 0,5 (`carrier_policies.BeliefThreshold`), tiên nghiệm của p_attack là 0,5 (`belief.WindowBelief`, `pi_attack = 0.5`), và một lần commit không cho tín hiệu carrier nào (D17). Vậy p_attack đứng yên ở 0,5, và member này commit ở mọi task.
->    - Kiểm nhanh trên code, không đụng dữ liệu eval: nếu chỉ mua commit thì p_attack giữ đúng 0,5 sau mọi lần cập nhật, có hay không có β̂, có hay không có trí nhớ.
-> 3. Vì vậy, ở ρ ≤ 0,5 không quyết định nào phụ thuộc belief. Bỏ trí nhớ alarm hay đặt β̂ = 0 chỉ đổi belief, nên không đổi gì.
+> **[post hoc] Cả 12/12 member BT bị khoá ở một chế độ.** Rà soát cuối (25/09) chỉ ra điều này; kiểm trên code, không đụng dữ liệu eval, cho cùng kết quả.
+> 1. **τ ≥ 0,5 (9 member): luôn commit.** `BeliefThreshold` commit khi p_attack ≤ τ. Tiên nghiệm p_attack là 0,5 (`belief.WindowBelief`, `pi_attack = 0.5`), và một lần commit không cho tín hiệu carrier nào (D17). Vậy p_attack đứng yên ở 0,5, và các member này chơi đúng như B1.
+> 2. **τ = 0,3 (3 member): không bao giờ commit.**
+>    - Cửa sổ Δ = 0 không bao giờ "sống", và carrier branch không bao giờ được quét. Các cửa sổ đó chiếm 44,09–51,47% số cửa sổ, tuỳ H, và khối tiên nghiệm trên chúng giữ tỉ lệ cố định với NULL.
+>    - Vì vậy p_attack không xuống dưới 0,3060 (H = 14) đến 0,3398 (H = 6), luôn trên τ = 0,3.
+> 3. **Thư viện.** 10 trong 28 member là B1 (9 member BT với τ ≥ 0,5 và `L-SW-commit`), nên chỉ có 19 hành vi khác nhau.
+>    - `L-BT-0.5-f0` thắng một cuộc hoà 10 bản sao chỉ vì đứng đầu theo thứ tự tên (`d32-effect.txt`: "tied at worst …: 10, FQ% of the tied: min 0.00, max 0.00").
+>    - Nó mang 0,3483–0,8602 trọng số ở các ô headline, và 0,9924–1 ở mid Δ = 0 và "all".
+> 4. **Không mixture robust nào đọc belief để chọn hành động.** Trong 72 ô tinh chỉnh, không mixture robust nào (mixture mà Sentinel chơi) đặt trọng số lên BT với τ = 0,3, loại member duy nhất dùng belief để chọn carrier.
+>    - Chỉ một mixture danh nghĩa (ρ = 1, weak, Δ = 8), dùng cho "−transition uncertainty", có `L-BT-0.3-f0` 0,0110 và `L-BT-0.3-f1` 0,1493.
+>    - Vậy trong Sentinel, dòng 7 không lái việc phân bổ audit ở ô nào.
+> 5. **Dòng 8 ở ρ ≤ 0,5.** η_Q = 0 (ghi nhận Task 10; bảng trên), nên một item nổ bị gỡ chỉ cần p_k > 0. Không quyết định nào ở đó phụ thuộc belief hay β̂.
+>
+> Hệ quả: ở ρ ≤ 0,5, "−alarm memory" và "−benign-drift" không được thử, và hai phép quét drift (§6.1, §6.2) không thể đổi harm. Báo cáo không quy phần nào của gain cho belief hay cho mô hình drift. Khuyết tật nằm ở plan (§10, mục 11).
 
-**Kiểm diễn giải ở ρ = 1.** Ở đây η_Q = 0,3543, nên dòng 8 so hậu nghiệm với một ngưỡng dương, và belief phải có tác dụng. Các member ở ρ = 1 vẫn thuộc ba loại trên, nên khác biệt, nếu có, phải đến từ dòng 8.
+**Ở ρ = 1 hai arm này được thử.** Ở đây η_Q = 0,3543, nên dòng 8 so hậu nghiệm với một ngưỡng dương, và belief có tác dụng qua dòng 8. Các member ở ρ = 1 vẫn là B1, RO và SW, nên khác biệt đến từ dòng 8.
 - Hai ablation **khác** Sentinel: V = 0,1725 so với 0,1772. Hiệu là −0,0047 với CI [−0,0147; 0,0000] cho cả hai.
 - FQ: "−alarm memory" 0,38%, "−benign-drift" 1,56%, Sentinel 0,36%.
 - L tệ nhất: 0,4873, 0,5854 và 0,4903. V_BR: 0,1477, 0,1420 và 0,1477.
-- **Dữ liệu nhất quán với diễn giải:** khi η_Q > 0, belief quyết định item nào bị gỡ, và hai ablation đổi kết quả.
+- **Dữ liệu nhất quán với điều trên:** khi η_Q > 0, belief quyết định item nào bị gỡ, và hai ablation đổi kết quả.
 - Chiều của hiệu: bỏ cơ chế thì harm tệ nhất hơi **thấp hơn** (cận trên CI bằng 0), và bỏ β̂ thì gỡ nhầm nhiều hơn.
 - Draft (tr. 7): "−alarm memory" "costs 0,099" (V 0,371 so với 0,272, tr. 8); "−benign-drift" "slightly improves harm and quadruples false quarantine (5.1% → 19.8%)", V 0,264 (tr. 8).
 
@@ -323,7 +392,12 @@ Endpoint là cả đường theo ρ (§2), vì `HEADLINE_RHO = None`.
 - **Đạt biên 15% ở ρ = 0; 0,25; 0,5**, với gain 49,20 / 49,15 / 43,03% và hiệu 0,3927 / 0,3517 / 0,2318.
 - **Không đạt ở ρ = 1**: gain 8,79%, hiệu 0,0171 với CI chứa 0.
 - N ở mọi điểm là 57 workflow / 16 repo. B1 có 128 / 115 / 102 / 66 sự kiện harm ở cột tệ nhất (ngưỡng D21 là 10), và không lượt bootstrap nào có V(B1) = 0.
-- Diễn giải (§4.1, không kiểm trên record thô): ở ô headline, không member nào của mixture đọc belief để chọn hành động; `L-BT-0.5-f0` commit ở mọi task. Vậy gain ở đây đến từ việc trộn commit với các lịch carrier cố định (RO, SW). Ở ρ ≤ 0,5 dòng 8 gỡ mọi item nổ có hậu nghiệm dương, gần với luật của baseline, và phần thích nghi theo belief không đổi quyết định nào.
+- **Điều kiện đi kèm** (chi tiết ở §2.1):
+  - dòng 1 là bộ ước lượng regime hoàn hảo, và "−regime estimate" bằng B1 ở mọi ρ;
+  - FQ của Sentinel là 6,98–8,58% ở ba ρ đạt biên, so với 0% của B1;
+  - L tệ nhất của Sentinel tệ hơn B1 ở đúng các ρ đạt biên;
+  - baseline tốt nhất của D22 có FQ 12,32–14,37%, trên trần 10% mà Sentinel phải giữ.
+- **[post hoc] Cơ chế:** gain đến từ việc trộn B1 (qua `L-BT-0.5-f0`) với các lịch quét RO/SW không đọc bằng chứng. Không phần nào của gain đến từ belief hay mô hình drift (§4.1).
 - Draft: 34,1% với CI [25,1; 42,6] (tr. 7).
 
 ### 5.2 Chuyển giao attacker (RQ3)
@@ -426,7 +500,7 @@ Draft, để đặt cạnh:
 
 ### 5.5 Quét η_Q (§11 của draft)
 
-Ô: Sentinel ở mọi η_Q của lưới; Δ ∈ {4, 8}, mid, 7 attacker held-out. B1 không có dòng 8, nên gain ghép record B1 của lưới chính ở cùng ô với từng η_Q. Cột "Chọn trên dev" đánh dấu η_Q đã tinh chỉnh.
+Ô: Sentinel ở mọi η_Q của lưới; Δ ∈ {4, 8}, mid, 7 attacker held-out. B1 không có dòng 8, nên gain ghép record B1 của lưới chính ở cùng ô với từng η_Q. Cột "Chọn trên dev" đánh dấu η_Q đã tinh chỉnh. Gain so với B1 theo từng η_Q là một phân tích mà D33 không liệt kê; báo cáo khai nó ở đây (ghi nhận M8 trong tiền đăng ký).
 
 <!-- tbl:eta -->
 | ρ_patch | η_Q | Chọn trên dev | V(S) | FQ % | Clean completion % | V(B1) | Gain so với B1, % [CI 95%] | Hiệu V(B1) − V(S) [CI 95%] | N (workflow / repo / episode) |
@@ -474,10 +548,11 @@ Draft: "sweeping η_Q shows Sentinel's advantage over B1 growing from 34.1% to 4
   - ρ = 1: từ 8,79% lên 12,83%.
 - Cái giá là gỡ nhầm: ở ρ = 0, FQ đi từ 0,52% (η_Q = 0,5) lên 8,58% (η_Q = 0).
 - **Ở ρ = 0, trên eval, η_Q ∈ {0,01; 0,02; 0,05; 0,1} cho cùng V với η_Q = 0 đã chọn** (0,4054), nhưng FQ chỉ 3,02%, 2,62%, 2,01% và 1,22%, thay vì 8,58%.
-  - Trên dev, η_Q = 0 cho harm tệ nhất thấp hơn hẳn: 0,4117 so với 0,4197 ở η_Q = 0,01 (`select-log.txt`). Luật khai trước (D11) vì thế chọn 0.
+  - Trên dev (43 workflow django, 2 seed tinh chỉnh), η_Q = 0 cho harm tệ nhất thấp hơn khi so ở 4 chữ số thập phân, như quy tắc hoà của D11: 0,4117 so với 0,4197 ở η_Q = 0,01 (`select-log.txt`). Luật khai trước vì thế chọn 0. §10, mục 12 nói vì sao luật này chọn 0 mỗi khi trần FQ không chặn.
   - Eval chỉ để đọc; η_Q không được chỉnh lại.
 - **Ở ρ = 1,** η_Q = 0,3543 đã chọn cho V = 0,1772; mọi η_Q ≤ 0,2 cho 0,1693. Trên dev, η_Q từ 0 đến 0,3543 hoà nhau ở harm tệ nhất (0,1589), và luật hoà chọn FQ nhỏ nhất, tức 0,3543 (`select-log.txt`).
 - Ở η_Q đã chọn, phép quét cho lại đúng V và FQ của Sentinel trong lưới chính, ở cả bốn ρ.
+- **[post hoc] Độ nhạy theo D30.** Giữ nguyên mixture và đặt η_Q ở bất kỳ giá trị nào của lưới, cận dưới CI 95% thấp nhất của gain là 36,84% (ρ = 0), 32,37% (ρ = 0,25) và 25,77% (ρ = 0,5), cả ba ở η_Q = 0,5. Đây là CI 95%, không phải CI Bonferroni của endpoint.
 
 ## 6. Kiểm độ nhạy
 
@@ -504,7 +579,8 @@ Thế giới và defender cùng đổi match; headline là match 1 (Q8). Tóm t�
 Đọc:
 - Ở ρ ≤ 0,5, gain và hiệu giống hệt nhau ở cả ba mức match, và bằng số headline.
 - Ở ρ = 1: match 0 và 0,5 cho 11,22% (V(S) = 0,1725); match 1 cho 8,79%. Mọi CI của hiệu chứa 0.
-- Điều này nhất quán với diễn giải ở §4.1: khi η_Q = 0, drift chỉ có thể đổi item lành tính nào bị gỡ, không đổi harm tệ nhất.
+- [post hoc] Ở ρ ≤ 0,5 phép quét này **không thể** đổi harm: η_Q = 0 và không member nào đọc belief để chọn hành động (§4.1). Số giống hệt nhau vì thế không phải bằng chứng về độ bền trước drift.
+- Tóm tắt của phép quét chỉ tính trên harm, trong khi drift tác động qua FQ. FQ của phép quét không có trong tóm tắt (M3).
 
 ### 6.2 Drift vĩnh viễn
 
@@ -522,11 +598,11 @@ Kiểm độ nhạy khai trước ở Q8: item drift nổ suốt đời thay vì
 | 1 | tạm thời, 1 task (headline) | 57 / 16 / 3.829 | 0,1943 | 0,1772 | 8,79 [−13,60; 16,70] | 0,0171 [−0,0200; 0,0333] |
 | 1 | vĩnh viễn | 57 / 16 / 3.829 | 0,1943 | 0,1740 | 10,41 [−12,86; 17,21] | 0,0202 [−0,0193; 0,0341] |
 
-Đọc: ở ρ ≤ 0,5 drift vĩnh viễn cho đúng số headline. Ở ρ = 1 gain là 10,41% so với 8,79% ở headline, và CI của hiệu chứa 0.
+Đọc: ở ρ ≤ 0,5 drift vĩnh viễn cho đúng số headline. Ở ρ = 1 gain là 10,41% so với 8,79% ở headline, và CI của hiệu chứa 0. [post hoc] Như ở §6.1, ở ρ ≤ 0,5 phép quét này không thể đổi harm, và FQ của nó không có trong tóm tắt (M3).
 
 ### 6.3 Ngân sách × χ: EXPLORATORY (D4b)
 
-**Nhãn EXPLORATORY.** Ở ngân sách b1 (phần 1), một hành động không bao giờ vượt B/H, nên lưới chính không đo được tác dụng của χ. χ và phần phụ thuộc ngân sách của Định lý 4 chỉ đọc ở đây (D4b). Phép quét này không có kiểm định nào được khai trước.
+**Nhãn EXPLORATORY.** Ở ngân sách b1 (phần 1), một hành động không bao giờ vượt B/H, nên lưới chính không đo được tác dụng của χ. χ và phần phụ thuộc ngân sách của Định lý 4 chỉ đọc ở đây (D4b). Phép quét này không có kiểm định nào được khai trước. Nó chạy Sentinel đã tinh chỉnh ở b1 trên mọi phần ngân sách, không tinh chỉnh lại cho từng ngân sách (M9).
 
 Hai nhãn χ cho cùng một điểm lưới:
 - χ theo 2·MAD/κ̄ là nhãn của v2 (D2): 0; 0,5; 1,34;
@@ -617,10 +693,10 @@ Endpoint chỉ trên các repo Python của SWE-bench Verified.
 | # | Dự đoán (nguyên văn tiền đăng ký) | Quan sát | Kết quả | Ghi chú về cơ chế |
 |---|---|---|---|---|
 | P1 | "Hai đối chứng D28 đạt." | `controls.ok = true`; V(Oracle) = 0,0054; ở Δ = 0, V(B3) = V(B4) = 0,8592 ≥ V(B1) = 0,6444 | khớp | — |
-| P2 | "Ở Δ = 0, Sentinel ≈ B1: mixture của regime Δ = 0 là commit." | Ở Δ = 0, gain bằng 0 với CI [0; 0] ở cả bốn ρ; hiệu 0,0000 | kết cục khớp | Cơ chế không khớp nguyên văn. Mixture Δ = 0 là `L-BT-0.5-f0` với trọng số 1, ở mọi ρ và mọi detector, chứ không phải member commit `L-SW-commit`. Ở detector mid, `d32-effect.txt` ghi 10 policy hoà ở harm tệ nhất trong ô Δ = 0, cả 10 có FQ 0,00, ở cả bốn ρ. Theo diễn giải ở §4.1, `L-BT-0.5-f0` commit ở mọi task, nên kết cục vẫn ra như dự đoán. |
+| P2 | "Ở Δ = 0, Sentinel ≈ B1: mixture của regime Δ = 0 là commit." | Ở Δ = 0, gain bằng 0 với CI [0; 0] ở cả bốn ρ; hiệu 0,0000 | kết cục khớp | Cơ chế không khớp nguyên văn. Mixture Δ = 0 là `L-BT-0.5-f0` với trọng số 1, ở mọi ρ và mọi detector, chứ không phải member commit `L-SW-commit`. [post hoc] `L-BT-0.5-f0` là một bản sao của B1 (§4.1). Ở detector mid, `d32-effect.txt` ghi 10 policy hoà ở harm tệ nhất trong ô Δ = 0, cả 10 có FQ 0,00, ở cả bốn ρ; `L-BT-0.5-f0` thắng vì đứng đầu theo thứ tự tên. Kết cục khớp vì member được chọn chơi đúng như commit. |
 | P3 | "Gain so với B1 giảm khi ρ tăng, vì B1 yếu nhất với patch uỷ quyền; ở ρ = 1 gain có thể ≈ 0 hoặc âm." | Gain 49,20 → 49,15 → 43,03 → 8,79%; ở ρ = 1, CI [−27,32; 18,86] và hiệu 0,0171 [−0,0390; 0,0372] | khớp | Bước đầu gần như phẳng (49,20 và 49,15). V(B1) giảm từ 0,7981 xuống 0,1943 khi ρ tăng, nhất quán với cơ chế đã nêu. |
-| P4 | "'A1 −regime estimate' ≈ B1: mixture gộp mọi Δ co về commit." | V(−regime estimate) = V(B1) ở cả bốn ρ: 0,7981 / 0,7154 / 0,5387 / 0,1943; ở ρ ≥ 0,5 mọi cột Bảng 2 trùng B1 | kết cục khớp | Cơ chế không khớp nguyên văn: mixture "all" ở mid là `L-BT-0.5-f0` với trọng số 0,9924 và 0,9928 ở ρ ≤ 0,25 (phần còn lại là member SW), và 1 ở ρ ≥ 0,5 (bảng mixture ở §4.1). Cùng diễn giải như P2. |
-| P5 | "Dưới best response cross-fit, 'A1 −randomization' có V_BR lớn hơn Sentinel." | V_BR(−randomization) = 0,8672 / 0,8672 / 0,4839 / 0,1175; V_BR(S) = 0,3709 / 0,3621 / 0,2911 / 0,1477 | khớp ở ρ ≤ 0,5; không khớp ở ρ = 1 | Ở ρ ≥ 0,5 "−randomization" trùng B1 ở mọi cột Bảng 2. Ở ρ = 1, V_BR của B1 thấp hơn V_BR của Sentinel. V_BR không có CI, nên đây là so điểm ước lượng. |
+| P4 | "'A1 −regime estimate' ≈ B1: mixture gộp mọi Δ co về commit." | V(−regime estimate) = V(B1) ở cả bốn ρ: 0,7981 / 0,7154 / 0,5387 / 0,1943; ở ρ ≥ 0,5 mọi cột Bảng 2 trùng B1 | kết cục khớp | Cơ chế không khớp nguyên văn: mixture "all" ở mid là `L-BT-0.5-f0` với trọng số 0,9924 và 0,9928 ở ρ ≤ 0,25 (phần còn lại là member SW), và 1 ở ρ ≥ 0,5 (bảng mixture ở §4.1). [post hoc] `L-BT-0.5-f0` là bản sao của B1, nên kết cục khớp theo cấu tạo. |
+| P5 | "Dưới best response cross-fit, 'A1 −randomization' có V_BR lớn hơn Sentinel." | V_BR(−randomization) = 0,8672 / 0,8672 / 0,4839 / 0,1175; V_BR(S) = 0,3709 / 0,3621 / 0,2911 / 0,1477 | khớp ở ρ ≤ 0,5; không khớp ở ρ = 1 | Ở ρ ≥ 0,5 "−randomization" trùng B1 ở mọi cột Bảng 2; [post hoc] vì vậy P5 ở ρ = 0,5 thực chất so Sentinel với B1. Ở ρ = 1, V_BR của B1 thấp hơn V_BR của Sentinel. V_BR không có CI và là cận dưới (§3), nên đây là so điểm ước lượng; [post hoc] thứ tự của P5 giữ nguyên với ước lượng naive. |
 | P6 | "Thế giới phụ đúng như D29." | xem §1.2 | khớp | — |
 
 ## 8. Hàm mất L (D15)
@@ -642,7 +718,7 @@ L được khai trước là đại lượng **báo kèm, không dùng để tin
 - **Ở ρ = 1, L tệ nhất của Sentinel thấp nhất** (0,4903 so với 0,5601 của B1). η_Q = 0,3543 hạ FQ của Sentinel xuống 0,36%.
 - B2–B6 có L tệ nhất cao hơn cả Sentinel lẫn B1 ở mọi ρ.
 - Tóm tắt không có CI cho L, nên không đọc được hiệu L có vượt nhiễu hay không.
-- Draft không có cột L. Draft ghi Sentinel gỡ nhầm nhiều hơn B1 1,9 điểm (5,1% so với 3,2%, tr. 6 và tr. 8).
+- Draft không có cột L. Draft ghi Sentinel gỡ nhầm nhiều hơn B1 1,9 điểm (5,1% so với 3,2%, tr. 6 và tr. 8). Ở v2, FQ(B1) = 0 theo cấu tạo (§2.1), nên khoảng cách FQ của v2 và của draft không so được.
 
 ## 9. B7 trên game nhỏ (mô hình covering)
 
@@ -681,7 +757,17 @@ Theo danh sách ở plan (Task 12 Step 6, mục 7):
 10. **Sai lệch D30.** Ngày 25/09, một lượt smoke của công cụ eval đã chạm tập eval với cấu hình chưa đóng băng (Q12).
     - Hồ sơ nằm ở `spikes/v2-pilot/eval-touch-2509/` và vẫn chưa được mở; báo cáo này cũng không mở nó.
     - Sau lượt chạm, lưới η_Q và τ₅ được nới xuống tới 0, với động cơ đã khai là từ dev (Q12). Giá trị được chọn là 0 ở nhiều ô: η_Q = 0 ở ρ ≤ 0,5 và τ₅ = 0 ở ρ ≥ 0,5 (`reference/v2_tuned.json`). Cả hai là mép dưới mới của lưới.
-    - Theo diễn giải ở §4.1, η_Q = 0 là điều làm hai ablation ở đó bằng 0.
+    - η_Q = 0 là một trong hai lý do khiến hai ablation ở §4.1 không được thử.
+    - [post hoc] Độ nhạy: với mixture giữ nguyên, ở mọi η_Q của lưới, cận dưới CI 95% của gain không xuống dưới 25,77% ở ρ ≤ 0,5 (§5.5).
+11. **[post hoc] Khuyết tật thiết kế của plan: thư viện BT bị khoá (12/12 member, §4.1).**
+    - Lưới τ ∈ {0,3; 0,5; 0,7; 0,9} được đặt mà không kiểm miền mà p_attack có thể đạt. Thống kê này không đổi nếu không có bằng chứng từ lần quét, nên một member BT hoặc luôn commit, hoặc không bao giờ commit.
+    - D17 trung thành với §4 của draft; khuyết tật nằm ở plan. Test BT duy nhất đặt hậu nghiệm bằng tay (`tests/gate1_integrity/test_v2_policies.py`), nên không bắt được lỗi này.
+    - Hệ quả: 10/28 member là B1; trong Sentinel, dòng 7 không lái việc phân bổ audit ở ô nào; ở ρ ≤ 0,5 "−alarm memory" và "−benign-drift" không được thử. Bảng 3 của bài nên ghi hai arm này là "không được thử ở ρ ≤ 0,5".
+    - Sửa thư viện cần tinh chỉnh lại và một lượt eval mới, tức một nghiên cứu mới; tập eval đã không còn mới.
+12. **[post hoc] Mục tiêu D26 đẩy η_Q về 0 mỗi khi trần FQ không chặn.**
+    - D26 ưu tiên harm tệ nhất, với trần FQ 10%. Harm tệ nhất không bao giờ tăng khi gỡ nhiều item hơn: log η trên dev (`select-log.txt`) và trên eval (§5.5) đều đơn điệu.
+    - Vì vậy η_Q = 0, tức luật ngây thơ, thắng mỗi khi trần không chặn. Điều này ngược với ý định của D11 và Q5: để trần FQ, chứ không phải mép lưới, giới hạn dòng 8.
+    - Ở ρ ≤ 0,5 trần không chặn: FQ trên dev ở η_Q = 0 là 6,37 / 5,97 / 4,46%. Ở ρ = 1 harm hoà trên dev, nên luật hoà chọn η_Q = 0,3543.
 
 Sai lệch khai thêm:
 - **D32, luật hoà của LP.** LP của D26 có thể có nhiều nghiệm; thêm bước giữ harm tệ nhất tối ưu rồi lấy FQ nhỏ nhất, và `pure` theo cùng thứ tự rồi theo tên.
@@ -697,10 +783,17 @@ Sai lệch khai thêm:
   - record thô không commit, được ghim bằng sha256.
 
 Các điểm provenance nhỏ còn mở:
-- **V_BR không có N riêng.** Chỉ có tổng số vị trí ở `denominators.br` (§3).
+- **V_BR không có N trong tóm tắt.** Tóm tắt chỉ có tổng số vị trí ở `denominators.br`; [post hoc] N của best response đọc từ `eval-br.jsonl` ở §3.
 - **N của đối chứng là hợp của hai ô** (3.829 + 2.472 = 6.301 episode, §1.1).
-- **`--summarise-only` xoá hai file tóm tắt cũ trước khi kiểm đầu vào.** `summarise()` gọi `unlink` với `eval-summary.json` và `eval-sweeps-summary.json`, rồi mới so các giá trị ρ, Δ, seed có trong record với cờ của lượt chạy. Gọi nhầm cờ thì mất tóm tắt rồi mới dừng. Hai file này hiện chưa được commit.
+- **`--summarise-only` xoá hai file tóm tắt cũ trước khi kiểm đầu vào.** `summarise()` gọi `unlink` với `eval-summary.json` và `eval-sweeps-summary.json`, rồi mới so các giá trị ρ, Δ, seed có trong record với cờ của lượt chạy. Gọi nhầm cờ thì mất tóm tắt rồi mới dừng. Hai file đã được commit ở `f356fd4`, nên lấy lại được từ git. Chấp nhận và không sửa công cụ đã ghim (M6).
 - **Tiền đăng ký ghi "9 repo" cho dòng chỉ Verified**, dữ liệu có 7 (§6.4).
+
+[post hoc] Khai thêm từ rà soát cuối:
+- **M3.** Hai phép quét drift chỉ được tóm tắt trên harm, trong khi drift tác động qua FQ (§6.1, §6.2).
+- **M4.** Tinh chỉnh lấy trung bình harm của mỗi cột theo episode (`tools/select_mixture.py`, `member_cell`), còn eval lấy trung bình của các trung bình theo workflow. LP của từng regime dùng FQ gộp trên mọi Δ.
+- **M7.** Một số đầu vào nằm ngoài digest của freeze: `swebench_dataset.py`, `topics.py`, `prose_world.py`, `data/*.jsonl`, và `make_world` trong `tools/select_mixture.py`. Chúng được phủ bởi `git_head`, `git_clean` và sha256 của hai công cụ trong khối `run`.
+- **M9.** Độ trễ phát hiện có thể gồm lần commit chặn patch ở σ hoặc sau σ (§3). Phép quét ngân sách chạy Sentinel tinh chỉnh ở b1, không tinh chỉnh lại (§6.3).
+- **Độ phủ của CI** với 16 họ repo không cân bằng là một giới hạn (§2.1).
 
 ## 11. Nguồn gốc số và cách dựng lại
 
@@ -708,7 +801,9 @@ Mọi số v2 trong báo cáo đọc từ:
 - `auditgame/spikes/v2/eval-summary.json` và `auditgame/spikes/v2/eval-sweeps-summary.json` (freeze, git HEAD, seed, Δ, ρ, `n_boot`, λ, header ở khối `run`);
 - `auditgame/spikes/v2/small-games.json` (§9);
 - `auditgame/reference/v2_tuned.json`, `auditgame/spikes/v2/select-log.txt`, `auditgame/spikes/v2/d32-effect.txt` (mixture, η_Q, số liệu dev ở §4.1, §5.5, §7);
-- `auditgame/spikes/v2/eval-log.txt` (giờ chạy).
+- `auditgame/spikes/v2/eval-log.txt` (giờ chạy);
+- [post hoc] `auditgame/spikes/v2/eval-br.jsonl`, đọc trọn, và một lượt streamed của `auditgame/spikes/v2/eval-main.jsonl`, chỉ các dòng của ô headline, với sha256 khớp `eval-records.sha256` (§2.2, §3);
+- [post hoc] code (`belief.py`, `belief_v2.py`, `carrier_policies.py`) và `reference/v2_tuned.json` cho các sự kiện về thư viện BT (§4.1).
 
 Số của draft đọc từ `docs/FSE-2027-15-paper.pdf`, trang ghi cạnh từng số.
 

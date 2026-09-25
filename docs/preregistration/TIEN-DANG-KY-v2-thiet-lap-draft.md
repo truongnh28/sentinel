@@ -372,3 +372,11 @@ Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết 
   - (−) ở Δ = 0: V(B3) = V(B4) = `0.8592`, V(B1) = `0.6444`;
   - N: 57 workflow, 16 repo, 6.301 episode.
 - Task 12, Step 5 (B7): `spikes/v2/small-games.json` trùng bản v1 `spikes/small-games.json`, trừ commit và thời điểm.
+- 25/09, sau lượt eval, rà soát cuối của nhánh, I1 (ghi nhận post hoc, không phải dòng D mới): cả 12/12 member BT bị khoá ở một chế độ.
+  - τ ≥ 0,5 (9 member) commit ở mọi task: tiên nghiệm p_attack = 0,5, và commit không cho tín hiệu carrier (D17). Chúng là bản sao của B1.
+  - τ = 0,3 (3 member) không bao giờ commit: cửa sổ Δ = 0 và cửa sổ của carrier branch không bao giờ nhận bằng chứng, nên p_attack ≥ 0,306 (H = 14) đến 0,340 (H = 6).
+  - 10/28 member là B1, nên thư viện chỉ có 19 hành vi khác nhau; `L-BT-0.5-f0` thắng cuộc hoà 10 bản sao theo thứ tự tên.
+  - Không mixture robust nào đặt trọng số lên member đọc belief để chọn hành động. Với η_Q = 0 ở ρ ≤ 0,5, không quyết định nào ở đó phụ thuộc belief hay β̂, nên "−alarm memory" và "−benign-drift" không được thử ở ρ ≤ 0,5.
+  - Khuyết tật nằm ở plan: lưới τ không được kiểm với miền mà p_attack đạt được. Sửa cần tinh chỉnh lại và một lượt eval mới. Khai ở `docs/reports/v2-so-voi-draft.md`, §4.1 và §10.
+- 25/09, M8: gain so với B1 theo từng η_Q trong phép quét η là một phân tích mà D33 không liệt kê; khai ở `docs/reports/v2-so-voi-draft.md`, §5.5.
+- 25/09, rà soát cuối: cột quyết định V được tìm bằng một lượt đọc streamed của `eval-main.jsonl` đã ghim (sha256 khớp `eval-records.sha256`), không chạy mô phỏng. Bảng post hoc ở báo cáo §2.2 đọc lại theo cùng cách.
