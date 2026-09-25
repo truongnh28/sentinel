@@ -479,5 +479,23 @@ Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết 
   - Mặt (V, FQ): ở mọi ρ, B2–B6 đều có V và FQ cùng cao hơn Sentinel-A1; không baseline nào được tinh chỉnh lại về cùng FQ.
   - D30 ở mức họ 98,75%: cận dưới thấp nhất trên lưới η_Q là 35,02 / 29,84 / 21,46 % ở ρ ≤ 0,5 (thay các cận 95% đã báo).
 - 26/09, D35 trước freeze (ghi nhận, không phải dòng D mới):
-  - Tinh chỉnh dev của addendum (`tools/tune_d35.py`, 67 giây): B2 FQ-matched p* = 0,9 (ρ 0; 0,25), 0,95 (ρ 0,5), 1 (ρ 1). Lịch cố định: ở ρ ≤ 0,5 không lịch nào giữ FQ ≤ 10% trên dev (10,2–11,5%), nên theo luật của `pure` (đã khai ở D35) lịch được chọn là lịch có harm tệ nhất nhỏ nhất, cờ `cap_ok = false`; ở ρ = 1 cap đạt.
+  - Tinh chỉnh dev của addendum (`tools/tune_d35.py`, 67 giây): B2 FQ-matched p* = 0,9 (ρ 0; 0,25), 0,95 (ρ 0,5), 1 (ρ 1). Lịch cố định: ở ρ ≤ 0,5 không lịch nào giữ FQ ≤ 10% trên dev (cả họ: 10,2–13,4%; hai lịch được chọn: 10,2–11,5%), nên theo luật của `pure` (đã khai ở D35) lịch được chọn là lịch có harm tệ nhất nhỏ nhất, cờ `cap_ok = false`; ở ρ = 1 cap đạt.
   - Review Task 3 thêm các chốt chặn (không đổi số nào của một lượt chạy đủ, pilot dev chạy lại trùng từng byte): kiểm đủ record trước mọi số, NaN không thành False, kiểm pin trước khi đọc record, kiểm lại freeze lúc tóm tắt, pre-flight tóm tắt chính. Manifest D35 ghim thêm `tools/run_d35.py` (chặt hơn danh sách D35 nêu) để luật đọc không đổi được sau freeze. Trường (C) đổi tên thành `C_fixed_worse_than_sentinel` vì D35 chỉ cho phép chiều "không quy được cho ngẫu nhiên hoá".
+- 26/09, D35, luật chấm P7–P9 và các làm rõ, ghi TRƯỚC freeze D35 và trước lượt eval (sau rà soát cuối):
+  - Luật chấm (đọc từ `d35-summary.json`):
+    - P7a: `readings.A_oracle_survives_one_step` = true.
+    - P7b "giữ phần lớn gain": `retained` > 0,5 cho dhat-swap và dhat-down1 ở mọi ρ ≤ 0,5.
+    - P7c "hai bậc giữ ít hơn": `retained`(down2) < min(`retained`(swap), `retained`(down1)) ở mọi ρ ≤ 0,5.
+    - P7 "có thể mất gain ở ρ = 0,5": chỉ mô tả, không chấm.
+    - P8a: `readings.B_beats_fq_matched_mix` = true ở ρ 0; 0,25; 0,5.
+    - P8b: ở ρ = 1, V(B2 FQ-matched) = V(B1) (đúng theo cấu trúc vì p* = 1).
+    - P8 "nằm sát B1": chỉ mô tả.
+    - P9a: `readings.C_fixed_worse_than_sentinel` = true ở cả 4 ρ.
+    - P9b "tệ hơn B1 ở ρ ≥ 0,25": ước lượng điểm `vs_b1.abs_diff` < 0 ở ρ 0,25; 0,5; 1 (báo kèm khoảng).
+    - P9c: `readings.C_br_fixed_above_sentinel` = true ở cả 4 ρ.
+    - P9 "V gần như không đổi theo ρ": chỉ mô tả.
+  - "FQ-matched" nghĩa là FQ trên dev không vượt FQ của Sentinel, không phải bằng FQ: lưới 0,05 để B2 dưới mức đó (trên dev 4,89 so với 8,92). Cách đọc (B) so với một phép trộn có FQ không cao hơn Sentinel; báo cả hai FQ.
+  - "Mỗi arm là một họ": mỗi hệ trong 5 hệ có khoảng 98,75% riêng; ba hệ Δ̂ của arm A không hiệu chỉnh với nhau. Cách đọc (A) là phép hội nên bảo thủ.
+  - `retained` chỉ đọc ở ρ ≤ 0,5 (ở ρ = 1 mẫu số V(B1) − V(S) ≈ 0,017).
+  - Lượt chạy bị gián đoạn: nếu lượt eval dừng sau khi `d35-main.jsonl` đã có, không chạy lại (tool từ chối), không tóm tắt record dở (tool giữ lại vì thiếu pin); addendum được báo là "không hoàn tất" kèm lý do. Stdout của lượt chạy lưu ở `spikes/v2-addendum/d35-log.txt`.
+  - Kiểm tra sau lượt chạy, không chặn: `v_br_by_delta` của B1 và Sentinel-A1 chạy lại phải trùng `table2` của tóm tắt chính; kết quả ghi vào sổ.

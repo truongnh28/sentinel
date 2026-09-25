@@ -488,5 +488,23 @@ This section only records values measured while executing the plan; every decisi
   - The (V, FQ) plane: at every ρ, each of B2–B6 has both a higher V and a higher FQ than Sentinel-A1; no baseline was re-tuned to the same FQ.
   - D30 at the 98.75% family level: the lowest lower bound over the η_Q grid is 35.02 / 29.84 / 21.46 % at ρ ≤ 0.5 (replacing the 95% bounds reported earlier).
 - 26/09, D35 before the freeze (a note, not a new D line):
-  - The addendum's dev tuning (`tools/tune_d35.py`, 67 seconds): B2 FQ-matched p* = 0.9 (ρ 0, 0.25), 0.95 (ρ 0.5), 1 (ρ 1). Fixed schedules: at ρ ≤ 0.5 no schedule keeps dev FQ ≤ 10% (10.2–11.5%), so by the rule of `pure` (declared in D35) the schedule with the lowest worst case was chosen, flagged `cap_ok = false`; at ρ = 1 the cap is met.
+  - The addendum's dev tuning (`tools/tune_d35.py`, 67 seconds): B2 FQ-matched p* = 0.9 (ρ 0, 0.25), 0.95 (ρ 0.5), 1 (ρ 1). Fixed schedules: at ρ ≤ 0.5 no schedule keeps dev FQ ≤ 10% (the whole family: 10.2–13.4%; the two chosen schedules: 10.2–11.5%), so by the rule of `pure` (declared in D35) the schedule with the lowest worst case was chosen, flagged `cap_ok = false`; at ρ = 1 the cap is met.
   - The Task 3 review added guards (no number of a complete run changes; the redone dev pilot is byte-identical): completeness before any number, NaN never becomes False, pins checked before records are parsed, the freeze re-checked at summary time, a pre-flight of the main summary. The D35 manifest also pins `tools/run_d35.py` (stricter than the list in D35), so the reading rules cannot change after the freeze. Reading (C)'s field was renamed `C_fixed_worse_than_sentinel`, since D35 licenses only the "not attributable to randomisation" direction.
+- 26/09, D35, scoring rules for P7–P9 and clarifications, written BEFORE the D35 freeze and the eval run (after the final review):
+  - Scoring (read from `d35-summary.json`):
+    - P7a: `readings.A_oracle_survives_one_step` is true.
+    - P7b "keeps most of the gain": `retained` > 0.5 for dhat-swap and dhat-down1 at every ρ ≤ 0.5.
+    - P7c "two steps keep less": `retained`(down2) < min(`retained`(swap), `retained`(down1)) at every ρ ≤ 0.5.
+    - P7 "may lose the gain at ρ = 0.5": descriptive, not scored.
+    - P8a: `readings.B_beats_fq_matched_mix` is true at ρ 0, 0.25, 0.5.
+    - P8b: at ρ = 1, V(B2 FQ-matched) = V(B1) (true by construction, since p* = 1).
+    - P8 "sits close to B1": descriptive.
+    - P9a: `readings.C_fixed_worse_than_sentinel` is true at all 4 ρ.
+    - P9b "worse than B1 at ρ ≥ 0.25": the point estimate `vs_b1.abs_diff` < 0 at ρ 0.25, 0.5, 1 (interval reported alongside).
+    - P9c: `readings.C_br_fixed_above_sentinel` is true at all 4 ρ.
+    - P9 "V nearly flat in ρ": descriptive.
+  - "FQ-matched" means dev FQ no higher than Sentinel's, not equal to it: the 0.05 grid leaves B2 below the target (on dev 4.89 against 8.92). Reading (B) compares with a mix whose FQ is no higher than Sentinel's; both FQs are reported.
+  - "Each arm is its own family": each of the 5 systems gets its own 98.75% interval; arm A's three Δ̂ systems are not corrected against each other. Reading (A) is a conjunction, hence conservative.
+  - `retained` is read only at ρ ≤ 0.5 (at ρ = 1 its denominator V(B1) − V(S) is about 0.017).
+  - Interrupted run: if the eval run stops after `d35-main.jsonl` exists, it is not re-run (the tool refuses) and the partial records are not summarised (the tool withholds for the missing pins); the addendum is reported as "not completed" with the reason. The run's stdout is kept in `spikes/v2-addendum/d35-log.txt`.
+  - Post-run check, not gating: the re-simulated `v_br_by_delta` of B1 and Sentinel-A1 must equal the main summary's `table2`; the result is recorded.
