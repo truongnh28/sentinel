@@ -399,3 +399,8 @@ Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết 
   - Cột Δ = 8 của tập eval có 34 workflow / 12 repo.
   - D15 viết λ_Q·FQ; mã (`metrics.loss`) dùng số item bị cách ly nhầm Q_false. Bài dùng Q_false.
   - D2 dẫn "§8" của draft cho bảng giá và song ánh; trong PDF là §7 ("Audit actions", tr. 5) và Bảng 1.
+- 25/09, hậu kiểm #2 (trả lời một bản phản biện bài báo; ghi nhận post hoc, không phải dòng D mới): `auditgame/spikes/v2/posthoc/posthoc2.py` → `posthoc2.json`. Script chỉ đọc record đã ghim (kiểm sha256 `eval-main.jsonl`, `sweep-eta.jsonl`) bằng mã metric đã ghim, không mô phỏng, không tinh chỉnh; mọi số dùng trong bài đều gắn nhãn post hoc.
+  - L theo η_Q (mixture giữ nguyên): L xấu nhất cao hơn B1 ở ρ ≤ 0,5 là do góc η_Q = 0; ở η_Q = 0,01, V đổi ≤ 0,0025, FQ giảm còn khoảng một phần ba, L xấu nhất thấp hơn B1. λ_Q hoà với B1: 0,30–0,34 ở η_Q = 0 (dưới λ_Q đã khai 0,54865), 0,86–0,96 ở η_Q = 0,01. Trên dev, η_Q = 0 thắng thật về harm (select-log), nên không kết luận rằng một mục tiêu theo L "sẽ chọn" 0,01.
+  - Bỏ từng repo: gain 47,46–51,33 / 47,16–51,02 / 40,95–44,72 / 5,23–11,42 % ở ρ 0 / 0,25 / 0,5 / 1. Bỏ sympy: cận dưới 98,75% là 37,89 / 32,63 / 17,96 % ở ρ ≤ 0,5.
+  - Mặt (V, FQ): ở mọi ρ, B2–B6 đều có V và FQ cùng cao hơn Sentinel-A1; không baseline nào được tinh chỉnh lại về cùng FQ.
+  - D30 ở mức họ 98,75%: cận dưới thấp nhất trên lưới η_Q là 35,02 / 29,84 / 21,46 % ở ρ ≤ 0,5 (thay các cận 95% đã báo).

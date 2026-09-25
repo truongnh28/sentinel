@@ -401,3 +401,8 @@ This section only records values measured while executing the plan; every decisi
   - The Δ = 8 column of the eval split has 34 workflows / 12 repos.
   - D15 writes λ_Q·FQ; the code (`metrics.loss`) uses the count of wrongly-quarantined items, Q_false. The paper uses Q_false.
   - D2 cites "§8" of the draft for the price table and the bijection; in the PDF it is §7 ("Audit actions", p. 5) and Table 1.
+- 25/09, post hoc #2 (answering a critique of the paper; a post hoc note, not a new D line): `auditgame/spikes/v2/posthoc/posthoc2.py` → `posthoc2.json`. The script only reads the pinned records (sha256 of `eval-main.jsonl` and `sweep-eta.jsonl` checked) with the pinned metric code; no simulation, no tuning; every number the paper uses from it is labelled post hoc.
+  - L by η_Q (mixtures fixed): the worst-case L above B1's at ρ ≤ 0.5 is a property of the corner η_Q = 0; at η_Q = 0.01, V moves by at most 0.0025, FQ falls to about a third and the worst-case L falls below B1's. Break-even λ_Q against B1: 0.30–0.34 at η_Q = 0 (below the declared 0.54865), 0.86–0.96 at η_Q = 0.01. On dev, η_Q = 0 was strictly better on harm (select-log), so we do not conclude that an L-first objective "would have chosen" 0.01.
+  - Leaving out one repository: gain 47.46–51.33 / 47.16–51.02 / 40.95–44.72 / 5.23–11.42 % at ρ 0 / 0.25 / 0.5 / 1. Without sympy: 98.75% lower bounds 37.89 / 32.63 / 17.96 % at ρ ≤ 0.5.
+  - The (V, FQ) plane: at every ρ, each of B2–B6 has both a higher V and a higher FQ than Sentinel-A1; no baseline was re-tuned to the same FQ.
+  - D30 at the 98.75% family level: the lowest lower bound over the η_Q grid is 35.02 / 29.84 / 21.46 % at ρ ≤ 0.5 (replacing the 95% bounds reported earlier).
