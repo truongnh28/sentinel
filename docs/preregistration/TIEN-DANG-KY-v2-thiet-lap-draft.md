@@ -343,4 +343,8 @@ Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết 
   - β̂: `{'memory': 0.3058, 'skill': 0.0654, 'queue': 0.0326, 'branch': 0.0141}`; thế giới `{'memory': 0.314, 'skill': 0.058, 'queue': 0.033, 'branch': 0.0}`
   - ρ = 0 / 0,25 / 0,5 / 1: τ₅ = `0.1 / 0.1 / 0.0 / 0.0`, η_Q = `0.0 / 0.0 / 0.0 / 0.3543`
   - Mỗi ρ có 18 ô mixture, tổng trọng số bằng 1, `cap_ok` đều True: D26 không có ô nào phải khai.
-  - D32 đổi 2/72 ô mixture (ρ = 0, strong, Δ = 0 và all), không đổi `pure` ở ô nào, và không đổi τ₅ hay η_Q.
+  - Hiệu ứng của D32, đo ở `auditgame/spikes/v2/d32-effect.txt` (luật cũ đọc từ commit 4c02883):
+    - đổi 2/72 ô mixture (ρ = 0, strong, Δ = 0 và all);
+    - không đổi `pure` ở ô nào;
+    - không đổi τ₅ hay η_Q được chọn.
+  - Ba dòng η_Q của ρ = 1 in FQ% nhỏ hơn lượt đầu, vì bước 2 của D32; η_Q chọn vẫn là 0,3543.
