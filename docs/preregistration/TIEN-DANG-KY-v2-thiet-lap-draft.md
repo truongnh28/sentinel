@@ -363,3 +363,12 @@ Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết 
 - Task 11 (cụm eval, trước khi ghi manifest, D8): `[('sympy/sympy', 15), ('sphinx-doc/sphinx', 8), ('scikit-learn/scikit-learn', 6), ('matplotlib/matplotlib', 5), ('projectlombok/lombok', 3), ('pydata/xarray', 3), ('pytest-dev/pytest', 3), ('astropy/astropy', 2), ('caddyserver/caddy', 2), ('laravel/framework', 2), ('preactjs/preact', 2), ('rubocop/rubocop', 2), ('fastlane/fastlane', 1), ('fluent/fluentd', 1), ('phpoffice/phpspreadsheet', 1), ('sharkdp/bat', 1)] 8.1`
 - Task 11 (đóng băng v2): manifest `sha256:c789fa7362e0`; header `freeze: clean sha256:c789fa7362e0`
 - Task 11 (bộ test): gate 1 710/710; gate 2 203/205 (hai lỗi đã biết: some_epsilon_makes_the_payload_indistinguishable_at_every_delta (pipeline='matched', phase='screen'), one_split_cannot_decide_a_delta_of_the_certify_corpus); gate 3 15/15; test_v2_select 5 OK
+- Task 12, Step 3 (lượt eval duy nhất, 25/09 16:00–16:29, `--split eval`):
+  - header lúc bắt đầu và lúc tóm tắt đều là `freeze: clean sha256:c789fa7362e0`; git `5c99042`, cây `auditgame/` sạch;
+  - record: `main 8501064`, `br 260`, `sweep-eta 122528`, `sweep-match 91896`, `sweep-persistent-drift 30632`, `sweep-budget-EXPLORATORY 605760`, `gate 61264`; sha256 từng file ở `auditgame/spikes/v2/eval-records.sha256`;
+  - 10 seed, Δ {0, 1, 2, 4, 8}, ρ {0; 0,25; 0,5; 1}, 10.000 lượt bootstrap, alpha họ 0,0125.
+- Task 12, Step 4 (đối chứng D28, đọc trước mọi số Sentinel): `ok = True`.
+  - (+) V(Oracle) = `0.00543` ≤ 0,05;
+  - (−) ở Δ = 0: V(B3) = V(B4) = `0.8592`, V(B1) = `0.6444`;
+  - N: 57 workflow, 16 repo, 6.301 episode.
+- Task 12, Step 5 (B7): `spikes/v2/small-games.json` trùng bản v1 `spikes/small-games.json`, trừ commit và thời điểm.

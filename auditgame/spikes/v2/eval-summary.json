@@ -1,0 +1,3732 @@
+{
+  "run": {
+    "split": "eval",
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "deltas": [
+      0,
+      1,
+      2,
+      4,
+      8
+    ],
+    "rhos": [
+      0.0,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "rho_mid_only": false,
+    "skip_br": false,
+    "skip_sweeps": false,
+    "summarise_only": false,
+    "header_start": "freeze: clean sha256:c789fa7362e0",
+    "git_head": "5c99042",
+    "git_clean": true,
+    "git_dirty": [],
+    "sha256": {
+      "tools/run_draft_eval.py": "388510aceecaa516f9fd3e5dc50b2c886036c82e3efc7fa8769d85f5bc7e9bf8",
+      "tools/select_mixture.py": "3fa56fd720420c924d32b325e0e62ead0a7718ebf218d23eb52ecc3199141221"
+    },
+    "ref_rho": 0.25,
+    "headline_rho": null,
+    "family_alpha": 0.0125,
+    "n_boot": 10000,
+    "lambda_Q": 0.54865,
+    "lambda_T": 0.5,
+    "header_summary": "freeze: clean sha256:c789fa7362e0",
+    "records_read": {
+      "eval-main.jsonl": 8501064,
+      "eval-br.jsonl": 260,
+      "sweep-eta.jsonl": 122528,
+      "sweep-match.jsonl": 91896,
+      "sweep-persistent-drift.jsonl": 30632,
+      "sweep-budget-EXPLORATORY.jsonl": 605760,
+      "eval-gate-world.jsonl": 61264
+    },
+    "records_kept": {
+      "eval-main.jsonl": 4512456,
+      "eval-br.jsonl": 260,
+      "sweep-eta.jsonl": 122528,
+      "sweep-match.jsonl": 91896,
+      "sweep-persistent-drift.jsonl": 30632,
+      "sweep-budget-EXPLORATORY.jsonl": 605760,
+      "eval-gate-world.jsonl": 61264
+    },
+    "present": {
+      "eval-main.jsonl": {
+        "rho_patch": [
+          0.0,
+          0.25,
+          0.5,
+          1.0
+        ],
+        "delta": [
+          0,
+          1,
+          2,
+          4,
+          8
+        ],
+        "setting": [
+          "mid",
+          "strong",
+          "weak"
+        ],
+        "seed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "eval-br.jsonl": {
+        "rho_patch": [
+          0.0,
+          0.25,
+          0.5,
+          1.0
+        ],
+        "delta": [
+          0,
+          1,
+          2,
+          4,
+          8
+        ],
+        "setting": [
+          "mid"
+        ]
+      },
+      "sweep-eta.jsonl": {
+        "rho_patch": [
+          0.0,
+          0.25,
+          0.5,
+          1.0
+        ],
+        "delta": [
+          4,
+          8
+        ],
+        "setting": [
+          "mid"
+        ],
+        "seed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "sweep-match.jsonl": {
+        "rho_patch": [
+          0.0,
+          0.25,
+          0.5,
+          1.0
+        ],
+        "delta": [
+          4,
+          8
+        ],
+        "setting": [
+          "mid"
+        ],
+        "seed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "sweep-persistent-drift.jsonl": {
+        "rho_patch": [
+          0.0,
+          0.25,
+          0.5,
+          1.0
+        ],
+        "delta": [
+          4,
+          8
+        ],
+        "setting": [
+          "mid"
+        ],
+        "seed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "sweep-budget-EXPLORATORY.jsonl": {
+        "rho_patch": [
+          0.0,
+          0.25,
+          0.5,
+          1.0
+        ],
+        "delta": [
+          2,
+          4,
+          8
+        ],
+        "setting": [
+          "mid"
+        ],
+        "seed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "eval-gate-world.jsonl": {
+        "rho_patch": [
+          0.0,
+          0.25,
+          0.5,
+          1.0
+        ],
+        "delta": [
+          4,
+          8
+        ],
+        "seed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      }
+    }
+  },
+  "freeze": "freeze: clean sha256:c789fa7362e0",
+  "controls": {
+    "positive_ok": true,
+    "negative_ok": true,
+    "ok": true,
+    "v_oracle_headline": 0.005430242272347536,
+    "v_b1_delta0": 0.6444026733500418,
+    "v_sweepers_delta0": {
+      "B3 audit-on-insertion": 0.8591687552213868,
+      "B4 audit-on-retrieval": 0.8591687552213868
+    },
+    "n_workflows": 57,
+    "n_repos": 16,
+    "n_episodes": 6301
+  },
+  "family_alpha": 0.0125,
+  "curve_rho": {
+    "0": {
+      "gain": 49.2,
+      "lo": 40.8046,
+      "hi": 54.9194,
+      "abs_diff": 0.3927,
+      "abs_lo": 0.308,
+      "abs_hi": 0.4465,
+      "alpha": 0.0125,
+      "v_base": 0.7981,
+      "v_cand": 0.4054,
+      "n_zero_base": 0,
+      "base_events": 128,
+      "rel_reliable": true,
+      "n_repos": 16,
+      "n_workflows": 57,
+      "n_boot": 10000,
+      "n_episodes": 3829,
+      "meets_margin": true
+    },
+    "0.25": {
+      "gain": 49.15,
+      "lo": 36.8892,
+      "hi": 54.133,
+      "abs_diff": 0.3517,
+      "abs_lo": 0.2302,
+      "abs_hi": 0.4194,
+      "alpha": 0.0125,
+      "v_base": 0.7154,
+      "v_cand": 0.3638,
+      "n_zero_base": 0,
+      "base_events": 115,
+      "rel_reliable": true,
+      "n_repos": 16,
+      "n_workflows": 57,
+      "n_boot": 10000,
+      "n_episodes": 3829,
+      "meets_margin": true
+    },
+    "0.5": {
+      "gain": 43.03,
+      "lo": 23.8159,
+      "hi": 47.1006,
+      "abs_diff": 0.2318,
+      "abs_lo": 0.1136,
+      "abs_hi": 0.271,
+      "alpha": 0.0125,
+      "v_base": 0.5387,
+      "v_cand": 0.3069,
+      "n_zero_base": 0,
+      "base_events": 102,
+      "rel_reliable": true,
+      "n_repos": 16,
+      "n_workflows": 57,
+      "n_boot": 10000,
+      "n_episodes": 3829,
+      "meets_margin": true
+    },
+    "1": {
+      "gain": 8.79,
+      "lo": -27.3201,
+      "hi": 18.8573,
+      "abs_diff": 0.0171,
+      "abs_lo": -0.039,
+      "abs_hi": 0.0372,
+      "alpha": 0.0125,
+      "v_base": 0.1943,
+      "v_cand": 0.1772,
+      "n_zero_base": 0,
+      "base_events": 66,
+      "rel_reliable": true,
+      "n_repos": 16,
+      "n_workflows": 57,
+      "n_boot": 10000,
+      "n_episodes": 3829,
+      "meets_margin": false
+    }
+  },
+  "curve_rho_vs_best": {
+    "0": {
+      "best_baseline": "B2 uniform random",
+      "v_best": 0.6754,
+      "v_cand": 0.4054,
+      "abs_diff": 0.27,
+      "abs_lo": 0.1656,
+      "abs_hi": 0.3579,
+      "n_repos": 16,
+      "n_workflows": 57,
+      "n_boot": 10000,
+      "n_episodes": 3829
+    },
+    "0.25": {
+      "best_baseline": "B2 uniform random",
+      "v_best": 0.6754,
+      "v_cand": 0.3638,
+      "abs_diff": 0.3116,
+      "abs_lo": 0.2106,
+      "abs_hi": 0.3692,
+      "n_repos": 16,
+      "n_workflows": 57,
+      "n_boot": 10000,
+      "n_episodes": 3829
+    },
+    "0.5": {
+      "best_baseline": "B5 risk-score",
+      "v_best": 0.492,
+      "v_cand": 0.3069,
+      "abs_diff": 0.1851,
+      "abs_lo": 0.0493,
+      "abs_hi": 0.2566,
+      "n_repos": 16,
+      "n_workflows": 57,
+      "n_boot": 10000,
+      "n_episodes": 3829
+    },
+    "1": {
+      "best_baseline": "B1 audit-at-commit",
+      "v_best": 0.1943,
+      "v_cand": 0.1772,
+      "abs_diff": 0.0171,
+      "abs_lo": -0.039,
+      "abs_hi": 0.0372,
+      "n_repos": 16,
+      "n_workflows": 57,
+      "n_boot": 10000,
+      "n_episodes": 3829
+    }
+  },
+  "by_rho": {
+    "0": {
+      "table2": {
+        "B1 audit-at-commit": {
+          "worst_case_harm": 0.7981379731379731,
+          "worst_case_L": 1.1838675213675214,
+          "v_br_crossfit": 0.7928,
+          "v_br_by_delta": {
+            "4": 0.7488,
+            "8": 0.7928
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.005337973137973129,
+          "clean_completion": 89.42614868862158,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.509628610729023,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B2 uniform random": {
+          "worst_case_harm": 0.6754177109440268,
+          "worst_case_L": 3.4087187453703702,
+          "v_br_crossfit": 0.5848,
+          "v_br_by_delta": {
+            "4": 0.5643,
+            "8": 0.5848
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.09061771094402682,
+          "clean_completion": 97.17215539341353,
+          "false_quarantine_pct": 14.365601287652334,
+          "false_removed_per_ep": 4.079132932880648,
+          "detection_delay": 2.4457340025094103,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B3 audit-on-insertion": {
+          "worst_case_harm": 0.8832722832722832,
+          "worst_case_L": 6.0967452190170945,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.016072283272283272,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 18.570003444057814,
+          "false_removed_per_ep": 8.167406633585793,
+          "detection_delay": 0.002960331557134399,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B4 audit-on-retrieval": {
+          "worst_case_harm": 0.8832722832722832,
+          "worst_case_L": 2.266391848544974,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.016072283272283272,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 14.567625094700386,
+          "false_removed_per_ep": 2.109166884303996,
+          "detection_delay": 0.0009174311926605505,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B5 risk-score": {
+          "worst_case_harm": 0.776878306878307,
+          "worst_case_L": 3.652801513888889,
+          "v_br_crossfit": 0.7828,
+          "v_br_by_delta": {
+            "4": 0.6586,
+            "8": 0.7828
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": 0.005921693121693106,
+          "clean_completion": 97.7834746598304,
+          "false_quarantine_pct": 14.173004120741064,
+          "false_removed_per_ep": 4.419430660746931,
+          "detection_delay": 2.2698788057936743,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B6 two-stage": {
+          "worst_case_harm": 0.8658173210804789,
+          "worst_case_L": 4.538020566798942,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": 0.001382678919521041,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 15.701374290331346,
+          "false_removed_per_ep": 5.7349177330895795,
+          "detection_delay": 2.0337743732590527,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "Sentinel-A1": {
+          "worst_case_harm": 0.40543650793650793,
+          "worst_case_L": 1.559235246031746,
+          "v_br_crossfit": 0.3709,
+          "v_br_by_delta": {
+            "4": 0.3709,
+            "8": 0.3598
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.03453650793650792,
+          "clean_completion": 93.99723920331296,
+          "false_quarantine_pct": 8.580971139847563,
+          "false_removed_per_ep": 1.5701227474536432,
+          "detection_delay": 3.0858794384805948,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -randomization": {
+          "worst_case_harm": 0.8470502645502646,
+          "worst_case_L": 2.268870642195767,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8518,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": 0.020149735449735418,
+          "clean_completion": 98.4736738315914,
+          "false_quarantine_pct": 12.75186121166587,
+          "false_removed_per_ep": 1.9503786889527293,
+          "detection_delay": 1.8455165692007798,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -alarm memory": {
+          "worst_case_harm": 0.40543650793650793,
+          "worst_case_L": 1.559235246031746,
+          "v_br_crossfit": 0.3709,
+          "v_br_by_delta": {
+            "4": 0.3709,
+            "8": 0.3598
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.03453650793650792,
+          "clean_completion": 93.99723920331296,
+          "false_quarantine_pct": 8.580971139847563,
+          "false_removed_per_ep": 1.5701227474536432,
+          "detection_delay": 3.0858794384805948,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -transition uncertainty": {
+          "worst_case_harm": 0.4459920634920635,
+          "worst_case_L": 1.9261453167989417,
+          "v_br_crossfit": 0.3931,
+          "v_br_by_delta": {
+            "4": 0.3836,
+            "8": 0.3931
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.05289206349206349,
+          "clean_completion": 93.63833563399724,
+          "false_quarantine_pct": 8.712464664782122,
+          "false_removed_per_ep": 1.7064507704361451,
+          "detection_delay": 3.0468933177022275,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -benign-drift": {
+          "worst_case_harm": 0.40543650793650793,
+          "worst_case_L": 1.559235246031746,
+          "v_br_crossfit": 0.3709,
+          "v_br_by_delta": {
+            "4": 0.3709,
+            "8": 0.3598
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.03453650793650792,
+          "clean_completion": 93.99723920331296,
+          "false_quarantine_pct": 8.580971139847563,
+          "false_removed_per_ep": 1.5701227474536432,
+          "detection_delay": 3.0858794384805948,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -regime estimate": {
+          "worst_case_harm": 0.7981379731379731,
+          "worst_case_L": 1.1838675213675214,
+          "v_br_crossfit": 0.7928,
+          "v_br_by_delta": {
+            "4": 0.7408,
+            "8": 0.7928
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.005337973137973129,
+          "clean_completion": 89.42614868862158,
+          "false_quarantine_pct": 0.2726972234464522,
+          "false_removed_per_ep": 0.025855314703577957,
+          "detection_delay": 5.464894342194956,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "Oracle (control)": {
+          "worst_case_harm": 0.005430242272347536,
+          "worst_case_L": 5.206710271825397,
+          "v_br_crossfit": 0.0051,
+          "v_br_by_delta": {
+            "4": 0.0051,
+            "8": 0.0
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.0003302422723475357,
+          "clean_completion": 98.58804969434036,
+          "false_quarantine_pct": 16.919166848678593,
+          "false_removed_per_ep": 4.450770436145207,
+          "detection_delay": 0.7073689811119979,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        }
+      },
+      "table3_ablations": {
+        "A1 -randomization": {
+          "gain": 52.14,
+          "lo": 46.5829,
+          "hi": 57.9563,
+          "abs_diff": 0.4416,
+          "abs_lo": 0.3808,
+          "abs_hi": 0.5004,
+          "alpha": 0.05,
+          "v_base": 0.8471,
+          "v_cand": 0.4054,
+          "n_zero_base": 0,
+          "base_events": 170,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -alarm memory": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.4054,
+          "v_cand": 0.4054,
+          "n_zero_base": 0,
+          "base_events": 81,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -transition uncertainty": {
+          "gain": 9.09,
+          "lo": 0.5747,
+          "hi": 15.3604,
+          "abs_diff": 0.0406,
+          "abs_lo": 0.0025,
+          "abs_hi": 0.0714,
+          "alpha": 0.05,
+          "v_base": 0.446,
+          "v_cand": 0.4054,
+          "n_zero_base": 0,
+          "base_events": 90,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -benign-drift": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.4054,
+          "v_cand": 0.4054,
+          "n_zero_base": 0,
+          "base_events": 81,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -regime estimate": {
+          "gain": 49.2,
+          "lo": 42.8694,
+          "hi": 53.857,
+          "abs_diff": 0.3927,
+          "abs_lo": 0.3267,
+          "abs_hi": 0.435,
+          "alpha": 0.05,
+          "v_base": 0.7981,
+          "v_cand": 0.4054,
+          "n_zero_base": 0,
+          "base_events": 128,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "figure3_gain_by_delta": {
+        "0": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.7625,
+          "v_cand": 0.7625,
+          "n_zero_base": 0,
+          "base_events": 270,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2472
+        },
+        "1": {
+          "gain": 25.4,
+          "lo": 18.4212,
+          "hi": 29.1775,
+          "abs_diff": 0.1959,
+          "abs_lo": 0.1387,
+          "abs_hi": 0.2297,
+          "alpha": 0.05,
+          "v_base": 0.7713,
+          "v_cand": 0.5754,
+          "n_zero_base": 0,
+          "base_events": 274,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2478
+        },
+        "2": {
+          "gain": 37.05,
+          "lo": 30.9231,
+          "hi": 39.8495,
+          "abs_diff": 0.29,
+          "abs_lo": 0.2351,
+          "abs_hi": 0.3196,
+          "alpha": 0.05,
+          "v_base": 0.7828,
+          "v_cand": 0.4928,
+          "n_zero_base": 0,
+          "base_events": 279,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2481
+        },
+        "4": {
+          "gain": 51.18,
+          "lo": 44.6167,
+          "hi": 53.9696,
+          "abs_diff": 0.3896,
+          "abs_lo": 0.34,
+          "abs_hi": 0.4043,
+          "alpha": 0.05,
+          "v_base": 0.7611,
+          "v_cand": 0.3716,
+          "n_zero_base": 0,
+          "base_events": 270,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2486
+        },
+        "8": {
+          "gain": 49.2,
+          "lo": 43.0627,
+          "hi": 56.2043,
+          "abs_diff": 0.3927,
+          "abs_lo": 0.3231,
+          "abs_hi": 0.4499,
+          "alpha": 0.05,
+          "v_base": 0.7981,
+          "v_cand": 0.4054,
+          "n_zero_base": 0,
+          "base_events": 128,
+          "rel_reliable": true,
+          "n_repos": 12,
+          "n_workflows": 34,
+          "n_boot": 10000,
+          "n_episodes": 1343
+        }
+      },
+      "transfer_dev_vs_heldout": {
+        "dev_attackers": {
+          "gain": 45.12,
+          "lo": 37.6449,
+          "hi": 49.6507,
+          "abs_diff": 0.3509,
+          "abs_lo": 0.2845,
+          "abs_hi": 0.4168,
+          "alpha": 0.05,
+          "v_base": 0.7776,
+          "v_cand": 0.4268,
+          "n_zero_base": 0,
+          "base_events": 146,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 6020
+        },
+        "heldout_attackers": {
+          "gain": 49.2,
+          "lo": 42.9857,
+          "hi": 53.914,
+          "abs_diff": 0.3927,
+          "abs_lo": 0.3288,
+          "abs_hi": 0.435,
+          "alpha": 0.05,
+          "v_base": 0.7981,
+          "v_cand": 0.4054,
+          "n_zero_base": 0,
+          "base_events": 128,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "transfer_tuning_vs_heldout": {
+        "tuning_attackers": {
+          "gain": 45.12,
+          "lo": 37.671,
+          "hi": 49.6507,
+          "abs_diff": 0.3509,
+          "abs_lo": 0.2847,
+          "abs_hi": 0.4168,
+          "alpha": 0.05,
+          "v_base": 0.7776,
+          "v_cand": 0.4268,
+          "n_zero_base": 0,
+          "base_events": 146,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3301
+        },
+        "heldout_attackers": {
+          "gain": 49.2,
+          "lo": 42.9857,
+          "hi": 53.914,
+          "abs_diff": 0.3927,
+          "abs_lo": 0.3288,
+          "abs_hi": 0.435,
+          "alpha": 0.05,
+          "v_base": 0.7981,
+          "v_cand": 0.4054,
+          "n_zero_base": 0,
+          "base_events": 128,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "verified_only": {
+        "gain": 49.19,
+        "lo": 44.9099,
+        "hi": 54.4007,
+        "abs_diff": 0.3991,
+        "abs_lo": 0.3569,
+        "abs_hi": 0.4307,
+        "alpha": 0.05,
+        "v_base": 0.8114,
+        "v_cand": 0.4123,
+        "n_zero_base": 0,
+        "base_events": 116,
+        "rel_reliable": true,
+        "n_repos": 7,
+        "n_workflows": 42,
+        "n_boot": 10000,
+        "n_episodes": 2970
+      },
+      "rq4_detectors": {
+        "mid": {
+          "gain": 49.2,
+          "lo": 42.9857,
+          "hi": 53.914,
+          "abs_diff": 0.3927,
+          "abs_lo": 0.3288,
+          "abs_hi": 0.435,
+          "alpha": 0.05,
+          "v_base": 0.7981,
+          "v_cand": 0.4054,
+          "n_zero_base": 0,
+          "base_events": 128,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "strong": {
+          "gain": 49.83,
+          "lo": 44.6332,
+          "hi": 54.5247,
+          "abs_diff": 0.4077,
+          "abs_lo": 0.3577,
+          "abs_hi": 0.4505,
+          "alpha": 0.05,
+          "v_base": 0.8181,
+          "v_cand": 0.4104,
+          "n_zero_base": 0,
+          "base_events": 131,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "weak": {
+          "gain": 49.07,
+          "lo": 40.6287,
+          "hi": 52.8579,
+          "abs_diff": 0.3721,
+          "abs_lo": 0.2706,
+          "abs_hi": 0.4249,
+          "alpha": 0.05,
+          "v_base": 0.7583,
+          "v_cand": 0.3862,
+          "n_zero_base": 0,
+          "base_events": 122,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      }
+    },
+    "0.25": {
+      "table2": {
+        "B1 audit-at-commit": {
+          "worst_case_harm": 0.7154304029304028,
+          "worst_case_L": 1.1011599511599512,
+          "v_br_crossfit": 0.656,
+          "v_br_by_delta": {
+            "4": 0.5921,
+            "8": 0.656
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.059430402930402804,
+          "clean_completion": 89.42220469335437,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.456643792888334,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B2 uniform random": {
+          "worst_case_harm": 0.6754177109440268,
+          "worst_case_L": 3.4087187453703702,
+          "v_br_crossfit": 0.5848,
+          "v_br_by_delta": {
+            "4": 0.5813,
+            "8": 0.5848
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.09061771094402682,
+          "clean_completion": 97.17215539341353,
+          "false_quarantine_pct": 14.365601287652334,
+          "false_removed_per_ep": 4.079132932880648,
+          "detection_delay": 2.458515283842795,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B3 audit-on-insertion": {
+          "worst_case_harm": 0.8832722832722832,
+          "worst_case_L": 6.0967452190170945,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.016072283272283272,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 18.570003444057814,
+          "false_removed_per_ep": 8.167406633585793,
+          "detection_delay": 0.002960331557134399,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B4 audit-on-retrieval": {
+          "worst_case_harm": 0.8832722832722832,
+          "worst_case_L": 2.266391848544974,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.016072283272283272,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 14.567625094700386,
+          "false_removed_per_ep": 2.109166884303996,
+          "detection_delay": 0.0009174311926605505,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B5 risk-score": {
+          "worst_case_harm": 0.776878306878307,
+          "worst_case_L": 3.652801513888889,
+          "v_br_crossfit": 0.7828,
+          "v_br_by_delta": {
+            "4": 0.655,
+            "8": 0.7828
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": 0.005921693121693106,
+          "clean_completion": 97.7834746598304,
+          "false_quarantine_pct": 14.17288541588147,
+          "false_removed_per_ep": 4.419430660746931,
+          "detection_delay": 2.2729952830188678,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B6 two-stage": {
+          "worst_case_harm": 0.8658173210804789,
+          "worst_case_L": 4.538020566798942,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": 0.001382678919521041,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 15.701374290331346,
+          "false_removed_per_ep": 5.7349177330895795,
+          "detection_delay": 2.0337743732590527,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "Sentinel-A1": {
+          "worst_case_harm": 0.36376984126984124,
+          "worst_case_L": 1.4795699656084655,
+          "v_br_crossfit": 0.3621,
+          "v_br_by_delta": {
+            "4": 0.3227,
+            "8": 0.3621
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.0016698412698412657,
+          "clean_completion": 93.73299152041017,
+          "false_quarantine_pct": 8.397552797223366,
+          "false_removed_per_ep": 1.4912509793679811,
+          "detection_delay": 3.2115463917525773,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -randomization": {
+          "worst_case_harm": 0.8470502645502646,
+          "worst_case_L": 2.268870642195767,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8518,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": 0.020149735449735418,
+          "clean_completion": 98.4736738315914,
+          "false_quarantine_pct": 12.75186121166587,
+          "false_removed_per_ep": 1.9503786889527293,
+          "detection_delay": 1.8465660009741842,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -alarm memory": {
+          "worst_case_harm": 0.36376984126984124,
+          "worst_case_L": 1.4795699656084655,
+          "v_br_crossfit": 0.3621,
+          "v_br_by_delta": {
+            "4": 0.3227,
+            "8": 0.3621
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.0016698412698412657,
+          "clean_completion": 93.73299152041017,
+          "false_quarantine_pct": 8.397552797223366,
+          "false_removed_per_ep": 1.4912509793679811,
+          "detection_delay": 3.2115463917525773,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -transition uncertainty": {
+          "worst_case_harm": 0.40854497354497354,
+          "worst_case_L": 1.6506404080687829,
+          "v_br_crossfit": 0.3266,
+          "v_br_by_delta": {
+            "4": 0.3266,
+            "8": 0.3118
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.08194497354497354,
+          "clean_completion": 93.60678367185959,
+          "false_quarantine_pct": 8.412358079231002,
+          "false_removed_per_ep": 1.5267693914860276,
+          "detection_delay": 3.1835160373528217,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -benign-drift": {
+          "worst_case_harm": 0.36376984126984124,
+          "worst_case_L": 1.4795699656084655,
+          "v_br_crossfit": 0.3621,
+          "v_br_by_delta": {
+            "4": 0.3227,
+            "8": 0.3621
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.0016698412698412657,
+          "clean_completion": 93.73299152041017,
+          "false_quarantine_pct": 8.397552797223366,
+          "false_removed_per_ep": 1.4912509793679811,
+          "detection_delay": 3.2115463917525773,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -regime estimate": {
+          "worst_case_harm": 0.7154304029304028,
+          "worst_case_L": 1.1011599511599512,
+          "v_br_crossfit": 0.6647,
+          "v_br_by_delta": {
+            "4": 0.576,
+            "8": 0.6647
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.050730402930402874,
+          "clean_completion": 89.41826069808715,
+          "false_quarantine_pct": 0.08859602979041502,
+          "false_removed_per_ep": 0.00835727343954035,
+          "detection_delay": 5.428305400372439,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "Oracle (control)": {
+          "worst_case_harm": 0.005430242272347536,
+          "worst_case_L": 5.206710271825397,
+          "v_br_crossfit": 0.0051,
+          "v_br_by_delta": {
+            "4": 0.0051,
+            "8": 0.0
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.0003302422723475357,
+          "clean_completion": 98.58804969434036,
+          "false_quarantine_pct": 16.919166848678593,
+          "false_removed_per_ep": 4.450770436145207,
+          "detection_delay": 0.7117787822387663,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        }
+      },
+      "table3_ablations": {
+        "A1 -randomization": {
+          "gain": 57.05,
+          "lo": 51.8015,
+          "hi": 61.8489,
+          "abs_diff": 0.4833,
+          "abs_lo": 0.4204,
+          "abs_hi": 0.536,
+          "alpha": 0.05,
+          "v_base": 0.8471,
+          "v_cand": 0.3638,
+          "n_zero_base": 0,
+          "base_events": 170,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -alarm memory": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.3638,
+          "v_cand": 0.3638,
+          "n_zero_base": 0,
+          "base_events": 73,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -transition uncertainty": {
+          "gain": 10.96,
+          "lo": 1.6807,
+          "hi": 14.5257,
+          "abs_diff": 0.0448,
+          "abs_lo": 0.0062,
+          "abs_hi": 0.0639,
+          "alpha": 0.05,
+          "v_base": 0.4085,
+          "v_cand": 0.3638,
+          "n_zero_base": 0,
+          "base_events": 82,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -benign-drift": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.3638,
+          "v_cand": 0.3638,
+          "n_zero_base": 0,
+          "base_events": 73,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -regime estimate": {
+          "gain": 49.15,
+          "lo": 39.9689,
+          "hi": 52.9654,
+          "abs_diff": 0.3517,
+          "abs_lo": 0.2515,
+          "abs_hi": 0.4067,
+          "alpha": 0.05,
+          "v_base": 0.7154,
+          "v_cand": 0.3638,
+          "n_zero_base": 0,
+          "base_events": 115,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "figure3_gain_by_delta": {
+        "0": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.6444,
+          "v_cand": 0.6444,
+          "n_zero_base": 0,
+          "base_events": 229,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2472
+        },
+        "1": {
+          "gain": 9.0,
+          "lo": 0.648,
+          "hi": 16.4769,
+          "abs_diff": 0.0592,
+          "abs_lo": 0.004,
+          "abs_hi": 0.1138,
+          "alpha": 0.05,
+          "v_base": 0.658,
+          "v_cand": 0.5988,
+          "n_zero_base": 0,
+          "base_events": 236,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2478
+        },
+        "2": {
+          "gain": 32.01,
+          "lo": 21.9437,
+          "hi": 33.8282,
+          "abs_diff": 0.2168,
+          "abs_lo": 0.1434,
+          "abs_hi": 0.2381,
+          "alpha": 0.05,
+          "v_base": 0.6774,
+          "v_cand": 0.4606,
+          "n_zero_base": 0,
+          "base_events": 241,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2481
+        },
+        "4": {
+          "gain": 46.25,
+          "lo": 41.2957,
+          "hi": 49.943,
+          "abs_diff": 0.3049,
+          "abs_lo": 0.2641,
+          "abs_hi": 0.3293,
+          "alpha": 0.05,
+          "v_base": 0.6592,
+          "v_cand": 0.3543,
+          "n_zero_base": 0,
+          "base_events": 233,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2486
+        },
+        "8": {
+          "gain": 49.15,
+          "lo": 39.5556,
+          "hi": 55.6611,
+          "abs_diff": 0.3517,
+          "abs_lo": 0.2443,
+          "abs_hi": 0.4181,
+          "alpha": 0.05,
+          "v_base": 0.7154,
+          "v_cand": 0.3638,
+          "n_zero_base": 0,
+          "base_events": 115,
+          "rel_reliable": true,
+          "n_repos": 12,
+          "n_workflows": 34,
+          "n_boot": 10000,
+          "n_episodes": 1343
+        }
+      },
+      "transfer_dev_vs_heldout": {
+        "dev_attackers": {
+          "gain": 43.03,
+          "lo": 30.6494,
+          "hi": 48.8935,
+          "abs_diff": 0.2943,
+          "abs_lo": 0.193,
+          "abs_hi": 0.371,
+          "alpha": 0.05,
+          "v_base": 0.684,
+          "v_cand": 0.3897,
+          "n_zero_base": 0,
+          "base_events": 128,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 6020
+        },
+        "heldout_attackers": {
+          "gain": 49.15,
+          "lo": 40.2798,
+          "hi": 52.9654,
+          "abs_diff": 0.3517,
+          "abs_lo": 0.2564,
+          "abs_hi": 0.4067,
+          "alpha": 0.05,
+          "v_base": 0.7154,
+          "v_cand": 0.3638,
+          "n_zero_base": 0,
+          "base_events": 115,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "transfer_tuning_vs_heldout": {
+        "tuning_attackers": {
+          "gain": 43.03,
+          "lo": 30.88,
+          "hi": 49.4936,
+          "abs_diff": 0.2943,
+          "abs_lo": 0.1947,
+          "abs_hi": 0.3759,
+          "alpha": 0.05,
+          "v_base": 0.684,
+          "v_cand": 0.3897,
+          "n_zero_base": 0,
+          "base_events": 128,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3301
+        },
+        "heldout_attackers": {
+          "gain": 49.15,
+          "lo": 40.2798,
+          "hi": 52.9654,
+          "abs_diff": 0.3517,
+          "abs_lo": 0.2564,
+          "abs_hi": 0.4067,
+          "alpha": 0.05,
+          "v_base": 0.7154,
+          "v_cand": 0.3638,
+          "n_zero_base": 0,
+          "base_events": 115,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "verified_only": {
+        "gain": 50.27,
+        "lo": 44.3722,
+        "hi": 54.5872,
+        "abs_diff": 0.3782,
+        "abs_lo": 0.2965,
+        "abs_hi": 0.4098,
+        "alpha": 0.05,
+        "v_base": 0.7523,
+        "v_cand": 0.3741,
+        "n_zero_base": 0,
+        "base_events": 107,
+        "rel_reliable": true,
+        "n_repos": 7,
+        "n_workflows": 42,
+        "n_boot": 10000,
+        "n_episodes": 2970
+      },
+      "rq4_detectors": {
+        "mid": {
+          "gain": 49.15,
+          "lo": 40.2798,
+          "hi": 52.9654,
+          "abs_diff": 0.3517,
+          "abs_lo": 0.2564,
+          "abs_hi": 0.4067,
+          "alpha": 0.05,
+          "v_base": 0.7154,
+          "v_cand": 0.3638,
+          "n_zero_base": 0,
+          "base_events": 115,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "strong": {
+          "gain": 48.57,
+          "lo": 40.5722,
+          "hi": 53.8651,
+          "abs_diff": 0.363,
+          "abs_lo": 0.273,
+          "abs_hi": 0.419,
+          "alpha": 0.05,
+          "v_base": 0.7473,
+          "v_cand": 0.3843,
+          "n_zero_base": 0,
+          "base_events": 120,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "weak": {
+          "gain": 45.26,
+          "lo": 35.1292,
+          "hi": 48.8597,
+          "abs_diff": 0.2975,
+          "abs_lo": 0.2061,
+          "abs_hi": 0.3542,
+          "alpha": 0.05,
+          "v_base": 0.6574,
+          "v_cand": 0.3598,
+          "n_zero_base": 0,
+          "base_events": 106,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      }
+    },
+    "0.5": {
+      "table2": {
+        "B1 audit-at-commit": {
+          "worst_case_harm": 0.5386904761904762,
+          "worst_case_L": 0.9166514041514042,
+          "v_br_crossfit": 0.4839,
+          "v_br_by_delta": {
+            "4": 0.4439,
+            "8": 0.4839
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.05479047619047617,
+          "clean_completion": 89.42220469335437,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.435718128025821,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B2 uniform random": {
+          "worst_case_harm": 0.6754177109440268,
+          "worst_case_L": 3.4087187453703702,
+          "v_br_crossfit": 0.5879,
+          "v_br_by_delta": {
+            "4": 0.5879,
+            "8": 0.5718
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.08751771094402683,
+          "clean_completion": 97.17215539341353,
+          "false_quarantine_pct": 14.365601287652334,
+          "false_removed_per_ep": 4.079132932880648,
+          "detection_delay": 2.4606776499844574,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B3 audit-on-insertion": {
+          "worst_case_harm": 0.8832722832722832,
+          "worst_case_L": 6.0967452190170945,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.016072283272283272,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 18.570003444057814,
+          "false_removed_per_ep": 8.167406633585793,
+          "detection_delay": 0.002960331557134399,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B4 audit-on-retrieval": {
+          "worst_case_harm": 0.8832722832722832,
+          "worst_case_L": 2.266391848544974,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.016072283272283272,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 14.567625094700386,
+          "false_removed_per_ep": 2.109166884303996,
+          "detection_delay": 0.0009174311926605505,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B5 risk-score": {
+          "worst_case_harm": 0.49198412698412697,
+          "worst_case_L": 2.595043652116402,
+          "v_br_crossfit": 0.5006,
+          "v_br_by_delta": {
+            "4": 0.4946,
+            "8": 0.5006
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": 0.008615873015873077,
+          "clean_completion": 94.96351804377835,
+          "false_quarantine_pct": 12.323955114652788,
+          "false_removed_per_ep": 2.9686602246017237,
+          "detection_delay": 3.019068458893404,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B6 two-stage": {
+          "worst_case_harm": 0.8658173210804789,
+          "worst_case_L": 4.538020566798942,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": 0.001382678919521041,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 15.701374290331346,
+          "false_removed_per_ep": 5.7349177330895795,
+          "detection_delay": 2.0337743732590527,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "Sentinel-A1": {
+          "worst_case_harm": 0.306885268727374,
+          "worst_case_L": 1.2285819113756615,
+          "v_br_crossfit": 0.2911,
+          "v_br_by_delta": {
+            "4": 0.2763,
+            "8": 0.2911
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.015785268727373958,
+          "clean_completion": 92.4985210017748,
+          "false_quarantine_pct": 6.9768222479566315,
+          "false_removed_per_ep": 1.0856620527552885,
+          "detection_delay": 3.7761382799325465,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -randomization": {
+          "worst_case_harm": 0.5386904761904762,
+          "worst_case_L": 0.9166514041514042,
+          "v_br_crossfit": 0.4839,
+          "v_br_by_delta": {
+            "4": 0.4439,
+            "8": 0.4839
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.05479047619047617,
+          "clean_completion": 89.42220469335437,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.435718128025821,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -alarm memory": {
+          "worst_case_harm": 0.306885268727374,
+          "worst_case_L": 1.2285819113756615,
+          "v_br_crossfit": 0.2911,
+          "v_br_by_delta": {
+            "4": 0.2763,
+            "8": 0.2911
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.015785268727373958,
+          "clean_completion": 92.4985210017748,
+          "false_quarantine_pct": 6.9768222479566315,
+          "false_removed_per_ep": 1.0856620527552885,
+          "detection_delay": 3.7761382799325465,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -transition uncertainty": {
+          "worst_case_harm": 0.32852269562795877,
+          "worst_case_L": 1.3551874715608465,
+          "v_br_crossfit": 0.3233,
+          "v_br_by_delta": {
+            "4": 0.2851,
+            "8": 0.3233
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.0052226956279587955,
+          "clean_completion": 92.74304870834155,
+          "false_quarantine_pct": 7.253809842706173,
+          "false_removed_per_ep": 1.159832854531209,
+          "detection_delay": 3.7103075644222776,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -benign-drift": {
+          "worst_case_harm": 0.306885268727374,
+          "worst_case_L": 1.2285819113756615,
+          "v_br_crossfit": 0.2911,
+          "v_br_by_delta": {
+            "4": 0.2763,
+            "8": 0.2911
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.015785268727373958,
+          "clean_completion": 92.4985210017748,
+          "false_quarantine_pct": 6.9768222479566315,
+          "false_removed_per_ep": 1.0856620527552885,
+          "detection_delay": 3.7761382799325465,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -regime estimate": {
+          "worst_case_harm": 0.5386904761904762,
+          "worst_case_L": 0.9166514041514042,
+          "v_br_crossfit": 0.4839,
+          "v_br_by_delta": {
+            "4": 0.4439,
+            "8": 0.4839
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.05479047619047617,
+          "clean_completion": 89.42220469335437,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.435718128025821,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "Oracle (control)": {
+          "worst_case_harm": 0.005430242272347536,
+          "worst_case_L": 5.206710271825397,
+          "v_br_crossfit": 0.0051,
+          "v_br_by_delta": {
+            "4": 0.0051,
+            "8": 0.0
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.0003302422723475357,
+          "clean_completion": 98.58804969434036,
+          "false_quarantine_pct": 16.919166848678593,
+          "false_removed_per_ep": 4.450770436145207,
+          "detection_delay": 0.7151209141642306,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        }
+      },
+      "table3_ablations": {
+        "A1 -randomization": {
+          "gain": 43.03,
+          "lo": 30.0608,
+          "hi": 45.9813,
+          "abs_diff": 0.2318,
+          "abs_lo": 0.1465,
+          "abs_hi": 0.2629,
+          "alpha": 0.05,
+          "v_base": 0.5387,
+          "v_cand": 0.3069,
+          "n_zero_base": 0,
+          "base_events": 102,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -alarm memory": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.3069,
+          "v_cand": 0.3069,
+          "n_zero_base": 0,
+          "base_events": 112,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -transition uncertainty": {
+          "gain": 6.59,
+          "lo": -9.4825,
+          "hi": 11.941,
+          "abs_diff": 0.0216,
+          "abs_lo": -0.0298,
+          "abs_hi": 0.042,
+          "alpha": 0.05,
+          "v_base": 0.3285,
+          "v_cand": 0.3069,
+          "n_zero_base": 0,
+          "base_events": 118,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -benign-drift": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.3069,
+          "v_cand": 0.3069,
+          "n_zero_base": 0,
+          "base_events": 112,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -regime estimate": {
+          "gain": 43.03,
+          "lo": 30.0608,
+          "hi": 45.9813,
+          "abs_diff": 0.2318,
+          "abs_lo": 0.1465,
+          "abs_hi": 0.2629,
+          "alpha": 0.05,
+          "v_base": 0.5387,
+          "v_cand": 0.3069,
+          "n_zero_base": 0,
+          "base_events": 102,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "figure3_gain_by_delta": {
+        "0": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.4725,
+          "v_cand": 0.4725,
+          "n_zero_base": 0,
+          "base_events": 170,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2472
+        },
+        "1": {
+          "gain": -4.46,
+          "lo": -16.0104,
+          "hi": 3.2094,
+          "abs_diff": -0.0229,
+          "abs_lo": -0.0777,
+          "abs_hi": 0.017,
+          "alpha": 0.05,
+          "v_base": 0.5125,
+          "v_cand": 0.5354,
+          "n_zero_base": 0,
+          "base_events": 184,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2478
+        },
+        "2": {
+          "gain": 14.2,
+          "lo": 5.8168,
+          "hi": 22.1268,
+          "abs_diff": 0.0715,
+          "abs_lo": 0.029,
+          "abs_hi": 0.1201,
+          "alpha": 0.05,
+          "v_base": 0.5034,
+          "v_cand": 0.432,
+          "n_zero_base": 0,
+          "base_events": 181,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2481
+        },
+        "4": {
+          "gain": 36.94,
+          "lo": 30.7262,
+          "hi": 42.0416,
+          "abs_diff": 0.1798,
+          "abs_lo": 0.1435,
+          "abs_hi": 0.2168,
+          "alpha": 0.05,
+          "v_base": 0.4867,
+          "v_cand": 0.3069,
+          "n_zero_base": 0,
+          "base_events": 174,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2486
+        },
+        "8": {
+          "gain": 43.98,
+          "lo": 30.3619,
+          "hi": 47.3657,
+          "abs_diff": 0.2369,
+          "abs_lo": 0.1498,
+          "abs_hi": 0.2689,
+          "alpha": 0.05,
+          "v_base": 0.5387,
+          "v_cand": 0.3018,
+          "n_zero_base": 0,
+          "base_events": 102,
+          "rel_reliable": true,
+          "n_repos": 12,
+          "n_workflows": 34,
+          "n_boot": 10000,
+          "n_episodes": 1343
+        }
+      },
+      "transfer_dev_vs_heldout": {
+        "dev_attackers": {
+          "gain": 38.77,
+          "lo": 23.7979,
+          "hi": 44.8948,
+          "abs_diff": 0.2041,
+          "abs_lo": 0.1144,
+          "abs_hi": 0.2647,
+          "alpha": 0.05,
+          "v_base": 0.5264,
+          "v_cand": 0.3223,
+          "n_zero_base": 0,
+          "base_events": 105,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 6020
+        },
+        "heldout_attackers": {
+          "gain": 43.03,
+          "lo": 30.0608,
+          "hi": 45.9813,
+          "abs_diff": 0.2318,
+          "abs_lo": 0.1465,
+          "abs_hi": 0.2629,
+          "alpha": 0.05,
+          "v_base": 0.5387,
+          "v_cand": 0.3069,
+          "n_zero_base": 0,
+          "base_events": 102,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "transfer_tuning_vs_heldout": {
+        "tuning_attackers": {
+          "gain": 38.77,
+          "lo": 23.7979,
+          "hi": 44.9201,
+          "abs_diff": 0.2041,
+          "abs_lo": 0.1144,
+          "abs_hi": 0.2647,
+          "alpha": 0.05,
+          "v_base": 0.5264,
+          "v_cand": 0.3223,
+          "n_zero_base": 0,
+          "base_events": 105,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3301
+        },
+        "heldout_attackers": {
+          "gain": 43.03,
+          "lo": 30.0608,
+          "hi": 45.9813,
+          "abs_diff": 0.2318,
+          "abs_lo": 0.1465,
+          "abs_hi": 0.2629,
+          "alpha": 0.05,
+          "v_base": 0.5387,
+          "v_cand": 0.3069,
+          "n_zero_base": 0,
+          "base_events": 102,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "verified_only": {
+        "gain": 45.63,
+        "lo": 34.4242,
+        "hi": 47.3136,
+        "abs_diff": 0.2592,
+        "abs_lo": 0.1875,
+        "abs_hi": 0.2771,
+        "alpha": 0.05,
+        "v_base": 0.568,
+        "v_cand": 0.3088,
+        "n_zero_base": 0,
+        "base_events": 89,
+        "rel_reliable": true,
+        "n_repos": 7,
+        "n_workflows": 42,
+        "n_boot": 10000,
+        "n_episodes": 2970
+      },
+      "rq4_detectors": {
+        "mid": {
+          "gain": 43.03,
+          "lo": 30.0608,
+          "hi": 45.9813,
+          "abs_diff": 0.2318,
+          "abs_lo": 0.1465,
+          "abs_hi": 0.2629,
+          "alpha": 0.05,
+          "v_base": 0.5387,
+          "v_cand": 0.3069,
+          "n_zero_base": 0,
+          "base_events": 102,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "strong": {
+          "gain": 43.31,
+          "lo": 30.9129,
+          "hi": 46.5025,
+          "abs_diff": 0.2333,
+          "abs_lo": 0.1516,
+          "abs_hi": 0.2677,
+          "alpha": 0.05,
+          "v_base": 0.5387,
+          "v_cand": 0.3054,
+          "n_zero_base": 0,
+          "base_events": 102,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "weak": {
+          "gain": 41.91,
+          "lo": 29.4888,
+          "hi": 45.9138,
+          "abs_diff": 0.2258,
+          "abs_lo": 0.1452,
+          "abs_hi": 0.2643,
+          "alpha": 0.05,
+          "v_base": 0.5387,
+          "v_cand": 0.3129,
+          "n_zero_base": 0,
+          "base_events": 102,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      }
+    },
+    "1": {
+      "table2": {
+        "B1 audit-at-commit": {
+          "worst_case_harm": 0.19425726265348908,
+          "worst_case_L": 0.5601037851037851,
+          "v_br_crossfit": 0.1175,
+          "v_br_by_delta": {
+            "4": 0.1175,
+            "8": 0.1089
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.07675726265348909,
+          "clean_completion": 89.42220469335437,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.434726962457338,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B2 uniform random": {
+          "worst_case_harm": 0.6754177109440268,
+          "worst_case_L": 3.4087187453703702,
+          "v_br_crossfit": 0.5879,
+          "v_br_by_delta": {
+            "4": 0.5879,
+            "8": 0.5718
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.08751771094402683,
+          "clean_completion": 97.17215539341353,
+          "false_quarantine_pct": 14.365601287652334,
+          "false_removed_per_ep": 4.079132932880648,
+          "detection_delay": 2.477027443724946,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B3 audit-on-insertion": {
+          "worst_case_harm": 0.8832722832722832,
+          "worst_case_L": 6.0967452190170945,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.016072283272283272,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 18.570003444057814,
+          "false_removed_per_ep": 8.167406633585793,
+          "detection_delay": 0.002960331557134399,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B4 audit-on-retrieval": {
+          "worst_case_harm": 0.8832722832722832,
+          "worst_case_L": 2.266391848544974,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.016072283272283272,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 14.567625094700386,
+          "false_removed_per_ep": 2.109166884303996,
+          "detection_delay": 0.0009174311926605505,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B5 risk-score": {
+          "worst_case_harm": 0.49198412698412697,
+          "worst_case_L": 2.595043652116402,
+          "v_br_crossfit": 0.5109,
+          "v_br_by_delta": {
+            "4": 0.5107,
+            "8": 0.5109
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": 0.018915873015873053,
+          "clean_completion": 94.96351804377835,
+          "false_quarantine_pct": 12.323955114652788,
+          "false_removed_per_ep": 2.9686602246017237,
+          "detection_delay": 3.02994751466502,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "B6 two-stage": {
+          "worst_case_harm": 0.8658173210804789,
+          "worst_case_L": 4.538020566798942,
+          "v_br_crossfit": 0.8672,
+          "v_br_by_delta": {
+            "4": 0.8408,
+            "8": 0.8672
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": 0.001382678919521041,
+          "clean_completion": 100.0,
+          "false_quarantine_pct": 15.701374290331346,
+          "false_removed_per_ep": 5.7349177330895795,
+          "detection_delay": 2.0337743732590527,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "Sentinel-A1": {
+          "worst_case_harm": 0.17718628331835878,
+          "worst_case_L": 0.4902659636118598,
+          "v_br_crossfit": 0.1477,
+          "v_br_by_delta": {
+            "4": 0.1389,
+            "8": 0.1477
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.029486283318358786,
+          "clean_completion": 91.33504239794912,
+          "false_quarantine_pct": 0.3582632585249949,
+          "false_removed_per_ep": 0.05040480543222774,
+          "detection_delay": 4.801672640382318,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -randomization": {
+          "worst_case_harm": 0.19425726265348908,
+          "worst_case_L": 0.5601037851037851,
+          "v_br_crossfit": 0.1175,
+          "v_br_by_delta": {
+            "4": 0.1175,
+            "8": 0.1089
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.07675726265348909,
+          "clean_completion": 89.42220469335437,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.434726962457338,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -alarm memory": {
+          "worst_case_harm": 0.1724693021862833,
+          "worst_case_L": 0.4872742969451932,
+          "v_br_crossfit": 0.1477,
+          "v_br_by_delta": {
+            "4": 0.1389,
+            "8": 0.1477
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.024769302186283315,
+          "clean_completion": 91.33504239794912,
+          "false_quarantine_pct": 0.378689437534806,
+          "false_removed_per_ep": 0.05327761817706973,
+          "detection_delay": 4.799840827695981,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -transition uncertainty": {
+          "worst_case_harm": 0.17502645502645503,
+          "worst_case_L": 0.488516744047619,
+          "v_br_crossfit": 0.1503,
+          "v_br_by_delta": {
+            "4": 0.1161,
+            "8": 0.1503
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.02472645502645504,
+          "clean_completion": 91.4533622559653,
+          "false_quarantine_pct": 0.4669601844969219,
+          "false_removed_per_ep": 0.06398537477148081,
+          "detection_delay": 4.652191558441558,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -benign-drift": {
+          "worst_case_harm": 0.1724693021862833,
+          "worst_case_L": 0.5854139972527472,
+          "v_br_crossfit": 0.142,
+          "v_br_by_delta": {
+            "4": 0.1389,
+            "8": 0.142
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.030469302186283326,
+          "clean_completion": 91.33504239794912,
+          "false_quarantine_pct": 1.5639478810113656,
+          "false_removed_per_ep": 0.21598328545312093,
+          "detection_delay": 4.691188040912667,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "A1 -regime estimate": {
+          "worst_case_harm": 0.19425726265348908,
+          "worst_case_L": 0.5601037851037851,
+          "v_br_crossfit": 0.1175,
+          "v_br_by_delta": {
+            "4": 0.1175,
+            "8": 0.1089
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.07675726265348909,
+          "clean_completion": 89.42220469335437,
+          "false_quarantine_pct": 0.0,
+          "false_removed_per_ep": 0.0,
+          "detection_delay": 5.434726962457338,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        },
+        "Oracle (control)": {
+          "worst_case_harm": 0.005430242272347536,
+          "worst_case_L": 5.206710271825397,
+          "v_br_crossfit": 0.0051,
+          "v_br_by_delta": {
+            "4": 0.0051,
+            "8": 0.0
+          },
+          "v_br_nan_deltas": [],
+          "exploitability": -0.0003302422723475357,
+          "clean_completion": 98.58804969434036,
+          "false_quarantine_pct": 16.918998878155808,
+          "false_removed_per_ep": 4.450770436145207,
+          "detection_delay": 0.7159936238044633,
+          "n_workflows": 57,
+          "n_repos": 16,
+          "n_episodes": 3829
+        }
+      },
+      "table3_ablations": {
+        "A1 -randomization": {
+          "gain": 8.79,
+          "lo": -13.6023,
+          "hi": 16.6984,
+          "abs_diff": 0.0171,
+          "abs_lo": -0.02,
+          "abs_hi": 0.0333,
+          "alpha": 0.05,
+          "v_base": 0.1943,
+          "v_cand": 0.1772,
+          "n_zero_base": 0,
+          "base_events": 66,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -alarm memory": {
+          "gain": -2.73,
+          "lo": -9.7727,
+          "hi": 0.0,
+          "abs_diff": -0.0047,
+          "abs_lo": -0.0147,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.1725,
+          "v_cand": 0.1772,
+          "n_zero_base": 0,
+          "base_events": 60,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -transition uncertainty": {
+          "gain": -1.23,
+          "lo": -12.4782,
+          "hi": 27.7919,
+          "abs_diff": -0.0022,
+          "abs_lo": -0.0206,
+          "abs_hi": 0.0595,
+          "alpha": 0.05,
+          "v_base": 0.175,
+          "v_cand": 0.1772,
+          "n_zero_base": 0,
+          "base_events": 37,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -benign-drift": {
+          "gain": -2.73,
+          "lo": -9.7727,
+          "hi": 0.0,
+          "abs_diff": -0.0047,
+          "abs_lo": -0.0147,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.1725,
+          "v_cand": 0.1772,
+          "n_zero_base": 0,
+          "base_events": 60,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "A1 -regime estimate": {
+          "gain": 8.79,
+          "lo": -13.6023,
+          "hi": 16.6984,
+          "abs_diff": 0.0171,
+          "abs_lo": -0.02,
+          "abs_hi": 0.0333,
+          "alpha": 0.05,
+          "v_base": 0.1943,
+          "v_cand": 0.1772,
+          "n_zero_base": 0,
+          "base_events": 66,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "figure3_gain_by_delta": {
+        "0": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.1493,
+          "v_cand": 0.1493,
+          "n_zero_base": 0,
+          "base_events": 55,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2472
+        },
+        "1": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.1662,
+          "v_cand": 0.1662,
+          "n_zero_base": 0,
+          "base_events": 61,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2478
+        },
+        "2": {
+          "gain": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "abs_diff": 0.0,
+          "abs_lo": 0.0,
+          "abs_hi": 0.0,
+          "alpha": 0.05,
+          "v_base": 0.1806,
+          "v_cand": 0.1806,
+          "n_zero_base": 0,
+          "base_events": 66,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2481
+        },
+        "4": {
+          "gain": 8.79,
+          "lo": -8.894,
+          "hi": 17.2151,
+          "abs_diff": 0.0171,
+          "abs_lo": -0.0134,
+          "abs_hi": 0.034,
+          "alpha": 0.05,
+          "v_base": 0.1943,
+          "v_cand": 0.1772,
+          "n_zero_base": 0,
+          "base_events": 66,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 2486
+        },
+        "8": {
+          "gain": 15.99,
+          "lo": -41.4298,
+          "hi": 22.0645,
+          "abs_diff": 0.0279,
+          "abs_lo": -0.0447,
+          "abs_hi": 0.0385,
+          "alpha": 0.05,
+          "v_base": 0.1744,
+          "v_cand": 0.1465,
+          "n_zero_base": 0,
+          "base_events": 27,
+          "rel_reliable": true,
+          "n_repos": 12,
+          "n_workflows": 34,
+          "n_boot": 10000,
+          "n_episodes": 1343
+        }
+      },
+      "transfer_dev_vs_heldout": {
+        "dev_attackers": {
+          "gain": 5.82,
+          "lo": -34.8194,
+          "hi": 22.3261,
+          "abs_diff": 0.0096,
+          "abs_lo": -0.0478,
+          "abs_hi": 0.0439,
+          "alpha": 0.05,
+          "v_base": 0.1643,
+          "v_cand": 0.1547,
+          "n_zero_base": 0,
+          "base_events": 32,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 6020
+        },
+        "heldout_attackers": {
+          "gain": 8.79,
+          "lo": -13.6023,
+          "hi": 16.6984,
+          "abs_diff": 0.0171,
+          "abs_lo": -0.02,
+          "abs_hi": 0.0333,
+          "alpha": 0.05,
+          "v_base": 0.1943,
+          "v_cand": 0.1772,
+          "n_zero_base": 0,
+          "base_events": 66,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "transfer_tuning_vs_heldout": {
+        "tuning_attackers": {
+          "gain": 5.82,
+          "lo": -34.8194,
+          "hi": 22.3261,
+          "abs_diff": 0.0096,
+          "abs_lo": -0.0478,
+          "abs_hi": 0.0439,
+          "alpha": 0.05,
+          "v_base": 0.1643,
+          "v_cand": 0.1547,
+          "n_zero_base": 0,
+          "base_events": 32,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3301
+        },
+        "heldout_attackers": {
+          "gain": 8.79,
+          "lo": -13.6023,
+          "hi": 16.6984,
+          "abs_diff": 0.0171,
+          "abs_lo": -0.02,
+          "abs_hi": 0.0333,
+          "alpha": 0.05,
+          "v_base": 0.1943,
+          "v_cand": 0.1772,
+          "n_zero_base": 0,
+          "base_events": 66,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      },
+      "verified_only": {
+        "gain": 11.5,
+        "lo": -29.3228,
+        "hi": 18.542,
+        "abs_diff": 0.0238,
+        "abs_lo": -0.0434,
+        "abs_hi": 0.0389,
+        "alpha": 0.05,
+        "v_base": 0.2071,
+        "v_cand": 0.1833,
+        "n_zero_base": 0,
+        "base_events": 54,
+        "rel_reliable": true,
+        "n_repos": 7,
+        "n_workflows": 42,
+        "n_boot": 10000,
+        "n_episodes": 2970
+      },
+      "rq4_detectors": {
+        "mid": {
+          "gain": 8.79,
+          "lo": -13.6023,
+          "hi": 16.6984,
+          "abs_diff": 0.0171,
+          "abs_lo": -0.02,
+          "abs_hi": 0.0333,
+          "alpha": 0.05,
+          "v_base": 0.1943,
+          "v_cand": 0.1772,
+          "n_zero_base": 0,
+          "base_events": 66,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "strong": {
+          "gain": -15.15,
+          "lo": -91.3805,
+          "hi": 6.705,
+          "abs_diff": -0.0161,
+          "abs_lo": -0.0775,
+          "abs_hi": 0.0086,
+          "alpha": 0.05,
+          "v_base": 0.1063,
+          "v_cand": 0.1224,
+          "n_zero_base": 0,
+          "base_events": 16,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        },
+        "weak": {
+          "gain": 4.05,
+          "lo": -34.8533,
+          "hi": 20.0222,
+          "abs_diff": 0.011,
+          "abs_lo": -0.0773,
+          "abs_hi": 0.0639,
+          "alpha": 0.05,
+          "v_base": 0.2716,
+          "v_cand": 0.2607,
+          "n_zero_base": 0,
+          "base_events": 43,
+          "rel_reliable": true,
+          "n_repos": 16,
+          "n_workflows": 57,
+          "n_boot": 10000,
+          "n_episodes": 3829
+        }
+      }
+    }
+  },
+  "gate_world": {
+    "0": {
+      "B1g commit": {
+        "worst_case_harm": 0.7981379731379731,
+        "false_blocks_per_ep": 0.0,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B2g uniform": {
+        "worst_case_harm": 0.6238492063492064,
+        "false_blocks_per_ep": 2.69600417863672,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B3g insertion": {
+        "worst_case_harm": 0.856031746031746,
+        "false_blocks_per_ep": 5.447114129015409,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B4g retrieval": {
+        "worst_case_harm": 0.014411027568922305,
+        "false_blocks_per_ep": 4.751893444763646,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      }
+    },
+    "0.25": {
+      "B1g commit": {
+        "worst_case_harm": 0.7154304029304028,
+        "false_blocks_per_ep": 0.0,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B2g uniform": {
+        "worst_case_harm": 0.5937698412698412,
+        "false_blocks_per_ep": 2.69600417863672,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B3g insertion": {
+        "worst_case_harm": 0.856031746031746,
+        "false_blocks_per_ep": 5.447114129015409,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B4g retrieval": {
+        "worst_case_harm": 0.014411027568922305,
+        "false_blocks_per_ep": 4.751893444763646,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      }
+    },
+    "0.5": {
+      "B1g commit": {
+        "worst_case_harm": 0.5386904761904762,
+        "false_blocks_per_ep": 0.0,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B2g uniform": {
+        "worst_case_harm": 0.5589285714285714,
+        "false_blocks_per_ep": 2.69600417863672,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B3g insertion": {
+        "worst_case_harm": 0.856031746031746,
+        "false_blocks_per_ep": 5.447114129015409,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B4g retrieval": {
+        "worst_case_harm": 0.014411027568922305,
+        "false_blocks_per_ep": 4.751893444763646,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      }
+    },
+    "1": {
+      "B1g commit": {
+        "worst_case_harm": 0.19425726265348908,
+        "false_blocks_per_ep": 0.0,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B2g uniform": {
+        "worst_case_harm": 0.4562726260094681,
+        "false_blocks_per_ep": 2.69600417863672,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B3g insertion": {
+        "worst_case_harm": 0.856031746031746,
+        "false_blocks_per_ep": 5.447114129015409,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      },
+      "B4g retrieval": {
+        "worst_case_harm": 0.014411027568922305,
+        "false_blocks_per_ep": 4.751893444763646,
+        "n_workflows": 57,
+        "n_repos": 16,
+        "n_episodes": 3829
+      }
+    }
+  },
+  "denominators": {
+    "reasons": {
+      "infeasible": "attacker rule has no placement at this Δ and H",
+      "non_surviving": "N4: the task at σ is not solved in the clean run",
+      "br": "N4: a menu placement whose task at σ is not solved in the clean run is dropped (tried - survived)"
+    },
+    "workflows": 57,
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "main": {
+      "total": {
+        "pairs": 51300,
+        "infeasible": 4870,
+        "non_surviving": 17504,
+        "used": 28926
+      },
+      "columns": {
+        "branch-first-write-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 238,
+          "used": 332
+        },
+        "branch-first-write-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 221,
+          "used": 349
+        },
+        "branch-first-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 221,
+          "used": 349
+        },
+        "branch-first-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "branch-first-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 100,
+          "used": 200
+        },
+        "branch-last-ingress-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "branch-last-ingress-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "branch-last-ingress-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "branch-last-ingress-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "branch-last-ingress-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "branch-last-write-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "branch-last-write-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "branch-last-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "branch-last-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "branch-last-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "branch-mid-ingress-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "branch-mid-ingress-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "branch-mid-ingress-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "branch-mid-ingress-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "branch-mid-ingress-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 113,
+          "used": 187
+        },
+        "memory-first-write-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 238,
+          "used": 332
+        },
+        "memory-first-write-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 221,
+          "used": 349
+        },
+        "memory-first-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 221,
+          "used": 349
+        },
+        "memory-first-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "memory-first-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 100,
+          "used": 200
+        },
+        "memory-last-ingress-e0.3@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "memory-last-ingress-e0.3@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "memory-last-ingress-e0.3@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "memory-last-ingress-e0.3@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "memory-last-ingress-e0.3@8": {
+          "pairs": 570,
+          "infeasible": 230,
+          "non_surviving": 133,
+          "used": 207
+        },
+        "memory-last-ingress-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "memory-last-ingress-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "memory-last-ingress-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "memory-last-ingress-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "memory-last-ingress-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "memory-last-write-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "memory-last-write-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "memory-last-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "memory-last-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "memory-last-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "memory-mid-write-e0.3@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "memory-mid-write-e0.3@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 221,
+          "used": 349
+        },
+        "memory-mid-write-e0.3@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 223,
+          "used": 347
+        },
+        "memory-mid-write-e0.3@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 200,
+          "used": 370
+        },
+        "memory-mid-write-e0.3@8": {
+          "pairs": 570,
+          "infeasible": 230,
+          "non_surviving": 127,
+          "used": 213
+        },
+        "queue-first-write-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 238,
+          "used": 332
+        },
+        "queue-first-write-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 221,
+          "used": 349
+        },
+        "queue-first-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 221,
+          "used": 349
+        },
+        "queue-first-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "queue-first-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 100,
+          "used": 200
+        },
+        "queue-last-ingress-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "queue-last-ingress-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "queue-last-ingress-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "queue-last-ingress-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "queue-last-ingress-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "queue-mid-write-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "queue-mid-write-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "queue-mid-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "queue-mid-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "queue-mid-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 113,
+          "used": 187
+        },
+        "skill-first-write-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 238,
+          "used": 332
+        },
+        "skill-first-write-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 221,
+          "used": 349
+        },
+        "skill-first-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 221,
+          "used": 349
+        },
+        "skill-first-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "skill-first-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 100,
+          "used": 200
+        },
+        "skill-last-ingress-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "skill-last-ingress-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "skill-last-ingress-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "skill-last-ingress-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "skill-last-ingress-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "skill-last-write-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "skill-last-write-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "skill-last-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "skill-last-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "skill-last-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "skill-last-write-e1.0@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "skill-last-write-e1.0@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "skill-last-write-e1.0@2": {
+          "pairs": 570,
+          "infeasible": 10,
+          "non_surviving": 205,
+          "used": 355
+        },
+        "skill-last-write-e1.0@4": {
+          "pairs": 570,
+          "infeasible": 40,
+          "non_surviving": 196,
+          "used": 334
+        },
+        "skill-last-write-e1.0@8": {
+          "pairs": 570,
+          "infeasible": 310,
+          "non_surviving": 100,
+          "used": 160
+        },
+        "uniform-last-ingress-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "uniform-last-ingress-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "uniform-last-ingress-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "uniform-last-ingress-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "uniform-last-ingress-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "uniform-mid-write-e0.6@0": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "uniform-mid-write-e0.6@1": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "uniform-mid-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "uniform-mid-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "uniform-mid-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 113,
+          "used": 187
+        }
+      }
+    },
+    "br": {
+      "0": {
+        "tried": 21760,
+        "survived": 13412
+      },
+      "1": {
+        "tried": 16760,
+        "survived": 10420
+      },
+      "2": {
+        "tried": 13840,
+        "survived": 8632
+      },
+      "4": {
+        "tried": 9160,
+        "survived": 5772
+      },
+      "8": {
+        "tried": 2800,
+        "survived": 1804
+      }
+    },
+    "sweeps": {
+      "total": {
+        "pairs": 7980,
+        "infeasible": 1890,
+        "non_surviving": 2261,
+        "used": 3829
+      },
+      "columns": {
+        "branch-first-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "branch-first-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 100,
+          "used": 200
+        },
+        "memory-last-ingress-e0.3@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "memory-last-ingress-e0.3@8": {
+          "pairs": 570,
+          "infeasible": 230,
+          "non_surviving": 133,
+          "used": 207
+        },
+        "memory-last-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "memory-last-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "memory-mid-write-e0.3@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 200,
+          "used": 370
+        },
+        "memory-mid-write-e0.3@8": {
+          "pairs": 570,
+          "infeasible": 230,
+          "non_surviving": 127,
+          "used": 213
+        },
+        "queue-last-ingress-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "queue-last-ingress-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "queue-mid-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "queue-mid-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 113,
+          "used": 187
+        },
+        "skill-last-write-e1.0@4": {
+          "pairs": 570,
+          "infeasible": 40,
+          "non_surviving": 196,
+          "used": 334
+        },
+        "skill-last-write-e1.0@8": {
+          "pairs": 570,
+          "infeasible": 310,
+          "non_surviving": 100,
+          "used": 160
+        }
+      }
+    },
+    "sweep_budget": {
+      "total": {
+        "pairs": 11970,
+        "infeasible": 1900,
+        "non_surviving": 3760,
+        "used": 6310
+      },
+      "columns": {
+        "branch-first-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 221,
+          "used": 349
+        },
+        "branch-first-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "branch-first-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 100,
+          "used": 200
+        },
+        "memory-last-ingress-e0.3@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "memory-last-ingress-e0.3@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "memory-last-ingress-e0.3@8": {
+          "pairs": 570,
+          "infeasible": 230,
+          "non_surviving": 133,
+          "used": 207
+        },
+        "memory-last-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "memory-last-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "memory-last-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "memory-mid-write-e0.3@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 223,
+          "used": 347
+        },
+        "memory-mid-write-e0.3@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 200,
+          "used": 370
+        },
+        "memory-mid-write-e0.3@8": {
+          "pairs": 570,
+          "infeasible": 230,
+          "non_surviving": 127,
+          "used": 213
+        },
+        "queue-last-ingress-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 213,
+          "used": 357
+        },
+        "queue-last-ingress-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "queue-last-ingress-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "queue-mid-write-e0.6@2": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "queue-mid-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "queue-mid-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 113,
+          "used": 187
+        },
+        "skill-last-write-e1.0@2": {
+          "pairs": 570,
+          "infeasible": 10,
+          "non_surviving": 205,
+          "used": 355
+        },
+        "skill-last-write-e1.0@4": {
+          "pairs": 570,
+          "infeasible": 40,
+          "non_surviving": 196,
+          "used": 334
+        },
+        "skill-last-write-e1.0@8": {
+          "pairs": 570,
+          "infeasible": 310,
+          "non_surviving": 100,
+          "used": 160
+        }
+      }
+    },
+    "gate_world": {
+      "total": {
+        "pairs": 7980,
+        "infeasible": 1890,
+        "non_surviving": 2261,
+        "used": 3829
+      },
+      "columns": {
+        "branch-first-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "branch-first-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 100,
+          "used": 200
+        },
+        "memory-last-ingress-e0.3@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 214,
+          "used": 356
+        },
+        "memory-last-ingress-e0.3@8": {
+          "pairs": 570,
+          "infeasible": 230,
+          "non_surviving": 133,
+          "used": 207
+        },
+        "memory-last-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "memory-last-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "memory-mid-write-e0.3@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 200,
+          "used": 370
+        },
+        "memory-mid-write-e0.3@8": {
+          "pairs": 570,
+          "infeasible": 230,
+          "non_surviving": 127,
+          "used": 213
+        },
+        "queue-last-ingress-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 215,
+          "used": 355
+        },
+        "queue-last-ingress-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 112,
+          "used": 188
+        },
+        "queue-mid-write-e0.6@4": {
+          "pairs": 570,
+          "infeasible": 0,
+          "non_surviving": 210,
+          "used": 360
+        },
+        "queue-mid-write-e0.6@8": {
+          "pairs": 570,
+          "infeasible": 270,
+          "non_surviving": 113,
+          "used": 187
+        },
+        "skill-last-write-e1.0@4": {
+          "pairs": 570,
+          "infeasible": 40,
+          "non_surviving": 196,
+          "used": 334
+        },
+        "skill-last-write-e1.0@8": {
+          "pairs": 570,
+          "infeasible": 310,
+          "non_surviving": 100,
+          "used": 160
+        }
+      }
+    }
+  },
+  "transfer_note": {
+    "dev_attackers_with_heldout_keys": [
+      "memory-last-ingress-e0.6",
+      "uniform-last-ingress-e0.6",
+      "uniform-mid-write-e0.6"
+    ],
+    "note": "D18: these development attackers can realise a held-out behaviour key (k, iota rule, eps), so transfer_dev_vs_heldout is not a clean transfer; transfer_tuning_vs_heldout reads the D18 tuning columns instead"
+  }
+}

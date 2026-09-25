@@ -1,0 +1,15 @@
+# raw v2 records of this run, not committed (D33); lines  bytes  file:
+#   8501064  4519237435  eval-main.jsonl
+#   260  709282  eval-br.jsonl
+#   122528  64145234  sweep-eta.jsonl
+#   91896  48553986  sweep-match.jsonl
+#   30632  16276731  sweep-persistent-drift.jsonl
+#   605760  323221264  sweep-budget-EXPLORATORY.jsonl
+#   61264  12779500  eval-gate-world.jsonl
+f65831ae619e92e9321d0e350d1fd80533b7c13bc220ada0f6dca8a4cfdf2df3  eval-main.jsonl
+4e3cb96def048565cf1c2385d3a2b6307a79301d021bf4cdd5584722e62f16a9  eval-br.jsonl
+6f5e082e6797322f22a9c7e31381e950d9903947efb4d60a1af5b08c8cc86a8f  sweep-eta.jsonl
+6229043f69e8dc5b81c41d767baf5f3c757c592e18efafab6382d6f5ea2fca2e  sweep-match.jsonl
+dc12abf66b197325b6842f15b63b5031a55a2e309875c87f4d886ac9c2ff9477  sweep-persistent-drift.jsonl
+ccd4183c8d2a7ca8843d59bb3a260bc21451343e3cc872bed2252a22b4c63138  sweep-budget-EXPLORATORY.jsonl
+419b5ae0a37dee535484b54b7852cfb1bc7524c7960d41d8b90c2909acabf274  eval-gate-world.jsonl
