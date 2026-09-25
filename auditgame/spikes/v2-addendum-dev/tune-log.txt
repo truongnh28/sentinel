@@ -1,0 +1,8 @@
+0 4 b2_fq {'p': 0.9, 'dev_worst': 0.694915, 'dev_fq': 5.58, 'target_fq': 6.365} fixed {'member': 'FI-alt-m3', 'dev_worst': 0.703704, 'dev_fq': 11.534, 'cap_ok': False}
+0 8 b2_fq {'p': 0.9, 'dev_worst': 0.682927, 'dev_fq': 5.58, 'target_fq': 6.701} fixed {'member': 'FI-alt-m2', 'dev_worst': 0.606061, 'dev_fq': 10.156, 'cap_ok': False}
+0.25 4 b2_fq {'p': 0.9, 'dev_worst': 0.627119, 'dev_fq': 5.577, 'target_fq': 5.96} fixed {'member': 'FI-alt-m3', 'dev_worst': 0.703704, 'dev_fq': 11.533, 'cap_ok': False}
+0.25 8 b2_fq {'p': 0.9, 'dev_worst': 0.512195, 'dev_fq': 5.577, 'target_fq': 6.114} fixed {'member': 'FI-alt-m2', 'dev_worst': 0.606061, 'dev_fq': 10.156, 'cap_ok': False}
+0.5 4 b2_fq {'p': 0.95, 'dev_worst': 0.407407, 'dev_fq': 3.157, 'target_fq': 4.453} fixed {'member': 'FI-alt-m3', 'dev_worst': 0.703704, 'dev_fq': 11.533, 'cap_ok': False}
+0.5 8 b2_fq {'p': 0.95, 'dev_worst': 0.390244, 'dev_fq': 3.157, 'target_fq': 4.798} fixed {'member': 'FI-alt-m2', 'dev_worst': 0.606061, 'dev_fq': 10.155, 'cap_ok': False}
+1 4 b2_fq {'p': 1.0, 'dev_worst': 0.152542, 'dev_fq': 0.0, 'target_fq': 0.081} fixed {'member': 'FI-alt-m3', 'dev_worst': 0.745763, 'dev_fq': 0.756, 'cap_ok': True}
+1 8 b2_fq {'p': 1.0, 'dev_worst': 0.195122, 'dev_fq': 0.0, 'target_fq': 0.192} fixed {'member': 'FI-alt-m2', 'dev_worst': 0.606061, 'dev_fq': 0.404, 'cap_ok': True}
