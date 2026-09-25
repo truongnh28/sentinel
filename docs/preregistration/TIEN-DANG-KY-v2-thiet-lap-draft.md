@@ -393,3 +393,9 @@ Mục này chỉ ghi giá trị đo được khi thực thi plan; mọi quyết 
   - Khuyết tật nằm ở plan: lưới τ không được kiểm với miền mà p_attack đạt được. Sửa cần tinh chỉnh lại và một lượt eval mới. Khai ở `docs/reports/v2-so-voi-draft.md`, §4.1 và §10.
 - 25/09, M8: gain so với B1 theo từng η_Q trong phép quét η là một phân tích mà D33 không liệt kê; khai ở `docs/reports/v2-so-voi-draft.md`, §5.5.
 - 25/09, rà soát cuối: cột quyết định V được tìm bằng một lượt đọc streamed của `eval-main.jsonl` đã ghim (sha256 khớp `eval-records.sha256`), không chạy mô phỏng. Bảng post hoc ở báo cáo §2.2 đọc lại theo cùng cách.
+- 25/09, số post hoc (cột quyết định V, bracket `v_br_naive`, N của BR): script và kết quả ở `auditgame/spikes/v2/posthoc/`. Script chỉ đọc record đã ghim (kiểm sha256), không mô phỏng; chạy lại cho kết quả trùng.
+- 25/09, chỗ chữ trong tiền đăng ký lệch với dữ liệu hoặc mã (ghi nhận, không sửa dòng quyết định):
+  - D8 ghi "chỉ Verified (9 repo)": trong tập eval là 7 repo / 42 workflow.
+  - Cột Δ = 8 của tập eval có 34 workflow / 12 repo.
+  - D15 viết λ_Q·FQ; mã (`metrics.loss`) dùng số item bị cách ly nhầm Q_false. Bài dùng Q_false.
+  - D2 dẫn "§8" của draft cho bảng giá và song ánh; trong PDF là §7 ("Audit actions", tr. 5) và Bảng 1.

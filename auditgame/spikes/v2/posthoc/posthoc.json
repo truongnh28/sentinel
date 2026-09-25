@@ -1,0 +1,2122 @@
+{
+ "sha256_eval_main": "f65831ae619e92e9321d0e350d1fd80533b7c13bc220ada0f6dca8a4cfdf2df3",
+ "lines_streamed": 8501064,
+ "lines_parsed": 30632,
+ "seconds": 9.1,
+ "br": {
+  "0|B1 audit-at-commit|0": {
+   "v_br": 0.7218,
+   "v_br_naive": 0.9701,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B1 audit-at-commit|0": {
+   "v_br": 0.5963,
+   "v_br_naive": 0.8832,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B1 audit-at-commit|0": {
+   "v_br": 0.4149,
+   "v_br_naive": 0.7367,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B1 audit-at-commit|0": {
+   "v_br": 0.0959,
+   "v_br_naive": 0.3501,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B1 audit-at-commit|1": {
+   "v_br": 0.7393,
+   "v_br_naive": 0.9475,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B1 audit-at-commit|1": {
+   "v_br": 0.5785,
+   "v_br_naive": 0.8537,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B1 audit-at-commit|1": {
+   "v_br": 0.4385,
+   "v_br_naive": 0.7107,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B1 audit-at-commit|1": {
+   "v_br": 0.1013,
+   "v_br_naive": 0.3246,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B1 audit-at-commit|2": {
+   "v_br": 0.7442,
+   "v_br_naive": 0.9273,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B1 audit-at-commit|2": {
+   "v_br": 0.6072,
+   "v_br_naive": 0.8436,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B1 audit-at-commit|2": {
+   "v_br": 0.4636,
+   "v_br_naive": 0.6938,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B1 audit-at-commit|2": {
+   "v_br": 0.1129,
+   "v_br_naive": 0.3086,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B1 audit-at-commit|4": {
+   "v_br": 0.7488,
+   "v_br_naive": 0.8833,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B1 audit-at-commit|4": {
+   "v_br": 0.5921,
+   "v_br_naive": 0.7828,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B1 audit-at-commit|4": {
+   "v_br": 0.4439,
+   "v_br_naive": 0.6218,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B1 audit-at-commit|4": {
+   "v_br": 0.1175,
+   "v_br_naive": 0.2739,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B1 audit-at-commit|8": {
+   "v_br": 0.7928,
+   "v_br_naive": 0.8576,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|B1 audit-at-commit|8": {
+   "v_br": 0.656,
+   "v_br_naive": 0.7867,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|B1 audit-at-commit|8": {
+   "v_br": 0.4839,
+   "v_br_naive": 0.6388,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|B1 audit-at-commit|8": {
+   "v_br": 0.1089,
+   "v_br_naive": 0.2453,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|B2 uniform random|0": {
+   "v_br": 0.6406,
+   "v_br_naive": 0.9796,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B2 uniform random|0": {
+   "v_br": 0.6406,
+   "v_br_naive": 0.9684,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B2 uniform random|0": {
+   "v_br": 0.6428,
+   "v_br_naive": 0.9513,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B2 uniform random|0": {
+   "v_br": 0.6297,
+   "v_br_naive": 0.9318,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B2 uniform random|1": {
+   "v_br": 0.6047,
+   "v_br_naive": 0.9393,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B2 uniform random|1": {
+   "v_br": 0.6083,
+   "v_br_naive": 0.9201,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B2 uniform random|1": {
+   "v_br": 0.6018,
+   "v_br_naive": 0.9082,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B2 uniform random|1": {
+   "v_br": 0.6023,
+   "v_br_naive": 0.888,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B2 uniform random|2": {
+   "v_br": 0.5899,
+   "v_br_naive": 0.879,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B2 uniform random|2": {
+   "v_br": 0.5823,
+   "v_br_naive": 0.8632,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B2 uniform random|2": {
+   "v_br": 0.5838,
+   "v_br_naive": 0.8586,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B2 uniform random|2": {
+   "v_br": 0.5865,
+   "v_br_naive": 0.8427,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B2 uniform random|4": {
+   "v_br": 0.5643,
+   "v_br_naive": 0.7918,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B2 uniform random|4": {
+   "v_br": 0.5813,
+   "v_br_naive": 0.7918,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B2 uniform random|4": {
+   "v_br": 0.5879,
+   "v_br_naive": 0.7876,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B2 uniform random|4": {
+   "v_br": 0.5879,
+   "v_br_naive": 0.7861,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B2 uniform random|8": {
+   "v_br": 0.5848,
+   "v_br_naive": 0.7111,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|B2 uniform random|8": {
+   "v_br": 0.5848,
+   "v_br_naive": 0.7111,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|B2 uniform random|8": {
+   "v_br": 0.5718,
+   "v_br_naive": 0.7055,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|B2 uniform random|8": {
+   "v_br": 0.5718,
+   "v_br_naive": 0.7,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|B3 audit-on-insertion|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B3 audit-on-insertion|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B3 audit-on-insertion|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B3 audit-on-insertion|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B3 audit-on-insertion|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B3 audit-on-insertion|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B3 audit-on-insertion|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B3 audit-on-insertion|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B3 audit-on-insertion|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B3 audit-on-insertion|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B3 audit-on-insertion|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B3 audit-on-insertion|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B3 audit-on-insertion|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B3 audit-on-insertion|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B3 audit-on-insertion|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B3 audit-on-insertion|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B3 audit-on-insertion|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|B3 audit-on-insertion|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|B3 audit-on-insertion|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|B3 audit-on-insertion|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|B4 audit-on-retrieval|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B4 audit-on-retrieval|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B4 audit-on-retrieval|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B4 audit-on-retrieval|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B4 audit-on-retrieval|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B4 audit-on-retrieval|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B4 audit-on-retrieval|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B4 audit-on-retrieval|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B4 audit-on-retrieval|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B4 audit-on-retrieval|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B4 audit-on-retrieval|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B4 audit-on-retrieval|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B4 audit-on-retrieval|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B4 audit-on-retrieval|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B4 audit-on-retrieval|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B4 audit-on-retrieval|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B4 audit-on-retrieval|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|B4 audit-on-retrieval|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|B4 audit-on-retrieval|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|B4 audit-on-retrieval|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|B5 risk-score|0": {
+   "v_br": 0.7709,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B5 risk-score|0": {
+   "v_br": 0.7709,
+   "v_br_naive": 0.9797,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B5 risk-score|0": {
+   "v_br": 0.7558,
+   "v_br_naive": 0.9644,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B5 risk-score|0": {
+   "v_br": 0.7654,
+   "v_br_naive": 0.9343,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B5 risk-score|1": {
+   "v_br": 0.7092,
+   "v_br_naive": 0.9715,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B5 risk-score|1": {
+   "v_br": 0.6982,
+   "v_br_naive": 0.9574,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B5 risk-score|1": {
+   "v_br": 0.7202,
+   "v_br_naive": 0.9234,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B5 risk-score|1": {
+   "v_br": 0.7257,
+   "v_br_naive": 0.8726,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B5 risk-score|2": {
+   "v_br": 0.7364,
+   "v_br_naive": 0.967,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B5 risk-score|2": {
+   "v_br": 0.7276,
+   "v_br_naive": 0.9441,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B5 risk-score|2": {
+   "v_br": 0.7098,
+   "v_br_naive": 0.9154,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B5 risk-score|2": {
+   "v_br": 0.7155,
+   "v_br_naive": 0.8649,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B5 risk-score|4": {
+   "v_br": 0.6586,
+   "v_br_naive": 0.8617,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B5 risk-score|4": {
+   "v_br": 0.655,
+   "v_br_naive": 0.8582,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B5 risk-score|4": {
+   "v_br": 0.4946,
+   "v_br_naive": 0.7374,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B5 risk-score|4": {
+   "v_br": 0.5107,
+   "v_br_naive": 0.6956,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B5 risk-score|8": {
+   "v_br": 0.7828,
+   "v_br_naive": 0.8506,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|B5 risk-score|8": {
+   "v_br": 0.7828,
+   "v_br_naive": 0.8506,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|B5 risk-score|8": {
+   "v_br": 0.5006,
+   "v_br_naive": 0.6535,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|B5 risk-score|8": {
+   "v_br": 0.5109,
+   "v_br_naive": 0.6535,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|B6 two-stage|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B6 two-stage|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B6 two-stage|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B6 two-stage|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B6 two-stage|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B6 two-stage|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B6 two-stage|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B6 two-stage|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B6 two-stage|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B6 two-stage|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B6 two-stage|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B6 two-stage|2": {
+   "v_br": 0.848,
+   "v_br_naive": 0.9733,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B6 two-stage|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|B6 two-stage|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|B6 two-stage|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|B6 two-stage|4": {
+   "v_br": 0.8408,
+   "v_br_naive": 0.9531,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|B6 two-stage|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|B6 two-stage|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|B6 two-stage|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|B6 two-stage|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9265,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|Sentinel-A1|0": {
+   "v_br": 0.7218,
+   "v_br_naive": 0.9701,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|Sentinel-A1|0": {
+   "v_br": 0.5963,
+   "v_br_naive": 0.8832,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|Sentinel-A1|0": {
+   "v_br": 0.4149,
+   "v_br_naive": 0.7367,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|Sentinel-A1|0": {
+   "v_br": 0.0959,
+   "v_br_naive": 0.3501,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|Sentinel-A1|1": {
+   "v_br": 0.5466,
+   "v_br_naive": 0.9151,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|Sentinel-A1|1": {
+   "v_br": 0.5192,
+   "v_br_naive": 0.9091,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|Sentinel-A1|1": {
+   "v_br": 0.5461,
+   "v_br_naive": 0.8749,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|Sentinel-A1|1": {
+   "v_br": 0.1013,
+   "v_br_naive": 0.3246,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|Sentinel-A1|2": {
+   "v_br": 0.4025,
+   "v_br_naive": 0.8065,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|Sentinel-A1|2": {
+   "v_br": 0.3621,
+   "v_br_naive": 0.769,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|Sentinel-A1|2": {
+   "v_br": 0.3734,
+   "v_br_naive": 0.7218,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|Sentinel-A1|2": {
+   "v_br": 0.1129,
+   "v_br_naive": 0.3086,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|Sentinel-A1|4": {
+   "v_br": 0.3709,
+   "v_br_naive": 0.607,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|Sentinel-A1|4": {
+   "v_br": 0.3227,
+   "v_br_naive": 0.5697,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|Sentinel-A1|4": {
+   "v_br": 0.2763,
+   "v_br_naive": 0.5045,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|Sentinel-A1|4": {
+   "v_br": 0.1389,
+   "v_br_naive": 0.312,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|Sentinel-A1|8": {
+   "v_br": 0.3598,
+   "v_br_naive": 0.5557,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|Sentinel-A1|8": {
+   "v_br": 0.3621,
+   "v_br_naive": 0.5527,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|Sentinel-A1|8": {
+   "v_br": 0.2911,
+   "v_br_naive": 0.4838,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|Sentinel-A1|8": {
+   "v_br": 0.1477,
+   "v_br_naive": 0.2761,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|A1 -randomization|0": {
+   "v_br": 0.7218,
+   "v_br_naive": 0.9701,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -randomization|0": {
+   "v_br": 0.5963,
+   "v_br_naive": 0.8832,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -randomization|0": {
+   "v_br": 0.4149,
+   "v_br_naive": 0.7367,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -randomization|0": {
+   "v_br": 0.0959,
+   "v_br_naive": 0.3501,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -randomization|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -randomization|1": {
+   "v_br": 0.8241,
+   "v_br_naive": 0.9743,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -randomization|1": {
+   "v_br": 0.4385,
+   "v_br_naive": 0.7107,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -randomization|1": {
+   "v_br": 0.1013,
+   "v_br_naive": 0.3246,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -randomization|2": {
+   "v_br": 0.8523,
+   "v_br_naive": 0.9724,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -randomization|2": {
+   "v_br": 0.8523,
+   "v_br_naive": 0.9724,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -randomization|2": {
+   "v_br": 0.4636,
+   "v_br_naive": 0.6938,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -randomization|2": {
+   "v_br": 0.1129,
+   "v_br_naive": 0.3086,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -randomization|4": {
+   "v_br": 0.8518,
+   "v_br_naive": 0.9404,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -randomization|4": {
+   "v_br": 0.8518,
+   "v_br_naive": 0.9404,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -randomization|4": {
+   "v_br": 0.4439,
+   "v_br_naive": 0.6218,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -randomization|4": {
+   "v_br": 0.1175,
+   "v_br_naive": 0.2739,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -randomization|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9257,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|A1 -randomization|8": {
+   "v_br": 0.8672,
+   "v_br_naive": 0.9257,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|A1 -randomization|8": {
+   "v_br": 0.4839,
+   "v_br_naive": 0.6388,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|A1 -randomization|8": {
+   "v_br": 0.1089,
+   "v_br_naive": 0.2453,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|A1 -alarm memory|0": {
+   "v_br": 0.7218,
+   "v_br_naive": 0.9701,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -alarm memory|0": {
+   "v_br": 0.5963,
+   "v_br_naive": 0.8832,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -alarm memory|0": {
+   "v_br": 0.4149,
+   "v_br_naive": 0.7367,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -alarm memory|0": {
+   "v_br": 0.0959,
+   "v_br_naive": 0.3501,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -alarm memory|1": {
+   "v_br": 0.5466,
+   "v_br_naive": 0.9151,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -alarm memory|1": {
+   "v_br": 0.5192,
+   "v_br_naive": 0.9091,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -alarm memory|1": {
+   "v_br": 0.5461,
+   "v_br_naive": 0.8749,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -alarm memory|1": {
+   "v_br": 0.1013,
+   "v_br_naive": 0.3246,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -alarm memory|2": {
+   "v_br": 0.4025,
+   "v_br_naive": 0.8065,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -alarm memory|2": {
+   "v_br": 0.3621,
+   "v_br_naive": 0.769,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -alarm memory|2": {
+   "v_br": 0.3734,
+   "v_br_naive": 0.7218,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -alarm memory|2": {
+   "v_br": 0.1129,
+   "v_br_naive": 0.3086,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -alarm memory|4": {
+   "v_br": 0.3709,
+   "v_br_naive": 0.607,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -alarm memory|4": {
+   "v_br": 0.3227,
+   "v_br_naive": 0.5697,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -alarm memory|4": {
+   "v_br": 0.2763,
+   "v_br_naive": 0.5045,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -alarm memory|4": {
+   "v_br": 0.1389,
+   "v_br_naive": 0.312,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -alarm memory|8": {
+   "v_br": 0.3598,
+   "v_br_naive": 0.5557,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|A1 -alarm memory|8": {
+   "v_br": 0.3621,
+   "v_br_naive": 0.5527,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|A1 -alarm memory|8": {
+   "v_br": 0.2911,
+   "v_br_naive": 0.4838,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|A1 -alarm memory|8": {
+   "v_br": 0.1477,
+   "v_br_naive": 0.2761,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|A1 -transition uncertainty|0": {
+   "v_br": 0.7218,
+   "v_br_naive": 0.9701,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -transition uncertainty|0": {
+   "v_br": 0.5963,
+   "v_br_naive": 0.8832,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -transition uncertainty|0": {
+   "v_br": 0.4149,
+   "v_br_naive": 0.7367,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -transition uncertainty|0": {
+   "v_br": 0.0959,
+   "v_br_naive": 0.3501,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -transition uncertainty|1": {
+   "v_br": 0.5506,
+   "v_br_naive": 0.9161,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -transition uncertainty|1": {
+   "v_br": 0.5279,
+   "v_br_naive": 0.896,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -transition uncertainty|1": {
+   "v_br": 0.5101,
+   "v_br_naive": 0.8662,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -transition uncertainty|1": {
+   "v_br": 0.1013,
+   "v_br_naive": 0.3246,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -transition uncertainty|2": {
+   "v_br": 0.4206,
+   "v_br_naive": 0.7851,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -transition uncertainty|2": {
+   "v_br": 0.3934,
+   "v_br_naive": 0.7695,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -transition uncertainty|2": {
+   "v_br": 0.3705,
+   "v_br_naive": 0.7174,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -transition uncertainty|2": {
+   "v_br": 0.1129,
+   "v_br_naive": 0.3086,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -transition uncertainty|4": {
+   "v_br": 0.3836,
+   "v_br_naive": 0.6103,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -transition uncertainty|4": {
+   "v_br": 0.3266,
+   "v_br_naive": 0.5781,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -transition uncertainty|4": {
+   "v_br": 0.2851,
+   "v_br_naive": 0.5128,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -transition uncertainty|4": {
+   "v_br": 0.1161,
+   "v_br_naive": 0.2977,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -transition uncertainty|8": {
+   "v_br": 0.3931,
+   "v_br_naive": 0.56,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|A1 -transition uncertainty|8": {
+   "v_br": 0.3118,
+   "v_br_naive": 0.5531,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|A1 -transition uncertainty|8": {
+   "v_br": 0.3233,
+   "v_br_naive": 0.4833,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|A1 -transition uncertainty|8": {
+   "v_br": 0.1503,
+   "v_br_naive": 0.2859,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|A1 -benign-drift|0": {
+   "v_br": 0.7218,
+   "v_br_naive": 0.9701,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -benign-drift|0": {
+   "v_br": 0.5963,
+   "v_br_naive": 0.8832,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -benign-drift|0": {
+   "v_br": 0.4149,
+   "v_br_naive": 0.7367,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -benign-drift|0": {
+   "v_br": 0.0959,
+   "v_br_naive": 0.3501,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -benign-drift|1": {
+   "v_br": 0.5466,
+   "v_br_naive": 0.9151,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -benign-drift|1": {
+   "v_br": 0.5192,
+   "v_br_naive": 0.9091,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -benign-drift|1": {
+   "v_br": 0.5461,
+   "v_br_naive": 0.8749,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -benign-drift|1": {
+   "v_br": 0.1013,
+   "v_br_naive": 0.3246,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -benign-drift|2": {
+   "v_br": 0.4025,
+   "v_br_naive": 0.8065,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -benign-drift|2": {
+   "v_br": 0.3621,
+   "v_br_naive": 0.769,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -benign-drift|2": {
+   "v_br": 0.3734,
+   "v_br_naive": 0.7218,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -benign-drift|2": {
+   "v_br": 0.1129,
+   "v_br_naive": 0.3086,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -benign-drift|4": {
+   "v_br": 0.3709,
+   "v_br_naive": 0.607,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -benign-drift|4": {
+   "v_br": 0.3227,
+   "v_br_naive": 0.5697,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -benign-drift|4": {
+   "v_br": 0.2763,
+   "v_br_naive": 0.5045,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -benign-drift|4": {
+   "v_br": 0.1389,
+   "v_br_naive": 0.312,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -benign-drift|8": {
+   "v_br": 0.3598,
+   "v_br_naive": 0.5557,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|A1 -benign-drift|8": {
+   "v_br": 0.3621,
+   "v_br_naive": 0.5527,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|A1 -benign-drift|8": {
+   "v_br": 0.2911,
+   "v_br_naive": 0.4838,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|A1 -benign-drift|8": {
+   "v_br": 0.142,
+   "v_br_naive": 0.2694,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|A1 -regime estimate|0": {
+   "v_br": 0.7218,
+   "v_br_naive": 0.9701,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -regime estimate|0": {
+   "v_br": 0.5963,
+   "v_br_naive": 0.8854,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -regime estimate|0": {
+   "v_br": 0.4149,
+   "v_br_naive": 0.7367,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -regime estimate|0": {
+   "v_br": 0.0959,
+   "v_br_naive": 0.3501,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -regime estimate|1": {
+   "v_br": 0.7437,
+   "v_br_naive": 0.9475,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -regime estimate|1": {
+   "v_br": 0.5807,
+   "v_br_naive": 0.8559,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -regime estimate|1": {
+   "v_br": 0.4385,
+   "v_br_naive": 0.7107,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -regime estimate|1": {
+   "v_br": 0.1013,
+   "v_br_naive": 0.3246,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -regime estimate|2": {
+   "v_br": 0.7442,
+   "v_br_naive": 0.9248,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -regime estimate|2": {
+   "v_br": 0.6086,
+   "v_br_naive": 0.8437,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -regime estimate|2": {
+   "v_br": 0.4636,
+   "v_br_naive": 0.6938,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -regime estimate|2": {
+   "v_br": 0.1129,
+   "v_br_naive": 0.3086,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -regime estimate|4": {
+   "v_br": 0.7408,
+   "v_br_naive": 0.8779,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|A1 -regime estimate|4": {
+   "v_br": 0.576,
+   "v_br_naive": 0.7727,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|A1 -regime estimate|4": {
+   "v_br": 0.4439,
+   "v_br_naive": 0.6218,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|A1 -regime estimate|4": {
+   "v_br": 0.1175,
+   "v_br_naive": 0.2739,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|A1 -regime estimate|8": {
+   "v_br": 0.7928,
+   "v_br_naive": 0.8576,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|A1 -regime estimate|8": {
+   "v_br": 0.6647,
+   "v_br_naive": 0.7867,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|A1 -regime estimate|8": {
+   "v_br": 0.4839,
+   "v_br_naive": 0.6388,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|A1 -regime estimate|8": {
+   "v_br": 0.1089,
+   "v_br_naive": 0.2453,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0|Oracle (control)|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|Oracle (control)|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|Oracle (control)|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|Oracle (control)|0": {
+   "v_br": 0.8099,
+   "v_br_naive": 0.9869,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|Oracle (control)|1": {
+   "v_br": 0.0018,
+   "v_br_naive": 0.0604,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|Oracle (control)|1": {
+   "v_br": 0.0018,
+   "v_br_naive": 0.0604,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|Oracle (control)|1": {
+   "v_br": 0.0018,
+   "v_br_naive": 0.0604,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|Oracle (control)|1": {
+   "v_br": 0.0018,
+   "v_br_naive": 0.0604,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|Oracle (control)|2": {
+   "v_br": 0.0,
+   "v_br_naive": 0.0084,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|Oracle (control)|2": {
+   "v_br": 0.0,
+   "v_br_naive": 0.0084,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|Oracle (control)|2": {
+   "v_br": 0.0,
+   "v_br_naive": 0.0084,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|Oracle (control)|2": {
+   "v_br": 0.0,
+   "v_br_naive": 0.0084,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|Oracle (control)|4": {
+   "v_br": 0.0051,
+   "v_br_naive": 0.0084,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.25|Oracle (control)|4": {
+   "v_br": 0.0051,
+   "v_br_naive": 0.0084,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0.5|Oracle (control)|4": {
+   "v_br": 0.0051,
+   "v_br_naive": 0.0084,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "1|Oracle (control)|4": {
+   "v_br": 0.0051,
+   "v_br_naive": 0.0084,
+   "n_workflows": 57,
+   "n_repos": 16
+  },
+  "0|Oracle (control)|8": {
+   "v_br": 0.0,
+   "v_br_naive": 0.0056,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.25|Oracle (control)|8": {
+   "v_br": 0.0,
+   "v_br_naive": 0.0056,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "0.5|Oracle (control)|8": {
+   "v_br": 0.0,
+   "v_br_naive": 0.0056,
+   "n_workflows": 29,
+   "n_repos": 11
+  },
+  "1|Oracle (control)|8": {
+   "v_br": 0.0,
+   "v_br_naive": 0.0056,
+   "n_workflows": 29,
+   "n_repos": 11
+  }
+ },
+ "cells": {
+  "0|B1 audit-at-commit": {
+   "V": 0.7981379731379731,
+   "deciding": [
+    "skill-last-write-e1.0@8"
+   ],
+   "n_columns": 14,
+   "n_workflows": 26,
+   "n_repos": 10,
+   "n_episodes": 160,
+   "within_0.05": 4,
+   "columns": {
+    "branch-first-write-e0.6@4": {
+     "mean": 0.005430242272347536,
+     "n_workflows": 57
+    },
+    "branch-first-write-e0.6@8": {
+     "mean": 0.0,
+     "n_workflows": 30
+    },
+    "memory-last-ingress-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-ingress-e0.3@8": {
+     "mean": 0.0,
+     "n_workflows": 34
+    },
+    "memory-last-write-e0.6@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-write-e0.6@8": {
+     "mean": 0.0,
+     "n_workflows": 30
+    },
+    "memory-mid-write-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-mid-write-e0.3@8": {
+     "mean": 0.0,
+     "n_workflows": 34
+    },
+    "queue-last-ingress-e0.6@4": {
+     "mean": 0.7611111111111111,
+     "n_workflows": 57
+    },
+    "queue-last-ingress-e0.6@8": {
+     "mean": 0.7776190476190477,
+     "n_workflows": 30
+    },
+    "queue-mid-write-e0.6@4": {
+     "mean": 0.7476120857699805,
+     "n_workflows": 57
+    },
+    "queue-mid-write-e0.6@8": {
+     "mean": 0.7526190476190476,
+     "n_workflows": 30
+    },
+    "skill-last-write-e1.0@4": {
+     "mean": 0.7446840371368674,
+     "n_workflows": 53
+    },
+    "skill-last-write-e1.0@8": {
+     "mean": 0.7981379731379731,
+     "n_workflows": 26
+    }
+   }
+  },
+  "0|Sentinel-A1": {
+   "V": 0.40543650793650793,
+   "deciding": [
+    "branch-first-write-e0.6@8"
+   ],
+   "n_columns": 14,
+   "n_workflows": 30,
+   "n_repos": 11,
+   "n_episodes": 200,
+   "within_0.05": 4,
+   "columns": {
+    "branch-first-write-e0.6@4": {
+     "mean": 0.2801865775549986,
+     "n_workflows": 57
+    },
+    "branch-first-write-e0.6@8": {
+     "mean": 0.40543650793650793,
+     "n_workflows": 30
+    },
+    "memory-last-ingress-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-ingress-e0.3@8": {
+     "mean": 0.08077731092436975,
+     "n_workflows": 34
+    },
+    "memory-last-write-e0.6@4": {
+     "mean": 0.006432748538011696,
+     "n_workflows": 57
+    },
+    "memory-last-write-e0.6@8": {
+     "mean": 0.29968253968253966,
+     "n_workflows": 30
+    },
+    "memory-mid-write-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-mid-write-e0.3@8": {
+     "mean": 0.025280112044817928,
+     "n_workflows": 34
+    },
+    "queue-last-ingress-e0.6@4": {
+     "mean": 0.3715538847117794,
+     "n_workflows": 57
+    },
+    "queue-last-ingress-e0.6@8": {
+     "mean": 0.25603174603174605,
+     "n_workflows": 30
+    },
+    "queue-mid-write-e0.6@4": {
+     "mean": 0.37116402116402114,
+     "n_workflows": 57
+    },
+    "queue-mid-write-e0.6@8": {
+     "mean": 0.2592063492063492,
+     "n_workflows": 30
+    },
+    "skill-last-write-e1.0@4": {
+     "mean": 0.36956424079065586,
+     "n_workflows": 53
+    },
+    "skill-last-write-e1.0@8": {
+     "mean": 0.28928571428571426,
+     "n_workflows": 26
+    }
+   }
+  },
+  "0.25|B1 audit-at-commit": {
+   "V": 0.7154304029304028,
+   "deciding": [
+    "skill-last-write-e1.0@8"
+   ],
+   "n_columns": 14,
+   "n_workflows": 26,
+   "n_repos": 10,
+   "n_episodes": 160,
+   "within_0.05": 3,
+   "columns": {
+    "branch-first-write-e0.6@4": {
+     "mean": 0.005430242272347536,
+     "n_workflows": 57
+    },
+    "branch-first-write-e0.6@8": {
+     "mean": 0.0,
+     "n_workflows": 30
+    },
+    "memory-last-ingress-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-ingress-e0.3@8": {
+     "mean": 0.0,
+     "n_workflows": 34
+    },
+    "memory-last-write-e0.6@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-write-e0.6@8": {
+     "mean": 0.0,
+     "n_workflows": 30
+    },
+    "memory-mid-write-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-mid-write-e0.3@8": {
+     "mean": 0.0,
+     "n_workflows": 34
+    },
+    "queue-last-ingress-e0.6@4": {
+     "mean": 0.6591896407685881,
+     "n_workflows": 57
+    },
+    "queue-last-ingress-e0.6@8": {
+     "mean": 0.6840476190476191,
+     "n_workflows": 30
+    },
+    "queue-mid-write-e0.6@4": {
+     "mean": 0.5990044555834029,
+     "n_workflows": 57
+    },
+    "queue-mid-write-e0.6@8": {
+     "mean": 0.6698280423280423,
+     "n_workflows": 30
+    },
+    "skill-last-write-e1.0@4": {
+     "mean": 0.6449236298292903,
+     "n_workflows": 53
+    },
+    "skill-last-write-e1.0@8": {
+     "mean": 0.7154304029304028,
+     "n_workflows": 26
+    }
+   }
+  },
+  "0.25|Sentinel-A1": {
+   "V": 0.36376984126984124,
+   "deciding": [
+    "branch-first-write-e0.6@8"
+   ],
+   "n_columns": 14,
+   "n_workflows": 30,
+   "n_repos": 11,
+   "n_episodes": 200,
+   "within_0.05": 3,
+   "columns": {
+    "branch-first-write-e0.6@4": {
+     "mean": 0.2668615984405458,
+     "n_workflows": 57
+    },
+    "branch-first-write-e0.6@8": {
+     "mean": 0.36376984126984124,
+     "n_workflows": 30
+    },
+    "memory-last-ingress-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-ingress-e0.3@8": {
+     "mean": 0.07710084033613446,
+     "n_workflows": 34
+    },
+    "memory-last-write-e0.6@4": {
+     "mean": 0.006432748538011696,
+     "n_workflows": 57
+    },
+    "memory-last-write-e0.6@8": {
+     "mean": 0.2865873015873016,
+     "n_workflows": 30
+    },
+    "memory-mid-write-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-mid-write-e0.3@8": {
+     "mean": 0.025280112044817928,
+     "n_workflows": 34
+    },
+    "queue-last-ingress-e0.6@4": {
+     "mean": 0.35432330827067665,
+     "n_workflows": 57
+    },
+    "queue-last-ingress-e0.6@8": {
+     "mean": 0.2701190476190476,
+     "n_workflows": 30
+    },
+    "queue-mid-write-e0.6@4": {
+     "mean": 0.29966583124477864,
+     "n_workflows": 57
+    },
+    "queue-mid-write-e0.6@8": {
+     "mean": 0.28055555555555556,
+     "n_workflows": 30
+    },
+    "skill-last-write-e1.0@4": {
+     "mean": 0.3400269541778976,
+     "n_workflows": 53
+    },
+    "skill-last-write-e1.0@8": {
+     "mean": 0.29816849816849816,
+     "n_workflows": 26
+    }
+   }
+  },
+  "0.5|B1 audit-at-commit": {
+   "V": 0.5386904761904762,
+   "deciding": [
+    "queue-mid-write-e0.6@8"
+   ],
+   "n_columns": 14,
+   "n_workflows": 30,
+   "n_repos": 11,
+   "n_episodes": 187,
+   "within_0.05": 3,
+   "columns": {
+    "branch-first-write-e0.6@4": {
+     "mean": 0.005430242272347536,
+     "n_workflows": 57
+    },
+    "branch-first-write-e0.6@8": {
+     "mean": 0.0,
+     "n_workflows": 30
+    },
+    "memory-last-ingress-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-ingress-e0.3@8": {
+     "mean": 0.0,
+     "n_workflows": 34
+    },
+    "memory-last-write-e0.6@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-write-e0.6@8": {
+     "mean": 0.0,
+     "n_workflows": 30
+    },
+    "memory-mid-write-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-mid-write-e0.3@8": {
+     "mean": 0.0,
+     "n_workflows": 34
+    },
+    "queue-last-ingress-e0.6@4": {
+     "mean": 0.486661097187413,
+     "n_workflows": 57
+    },
+    "queue-last-ingress-e0.6@8": {
+     "mean": 0.5090476190476191,
+     "n_workflows": 30
+    },
+    "queue-mid-write-e0.6@4": {
+     "mean": 0.41835839598997493,
+     "n_workflows": 57
+    },
+    "queue-mid-write-e0.6@8": {
+     "mean": 0.5386904761904762,
+     "n_workflows": 30
+    },
+    "skill-last-write-e1.0@4": {
+     "mean": 0.4804731955675352,
+     "n_workflows": 53
+    },
+    "skill-last-write-e1.0@8": {
+     "mean": 0.5309218559218559,
+     "n_workflows": 26
+    }
+   }
+  },
+  "0.5|Sentinel-A1": {
+   "V": 0.306885268727374,
+   "deciding": [
+    "queue-last-ingress-e0.6@4"
+   ],
+   "n_columns": 14,
+   "n_workflows": 57,
+   "n_repos": 16,
+   "n_episodes": 355,
+   "within_0.05": 7,
+   "columns": {
+    "branch-first-write-e0.6@4": {
+     "mean": 0.19725006961849068,
+     "n_workflows": 57
+    },
+    "branch-first-write-e0.6@8": {
+     "mean": 0.29170634920634925,
+     "n_workflows": 30
+    },
+    "memory-last-ingress-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-ingress-e0.3@8": {
+     "mean": 0.07048319327731092,
+     "n_workflows": 34
+    },
+    "memory-last-write-e0.6@4": {
+     "mean": 0.006432748538011696,
+     "n_workflows": 57
+    },
+    "memory-last-write-e0.6@8": {
+     "mean": 0.24813492063492062,
+     "n_workflows": 30
+    },
+    "memory-mid-write-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-mid-write-e0.3@8": {
+     "mean": 0.022338935574229692,
+     "n_workflows": 34
+    },
+    "queue-last-ingress-e0.6@4": {
+     "mean": 0.306885268727374,
+     "n_workflows": 57
+    },
+    "queue-last-ingress-e0.6@8": {
+     "mean": 0.27436507936507937,
+     "n_workflows": 30
+    },
+    "queue-mid-write-e0.6@4": {
+     "mean": 0.269228627123364,
+     "n_workflows": 57
+    },
+    "queue-mid-write-e0.6@8": {
+     "mean": 0.3017724867724868,
+     "n_workflows": 30
+    },
+    "skill-last-write-e1.0@4": {
+     "mean": 0.29580712788259955,
+     "n_workflows": 53
+    },
+    "skill-last-write-e1.0@8": {
+     "mean": 0.2796092796092796,
+     "n_workflows": 26
+    }
+   }
+  },
+  "1|B1 audit-at-commit": {
+   "V": 0.19425726265348908,
+   "deciding": [
+    "skill-last-write-e1.0@4"
+   ],
+   "n_columns": 14,
+   "n_workflows": 53,
+   "n_repos": 14,
+   "n_episodes": 334,
+   "within_0.05": 3,
+   "columns": {
+    "branch-first-write-e0.6@4": {
+     "mean": 0.005430242272347536,
+     "n_workflows": 57
+    },
+    "branch-first-write-e0.6@8": {
+     "mean": 0.0,
+     "n_workflows": 30
+    },
+    "memory-last-ingress-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-ingress-e0.3@8": {
+     "mean": 0.0,
+     "n_workflows": 34
+    },
+    "memory-last-write-e0.6@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-last-write-e0.6@8": {
+     "mean": 0.0,
+     "n_workflows": 30
+    },
+    "memory-mid-write-e0.3@4": {
+     "mean": 0.0029239766081871343,
+     "n_workflows": 57
+    },
+    "memory-mid-write-e0.3@8": {
+     "mean": 0.0,
+     "n_workflows": 34
+    },
+    "queue-last-ingress-e0.6@4": {
+     "mean": 0.14791144527986633,
+     "n_workflows": 57
+    },
+    "queue-last-ingress-e0.6@8": {
+     "mean": 0.14222222222222222,
+     "n_workflows": 30
+    },
+    "queue-mid-write-e0.6@4": {
+     "mean": 0.13253968253968254,
+     "n_workflows": 57
+    },
+    "queue-mid-write-e0.6@8": {
+     "mean": 0.13554232804232805,
+     "n_workflows": 30
+    },
+    "skill-last-write-e1.0@4": {
+     "mean": 0.19425726265348908,
+     "n_workflows": 53
+    },
+    "skill-last-write-e1.0@8": {
+     "mean": 0.1743742368742369,
+     "n_workflows": 26
+    }
+   }
+  },
+  "1|Sentinel-A1": {
+   "V": 0.17718628331835878,
+   "deciding": [
+    "skill-last-write-e1.0@4"
+   ],
+   "n_columns": 14,
+   "n_workflows": 53,
+   "n_repos": 14,
+   "n_episodes": 334,
+   "within_0.05": 4,
+   "columns": {
+    "branch-first-write-e0.6@4": {
+     "mean": 0.11141047062099693,
+     "n_workflows": 57
+    },
+    "branch-first-write-e0.6@8": {
+     "mean": 0.11578042328042329,
+     "n_workflows": 30
+    },
+    "memory-last-ingress-e0.3@4": {
+     "mean": 0.007309941520467836,
+     "n_workflows": 57
+    },
+    "memory-last-ingress-e0.3@8": {
+     "mean": 0.003676470588235294,
+     "n_workflows": 34
+    },
+    "memory-last-write-e0.6@4": {
+     "mean": 0.031892230576441104,
+     "n_workflows": 57
+    },
+    "memory-last-write-e0.6@8": {
+     "mean": 0.004166666666666667,
+     "n_workflows": 30
+    },
+    "memory-mid-write-e0.3@4": {
+     "mean": 0.004678362573099415,
+     "n_workflows": 57
+    },
+    "memory-mid-write-e0.3@8": {
+     "mean": 0.0,
+     "n_workflows": 34
+    },
+    "queue-last-ingress-e0.6@4": {
+     "mean": 0.1385129490392648,
+     "n_workflows": 57
+    },
+    "queue-last-ingress-e0.6@8": {
+     "mean": 0.12912698412698412,
+     "n_workflows": 30
+    },
+    "queue-mid-write-e0.6@4": {
+     "mean": 0.11283764967975494,
+     "n_workflows": 57
+    },
+    "queue-mid-write-e0.6@8": {
+     "mean": 0.1229100529100529,
+     "n_workflows": 30
+    },
+    "skill-last-write-e1.0@4": {
+     "mean": 0.17718628331835878,
+     "n_workflows": 53
+    },
+    "skill-last-write-e1.0@8": {
+     "mean": 0.14648962148962147,
+     "n_workflows": 26
+    }
+   }
+  }
+ }
+}
