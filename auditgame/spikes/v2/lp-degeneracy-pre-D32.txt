@@ -1,0 +1,75 @@
+# lp_degeneracy.py at 4c02883 (constrained_minimax before D32), DEV only.
+# n_pure_at_v* > 0: that many pure members already reach the LP optimum, so the LP vertex is arbitrary.
+# minFQ / minMean: the lowest FQ% / mean harm among mixtures that keep the worst case.
+rho=0 weak   0   v*=0.8214 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.4209 | minFQ: fq=0.00 mean=0.4209 | minMean: fq=0.00 mean=0.4209 top=L-BT-0.5-f0
+rho=0 weak   1   v*=0.6552 same_as_committed=True n_pure_at_v*= 0 | LP: fq=10.00 mean=0.5175 | minFQ: fq=10.00 mean=0.5175 | minMean: fq=10.00 mean=0.5175 top=L-SW-nomemory
+rho=0 weak   2   v*=0.5491 same_as_committed=True n_pure_at_v*= 0 | LP: fq=10.00 mean=0.4673 | minFQ: fq=10.00 mean=0.4673 | minMean: fq=10.00 mean=0.4673 top=L-SW-nomemory
+rho=0 weak   4   v*=0.4076 same_as_committed=True n_pure_at_v*= 0 | LP: fq=8.86 mean=0.3341 | minFQ: fq=8.86 mean=0.3341 | minMean: fq=8.86 mean=0.3341 top=L-BT-0.5-f0
+rho=0 weak   8   v*=0.3100 same_as_committed=True n_pure_at_v*= 0 | LP: fq=9.56 mean=0.3034 | minFQ: fq=9.56 mean=0.3034 | minMean: fq=9.56 mean=0.3034 top=L-SW-nomemory
+rho=0 weak   all v*=0.8221 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.09 mean=0.3981 | minFQ: fq=0.09 mean=0.3981 | minMean: fq=0.09 mean=0.3981 top=L-BT-0.5-f0
+rho=0 mid    0   v*=0.8929 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.4322 | minFQ: fq=0.00 mean=0.4322 | minMean: fq=0.00 mean=0.4322 top=L-BT-0.5-f0
+rho=0 mid    1   v*=0.6015 same_as_committed=True n_pure_at_v*= 0 | LP: fq=10.00 mean=0.5866 | minFQ: fq=10.00 mean=0.5866 | minMean: fq=10.00 mean=0.5865 top=L-SW-nomemory
+rho=0 mid    2   v*=0.5142 same_as_committed=True n_pure_at_v*= 0 | LP: fq=7.40 mean=0.4695 | minFQ: fq=7.40 mean=0.4695 | minMean: fq=7.40 mean=0.4695 top=L-SW-nomemory
+rho=0 mid    4   v*=0.4113 same_as_committed=True n_pure_at_v*= 0 | LP: fq=6.36 mean=0.3244 | minFQ: fq=6.36 mean=0.3244 | minMean: fq=6.36 mean=0.3244 top=L-RO-c4-p1-d3
+rho=0 mid    8   v*=0.3214 same_as_committed=True n_pure_at_v*= 0 | LP: fq=6.70 mean=0.3140 | minFQ: fq=6.70 mean=0.3140 | minMean: fq=6.70 mean=0.3140 top=L-SW-nomemory
+rho=0 mid    all v*=0.8930 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.08 mean=0.4182 | minFQ: fq=0.08 mean=0.4181 | minMean: fq=0.08 mean=0.4181 top=L-BT-0.5-f0
+rho=0 strong 0   v*=0.9643 same_as_committed=True n_pure_at_v*=16 | LP: fq=5.34 mean=0.7822 | minFQ: fq=0.00 mean=0.4657 | minMean: fq=0.00 mean=0.4657 top=L-BT-0.5-f0
+rho=0 strong 1   v*=0.5991 same_as_committed=True n_pure_at_v*= 0 | LP: fq=5.67 mean=0.5818 | minFQ: fq=5.67 mean=0.5818 | minMean: fq=5.67 mean=0.5818 top=L-SW-nomemory
+rho=0 strong 2   v*=0.5262 same_as_committed=True n_pure_at_v*= 0 | LP: fq=4.30 mean=0.4780 | minFQ: fq=4.30 mean=0.4780 | minMean: fq=4.30 mean=0.4780 top=L-SW-nomemory
+rho=0 strong 4   v*=0.4221 same_as_committed=True n_pure_at_v*= 0 | LP: fq=4.08 mean=0.3354 | minFQ: fq=4.08 mean=0.3354 | minMean: fq=4.08 mean=0.3354 top=L-RO-c4-p1-d2
+rho=0 strong 8   v*=0.3199 same_as_committed=True n_pure_at_v*= 0 | LP: fq=3.82 mean=0.3170 | minFQ: fq=3.82 mean=0.3164 | minMean: fq=3.82 mean=0.3164 top=L-SW-nomemory
+rho=0 strong all v*=0.9643 same_as_committed=True n_pure_at_v*=16 | LP: fq=7.51 mean=0.5462 | minFQ: fq=0.00 mean=0.4443 | minMean: fq=0.00 mean=0.4443 top=L-BT-0.5-f0
+rho=0.25 weak   0   v*=0.7500 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.3715 | minFQ: fq=0.00 mean=0.3715 | minMean: fq=0.00 mean=0.3715 top=L-BT-0.5-f0
+rho=0.25 weak   1   v*=0.6235 same_as_committed=True n_pure_at_v*= 0 | LP: fq=10.00 mean=0.4933 | minFQ: fq=10.00 mean=0.4933 | minMean: fq=10.00 mean=0.4933 top=L-SW-nomemory
+rho=0.25 weak   2   v*=0.5166 same_as_committed=True n_pure_at_v*= 0 | LP: fq=10.00 mean=0.4497 | minFQ: fq=10.00 mean=0.4497 | minMean: fq=10.00 mean=0.4497 top=L-SW-nomemory
+rho=0.25 weak   4   v*=0.3752 same_as_committed=True n_pure_at_v*= 0 | LP: fq=8.09 mean=0.3057 | minFQ: fq=8.09 mean=0.3057 | minMean: fq=8.09 mean=0.3057 top=L-BT-0.5-f0
+rho=0.25 weak   8   v*=0.2782 same_as_committed=True n_pure_at_v*= 0 | LP: fq=8.45 mean=0.2720 | minFQ: fq=8.45 mean=0.2720 | minMean: fq=8.45 mean=0.2720 top=L-BT-0.5-f0
+rho=0.25 weak   all v*=0.7514 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.13 mean=0.3410 | minFQ: fq=0.13 mean=0.3410 | minMean: fq=0.13 mean=0.3410 top=L-BT-0.5-f0
+rho=0.25 mid    0   v*=0.7679 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.3713 | minFQ: fq=0.00 mean=0.3713 | minMean: fq=0.00 mean=0.3713 top=L-BT-0.5-f0
+rho=0.25 mid    1   v*=0.5841 same_as_committed=True n_pure_at_v*= 0 | LP: fq=9.72 mean=0.5708 | minFQ: fq=9.72 mean=0.5708 | minMean: fq=9.72 mean=0.5708 top=L-SW-nomemory
+rho=0.25 mid    2   v*=0.4872 same_as_committed=True n_pure_at_v*= 0 | LP: fq=6.96 mean=0.4432 | minFQ: fq=6.96 mean=0.4432 | minMean: fq=6.96 mean=0.4432 top=L-SW-nomemory
+rho=0.25 mid    4   v*=0.3863 same_as_committed=True n_pure_at_v*= 0 | LP: fq=5.96 mean=0.3040 | minFQ: fq=5.96 mean=0.3040 | minMean: fq=5.96 mean=0.3040 top=L-BT-0.5-f0
+rho=0.25 mid    8   v*=0.2959 same_as_committed=True n_pure_at_v*= 0 | LP: fq=6.11 mean=0.2797 | minFQ: fq=6.11 mean=0.2798 | minMean: fq=6.11 mean=0.2797 top=L-SW-nomemory
+rho=0.25 mid    all v*=0.7689 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.07 mean=0.3555 | minFQ: fq=0.07 mean=0.3555 | minMean: fq=0.07 mean=0.3555 top=L-BT-0.5-f0
+rho=0.25 strong 0   v*=0.7857 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.3869 | minFQ: fq=0.00 mean=0.3869 | minMean: fq=0.00 mean=0.3869 top=L-BT-0.5-f0
+rho=0.25 strong 1   v*=0.5948 same_as_committed=True n_pure_at_v*= 0 | LP: fq=5.66 mean=0.5749 | minFQ: fq=5.66 mean=0.5749 | minMean: fq=5.66 mean=0.5749 top=L-SW-queue
+rho=0.25 strong 2   v*=0.5004 same_as_committed=True n_pure_at_v*= 0 | LP: fq=4.06 mean=0.4550 | minFQ: fq=4.06 mean=0.4550 | minMean: fq=4.06 mean=0.4550 top=L-SW-nomemory
+rho=0.25 strong 4   v*=0.3907 same_as_committed=True n_pure_at_v*= 0 | LP: fq=3.78 mean=0.3096 | minFQ: fq=3.78 mean=0.3096 | minMean: fq=3.78 mean=0.3096 top=L-BT-0.5-f0
+rho=0.25 strong 8   v*=0.2975 same_as_committed=True n_pure_at_v*= 0 | LP: fq=3.55 mean=0.2862 | minFQ: fq=3.55 mean=0.2857 | minMean: fq=3.55 mean=0.2857 top=L-SW-nomemory
+rho=0.25 strong all v*=0.7951 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.35 mean=0.3825 | minFQ: fq=0.35 mean=0.3825 | minMean: fq=0.35 mean=0.3825 top=L-BT-0.5-f0
+rho=0.5 weak   0   v*=0.6250 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.3106 | minFQ: fq=0.00 mean=0.3106 | minMean: fq=0.00 mean=0.3106 top=L-BT-0.5-f0
+rho=0.5 weak   1   v*=0.5676 same_as_committed=True n_pure_at_v*= 0 | LP: fq=10.00 mean=0.4670 | minFQ: fq=10.00 mean=0.4670 | minMean: fq=10.00 mean=0.4670 top=L-SW-nomemory
+rho=0.5 weak   2   v*=0.4385 same_as_committed=True n_pure_at_v*= 0 | LP: fq=9.68 mean=0.4078 | minFQ: fq=9.68 mean=0.4078 | minMean: fq=9.68 mean=0.4078 top=L-SW-nomemory
+rho=0.5 weak   4   v*=0.3045 same_as_committed=True n_pure_at_v*= 0 | LP: fq=6.42 mean=0.2551 | minFQ: fq=6.42 mean=0.2551 | minMean: fq=6.42 mean=0.2551 top=L-BT-0.5-f0
+rho=0.5 weak   8   v*=0.2414 same_as_committed=True n_pure_at_v*= 0 | LP: fq=7.13 mean=0.2380 | minFQ: fq=7.13 mean=0.2380 | minMean: fq=7.17 mean=0.2365 top=L-BT-0.5-f0
+rho=0.5 weak   all v*=0.6250 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.2702 | minFQ: fq=0.00 mean=0.2702 | minMean: fq=0.00 mean=0.2702 top=L-BT-0.5-f0
+rho=0.5 mid    0   v*=0.6250 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.2885 | minFQ: fq=0.00 mean=0.2885 | minMean: fq=0.00 mean=0.2885 top=L-BT-0.5-f0
+rho=0.5 mid    1   v*=0.5335 same_as_committed=True n_pure_at_v*= 0 | LP: fq=8.88 mean=0.5201 | minFQ: fq=8.88 mean=0.5201 | minMean: fq=8.88 mean=0.5201 top=L-SW-nomemory
+rho=0.5 mid    2   v*=0.4194 same_as_committed=True n_pure_at_v*= 0 | LP: fq=6.15 mean=0.3872 | minFQ: fq=6.15 mean=0.3872 | minMean: fq=6.15 mean=0.3872 top=L-SW-nomemory
+rho=0.5 mid    4   v*=0.2928 same_as_committed=True n_pure_at_v*= 0 | LP: fq=4.45 mean=0.2341 | minFQ: fq=4.45 mean=0.2341 | minMean: fq=4.45 mean=0.2341 top=L-BT-0.5-f0
+rho=0.5 mid    8   v*=0.2383 same_as_committed=True n_pure_at_v*= 0 | LP: fq=4.80 mean=0.2313 | minFQ: fq=4.80 mean=0.2313 | minMean: fq=4.80 mean=0.2313 top=L-BT-0.5-f0
+rho=0.5 mid    all v*=0.6250 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.2518 | minFQ: fq=0.00 mean=0.2518 | minMean: fq=0.00 mean=0.2518 top=L-BT-0.5-f0
+rho=0.5 strong 0   v*=0.6250 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.2885 | minFQ: fq=0.00 mean=0.2885 | minMean: fq=0.00 mean=0.2885 top=L-BT-0.5-f0
+rho=0.5 strong 1   v*=0.5318 same_as_committed=True n_pure_at_v*= 0 | LP: fq=4.97 mean=0.5185 | minFQ: fq=4.97 mean=0.5185 | minMean: fq=4.97 mean=0.5185 top=L-SW-nomemory
+rho=0.5 strong 2   v*=0.4194 same_as_committed=True n_pure_at_v*= 0 | LP: fq=3.36 mean=0.3860 | minFQ: fq=3.36 mean=0.3860 | minMean: fq=3.36 mean=0.3860 top=L-SW-nomemory
+rho=0.5 strong 4   v*=0.2889 same_as_committed=True n_pure_at_v*= 0 | LP: fq=2.79 mean=0.2325 | minFQ: fq=2.79 mean=0.2325 | minMean: fq=2.79 mean=0.2325 top=L-BT-0.5-f0
+rho=0.5 strong 8   v*=0.2312 same_as_committed=True n_pure_at_v*= 0 | LP: fq=2.76 mean=0.2267 | minFQ: fq=2.76 mean=0.2263 | minMean: fq=2.76 mean=0.2263 top=L-BT-0.5-f0
+rho=0.5 strong all v*=0.6250 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.2502 | minFQ: fq=0.00 mean=0.2502 | minMean: fq=0.00 mean=0.2502 top=L-BT-0.5-f0
+rho=1 weak   0   v*=0.2692 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.1471 | minFQ: fq=0.00 mean=0.1471 | minMean: fq=0.00 mean=0.1471 top=L-BT-0.5-f0
+rho=1 weak   1   v*=0.2653 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.1347 | minFQ: fq=0.00 mean=0.1347 | minMean: fq=0.00 mean=0.1347 top=L-BT-0.5-f0
+rho=1 weak   2   v*=0.2982 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.1513 | minFQ: fq=0.00 mean=0.1513 | minMean: fq=0.00 mean=0.1513 top=L-BT-0.5-f0
+rho=1 weak   4   v*=0.3014 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.29 mean=0.2722 | minFQ: fq=0.29 mean=0.2722 | minMean: fq=0.29 mean=0.2722 top=L-BT-0.5-f0
+rho=1 weak   8   v*=0.2152 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.18 mean=0.2031 | minFQ: fq=0.18 mean=0.2031 | minMean: fq=0.18 mean=0.2031 top=L-BT-0.5-f0
+rho=1 weak   all v*=0.3260 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.10 mean=0.1983 | minFQ: fq=0.10 mean=0.1983 | minMean: fq=0.10 mean=0.1982 top=L-BT-0.5-f0
+rho=1 mid    0   v*=0.1607 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.0760 | minFQ: fq=0.00 mean=0.0760 | minMean: fq=0.00 mean=0.0760 top=L-BT-0.5-f0
+rho=1 mid    1   v*=0.1111 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.0525 | minFQ: fq=0.00 mean=0.0525 | minMean: fq=0.00 mean=0.0525 top=L-BT-0.5-f0
+rho=1 mid    2   v*=0.2105 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.0916 | minFQ: fq=0.00 mean=0.0916 | minMean: fq=0.00 mean=0.0916 top=L-BT-0.5-f0
+rho=1 mid    4   v*=0.1444 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.08 mean=0.1161 | minFQ: fq=0.08 mean=0.1161 | minMean: fq=0.08 mean=0.1161 top=L-BT-0.5-f0
+rho=1 mid    8   v*=0.1493 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.19 mean=0.1128 | minFQ: fq=0.19 mean=0.1128 | minMean: fq=0.19 mean=0.1128 top=L-BT-0.5-f0
+rho=1 mid    all v*=0.2105 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.0763 | minFQ: fq=0.00 mean=0.0763 | minMean: fq=0.00 mean=0.0763 top=L-BT-0.5-f0
+rho=1 strong 0   v*=0.0385 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.0183 | minFQ: fq=0.00 mean=0.0183 | minMean: fq=0.00 mean=0.0183 top=L-BT-0.5-f0
+rho=1 strong 1   v*=0.0370 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.0130 | minFQ: fq=0.00 mean=0.0130 | minMean: fq=0.00 mean=0.0130 top=L-BT-0.5-f0
+rho=1 strong 2   v*=0.1404 same_as_committed=True n_pure_at_v*=10 | LP: fq=0.00 mean=0.0560 | minFQ: fq=0.00 mean=0.0560 | minMean: fq=0.00 mean=0.0560 top=L-BT-0.5-f0
+rho=1 strong 4   v*=0.0637 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.06 mean=0.0531 | minFQ: fq=0.06 mean=0.0531 | minMean: fq=0.06 mean=0.0531 top=L-BT-0.5-f0
+rho=1 strong 8   v*=0.1300 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.19 mean=0.0893 | minFQ: fq=0.19 mean=0.0893 | minMean: fq=0.19 mean=0.0893 top=L-BT-0.5-f0
+rho=1 strong all v*=0.1550 same_as_committed=True n_pure_at_v*= 0 | LP: fq=0.11 mean=0.0874 | minFQ: fq=0.11 mean=0.0874 | minMean: fq=0.11 mean=0.0874 top=L-BT-0.5-f0

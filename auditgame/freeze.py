@@ -65,12 +65,17 @@ SOURCE = (
     "hidden_tests/registry.py", "hidden_tests/h1_deprecation.py",
     "hidden_tests/r1_tier.py", "hidden_tests/per_instance.py",
     "hidden_tests/diffutil.py",
+    #: Model v2 (docs/preregistration/TIEN-DANG-KY-v2-thiet-lap-draft.md).  Its tools stay out,
+    #: as every tool does (test_docs_are_not_in_the_cell): what the tuner decided is pinned by
+    #: reference/v2_tuned.json in TABLES, and how the endpoint is read lives in metrics_v2.py.
+    "draft_setup.py", "corpus_v2.py", "world_v2.py", "carrier_runner.py", "gate_world.py",
+    "attackers_v2.py", "belief_v2.py", "carrier_policies.py", "sentinel.py", "metrics_v2.py",
 )
 
 #: Generated tables.  score_table.json is built FROM pi0, so it is a separate
 #: entry: changing pi0 and forgetting to regenerate is exactly the drift this
 #: catches.
-TABLES = ("reference/score_table.json",)
+TABLES = ("reference/score_table.json", "reference/v2_tuned.json")
 
 MANIFEST_PATH = ROOT / "frozen" / "MANIFEST.json"
 
@@ -198,6 +203,24 @@ def manifest() -> dict:
         #: the hash moves WHICH attackers are held out without renaming any of
         #: them -- invisible to the `attackers` list above.
         "held_out_attackers": sorted(attackers.held_out()),
+        #: Model v2: its systems, library, attacker class, held-out split, the tuning
+        #: columns that D18 derives from that split, and the dev family (D8).
+        **_manifest_v2(),
+    }
+
+
+def _manifest_v2() -> dict:
+    import attackers_v2 as A2
+    import carrier_policies as CP
+    import corpus_v2 as C2
+    import sentinel as S2
+    return {
+        "policies_v2": sorted(S2.REGISTRY),
+        "policy_library_v2": sorted(CP.LIBRARY),
+        "attackers_v2": sorted(A2.SCRIPTED),
+        "held_out_attackers_v2": A2.held_out(),
+        "tuning_attackers_v2": A2.tuning_attack_names(),
+        "dev_repos_v2": sorted(C2.dev_repos(C2.make_corpus_v2())),
     }
 
 
@@ -259,7 +282,9 @@ def drift(path: pathlib.Path = MANIFEST_PATH) -> list:
             out.append(f"pins/{key}: removed")
         else:
             out.append(f"pins/{key}: {a[:12]} -> {b[:12]}")
-    for section in ("policies", "policy_library", "attackers", "held_out_attackers"):
+    for section in ("policies", "policy_library", "attackers", "held_out_attackers",
+                    "policies_v2", "policy_library_v2", "attackers_v2", "held_out_attackers_v2",
+                    "tuning_attackers_v2", "dev_repos_v2"):
         extra = set(live.get(section, [])) - set(frozen.get(section, []))
         gone = set(frozen.get(section, [])) - set(live.get(section, []))
         if extra:
@@ -288,7 +313,8 @@ def require_frozen(policy_name: str, path: pathlib.Path = MANIFEST_PATH) -> None
     frozen = load(path)
     if frozen is None:
         return
-    known = set(frozen["policies"]) | set(frozen["policy_library"])
+    known = (set(frozen["policies"]) | set(frozen["policy_library"])
+             | set(frozen.get("policies_v2", [])) | set(frozen.get("policy_library_v2", [])))
     if policy_name not in known:
         raise NotFrozen(
             f"policy {policy_name!r} is not in the frozen manifest "

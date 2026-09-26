@@ -19,26 +19,6 @@
     "sparse-carrier",
     "uniform-by-workflow"
   ],
-  "attackers_v2": [
-    "branch-first-write-e0.6",
-    "branch-last-ingress-e0.6",
-    "branch-last-write-e0.6",
-    "branch-mid-ingress-e0.6",
-    "memory-first-write-e0.6",
-    "memory-last-ingress-e0.3",
-    "memory-last-ingress-e0.6",
-    "memory-last-write-e0.6",
-    "memory-mid-write-e0.3",
-    "queue-first-write-e0.6",
-    "queue-last-ingress-e0.6",
-    "queue-mid-write-e0.6",
-    "skill-first-write-e0.6",
-    "skill-last-ingress-e0.6",
-    "skill-last-write-e0.6",
-    "skill-last-write-e1.0",
-    "uniform-last-ingress-e0.6",
-    "uniform-mid-write-e0.6"
-  ],
   "constants": {
     "beta_default": 0.314,
     "chi_anchors": [
@@ -72,10 +52,7 @@
     "pi_attack": 0.5,
     "theta": 0.5
   },
-  "dev_repos_v2": [
-    "django/django"
-  ],
-  "digest": "c789fa7362e0a5a20b00fa7b896213cb82283c65e079742111534cb1f8e1d408",
+  "digest": "4ff1c8f72df486cdbe82c422a324002b7d6dc12794c5371ce0c1c3d0ad4c379a",
   "held_out_attackers": [
     "branch-max",
     "cheapest-carrier",
@@ -86,15 +63,6 @@
     "max-dormancy",
     "skill-immediate",
     "uniform-by-workflow"
-  ],
-  "held_out_attackers_v2": [
-    "branch-first-write-e0.6",
-    "memory-last-ingress-e0.3",
-    "memory-last-write-e0.6",
-    "memory-mid-write-e0.3",
-    "queue-last-ingress-e0.6",
-    "queue-mid-write-e0.6",
-    "skill-last-write-e1.0"
   ],
   "pins": {
     "gate2_v2": {
@@ -134,21 +102,6 @@
     "Sentinel",
     "SentinelW window-belief"
   ],
-  "policies_v2": [
-    "A1 -alarm memory",
-    "A1 -benign-drift",
-    "A1 -randomization",
-    "A1 -regime estimate",
-    "A1 -transition uncertainty",
-    "B1 audit-at-commit",
-    "B2 uniform random",
-    "B3 audit-on-insertion",
-    "B4 audit-on-retrieval",
-    "B5 risk-score",
-    "B6 two-stage",
-    "Oracle (control)",
-    "Sentinel-A1"
-  ],
   "policy_library": [
     "BT-tau0.3-d1",
     "BT-tau0.3-d2",
@@ -179,53 +132,16 @@
     "SW-memory",
     "SW-uniform"
   ],
-  "policy_library_v2": [
-    "L-BT-0.3-f0",
-    "L-BT-0.3-f1",
-    "L-BT-0.3-f2",
-    "L-BT-0.5-f0",
-    "L-BT-0.5-f1",
-    "L-BT-0.5-f2",
-    "L-BT-0.7-f0",
-    "L-BT-0.7-f1",
-    "L-BT-0.7-f2",
-    "L-BT-0.9-f0",
-    "L-BT-0.9-f1",
-    "L-BT-0.9-f2",
-    "L-RO-c3-p1-d2",
-    "L-RO-c3-p1-d3",
-    "L-RO-c3-p2-d2",
-    "L-RO-c3-p2-d3",
-    "L-RO-c4-p1-d2",
-    "L-RO-c4-p1-d3",
-    "L-RO-c4-p2-d2",
-    "L-RO-c4-p2-d3",
-    "L-SW-commit",
-    "L-SW-commit3",
-    "L-SW-memory",
-    "L-SW-nomemory",
-    "L-SW-queue",
-    "L-SW-skill",
-    "L-SW-sweeps",
-    "L-SW-uniform"
-  ],
   "source": {
     "agent.py": "5dc9ad13906330ad0289069e50b2963f34431e957881db4b99ca82aa105b7bb5",
     "attackers.py": "7b5fcbfbe5335c676ffc47ebfe13c72b5c73d6c47e405c9976aff6dec67c45a6",
-    "attackers_v2.py": "2a1435b1efe5a64b11d5cb9c1924c5896e88649202aff778fdbe7f6b049e3366",
     "belief.py": "10e5e10fba2dc97233e30805b573dbb397246fd6da2e33e7911bf6e733be8dbb",
-    "belief_v2.py": "fff6d363b0c8427d1282d4d7f76aedc2ad8df82597a860a412a9d0308d355a18",
     "build.py": "c0c5a6e5350ae23cf882a2555c24c8c02f49984687576baede0b53981c2fba6f",
-    "carrier_policies.py": "2882ac610a3c5859bd4434890961e590f9b1bd73c284467c51de3c3a1b9ff828",
-    "carrier_runner.py": "3bda4f7eb5fe651d66a5ec080dc44212f3ae3ca3ff0a4db6d4c82f46f19ae765",
     "checkpoints.py": "5778e609a1bd03fbd928c831a264f8f0f70951366768387dc7d86e60573ac867",
     "core.py": "4bdc2cbd3291ad8f09c7fe4c13b36b5805e287370590fd00bbe8cbed843a31cf",
-    "corpus_v2.py": "a944637251e8d2ef3401f606d3ae78ed1d9255b726d6ebe45ee4b89de8a829a0",
     "costs.py": "ac74d1b70a6a5fab865f53052723460c27f79a98d6021a583752967070c85504",
     "detector.py": "02aa660d26c17f9a9ed22e697c9e975dcbff59b9b7e3895d4c76602a76e4d332",
-    "draft_setup.py": "2b7f82d5f183f334fc9a2f85986d01365cac53799bab71122aa94c769c848917",
     "experiment.py": "060316e06848de9b9c583a4c72ae325fc5265feada6a988fc07931a38c13c363",
-    "gate_world.py": "26ea7a81950b415d96bc56c86e2845b5bdadab877b25009e363e4aa7e758f61f",
     "hidden_tests/diffutil.py": "dab3e75fb73c37be5a8daa7d9f39c1d8c81371663d77f9619843075395ee7c9a",
     "hidden_tests/h1_deprecation.py": "6754b201a89d2224deeea137d53044928ae7fa749bafd0deb24daca69ecd6543",
     "hidden_tests/per_instance.py": "71b9877d408e6b0efcab74b9998c06389e0b3f24cab47d3b543029644c0a2910",
@@ -233,27 +149,15 @@
     "hidden_tests/registry.py": "fe43917ad1d77ad764f6b7b110278515c84259dfcb9589a288f7051e82ccf759",
     "lp.py": "fe3703bde4735c5c91678a3734420899b67861360f2936664d6458b0a4e7ab5f",
     "metrics.py": "b03319b8373367a416fee1a63997b14876f1dedd0cb43a0dfcca1e71b3bf0500",
-    "metrics_v2.py": "bd1b2d86fa466735dc389d2516ccbbdb629421688efb851f8f658699b837976c",
     "oracle.py": "6a54e982785e99106051bd1273959f138903ee2c752f12709e247ced53ffbbb6",
     "policies.py": "fb45f1823527605bd089a17a76d6041c69d101266a2f6f098c2247a1792106f3",
     "policies_library.py": "582a98a47e1e12868f0618d1fb59a156f35354281c774563f82cc8c6a73ba1b8",
     "retrieval.py": "1f5947c04d5d73ab5b8929c5270add86f9cbffeb4f443cff89069199925b0a5f",
     "runner.py": "63c0e4d2438b8387b98930d70701311835208a09e6eeb1eb4c2c5fcb7aaa2c7e",
     "scoring.py": "2bedda3aee3d0b9698a7a8fbbbda211fe78b30a936acf63fdf78060f957ade14",
-    "sentinel.py": "21c1bdad87ec454aeb907014e78eb0188a535c28eacbefbad2380a6ce38e34f5",
-    "theory.py": "7b7934be2d52ad06feb9e10c8644bc351b9f46e7940e59ee51b1573881349667",
-    "world_v2.py": "d858805f793649e92283ecfaea6c16bf6ea430f575f22f7e74660b82534a96bc"
+    "theory.py": "7b7934be2d52ad06feb9e10c8644bc351b9f46e7940e59ee51b1573881349667"
   },
   "tables": {
-    "reference/score_table.json": "b93c800b1e2092ee31f8df2c2a0398fb14f62d334fdb8e18a39885e773250608",
-    "reference/v2_tuned.json": "e958430f20722472316c6c5e6c774f2129684e718d10b18490f291ce449d6dfd"
-  },
-  "tuning_attackers_v2": [
-    "branch-last-ingress-e0.6",
-    "branch-mid-ingress-e0.6",
-    "memory-first-write-e0.6",
-    "queue-first-write-e0.6",
-    "skill-first-write-e0.6",
-    "skill-last-ingress-e0.6"
-  ]
+    "reference/score_table.json": "b93c800b1e2092ee31f8df2c2a0398fb14f62d334fdb8e18a39885e773250608"
+  }
 }

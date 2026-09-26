@@ -1,0 +1,274 @@
+{
+  "betas": {
+    "branch": 0.003417030234615707,
+    "memory": 0.31363456082008717,
+    "queue": 0.04564176099093875,
+    "skill": 0.08396131433627237
+  },
+  "rho": {
+    "0.25": {
+      "eta_q": 0.05,
+      "mix": {
+        "mid|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.833333
+        },
+        "mid|1": {
+          "cap_ok": true,
+          "fq_pct": 2.389,
+          "nominal": {
+            "L-BT-0.5-f0": 0.113636,
+            "L-SW-nomemory": 0.590909,
+            "L-SW-queue": 0.295455
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.121377,
+            "L-RO-c3-p1-d3": 0.003623,
+            "L-SW-nomemory": 0.673913,
+            "L-SW-queue": 0.201087
+          },
+          "value": 0.596014
+        },
+        "mid|2": {
+          "cap_ok": true,
+          "fq_pct": 1.728,
+          "nominal": {
+            "L-BT-0.5-f0": 0.354642,
+            "L-RO-c3-p1-d3": 0.297858,
+            "L-SW-nomemory": 0.3475
+          },
+          "pure": "L-RO-c4-p2-d2",
+          "robust": {
+            "L-BT-0.5-f0": 0.362238,
+            "L-SW-nomemory": 0.436364,
+            "L-SW-queue": 0.201399
+          },
+          "value": 0.509091
+        },
+        "mid|4": {
+          "cap_ok": true,
+          "fq_pct": 1.192,
+          "nominal": {
+            "L-BT-0.5-f0": 0.586389,
+            "L-RO-c4-p1-d3": 0.36191,
+            "L-SW-skill": 0.051701
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.543793,
+            "L-RO-c4-p1-d3": 0.456207
+          },
+          "value": 0.383092
+        },
+        "mid|8": {
+          "cap_ok": true,
+          "fq_pct": 1.191,
+          "nominal": {
+            "L-BT-0.5-f0": 0.411523,
+            "L-RO-c4-p2-d3": 0.588477
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.470588,
+            "L-RO-c4-p2-d3": 0.529412
+          },
+          "value": 0.325792
+        },
+        "mid|all": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.833333
+        },
+        "strong|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.833333
+        },
+        "strong|1": {
+          "cap_ok": true,
+          "fq_pct": 2.389,
+          "nominal": {
+            "L-BT-0.5-f0": 0.113636,
+            "L-SW-nomemory": 0.590909,
+            "L-SW-queue": 0.295455
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.121377,
+            "L-RO-c3-p1-d3": 0.003623,
+            "L-SW-nomemory": 0.673913,
+            "L-SW-queue": 0.201087
+          },
+          "value": 0.596014
+        },
+        "strong|2": {
+          "cap_ok": true,
+          "fq_pct": 1.728,
+          "nominal": {
+            "L-BT-0.5-f0": 0.354642,
+            "L-RO-c3-p1-d3": 0.297858,
+            "L-SW-nomemory": 0.3475
+          },
+          "pure": "L-RO-c4-p2-d2",
+          "robust": {
+            "L-BT-0.5-f0": 0.362238,
+            "L-SW-nomemory": 0.436364,
+            "L-SW-queue": 0.201399
+          },
+          "value": 0.509091
+        },
+        "strong|4": {
+          "cap_ok": true,
+          "fq_pct": 1.192,
+          "nominal": {
+            "L-BT-0.5-f0": 0.586389,
+            "L-RO-c4-p1-d3": 0.36191,
+            "L-SW-skill": 0.051701
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.543793,
+            "L-RO-c4-p1-d3": 0.456207
+          },
+          "value": 0.383092
+        },
+        "strong|8": {
+          "cap_ok": true,
+          "fq_pct": 1.191,
+          "nominal": {
+            "L-BT-0.5-f0": 0.411523,
+            "L-RO-c4-p2-d3": 0.588477
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.470588,
+            "L-RO-c4-p2-d3": 0.529412
+          },
+          "value": 0.325792
+        },
+        "strong|all": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.833333
+        },
+        "weak|0": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.833333
+        },
+        "weak|1": {
+          "cap_ok": true,
+          "fq_pct": 2.389,
+          "nominal": {
+            "L-BT-0.5-f0": 0.113636,
+            "L-SW-nomemory": 0.590909,
+            "L-SW-queue": 0.295455
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 0.121377,
+            "L-RO-c3-p1-d3": 0.003623,
+            "L-SW-nomemory": 0.673913,
+            "L-SW-queue": 0.201087
+          },
+          "value": 0.596014
+        },
+        "weak|2": {
+          "cap_ok": true,
+          "fq_pct": 1.728,
+          "nominal": {
+            "L-BT-0.5-f0": 0.354642,
+            "L-RO-c3-p1-d3": 0.297858,
+            "L-SW-nomemory": 0.3475
+          },
+          "pure": "L-RO-c4-p2-d2",
+          "robust": {
+            "L-BT-0.5-f0": 0.362238,
+            "L-SW-nomemory": 0.436364,
+            "L-SW-queue": 0.201399
+          },
+          "value": 0.509091
+        },
+        "weak|4": {
+          "cap_ok": true,
+          "fq_pct": 1.192,
+          "nominal": {
+            "L-BT-0.5-f0": 0.586389,
+            "L-RO-c4-p1-d3": 0.36191,
+            "L-SW-skill": 0.051701
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.543793,
+            "L-RO-c4-p1-d3": 0.456207
+          },
+          "value": 0.383092
+        },
+        "weak|8": {
+          "cap_ok": true,
+          "fq_pct": 1.191,
+          "nominal": {
+            "L-BT-0.5-f0": 0.411523,
+            "L-RO-c4-p2-d3": 0.588477
+          },
+          "pure": "L-SW-commit3",
+          "robust": {
+            "L-BT-0.5-f0": 0.470588,
+            "L-RO-c4-p2-d3": 0.529412
+          },
+          "value": 0.325792
+        },
+        "weak|all": {
+          "cap_ok": true,
+          "fq_pct": 0.0,
+          "nominal": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "pure": "L-BT-0.5-f0",
+          "robust": {
+            "L-BT-0.5-f0": 1.0
+          },
+          "value": 0.833333
+        }
+      },
+      "tau5": 0.2
+    }
+  }
+}

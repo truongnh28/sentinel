@@ -1,0 +1,14 @@
+p_attack floor from never-informative windows, by H: {6: 0.3398, 7: 0.3333, 8: 0.3289, 9: 0.322, 10: 0.3171, 11: 0.3133, 12: 0.3103, 13: 0.308, 14: 0.306}
+L-BT-0.3-f0    action kinds seen ('sweep',): 180 episodes; min p_attack 0.4069
+L-BT-0.3-f1    action kinds seen ('sweep',): 180 episodes; min p_attack 0.4169
+L-BT-0.3-f2    action kinds seen ('sweep',): 180 episodes; min p_attack 0.4169
+L-BT-0.5-f0    action kinds seen ('commit',): 180 episodes; min p_attack 0.5000
+L-BT-0.5-f1    action kinds seen ('commit',): 180 episodes; min p_attack 0.5000
+L-BT-0.5-f2    action kinds seen ('commit',): 180 episodes; min p_attack 0.5000
+L-BT-0.7-f0    action kinds seen ('commit',): 180 episodes; min p_attack 0.5000
+L-BT-0.7-f1    action kinds seen ('commit',): 180 episodes; min p_attack 0.5000
+L-BT-0.7-f2    action kinds seen ('commit',): 180 episodes; min p_attack 0.5000
+L-BT-0.9-f0    action kinds seen ('commit',): 180 episodes; min p_attack 0.5000
+L-BT-0.9-f1    action kinds seen ('commit',): 180 episodes; min p_attack 0.5000
+L-BT-0.9-f2    action kinds seen ('commit',): 180 episodes; min p_attack 0.5000
+episodes differing from B1 (EpisodeResult !=): {'L-SW-commit': 0, 'L-BT-0.5-f0': 0, 'L-BT-0.5-f1': 0, 'L-BT-0.5-f2': 0, 'L-BT-0.7-f0': 0, 'L-BT-0.7-f1': 0, 'L-BT-0.7-f2': 0, 'L-BT-0.9-f0': 0, 'L-BT-0.9-f1': 0, 'L-BT-0.9-f2': 0}

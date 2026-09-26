@@ -1,0 +1,5080 @@
+{
+  "generated": "2026-09-25T15:50:19",
+  "commit": "fa6b4ef",
+  "setup": {
+    "n_games": 240,
+    "K_times_H_max": 24,
+    "ceiling": 40,
+    "library_size": 8,
+    "rho_target": 0.1,
+    "tv": "averaged over tasks, same convention as tools/measure_rho.py"
+  },
+  "draft_reference": {
+    "rho": 0.07,
+    "proposition6_bound": 0.42,
+    "regret_measured": 0.09,
+    "library_size_declared": 28
+  },
+  "rho_library_vs_optima": 0.75,
+  "max_regret": 0.333333,
+  "mean_regret": 0.027998,
+  "worst_covered_game": {
+    "H": 4,
+    "K": 4,
+    "delta": 3,
+    "m": 4
+  },
+  "double_oracle_curve": [
+    {
+      "added": 0,
+      "rho": 0.75,
+      "max_regret": 0.333333,
+      "mean_regret": 0.027998
+    },
+    {
+      "added": 1,
+      "rho": 0.666667,
+      "max_regret": 0.333333,
+      "mean_regret": 0.027998,
+      "added_game": {
+        "H": 4,
+        "K": 4,
+        "delta": 3,
+        "m": 4
+      }
+    },
+    {
+      "added": 2,
+      "rho": 0.666667,
+      "max_regret": 0.333333,
+      "mean_regret": 0.027998,
+      "added_game": {
+        "H": 3,
+        "K": 3,
+        "delta": 2,
+        "m": 3
+      }
+    },
+    {
+      "added": 3,
+      "rho": 0.666667,
+      "max_regret": 0.333333,
+      "mean_regret": 0.027998,
+      "added_game": {
+        "H": 3,
+        "K": 3,
+        "delta": 2,
+        "m": 4
+      }
+    },
+    {
+      "added": 4,
+      "rho": 0.666667,
+      "max_regret": 0.333333,
+      "mean_regret": 0.027535,
+      "added_game": {
+        "H": 6,
+        "K": 3,
+        "delta": 3,
+        "m": 4
+      }
+    },
+    {
+      "added": 5,
+      "rho": 0.6,
+      "max_regret": 0.333333,
+      "mean_regret": 0.02684,
+      "added_game": {
+        "H": 6,
+        "K": 4,
+        "delta": 4,
+        "m": 4
+      }
+    },
+    {
+      "added": 6,
+      "rho": 0.6,
+      "max_regret": 0.333333,
+      "mean_regret": 0.026424,
+      "added_game": {
+        "H": 5,
+        "K": 2,
+        "delta": 2,
+        "m": 3
+      }
+    },
+    {
+      "added": 7,
+      "rho": 0.6,
+      "max_regret": 0.333333,
+      "mean_regret": 0.026215,
+      "added_game": {
+        "H": 5,
+        "K": 4,
+        "delta": 2,
+        "m": 3
+      }
+    },
+    {
+      "added": 8,
+      "rho": 0.583333,
+      "max_regret": 0.333333,
+      "mean_regret": 0.026215,
+      "added_game": {
+        "H": 5,
+        "K": 4,
+        "delta": 4,
+        "m": 4
+      }
+    },
+    {
+      "added": 9,
+      "rho": 0.583333,
+      "max_regret": 0.333333,
+      "mean_regret": 0.026215,
+      "added_game": {
+        "H": 6,
+        "K": 4,
+        "delta": 2,
+        "m": 4
+      }
+    },
+    {
+      "added": 10,
+      "rho": 0.575,
+      "max_regret": 0.333333,
+      "mean_regret": 0.025868,
+      "added_game": {
+        "H": 6,
+        "K": 4,
+        "delta": 3,
+        "m": 4
+      }
+    },
+    {
+      "added": 11,
+      "rho": 0.55,
+      "max_regret": 0.333333,
+      "mean_regret": 0.025556,
+      "added_game": {
+        "H": 5,
+        "K": 4,
+        "delta": 3,
+        "m": 4
+      }
+    },
+    {
+      "added": 12,
+      "rho": 0.533333,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024931,
+      "added_game": {
+        "H": 5,
+        "K": 4,
+        "delta": 3,
+        "m": 3
+      }
+    },
+    {
+      "added": 13,
+      "rho": 0.533333,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024653,
+      "added_game": {
+        "H": 5,
+        "K": 3,
+        "delta": 2,
+        "m": 3
+      }
+    },
+    {
+      "added": 14,
+      "rho": 0.53125,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024514,
+      "added_game": {
+        "H": 5,
+        "K": 3,
+        "delta": 2,
+        "m": 4
+      }
+    },
+    {
+      "added": 15,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 4,
+        "K": 4,
+        "delta": 2,
+        "m": 3
+      }
+    },
+    {
+      "added": 16,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 2,
+        "K": 2,
+        "delta": 1,
+        "m": 2
+      }
+    },
+    {
+      "added": 17,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 2,
+        "K": 2,
+        "delta": 1,
+        "m": 3
+      }
+    },
+    {
+      "added": 18,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 2,
+        "K": 2,
+        "delta": 1,
+        "m": 4
+      }
+    },
+    {
+      "added": 19,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 2,
+        "K": 4,
+        "delta": 1,
+        "m": 2
+      }
+    },
+    {
+      "added": 20,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 2,
+        "K": 4,
+        "delta": 1,
+        "m": 3
+      }
+    },
+    {
+      "added": 21,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 2,
+        "K": 4,
+        "delta": 1,
+        "m": 4
+      }
+    },
+    {
+      "added": 22,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 3,
+        "K": 4,
+        "delta": 1,
+        "m": 3
+      }
+    },
+    {
+      "added": 23,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 3,
+        "K": 4,
+        "delta": 2,
+        "m": 3
+      }
+    },
+    {
+      "added": 24,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 3,
+        "K": 4,
+        "delta": 1,
+        "m": 4
+      }
+    },
+    {
+      "added": 25,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 3,
+        "K": 4,
+        "delta": 2,
+        "m": 4
+      }
+    },
+    {
+      "added": 26,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.024253,
+      "added_game": {
+        "H": 4,
+        "K": 2,
+        "delta": 1,
+        "m": 2
+      }
+    },
+    {
+      "added": 27,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.023212,
+      "added_game": {
+        "H": 4,
+        "K": 2,
+        "delta": 2,
+        "m": 2
+      }
+    },
+    {
+      "added": 28,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.023212,
+      "added_game": {
+        "H": 4,
+        "K": 2,
+        "delta": 1,
+        "m": 4
+      }
+    },
+    {
+      "added": 29,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.023212,
+      "added_game": {
+        "H": 4,
+        "K": 2,
+        "delta": 3,
+        "m": 4
+      }
+    },
+    {
+      "added": 30,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.023212,
+      "added_game": {
+        "H": 4,
+        "K": 3,
+        "delta": 1,
+        "m": 2
+      }
+    },
+    {
+      "added": 31,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.022517,
+      "added_game": {
+        "H": 4,
+        "K": 3,
+        "delta": 2,
+        "m": 2
+      }
+    },
+    {
+      "added": 32,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.022517,
+      "added_game": {
+        "H": 4,
+        "K": 3,
+        "delta": 3,
+        "m": 3
+      }
+    },
+    {
+      "added": 33,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.022517,
+      "added_game": {
+        "H": 4,
+        "K": 3,
+        "delta": 3,
+        "m": 4
+      }
+    },
+    {
+      "added": 34,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.022517,
+      "added_game": {
+        "H": 4,
+        "K": 4,
+        "delta": 1,
+        "m": 2
+      }
+    },
+    {
+      "added": 35,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.021997,
+      "added_game": {
+        "H": 4,
+        "K": 4,
+        "delta": 2,
+        "m": 2
+      }
+    },
+    {
+      "added": 36,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.021997,
+      "added_game": {
+        "H": 4,
+        "K": 4,
+        "delta": 1,
+        "m": 4
+      }
+    },
+    {
+      "added": 37,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.021997,
+      "added_game": {
+        "H": 4,
+        "K": 4,
+        "delta": 2,
+        "m": 4
+      }
+    },
+    {
+      "added": 38,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.021997,
+      "added_game": {
+        "H": 5,
+        "K": 2,
+        "delta": 3,
+        "m": 3
+      }
+    },
+    {
+      "added": 39,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.021892,
+      "added_game": {
+        "H": 5,
+        "K": 4,
+        "delta": 2,
+        "m": 4
+      }
+    },
+    {
+      "added": 40,
+      "rho": 0.5,
+      "max_regret": 0.333333,
+      "mean_regret": 0.021892,
+      "added_game": {
+        "H": 6,
+        "K": 2,
+        "delta": 2,
+        "m": 4
+      }
+    }
+  ],
+  "policies_needed_for_target": null,
+  "games": [
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 0,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 1,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 0,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 1,
+      "m": 2,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 0,
+      "m": 3,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 1,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 0,
+      "m": 4,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 1,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 0,
+      "m": 1,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 1,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 0,
+      "m": 2,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 1,
+      "m": 2,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 0,
+      "m": 3,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 1,
+      "m": 3,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 0,
+      "m": 4,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 1,
+      "m": 4,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 0,
+      "m": 1,
+      "value": 0.875,
+      "guaranteed_coverage": 0.125
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 1,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 0,
+      "m": 2,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 1,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 0,
+      "m": 3,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 1,
+      "m": 3,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 0,
+      "m": 4,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 1,
+      "m": 4,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 0,
+      "m": 1,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 1,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 2,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 0,
+      "m": 2,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 1,
+      "m": 2,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 2,
+      "m": 2,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 0,
+      "m": 3,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 1,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 2,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.5
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 0,
+      "m": 4,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 1,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 2,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.5
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 0,
+      "m": 1,
+      "value": 0.888889,
+      "guaranteed_coverage": 0.111111
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 1,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 2,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 0,
+      "m": 2,
+      "value": 0.777778,
+      "guaranteed_coverage": 0.222222
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 1,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 2,
+      "m": 2,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 0,
+      "m": 3,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 1,
+      "m": 3,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 2,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 0,
+      "m": 4,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 1,
+      "m": 4,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 2,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 0,
+      "m": 1,
+      "value": 0.916667,
+      "guaranteed_coverage": 0.083333
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 1,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 2,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 0,
+      "m": 2,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 1,
+      "m": 2,
+      "value": 0.625,
+      "guaranteed_coverage": 0.375
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 2,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 0,
+      "m": 3,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 1,
+      "m": 3,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 2,
+      "m": 3,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 0,
+      "m": 4,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 1,
+      "m": 4,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 2,
+      "m": 4,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 0,
+      "m": 1,
+      "value": 0.875,
+      "guaranteed_coverage": 0.125
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 1,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 2,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 3,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 0,
+      "m": 2,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 1,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 2,
+      "m": 2,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 3,
+      "m": 2,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 0,
+      "m": 3,
+      "value": 0.625,
+      "guaranteed_coverage": 0.375
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 1,
+      "m": 3,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 2,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.25
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 3,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.5
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 0,
+      "m": 4,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 1,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 2,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.5
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 3,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 2.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 0,
+      "m": 1,
+      "value": 0.916667,
+      "guaranteed_coverage": 0.083333
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 1,
+      "m": 1,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 2,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 3,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 0,
+      "m": 2,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 1,
+      "m": 2,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 2,
+      "m": 2,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 3,
+      "m": 2,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 0,
+      "m": 3,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 1,
+      "m": 3,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 2,
+      "m": 3,
+      "value": 0.166667,
+      "guaranteed_coverage": 0.833333
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 3,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 0,
+      "m": 4,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 1,
+      "m": 4,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 2,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 3,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.333333
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 0,
+      "m": 1,
+      "value": 0.9375,
+      "guaranteed_coverage": 0.0625
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 1,
+      "m": 1,
+      "value": 0.875,
+      "guaranteed_coverage": 0.125
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 2,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 3,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 0,
+      "m": 2,
+      "value": 0.875,
+      "guaranteed_coverage": 0.125
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 1,
+      "m": 2,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 2,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 3,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 0,
+      "m": 3,
+      "value": 0.8125,
+      "guaranteed_coverage": 0.1875
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 1,
+      "m": 3,
+      "value": 0.625,
+      "guaranteed_coverage": 0.375
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 2,
+      "m": 3,
+      "value": 0.375,
+      "guaranteed_coverage": 0.625
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 3,
+      "m": 3,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 0,
+      "m": 4,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 1,
+      "m": 4,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 2,
+      "m": 4,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 3,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 0,
+      "m": 1,
+      "value": 0.9,
+      "guaranteed_coverage": 0.1
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 1,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 2,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 3,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 4,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 0,
+      "m": 2,
+      "value": 0.8,
+      "guaranteed_coverage": 0.2
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 1,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 2,
+      "m": 2,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 3,
+      "m": 2,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 4,
+      "m": 2,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 0,
+      "m": 3,
+      "value": 0.7,
+      "guaranteed_coverage": 0.3
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 1,
+      "m": 3,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 2,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 3,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.5
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 4,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.5
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 0,
+      "m": 4,
+      "value": 0.6,
+      "guaranteed_coverage": 0.4
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 1,
+      "m": 4,
+      "value": 0.166667,
+      "guaranteed_coverage": 0.833333
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 2,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.25
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 3,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.75
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 4,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 2.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 0,
+      "m": 1,
+      "value": 0.933333,
+      "guaranteed_coverage": 0.066667
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 1,
+      "m": 1,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 2,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 3,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 4,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 0,
+      "m": 2,
+      "value": 0.866667,
+      "guaranteed_coverage": 0.133333
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 1,
+      "m": 2,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 2,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 3,
+      "m": 2,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 4,
+      "m": 2,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 0,
+      "m": 3,
+      "value": 0.8,
+      "guaranteed_coverage": 0.2
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 1,
+      "m": 3,
+      "value": 0.555556,
+      "guaranteed_coverage": 0.444444
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 2,
+      "m": 3,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 3,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 4,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 0,
+      "m": 4,
+      "value": 0.733333,
+      "guaranteed_coverage": 0.266667
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 1,
+      "m": 4,
+      "value": 0.444444,
+      "guaranteed_coverage": 0.555556
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 2,
+      "m": 4,
+      "value": 0.166667,
+      "guaranteed_coverage": 0.833333
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 3,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.166667
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 4,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.333333
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 0,
+      "m": 1,
+      "value": 0.95,
+      "guaranteed_coverage": 0.05
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 1,
+      "m": 1,
+      "value": 0.875,
+      "guaranteed_coverage": 0.125
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 2,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 3,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 4,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 0,
+      "m": 2,
+      "value": 0.9,
+      "guaranteed_coverage": 0.1
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 1,
+      "m": 2,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 2,
+      "m": 2,
+      "value": 0.625,
+      "guaranteed_coverage": 0.375
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 3,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 4,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 0,
+      "m": 3,
+      "value": 0.85,
+      "guaranteed_coverage": 0.15
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 1,
+      "m": 3,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 2,
+      "m": 3,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 3,
+      "m": 3,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 4,
+      "m": 3,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 0,
+      "m": 4,
+      "value": 0.8,
+      "guaranteed_coverage": 0.2
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 1,
+      "m": 4,
+      "value": 0.583333,
+      "guaranteed_coverage": 0.416667
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 2,
+      "m": 4,
+      "value": 0.375,
+      "guaranteed_coverage": 0.625
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 3,
+      "m": 4,
+      "value": 0.125,
+      "guaranteed_coverage": 0.875
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 4,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 0,
+      "m": 1,
+      "value": 0.916667,
+      "guaranteed_coverage": 0.083333
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 1,
+      "m": 1,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 2,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 3,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 4,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 5,
+      "m": 1,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 0,
+      "m": 2,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 1,
+      "m": 2,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 2,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 3,
+      "m": 2,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 4,
+      "m": 2,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 5,
+      "m": 2,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 0,
+      "m": 3,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 1,
+      "m": 3,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 2,
+      "m": 3,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 3,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.25
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 4,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.5
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 5,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.5
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 0,
+      "m": 4,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 1,
+      "m": 4,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 2,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 3,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.5
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 4,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 2.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 5,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 2.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 0,
+      "m": 1,
+      "value": 0.944444,
+      "guaranteed_coverage": 0.055556
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 1,
+      "m": 1,
+      "value": 0.888889,
+      "guaranteed_coverage": 0.111111
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 2,
+      "m": 1,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 3,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 4,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 5,
+      "m": 1,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 0,
+      "m": 2,
+      "value": 0.888889,
+      "guaranteed_coverage": 0.111111
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 1,
+      "m": 2,
+      "value": 0.777778,
+      "guaranteed_coverage": 0.222222
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 2,
+      "m": 2,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 3,
+      "m": 2,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 4,
+      "m": 2,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 5,
+      "m": 2,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 0,
+      "m": 3,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 1,
+      "m": 3,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 2,
+      "m": 3,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 3,
+      "m": 3,
+      "value": 0.166667,
+      "guaranteed_coverage": 0.833333
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 4,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 5,
+      "m": 3,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 0,
+      "m": 4,
+      "value": 0.777778,
+      "guaranteed_coverage": 0.222222
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 1,
+      "m": 4,
+      "value": 0.555556,
+      "guaranteed_coverage": 0.444444
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 2,
+      "m": 4,
+      "value": 0.333333,
+      "guaranteed_coverage": 0.666667
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 3,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 4,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.333333
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 5,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.333333
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 0,
+      "m": 1,
+      "value": 0.958333,
+      "guaranteed_coverage": 0.041667
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 1,
+      "m": 1,
+      "value": 0.916667,
+      "guaranteed_coverage": 0.083333
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 2,
+      "m": 1,
+      "value": 0.875,
+      "guaranteed_coverage": 0.125
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 3,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 4,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 5,
+      "m": 1,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 0,
+      "m": 2,
+      "value": 0.916667,
+      "guaranteed_coverage": 0.083333
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 1,
+      "m": 2,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 2,
+      "m": 2,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 3,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 4,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 5,
+      "m": 2,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 0,
+      "m": 3,
+      "value": 0.875,
+      "guaranteed_coverage": 0.125
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 1,
+      "m": 3,
+      "value": 0.75,
+      "guaranteed_coverage": 0.25
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 2,
+      "m": 3,
+      "value": 0.625,
+      "guaranteed_coverage": 0.375
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 3,
+      "m": 3,
+      "value": 0.375,
+      "guaranteed_coverage": 0.625
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 4,
+      "m": 3,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 5,
+      "m": 3,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 0,
+      "m": 4,
+      "value": 0.833333,
+      "guaranteed_coverage": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 1,
+      "m": 4,
+      "value": 0.666667,
+      "guaranteed_coverage": 0.333333
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 2,
+      "m": 4,
+      "value": 0.5,
+      "guaranteed_coverage": 0.5
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 3,
+      "m": 4,
+      "value": 0.25,
+      "guaranteed_coverage": 0.75
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 4,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 5,
+      "m": 4,
+      "value": 0.0,
+      "guaranteed_coverage": 1.0
+    }
+  ],
+  "per_game": [
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 2,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.833333,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.666667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.333333,
+      "nearest": "uniform",
+      "tv": 0.333333,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.666667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.333333,
+      "nearest": "uniform",
+      "tv": 0.333333,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.666667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 2,
+      "K": 3,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.333333,
+      "nearest": "uniform",
+      "tv": 0.333333,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.875,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.875,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.75,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.75,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.75,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 2,
+      "K": 4,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.833333,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.666667,
+      "regret": 0.166667
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.666667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.25,
+      "nearest": "uniform",
+      "tv": 0.361111,
+      "library_value": 0.333333,
+      "regret": 0.083333
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.333333,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "rotation",
+      "tv": 0.0,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.333333,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "rotation",
+      "tv": 0.0,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 2,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.333333,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.888889,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.888889,
+      "regret": -0.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.777778,
+      "regret": 0.111111
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.777778,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.777778,
+      "regret": -0.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.481481,
+      "library_value": 0.555556,
+      "regret": 0.055556
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.333333,
+      "nearest": "earliest",
+      "tv": 0.222222,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.666667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.333333,
+      "nearest": "uniform",
+      "tv": 0.333333,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.666667,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.666667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.333333,
+      "nearest": "uniform",
+      "tv": 0.333333,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 3,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.666667,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.916667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.916667,
+      "regret": -0.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.833333,
+      "regret": 0.083333
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.833333,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.625,
+      "nearest": "uniform",
+      "tv": 0.416667,
+      "library_value": 0.666667,
+      "regret": 0.041667
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.333333,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.75,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.25,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.25,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.75,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 3,
+      "K": 4,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.25,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.25,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.875,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.875,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.25,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.25,
+      "library_value": 0.625,
+      "regret": 0.125
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 3,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.75,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.5,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.0,
+      "nearest": "commit_only",
+      "tv": 0.5,
+      "library_value": 0.25,
+      "regret": 0.25
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 3,
+      "m": 2,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.25,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.625,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.625,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.25,
+      "nearest": "uniform",
+      "tv": 0.375,
+      "library_value": 0.25,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "rotation",
+      "tv": 0.3125,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 3,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.25,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.375,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 2,
+      "delta": 3,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.916667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.916667,
+      "regret": -0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.833333,
+      "nearest": "commit_only",
+      "tv": 0.25,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "commit_only",
+      "tv": 0.25,
+      "library_value": 0.75,
+      "regret": 0.083333
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 3,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.833333,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.666667,
+      "nearest": "commit_only",
+      "tv": 0.5,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.333333,
+      "nearest": "commit_only",
+      "tv": 0.5,
+      "library_value": 0.5,
+      "regret": 0.166667
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 3,
+      "m": 2,
+      "V_star": 0.333333,
+      "nearest": "earliest",
+      "tv": 0.166667,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.75,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.458333,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.166667,
+      "nearest": "rotation",
+      "tv": 0.333333,
+      "library_value": 0.25,
+      "regret": 0.083333
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 3,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.666667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.333333,
+      "nearest": "uniform",
+      "tv": 0.333333,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "rotation",
+      "tv": 0.0,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 3,
+      "delta": 3,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.9375,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.9375,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.875,
+      "nearest": "commit_only",
+      "tv": 0.25,
+      "library_value": 0.875,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.25,
+      "library_value": 0.8125,
+      "regret": 0.0625
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 3,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.875,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.875,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.5,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.5,
+      "library_value": 0.625,
+      "regret": 0.125
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 3,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.25,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.8125,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.8125,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.625,
+      "nearest": "earliest",
+      "tv": 0.40625,
+      "library_value": 0.625,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.375,
+      "nearest": "earliest",
+      "tv": 0.53125,
+      "library_value": 0.4375,
+      "regret": 0.0625
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 3,
+      "m": 3,
+      "V_star": 0.25,
+      "nearest": "earliest",
+      "tv": 0.375,
+      "library_value": 0.25,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.75,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.5,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.25,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.25,
+      "regret": 0.0
+    },
+    {
+      "H": 4,
+      "K": 4,
+      "delta": 3,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.75,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.9,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.9,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.2,
+      "library_value": 0.8,
+      "regret": 0.05
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.2,
+      "library_value": 0.7,
+      "regret": 0.2
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 3,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.2,
+      "library_value": 0.6,
+      "regret": 0.1
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 4,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.8,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.8,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.4,
+      "library_value": 0.6,
+      "regret": 0.1
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.25,
+      "nearest": "commit_only",
+      "tv": 0.4,
+      "library_value": 0.4,
+      "regret": 0.15
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 3,
+      "m": 2,
+      "V_star": 0.0,
+      "nearest": "commit_only",
+      "tv": 0.4,
+      "library_value": 0.2,
+      "regret": 0.2
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 4,
+      "m": 2,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.2,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.7,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.7,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.333333,
+      "nearest": "uniform",
+      "tv": 0.34,
+      "library_value": 0.4,
+      "regret": 0.066667
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "commit_only",
+      "tv": 0.6,
+      "library_value": 0.1,
+      "regret": 0.1
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 3,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 4,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.2,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.6,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.6,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.166667,
+      "nearest": "rotation",
+      "tv": 0.333333,
+      "library_value": 0.2,
+      "regret": 0.033333
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.4,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 3,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.45,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 2,
+      "delta": 4,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.4,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.933333,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.933333,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.833333,
+      "nearest": "commit_only",
+      "tv": 0.2,
+      "library_value": 0.866667,
+      "regret": 0.033334
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "commit_only",
+      "tv": 0.2,
+      "library_value": 0.8,
+      "regret": 0.133333
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 3,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "commit_only",
+      "tv": 0.2,
+      "library_value": 0.733333,
+      "regret": 0.066666
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 4,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.866667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.866667,
+      "regret": -0.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.666667,
+      "nearest": "commit_only",
+      "tv": 0.4,
+      "library_value": 0.733333,
+      "regret": 0.066666
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.4,
+      "library_value": 0.6,
+      "regret": 0.1
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 3,
+      "m": 2,
+      "V_star": 0.333333,
+      "nearest": "commit_only",
+      "tv": 0.4,
+      "library_value": 0.466667,
+      "regret": 0.133334
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 4,
+      "m": 2,
+      "V_star": 0.333333,
+      "nearest": "earliest",
+      "tv": 0.133333,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.8,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.8,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.555556,
+      "nearest": "uniform",
+      "tv": 0.435556,
+      "library_value": 0.6,
+      "regret": 0.044444
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.333333,
+      "nearest": "earliest",
+      "tv": 0.533333,
+      "library_value": 0.4,
+      "regret": 0.066667
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 3,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "rotation",
+      "tv": 0.4,
+      "library_value": 0.2,
+      "regret": 0.2
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 4,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.4,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.733333,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.733333,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.444444,
+      "nearest": "uniform",
+      "tv": 0.44,
+      "library_value": 0.466667,
+      "regret": 0.022223
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.166667,
+      "nearest": "earliest",
+      "tv": 0.533333,
+      "library_value": 0.2,
+      "regret": 0.033333
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 3,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "rotation",
+      "tv": 0.4,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 3,
+      "delta": 4,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.4,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.95,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.95,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.875,
+      "nearest": "commit_only",
+      "tv": 0.2,
+      "library_value": 0.9,
+      "regret": 0.025
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.2,
+      "library_value": 0.85,
+      "regret": 0.1
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 3,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.2,
+      "library_value": 0.8,
+      "regret": 0.05
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 4,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.9,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.9,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.4,
+      "library_value": 0.8,
+      "regret": 0.05
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.625,
+      "nearest": "commit_only",
+      "tv": 0.4,
+      "library_value": 0.7,
+      "regret": 0.075
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 3,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.4,
+      "library_value": 0.6,
+      "regret": 0.1
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 4,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.2,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.85,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.85,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.666667,
+      "nearest": "uniform",
+      "tv": 0.49,
+      "library_value": 0.7,
+      "regret": 0.033333
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.6,
+      "library_value": 0.55,
+      "regret": 0.05
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 3,
+      "m": 3,
+      "V_star": 0.25,
+      "nearest": "commit_only",
+      "tv": 0.6,
+      "library_value": 0.4,
+      "regret": 0.15
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 4,
+      "m": 3,
+      "V_star": 0.25,
+      "nearest": "earliest",
+      "tv": 0.3,
+      "library_value": 0.25,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.8,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.8,
+      "regret": 0.0
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.583333,
+      "nearest": "uniform",
+      "tv": 0.413333,
+      "library_value": 0.6,
+      "regret": 0.016667
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.375,
+      "nearest": "earliest",
+      "tv": 0.5,
+      "library_value": 0.4,
+      "regret": 0.025
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 3,
+      "m": 4,
+      "V_star": 0.125,
+      "nearest": "earliest",
+      "tv": 0.575,
+      "library_value": 0.2,
+      "regret": 0.075
+    },
+    {
+      "H": 5,
+      "K": 4,
+      "delta": 4,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.6,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.916667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.916667,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.833333,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 3,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.666667,
+      "regret": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 4,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.583333,
+      "regret": 0.083333
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 5,
+      "m": 1,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.833333,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.666667,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 3,
+      "m": 2,
+      "V_star": 0.0,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.333333,
+      "regret": 0.333333
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 4,
+      "m": 2,
+      "V_star": 0.0,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.166667,
+      "regret": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 5,
+      "m": 2,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.166667,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.75,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.333333,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.25,
+      "nearest": "uniform",
+      "tv": 0.416667,
+      "library_value": 0.25,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 3,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "uniform",
+      "tv": 0.458333,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 4,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.416667,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 5,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.166667,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.666667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.333333,
+      "nearest": "uniform",
+      "tv": 0.333333,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "single_c1",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 3,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 4,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "single_c1",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 2,
+      "delta": 5,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.333333,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.944444,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.944444,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.888889,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.888889,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.833333,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 3,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.777778,
+      "regret": 0.111111
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 4,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.722222,
+      "regret": 0.055555
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 5,
+      "m": 1,
+      "V_star": 0.666667,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.888889,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.888889,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.777778,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.777778,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.666667,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 3,
+      "m": 2,
+      "V_star": 0.333333,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.555556,
+      "regret": 0.222223
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 4,
+      "m": 2,
+      "V_star": 0.333333,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.444444,
+      "regret": 0.111111
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 5,
+      "m": 2,
+      "V_star": 0.333333,
+      "nearest": "earliest",
+      "tv": 0.111111,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.833333,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.666667,
+      "nearest": "earliest",
+      "tv": 0.333333,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.5,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 3,
+      "m": 3,
+      "V_star": 0.166667,
+      "nearest": "commit_only",
+      "tv": 0.5,
+      "library_value": 0.333333,
+      "regret": 0.166666
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 4,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "rotation",
+      "tv": 0.333333,
+      "library_value": 0.166667,
+      "regret": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 5,
+      "m": 3,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.333333,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.777778,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.777778,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.555556,
+      "nearest": "uniform",
+      "tv": 0.444444,
+      "library_value": 0.555556,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.333333,
+      "nearest": "earliest",
+      "tv": 0.5,
+      "library_value": 0.333333,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 3,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "commit_only",
+      "tv": 0.666667,
+      "library_value": 0.111111,
+      "regret": 0.111111
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 4,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "rotation",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 3,
+      "delta": 5,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.333333,
+      "library_value": 0.0,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 0,
+      "m": 1,
+      "V_star": 0.958333,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.958333,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 1,
+      "m": 1,
+      "V_star": 0.916667,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.916667,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 2,
+      "m": 1,
+      "V_star": 0.875,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.875,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 3,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.833333,
+      "regret": 0.083333
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 4,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.166667,
+      "library_value": 0.791667,
+      "regret": 0.041667
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 5,
+      "m": 1,
+      "V_star": 0.75,
+      "nearest": "earliest",
+      "tv": 0.0,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 0,
+      "m": 2,
+      "V_star": 0.916667,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.916667,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 1,
+      "m": 2,
+      "V_star": 0.833333,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 2,
+      "m": 2,
+      "V_star": 0.75,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 3,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.666667,
+      "regret": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 4,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "commit_only",
+      "tv": 0.333333,
+      "library_value": 0.583333,
+      "regret": 0.083333
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 5,
+      "m": 2,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.166667,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 0,
+      "m": 3,
+      "V_star": 0.875,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.875,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 1,
+      "m": 3,
+      "V_star": 0.75,
+      "nearest": "earliest",
+      "tv": 0.333333,
+      "library_value": 0.75,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 2,
+      "m": 3,
+      "V_star": 0.625,
+      "nearest": "uniform",
+      "tv": 0.458333,
+      "library_value": 0.625,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 3,
+      "m": 3,
+      "V_star": 0.375,
+      "nearest": "commit_only",
+      "tv": 0.5,
+      "library_value": 0.5,
+      "regret": 0.125
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 4,
+      "m": 3,
+      "V_star": 0.25,
+      "nearest": "commit_only",
+      "tv": 0.5,
+      "library_value": 0.375,
+      "regret": 0.125
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 5,
+      "m": 3,
+      "V_star": 0.25,
+      "nearest": "earliest",
+      "tv": 0.25,
+      "library_value": 0.25,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 0,
+      "m": 4,
+      "V_star": 0.833333,
+      "nearest": "uniform",
+      "tv": 0.0,
+      "library_value": 0.833333,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 1,
+      "m": 4,
+      "V_star": 0.666667,
+      "nearest": "uniform",
+      "tv": 0.5,
+      "library_value": 0.666667,
+      "regret": -0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 2,
+      "m": 4,
+      "V_star": 0.5,
+      "nearest": "earliest",
+      "tv": 0.583333,
+      "library_value": 0.5,
+      "regret": 0.0
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 3,
+      "m": 4,
+      "V_star": 0.25,
+      "nearest": "earliest",
+      "tv": 0.583333,
+      "library_value": 0.333333,
+      "regret": 0.083333
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 4,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "commit_only",
+      "tv": 0.666667,
+      "library_value": 0.166667,
+      "regret": 0.166667
+    },
+    {
+      "H": 6,
+      "K": 4,
+      "delta": 5,
+      "m": 4,
+      "V_star": 0.0,
+      "nearest": "earliest",
+      "tv": 0.5,
+      "library_value": 0.0,
+      "regret": 0.0
+    }
+  ]
+}

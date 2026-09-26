@@ -1,0 +1,14 @@
+Fri Sep 25 16:00:46 +07 2026
+freeze: clean sha256:c789fa7362e0
+main 8501064
+br 260
+sweep-eta 122528
+sweep-match 91896
+sweep-persistent-drift 30632
+sweep-budget-EXPLORATORY 605760
+gate 61264
+records /Users/truong.nh/Me/obsidian/HCMUT/code/Sentinel/auditgame/spikes/v2/eval-records.sha256
+controls ok
+curve_rho {"0": {"gain": 49.2, "lo": 40.8046, "abs_diff": 0.3927, "rel_reliable": true, "meets_margin": true}, "0.25": {"gain": 49.15, "lo": 36.8892, "abs_diff": 0.3517, "rel_reliable": true, "meets_margin": true}, "0.5": {"gain": 43.03, "lo": 23.8159, "abs_diff": 0.2318, "rel_reliable": true, "meets_margin": true}, "1": {"gain": 8.79, "lo": -27.3201, "abs_diff": 0.0171, "rel_reliable": true, "meets_margin": false}}
+exit 0
+Fri Sep 25 16:29:47 +07 2026

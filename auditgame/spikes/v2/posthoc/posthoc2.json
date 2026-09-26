@@ -1,0 +1,1176 @@
+{
+ "d30_98.75": {
+  "0": {
+   "abs_lo": 0.2721,
+   "by_eta": {
+    "0": {
+     "abs_lo": 0.308,
+     "lo": 40.8046
+    },
+    "0.01": {
+     "abs_lo": 0.3067,
+     "lo": 40.7928
+    },
+    "0.02": {
+     "abs_lo": 0.3067,
+     "lo": 40.6951
+    },
+    "0.05": {
+     "abs_lo": 0.3056,
+     "lo": 40.2599
+    },
+    "0.1": {
+     "abs_lo": 0.3052,
+     "lo": 40.2135
+    },
+    "0.2": {
+     "abs_lo": 0.2962,
+     "lo": 38.9059
+    },
+    "0.3543": {
+     "abs_lo": 0.2878,
+     "lo": 37.4542
+    },
+    "0.5": {
+     "abs_lo": 0.2721,
+     "lo": 35.0181
+    }
+   },
+   "lo": 35.0181,
+   "lowest_lo_at_eta": "0.5"
+  },
+  "0.25": {
+   "abs_lo": 0.1909,
+   "by_eta": {
+    "0": {
+     "abs_lo": 0.2302,
+     "lo": 36.8892
+    },
+    "0.01": {
+     "abs_lo": 0.2294,
+     "lo": 36.7084
+    },
+    "0.02": {
+     "abs_lo": 0.2279,
+     "lo": 36.5281
+    },
+    "0.05": {
+     "abs_lo": 0.2247,
+     "lo": 35.9842
+    },
+    "0.1": {
+     "abs_lo": 0.224,
+     "lo": 35.5638
+    },
+    "0.2": {
+     "abs_lo": 0.2196,
+     "lo": 34.6258
+    },
+    "0.3543": {
+     "abs_lo": 0.2095,
+     "lo": 32.9272
+    },
+    "0.5": {
+     "abs_lo": 0.1909,
+     "lo": 29.8392
+    }
+   },
+   "lo": 29.8392,
+   "lowest_lo_at_eta": "0.5"
+  },
+  "0.5": {
+   "abs_lo": 0.1033,
+   "by_eta": {
+    "0": {
+     "abs_lo": 0.1136,
+     "lo": 23.8159
+    },
+    "0.01": {
+     "abs_lo": 0.1135,
+     "lo": 23.8059
+    },
+    "0.02": {
+     "abs_lo": 0.1129,
+     "lo": 23.6814
+    },
+    "0.05": {
+     "abs_lo": 0.1127,
+     "lo": 23.5847
+    },
+    "0.1": {
+     "abs_lo": 0.1113,
+     "lo": 23.336
+    },
+    "0.2": {
+     "abs_lo": 0.1077,
+     "lo": 23.1096
+    },
+    "0.3543": {
+     "abs_lo": 0.104,
+     "lo": 21.757
+    },
+    "0.5": {
+     "abs_lo": 0.1033,
+     "lo": 21.4588
+    }
+   },
+   "lo": 21.4588,
+   "lowest_lo_at_eta": "0.5"
+  },
+  "1": {
+   "abs_lo": -0.039,
+   "by_eta": {
+    "0": {
+     "abs_lo": -0.039,
+     "lo": -27.3201
+    },
+    "0.01": {
+     "abs_lo": -0.039,
+     "lo": -27.3201
+    },
+    "0.02": {
+     "abs_lo": -0.039,
+     "lo": -27.3201
+    },
+    "0.05": {
+     "abs_lo": -0.039,
+     "lo": -27.3201
+    },
+    "0.1": {
+     "abs_lo": -0.039,
+     "lo": -27.3201
+    },
+    "0.2": {
+     "abs_lo": -0.039,
+     "lo": -27.3201
+    },
+    "0.3543": {
+     "abs_lo": -0.039,
+     "lo": -27.3201
+    },
+    "0.5": {
+     "abs_lo": -0.039,
+     "lo": -27.3201
+    }
+   },
+   "lo": -27.3201,
+   "lowest_lo_at_eta": "0"
+  }
+ },
+ "lambda_Q": 0.54865,
+ "lambda_T": 0.5,
+ "loro": {
+  "0": {
+   "max_gain": 51.33,
+   "min_gain": 47.46,
+   "per_repo": {
+    "astropy/astropy": {
+     "abs_diff": 0.3936,
+     "gain": 49.1,
+     "n_workflows": 55
+    },
+    "caddyserver/caddy": {
+     "abs_diff": 0.375,
+     "gain": 47.46,
+     "n_workflows": 55
+    },
+    "fastlane/fastlane": {
+     "abs_diff": 0.3927,
+     "gain": 49.2,
+     "n_workflows": 56
+    },
+    "fluent/fluentd": {
+     "abs_diff": 0.3984,
+     "gain": 49.92,
+     "n_workflows": 56
+    },
+    "laravel/framework": {
+     "abs_diff": 0.3984,
+     "gain": 49.91,
+     "n_workflows": 55
+    },
+    "matplotlib/matplotlib": {
+     "abs_diff": 0.3818,
+     "gain": 48.77,
+     "n_workflows": 52
+    },
+    "phpoffice/phpspreadsheet": {
+     "abs_diff": 0.3927,
+     "gain": 49.2,
+     "n_workflows": 56
+    },
+    "preactjs/preact": {
+     "abs_diff": 0.3927,
+     "gain": 49.2,
+     "n_workflows": 55
+    },
+    "projectlombok/lombok": {
+     "abs_diff": 0.3895,
+     "gain": 48.32,
+     "n_workflows": 54
+    },
+    "pydata/xarray": {
+     "abs_diff": 0.4025,
+     "gain": 49.68,
+     "n_workflows": 54
+    },
+    "pytest-dev/pytest": {
+     "abs_diff": 0.3927,
+     "gain": 49.2,
+     "n_workflows": 54
+    },
+    "rubocop/rubocop": {
+     "abs_diff": 0.4079,
+     "gain": 50.35,
+     "n_workflows": 55
+    },
+    "scikit-learn/scikit-learn": {
+     "abs_diff": 0.3934,
+     "gain": 48.8,
+     "n_workflows": 51
+    },
+    "sharkdp/bat": {
+     "abs_diff": 0.3927,
+     "gain": 49.2,
+     "n_workflows": 56
+    },
+    "sphinx-doc/sphinx": {
+     "abs_diff": 0.3829,
+     "gain": 47.78,
+     "n_workflows": 49
+    },
+    "sympy/sympy": {
+     "abs_diff": 0.3911,
+     "gain": 51.33,
+     "n_workflows": 42
+    }
+   },
+   "without_sympy_98.75": {
+    "abs_diff": 0.3911,
+    "abs_hi": 0.451,
+    "abs_lo": 0.2812,
+    "alpha": 0.0125,
+    "base_events": 79,
+    "gain": 51.33,
+    "hi": 55.5556,
+    "lo": 37.8936,
+    "n_repos": 15,
+    "n_workflows": 42,
+    "n_zero_base": 0,
+    "rel_reliable": true,
+    "v_base": 0.762,
+    "v_cand": 0.3709
+   }
+  },
+  "0.25": {
+   "max_gain": 51.02,
+   "min_gain": 47.16,
+   "per_repo": {
+    "astropy/astropy": {
+     "abs_diff": 0.3506,
+     "gain": 48.62,
+     "n_workflows": 55
+    },
+    "caddyserver/caddy": {
+     "abs_diff": 0.332,
+     "gain": 47.16,
+     "n_workflows": 55
+    },
+    "fastlane/fastlane": {
+     "abs_diff": 0.3517,
+     "gain": 49.15,
+     "n_workflows": 56
+    },
+    "fluent/fluentd": {
+     "abs_diff": 0.3548,
+     "gain": 49.59,
+     "n_workflows": 56
+    },
+    "laravel/framework": {
+     "abs_diff": 0.3714,
+     "gain": 51.02,
+     "n_workflows": 55
+    },
+    "matplotlib/matplotlib": {
+     "abs_diff": 0.3315,
+     "gain": 48.21,
+     "n_workflows": 52
+    },
+    "phpoffice/phpspreadsheet": {
+     "abs_diff": 0.3517,
+     "gain": 49.15,
+     "n_workflows": 56
+    },
+    "preactjs/preact": {
+     "abs_diff": 0.3517,
+     "gain": 49.15,
+     "n_workflows": 55
+    },
+    "projectlombok/lombok": {
+     "abs_diff": 0.3502,
+     "gain": 48.1,
+     "n_workflows": 54
+    },
+    "pydata/xarray": {
+     "abs_diff": 0.3711,
+     "gain": 50.55,
+     "n_workflows": 54
+    },
+    "pytest-dev/pytest": {
+     "abs_diff": 0.3476,
+     "gain": 48.59,
+     "n_workflows": 54
+    },
+    "rubocop/rubocop": {
+     "abs_diff": 0.3692,
+     "gain": 50.3,
+     "n_workflows": 55
+    },
+    "scikit-learn/scikit-learn": {
+     "abs_diff": 0.3462,
+     "gain": 48.58,
+     "n_workflows": 51
+    },
+    "sharkdp/bat": {
+     "abs_diff": 0.3517,
+     "gain": 49.15,
+     "n_workflows": 56
+    },
+    "sphinx-doc/sphinx": {
+     "abs_diff": 0.3505,
+     "gain": 48.3,
+     "n_workflows": 49
+    },
+    "sympy/sympy": {
+     "abs_diff": 0.323,
+     "gain": 49.08,
+     "n_workflows": 42
+    }
+   },
+   "without_sympy_98.75": {
+    "abs_diff": 0.323,
+    "abs_hi": 0.4179,
+    "abs_lo": 0.1987,
+    "alpha": 0.0125,
+    "base_events": 69,
+    "gain": 49.08,
+    "hi": 54.6996,
+    "lo": 32.632,
+    "n_repos": 15,
+    "n_workflows": 42,
+    "n_zero_base": 0,
+    "rel_reliable": true,
+    "v_base": 0.6582,
+    "v_cand": 0.3351
+   }
+  },
+  "0.5": {
+   "max_gain": 44.72,
+   "min_gain": 40.95,
+   "per_repo": {
+    "astropy/astropy": {
+     "abs_diff": 0.2304,
+     "gain": 42.93,
+     "n_workflows": 55
+    },
+    "caddyserver/caddy": {
+     "abs_diff": 0.2307,
+     "gain": 42.99,
+     "n_workflows": 55
+    },
+    "fastlane/fastlane": {
+     "abs_diff": 0.2323,
+     "gain": 43.12,
+     "n_workflows": 56
+    },
+    "fluent/fluentd": {
+     "abs_diff": 0.2303,
+     "gain": 42.45,
+     "n_workflows": 56
+    },
+    "laravel/framework": {
+     "abs_diff": 0.2433,
+     "gain": 44.72,
+     "n_workflows": 55
+    },
+    "matplotlib/matplotlib": {
+     "abs_diff": 0.2343,
+     "gain": 43.11,
+     "n_workflows": 52
+    },
+    "phpoffice/phpspreadsheet": {
+     "abs_diff": 0.2263,
+     "gain": 42.01,
+     "n_workflows": 56
+    },
+    "preactjs/preact": {
+     "abs_diff": 0.2369,
+     "gain": 43.98,
+     "n_workflows": 55
+    },
+    "projectlombok/lombok": {
+     "abs_diff": 0.238,
+     "gain": 43.53,
+     "n_workflows": 54
+    },
+    "pydata/xarray": {
+     "abs_diff": 0.2331,
+     "gain": 43.0,
+     "n_workflows": 54
+    },
+    "pytest-dev/pytest": {
+     "abs_diff": 0.2236,
+     "gain": 41.5,
+     "n_workflows": 54
+    },
+    "rubocop/rubocop": {
+     "abs_diff": 0.2374,
+     "gain": 43.27,
+     "n_workflows": 55
+    },
+    "scikit-learn/scikit-learn": {
+     "abs_diff": 0.228,
+     "gain": 42.02,
+     "n_workflows": 51
+    },
+    "sharkdp/bat": {
+     "abs_diff": 0.2335,
+     "gain": 43.34,
+     "n_workflows": 56
+    },
+    "sphinx-doc/sphinx": {
+     "abs_diff": 0.2234,
+     "gain": 42.24,
+     "n_workflows": 49
+    },
+    "sympy/sympy": {
+     "abs_diff": 0.2081,
+     "gain": 40.95,
+     "n_workflows": 42
+    }
+   },
+   "without_sympy_98.75": {
+    "abs_diff": 0.2081,
+    "abs_hi": 0.2747,
+    "abs_lo": 0.0823,
+    "alpha": 0.0125,
+    "base_events": 66,
+    "gain": 40.95,
+    "hi": 47.452,
+    "lo": 17.9637,
+    "n_repos": 15,
+    "n_workflows": 42,
+    "n_zero_base": 0,
+    "rel_reliable": true,
+    "v_base": 0.5083,
+    "v_cand": 0.3002
+   }
+  },
+  "1": {
+   "max_gain": 11.42,
+   "min_gain": 5.23,
+   "per_repo": {
+    "astropy/astropy": {
+     "abs_diff": 0.0177,
+     "gain": 9.21,
+     "n_workflows": 55
+    },
+    "caddyserver/caddy": {
+     "abs_diff": 0.021,
+     "gain": 10.58,
+     "n_workflows": 55
+    },
+    "fastlane/fastlane": {
+     "abs_diff": 0.0174,
+     "gain": 8.93,
+     "n_workflows": 56
+    },
+    "fluent/fluentd": {
+     "abs_diff": 0.0147,
+     "gain": 7.61,
+     "n_workflows": 56
+    },
+    "laravel/framework": {
+     "abs_diff": 0.0177,
+     "gain": 8.96,
+     "n_workflows": 55
+    },
+    "matplotlib/matplotlib": {
+     "abs_diff": 0.0105,
+     "gain": 5.23,
+     "n_workflows": 52
+    },
+    "phpoffice/phpspreadsheet": {
+     "abs_diff": 0.0171,
+     "gain": 8.79,
+     "n_workflows": 56
+    },
+    "preactjs/preact": {
+     "abs_diff": 0.0177,
+     "gain": 8.93,
+     "n_workflows": 55
+    },
+    "projectlombok/lombok": {
+     "abs_diff": 0.0186,
+     "gain": 9.63,
+     "n_workflows": 54
+    },
+    "pydata/xarray": {
+     "abs_diff": 0.0177,
+     "gain": 8.91,
+     "n_workflows": 54
+    },
+    "pytest-dev/pytest": {
+     "abs_diff": 0.0177,
+     "gain": 9.08,
+     "n_workflows": 54
+    },
+    "rubocop/rubocop": {
+     "abs_diff": 0.0177,
+     "gain": 9.12,
+     "n_workflows": 55
+    },
+    "scikit-learn/scikit-learn": {
+     "abs_diff": 0.0228,
+     "gain": 11.42,
+     "n_workflows": 51
+    },
+    "sharkdp/bat": {
+     "abs_diff": 0.0171,
+     "gain": 8.79,
+     "n_workflows": 56
+    },
+    "sphinx-doc/sphinx": {
+     "abs_diff": 0.0149,
+     "gain": 8.04,
+     "n_workflows": 49
+    },
+    "sympy/sympy": {
+     "abs_diff": 0.011,
+     "gain": 6.49,
+     "n_workflows": 42
+    }
+   },
+   "without_sympy_98.75": {
+    "abs_diff": 0.011,
+    "abs_hi": 0.0317,
+    "abs_lo": -0.0536,
+    "alpha": 0.0125,
+    "base_events": 43,
+    "gain": 6.49,
+    "hi": 16.3577,
+    "lo": -40.1862,
+    "n_repos": 15,
+    "n_workflows": 42,
+    "n_zero_base": 0,
+    "rel_reliable": true,
+    "v_base": 0.17,
+    "v_cand": 0.159
+   }
+  }
+ },
+ "loss_by_eta": {
+  "0": {
+   "0": {
+    "breakeven_lambda_Q": 0.335,
+    "fq_pct": 8.580971139847563,
+    "worst_case_L": 1.559235246031746,
+    "worst_case_harm": 0.40543650793650793
+   },
+   "0.01": {
+    "breakeven_lambda_Q": 0.962,
+    "fq_pct": 3.022504517330121,
+    "worst_case_L": 0.9233174303683738,
+    "worst_case_harm": 0.40543650793650793
+   },
+   "0.02": {
+    "breakeven_lambda_Q": 1.0915,
+    "fq_pct": 2.6246862381316163,
+    "worst_case_L": 0.883797522461815,
+    "worst_case_harm": 0.40543650793650793
+   },
+   "0.05": {
+    "breakeven_lambda_Q": 1.362,
+    "fq_pct": 2.013431924564141,
+    "worst_case_L": 0.8333480727513227,
+    "worst_case_harm": 0.40543650793650793
+   },
+   "0.1": {
+    "breakeven_lambda_Q": 1.9305,
+    "fq_pct": 1.2153732644711248,
+    "worst_case_L": 0.7637362896825396,
+    "worst_case_harm": 0.40543650793650793
+   },
+   "0.2": {
+    "breakeven_lambda_Q": 2.509,
+    "fq_pct": 0.8291718962800758,
+    "worst_case_L": 0.7252654742063492,
+    "worst_case_harm": 0.41754385964912283
+   },
+   "0.3543": {
+    "breakeven_lambda_Q": 2.8555,
+    "fq_pct": 0.7099486221391873,
+    "worst_case_L": 0.7096768472222222,
+    "worst_case_harm": 0.4365705931495405
+   },
+   "0.5": {
+    "breakeven_lambda_Q": 4.036,
+    "fq_pct": 0.5202719784971991,
+    "worst_case_L": 0.6886446143135617,
+    "worst_case_harm": 0.45415622389306604
+   },
+   "B1": {
+    "worst_case_L": 1.1838675213675214,
+    "worst_case_harm": 0.7981379731379731
+   }
+  },
+  "0.25": {
+   "0": {
+    "breakeven_lambda_Q": 0.322,
+    "fq_pct": 8.397552797223366,
+    "worst_case_L": 1.4795699656084655,
+    "worst_case_harm": 0.36376984126984124
+   },
+   "0.01": {
+    "breakeven_lambda_Q": 0.908,
+    "fq_pct": 3.0048788741927295,
+    "worst_case_L": 0.8852561489218329,
+    "worst_case_harm": 0.36428571428571427
+   },
+   "0.02": {
+    "breakeven_lambda_Q": 1.0295,
+    "fq_pct": 2.6075344391341018,
+    "worst_case_L": 0.8478066183737646,
+    "worst_case_harm": 0.3664786967418546
+   },
+   "0.05": {
+    "breakeven_lambda_Q": 1.2975,
+    "fq_pct": 1.9958071278825995,
+    "worst_case_L": 0.7930119305207463,
+    "worst_case_harm": 0.3711570593149541
+   },
+   "0.1": {
+    "breakeven_lambda_Q": 1.9355,
+    "fq_pct": 1.2065010088725503,
+    "worst_case_L": 0.7163150826719576,
+    "worst_case_harm": 0.38421052631578945
+   },
+   "0.2": {
+    "breakeven_lambda_Q": 2.5645,
+    "fq_pct": 0.8154229060957331,
+    "worst_case_L": 0.6767992195767196,
+    "worst_case_harm": 0.3924185463659148
+   },
+   "0.3543": {
+    "breakeven_lambda_Q": 3.0325,
+    "fq_pct": 0.6829174453116412,
+    "worst_case_L": 0.6752669949178502,
+    "worst_case_harm": 0.4114452798663325
+   },
+   "0.5": {
+    "breakeven_lambda_Q": 4.076,
+    "fq_pct": 0.4945950759703517,
+    "worst_case_L": 0.6749959092174882,
+    "worst_case_harm": 0.429030910609858
+   },
+   "B1": {
+    "worst_case_L": 1.1011599511599512,
+    "worst_case_harm": 0.7154304029304028
+   }
+  },
+  "0.5": {
+   "0": {
+    "breakeven_lambda_Q": 0.3045,
+    "fq_pct": 6.9768222479566315,
+    "worst_case_L": 1.2285819113756615,
+    "worst_case_harm": 0.306885268727374
+   },
+   "0.01": {
+    "breakeven_lambda_Q": 0.858,
+    "fq_pct": 2.5583657587548636,
+    "worst_case_L": 0.7891963187830687,
+    "worst_case_harm": 0.3093915343915344
+   },
+   "0.02": {
+    "breakeven_lambda_Q": 0.962,
+    "fq_pct": 2.2353778467908905,
+    "worst_case_L": 0.7538555270119743,
+    "worst_case_harm": 0.31158451684767474
+   },
+   "0.05": {
+    "breakeven_lambda_Q": 1.1915,
+    "fq_pct": 1.7210596580399222,
+    "worst_case_L": 0.7154525995807128,
+    "worst_case_harm": 0.31626287942077413
+   },
+   "0.1": {
+    "breakeven_lambda_Q": 1.5835,
+    "fq_pct": 1.0396599213488513,
+    "worst_case_L": 0.6897581256613756,
+    "worst_case_harm": 0.3187691450849346
+   },
+   "0.2": {
+    "breakeven_lambda_Q": 1.876,
+    "fq_pct": 0.7308643541124992,
+    "worst_case_L": 0.6709690403439154,
+    "worst_case_harm": 0.32096212754107495
+   },
+   "0.3543": {
+    "breakeven_lambda_Q": 2.115,
+    "fq_pct": 0.6354186473981112,
+    "worst_case_L": 0.6661160462962964,
+    "worst_case_harm": 0.33779587858535226
+   },
+   "0.5": {
+    "breakeven_lambda_Q": 2.8405,
+    "fq_pct": 0.4596865916845697,
+    "worst_case_L": 0.6436910661375662,
+    "worst_case_harm": 0.3467348927875244
+   },
+   "B1": {
+    "worst_case_L": 0.9166514041514042,
+    "worst_case_harm": 0.5386904761904762
+   }
+  },
+  "1": {
+   "0": {
+    "breakeven_lambda_Q": 0.1155,
+    "fq_pct": 5.528836754643207,
+    "worst_case_L": 0.9871627922771673,
+    "worst_case_harm": 0.16932464809823303
+   },
+   "0.01": {
+    "breakeven_lambda_Q": 0.3475,
+    "fq_pct": 2.1848451369575983,
+    "worst_case_L": 0.6258258547008547,
+    "worst_case_harm": 0.16932464809823303
+   },
+   "0.02": {
+    "breakeven_lambda_Q": 0.471,
+    "fq_pct": 1.8075834963069854,
+    "worst_case_L": 0.5787015229110513,
+    "worst_case_harm": 0.16932464809823303
+   },
+   "0.05": {
+    "breakeven_lambda_Q": 0.6085,
+    "fq_pct": 1.31372808093773,
+    "worst_case_L": 0.5491041640461216,
+    "worst_case_harm": 0.16932464809823303
+   },
+   "0.1": {
+    "breakeven_lambda_Q": 1.012,
+    "fq_pct": 0.7374355910686282,
+    "worst_case_L": 0.5088386107367475,
+    "worst_case_harm": 0.16932464809823303
+   },
+   "0.2": {
+    "breakeven_lambda_Q": 1.516,
+    "fq_pct": 0.46636071421935676,
+    "worst_case_L": 0.4886277841419587,
+    "worst_case_harm": 0.16932464809823303
+   },
+   "0.3543": {
+    "breakeven_lambda_Q": 1.6655,
+    "fq_pct": 0.3582632585249949,
+    "worst_case_L": 0.4902659636118598,
+    "worst_case_harm": 0.17718628331835878
+   },
+   "0.5": {
+    "breakeven_lambda_Q": 2.0675,
+    "fq_pct": 0.22977856017789308,
+    "worst_case_L": 0.4835947476789458,
+    "worst_case_harm": 0.17718628331835878
+   },
+   "B1": {
+    "worst_case_L": 0.5601037851037851,
+    "worst_case_harm": 0.19425726265348908
+   }
+  }
+ },
+ "post_hoc": true,
+ "sha256_eval_main": "f65831ae619e92e9321d0e350d1fd80533b7c13bc220ada0f6dca8a4cfdf2df3",
+ "sha256_sweep_eta": "6f5e082e6797322f22a9c7e31381e950d9903947efb4d60a1af5b08c8cc86a8f",
+ "v_fq": {
+  "0": {
+   "points": {
+    "A1 -alarm memory": {
+     "FQ": 8.580971139847563,
+     "V": 0.40543650793650793
+    },
+    "A1 -benign-drift": {
+     "FQ": 8.580971139847563,
+     "V": 0.40543650793650793
+    },
+    "A1 -randomization": {
+     "FQ": 12.75186121166587,
+     "V": 0.8470502645502646
+    },
+    "A1 -regime estimate": {
+     "FQ": 0.2726972234464522,
+     "V": 0.7981379731379731
+    },
+    "A1 -transition uncertainty": {
+     "FQ": 8.712464664782122,
+     "V": 0.4459920634920635
+    },
+    "B1 audit-at-commit": {
+     "FQ": 0.0,
+     "V": 0.7981379731379731
+    },
+    "B2 uniform random": {
+     "FQ": 14.365601287652334,
+     "V": 0.6754177109440268
+    },
+    "B3 audit-on-insertion": {
+     "FQ": 18.570003444057814,
+     "V": 0.8832722832722832
+    },
+    "B4 audit-on-retrieval": {
+     "FQ": 14.567625094700386,
+     "V": 0.8832722832722832
+    },
+    "B5 risk-score": {
+     "FQ": 14.173004120741064,
+     "V": 0.776878306878307
+    },
+    "B6 two-stage": {
+     "FQ": 15.701374290331346,
+     "V": 0.8658173210804789
+    },
+    "Sentinel-A1": {
+     "FQ": 8.580971139847563,
+     "V": 0.40543650793650793
+    },
+    "Sentinel-A1 eta_Q=0": {
+     "FQ": 8.580971139847563,
+     "V": 0.40543650793650793
+    },
+    "Sentinel-A1 eta_Q=0.01": {
+     "FQ": 3.022504517330121,
+     "V": 0.40543650793650793
+    },
+    "Sentinel-A1 eta_Q=0.02": {
+     "FQ": 2.6246862381316163,
+     "V": 0.40543650793650793
+    },
+    "Sentinel-A1 eta_Q=0.05": {
+     "FQ": 2.013431924564141,
+     "V": 0.40543650793650793
+    },
+    "Sentinel-A1 eta_Q=0.1": {
+     "FQ": 1.2153732644711248,
+     "V": 0.40543650793650793
+    },
+    "Sentinel-A1 eta_Q=0.2": {
+     "FQ": 0.8291718962800758,
+     "V": 0.41754385964912283
+    },
+    "Sentinel-A1 eta_Q=0.3543": {
+     "FQ": 0.7099486221391873,
+     "V": 0.4365705931495405
+    },
+    "Sentinel-A1 eta_Q=0.5": {
+     "FQ": 0.5202719784971991,
+     "V": 0.45415622389306604
+    }
+   },
+   "undominated": [
+    "B1 audit-at-commit",
+    "Sentinel-A1 eta_Q=0.1",
+    "Sentinel-A1 eta_Q=0.2",
+    "Sentinel-A1 eta_Q=0.3543",
+    "Sentinel-A1 eta_Q=0.5"
+   ]
+  },
+  "0.25": {
+   "points": {
+    "A1 -alarm memory": {
+     "FQ": 8.397552797223366,
+     "V": 0.36376984126984124
+    },
+    "A1 -benign-drift": {
+     "FQ": 8.397552797223366,
+     "V": 0.36376984126984124
+    },
+    "A1 -randomization": {
+     "FQ": 12.75186121166587,
+     "V": 0.8470502645502646
+    },
+    "A1 -regime estimate": {
+     "FQ": 0.08859602979041502,
+     "V": 0.7154304029304028
+    },
+    "A1 -transition uncertainty": {
+     "FQ": 8.412358079231002,
+     "V": 0.40854497354497354
+    },
+    "B1 audit-at-commit": {
+     "FQ": 0.0,
+     "V": 0.7154304029304028
+    },
+    "B2 uniform random": {
+     "FQ": 14.365601287652334,
+     "V": 0.6754177109440268
+    },
+    "B3 audit-on-insertion": {
+     "FQ": 18.570003444057814,
+     "V": 0.8832722832722832
+    },
+    "B4 audit-on-retrieval": {
+     "FQ": 14.567625094700386,
+     "V": 0.8832722832722832
+    },
+    "B5 risk-score": {
+     "FQ": 14.17288541588147,
+     "V": 0.776878306878307
+    },
+    "B6 two-stage": {
+     "FQ": 15.701374290331346,
+     "V": 0.8658173210804789
+    },
+    "Sentinel-A1": {
+     "FQ": 8.397552797223366,
+     "V": 0.36376984126984124
+    },
+    "Sentinel-A1 eta_Q=0": {
+     "FQ": 8.397552797223366,
+     "V": 0.36376984126984124
+    },
+    "Sentinel-A1 eta_Q=0.01": {
+     "FQ": 3.0048788741927295,
+     "V": 0.36428571428571427
+    },
+    "Sentinel-A1 eta_Q=0.02": {
+     "FQ": 2.6075344391341018,
+     "V": 0.3664786967418546
+    },
+    "Sentinel-A1 eta_Q=0.05": {
+     "FQ": 1.9958071278825995,
+     "V": 0.3711570593149541
+    },
+    "Sentinel-A1 eta_Q=0.1": {
+     "FQ": 1.2065010088725503,
+     "V": 0.38421052631578945
+    },
+    "Sentinel-A1 eta_Q=0.2": {
+     "FQ": 0.8154229060957331,
+     "V": 0.3924185463659148
+    },
+    "Sentinel-A1 eta_Q=0.3543": {
+     "FQ": 0.6829174453116412,
+     "V": 0.4114452798663325
+    },
+    "Sentinel-A1 eta_Q=0.5": {
+     "FQ": 0.4945950759703517,
+     "V": 0.429030910609858
+    }
+   },
+   "undominated": [
+    "A1 -alarm memory",
+    "A1 -benign-drift",
+    "B1 audit-at-commit",
+    "Sentinel-A1",
+    "Sentinel-A1 eta_Q=0",
+    "Sentinel-A1 eta_Q=0.01",
+    "Sentinel-A1 eta_Q=0.02",
+    "Sentinel-A1 eta_Q=0.05",
+    "Sentinel-A1 eta_Q=0.1",
+    "Sentinel-A1 eta_Q=0.2",
+    "Sentinel-A1 eta_Q=0.3543",
+    "Sentinel-A1 eta_Q=0.5"
+   ]
+  },
+  "0.5": {
+   "points": {
+    "A1 -alarm memory": {
+     "FQ": 6.9768222479566315,
+     "V": 0.306885268727374
+    },
+    "A1 -benign-drift": {
+     "FQ": 6.9768222479566315,
+     "V": 0.306885268727374
+    },
+    "A1 -randomization": {
+     "FQ": 0.0,
+     "V": 0.5386904761904762
+    },
+    "A1 -regime estimate": {
+     "FQ": 0.0,
+     "V": 0.5386904761904762
+    },
+    "A1 -transition uncertainty": {
+     "FQ": 7.253809842706173,
+     "V": 0.32852269562795877
+    },
+    "B1 audit-at-commit": {
+     "FQ": 0.0,
+     "V": 0.5386904761904762
+    },
+    "B2 uniform random": {
+     "FQ": 14.365601287652334,
+     "V": 0.6754177109440268
+    },
+    "B3 audit-on-insertion": {
+     "FQ": 18.570003444057814,
+     "V": 0.8832722832722832
+    },
+    "B4 audit-on-retrieval": {
+     "FQ": 14.567625094700386,
+     "V": 0.8832722832722832
+    },
+    "B5 risk-score": {
+     "FQ": 12.323955114652788,
+     "V": 0.49198412698412697
+    },
+    "B6 two-stage": {
+     "FQ": 15.701374290331346,
+     "V": 0.8658173210804789
+    },
+    "Sentinel-A1": {
+     "FQ": 6.9768222479566315,
+     "V": 0.306885268727374
+    },
+    "Sentinel-A1 eta_Q=0": {
+     "FQ": 6.9768222479566315,
+     "V": 0.306885268727374
+    },
+    "Sentinel-A1 eta_Q=0.01": {
+     "FQ": 2.5583657587548636,
+     "V": 0.3093915343915344
+    },
+    "Sentinel-A1 eta_Q=0.02": {
+     "FQ": 2.2353778467908905,
+     "V": 0.31158451684767474
+    },
+    "Sentinel-A1 eta_Q=0.05": {
+     "FQ": 1.7210596580399222,
+     "V": 0.31626287942077413
+    },
+    "Sentinel-A1 eta_Q=0.1": {
+     "FQ": 1.0396599213488513,
+     "V": 0.3187691450849346
+    },
+    "Sentinel-A1 eta_Q=0.2": {
+     "FQ": 0.7308643541124992,
+     "V": 0.32096212754107495
+    },
+    "Sentinel-A1 eta_Q=0.3543": {
+     "FQ": 0.6354186473981112,
+     "V": 0.33779587858535226
+    },
+    "Sentinel-A1 eta_Q=0.5": {
+     "FQ": 0.4596865916845697,
+     "V": 0.3467348927875244
+    }
+   },
+   "undominated": [
+    "A1 -alarm memory",
+    "A1 -benign-drift",
+    "A1 -randomization",
+    "A1 -regime estimate",
+    "B1 audit-at-commit",
+    "Sentinel-A1",
+    "Sentinel-A1 eta_Q=0",
+    "Sentinel-A1 eta_Q=0.01",
+    "Sentinel-A1 eta_Q=0.02",
+    "Sentinel-A1 eta_Q=0.05",
+    "Sentinel-A1 eta_Q=0.1",
+    "Sentinel-A1 eta_Q=0.2",
+    "Sentinel-A1 eta_Q=0.3543",
+    "Sentinel-A1 eta_Q=0.5"
+   ]
+  },
+  "1": {
+   "points": {
+    "A1 -alarm memory": {
+     "FQ": 0.378689437534806,
+     "V": 0.1724693021862833
+    },
+    "A1 -benign-drift": {
+     "FQ": 1.5639478810113656,
+     "V": 0.1724693021862833
+    },
+    "A1 -randomization": {
+     "FQ": 0.0,
+     "V": 0.19425726265348908
+    },
+    "A1 -regime estimate": {
+     "FQ": 0.0,
+     "V": 0.19425726265348908
+    },
+    "A1 -transition uncertainty": {
+     "FQ": 0.4669601844969219,
+     "V": 0.17502645502645503
+    },
+    "B1 audit-at-commit": {
+     "FQ": 0.0,
+     "V": 0.19425726265348908
+    },
+    "B2 uniform random": {
+     "FQ": 14.365601287652334,
+     "V": 0.6754177109440268
+    },
+    "B3 audit-on-insertion": {
+     "FQ": 18.570003444057814,
+     "V": 0.8832722832722832
+    },
+    "B4 audit-on-retrieval": {
+     "FQ": 14.567625094700386,
+     "V": 0.8832722832722832
+    },
+    "B5 risk-score": {
+     "FQ": 12.323955114652788,
+     "V": 0.49198412698412697
+    },
+    "B6 two-stage": {
+     "FQ": 15.701374290331346,
+     "V": 0.8658173210804789
+    },
+    "Sentinel-A1": {
+     "FQ": 0.3582632585249949,
+     "V": 0.17718628331835878
+    },
+    "Sentinel-A1 eta_Q=0": {
+     "FQ": 5.528836754643207,
+     "V": 0.16932464809823303
+    },
+    "Sentinel-A1 eta_Q=0.01": {
+     "FQ": 2.1848451369575983,
+     "V": 0.16932464809823303
+    },
+    "Sentinel-A1 eta_Q=0.02": {
+     "FQ": 1.8075834963069854,
+     "V": 0.16932464809823303
+    },
+    "Sentinel-A1 eta_Q=0.05": {
+     "FQ": 1.31372808093773,
+     "V": 0.16932464809823303
+    },
+    "Sentinel-A1 eta_Q=0.1": {
+     "FQ": 0.7374355910686282,
+     "V": 0.16932464809823303
+    },
+    "Sentinel-A1 eta_Q=0.2": {
+     "FQ": 0.46636071421935676,
+     "V": 0.16932464809823303
+    },
+    "Sentinel-A1 eta_Q=0.3543": {
+     "FQ": 0.3582632585249949,
+     "V": 0.17718628331835878
+    },
+    "Sentinel-A1 eta_Q=0.5": {
+     "FQ": 0.22977856017789308,
+     "V": 0.17718628331835878
+    }
+   },
+   "undominated": [
+    "A1 -alarm memory",
+    "A1 -randomization",
+    "A1 -regime estimate",
+    "B1 audit-at-commit",
+    "Sentinel-A1 eta_Q=0.2",
+    "Sentinel-A1 eta_Q=0.5"
+   ]
+  }
+ }
+}
