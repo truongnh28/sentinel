@@ -41,6 +41,9 @@ log_lr, drift_visible, checkpoint_lr -- nothing re-derived)
     commit      this task's patch: log_lr(s, patch_mean(marked, route, rho, d', depth)),
                 so a delegated marked patch moves the belief with strength rho*d' and not
                 at all at rho = 0 in A0; A7 adds log_lr(provenance, d'_prov) (C1, O9).
+                Sentinel is a READER of the A7 provenance channel (L2, fix-a7): the
+                filter takes the raw Observation.provenance score, never Observation.alarm
+                (which is the patch score's alone in every world).
     sweep of k  every inspected item i (score s_i, written_at w_i) is, a priori, one of
                     poison  (only under c[k] = 1, and only if w_i can hold it -- below)
                     drift   share q_k = beta_k / (r_k + beta_k), r_k the agent's own write

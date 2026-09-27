@@ -26,7 +26,9 @@ THE STAGE WORLD (world.audit_reading = "stage")
                  delegation  every skill / queued call the agent writes at t.
                  commit      the patch of task t (observe.ObservationModel.commit: D20 rho
                              for a delegated patch, A7 provenance when world.provenance =
-                             "A7"); a firing patch is removed from the branch before it lands.
+                             "A7", read only by a system that reads provenance,
+                             B1-prov: Inspection.commit_alarm); a firing patch is removed
+                             from the branch before it lands.
                Scores are the carrier world's (world_v2.DriftDetector: seed_of(seed,
                "v2-score", item, t), depth d' sqrt(d); the patch's seed_of(seed, "v2-patch",
                task_id)), so the two worlds share every draw (common random numbers).
@@ -314,6 +316,7 @@ class StageEpisode(R.Episode):
         self.inspected.extend((t, gates.stage, it.item_id) for it, _, _ in gates.seen)
         # 5. the commit gate: the patch before it lands
         checkpoint = self.obs.checkpoint(o.solved)
+        fired = False
         if bought is not None and bought.target == "commit":
             ins = self.obs.commit(t, bought.depth, has_marker=o.patch_has_marker,
                                   via=o.patch_via, task_id=task.task_id, seed=self.rs)
@@ -321,7 +324,8 @@ class StageEpisode(R.Episode):
             if patch is not None:
                 self.inspected.append((t, "commit", patch.item_id))
             obs = ins.observation(t, requested, checkpoint)
-            if ins.alarm and patch is not None:
+            fired = ins.commit_alarm(O.reads_provenance(pol))   # A7: readers only (L2)
+            if fired and patch is not None:
                 self.store.quarantine(patch.item_id)
                 self._count(t, "commit", patch)
                 if not patch.poisoned and o.solved:
@@ -336,7 +340,7 @@ class StageEpisode(R.Episode):
                                 checkpoint=checkpoint)
         else:
             obs = self.obs.nothing(t, requested, checkpoint)
-        if obs.alarm:
+        if obs.alarm or fired:
             self.alarms.append((t, bought.target))
         pol.observe(t, obs)
         # 7. lines 8-9: the whole carrier (runner's O7 accounting)

@@ -22,16 +22,23 @@ WHAT EACH AUDIT SEES (cell = the grid point, world = the model switches)
         A7 only (C1): plus a provenance score of the contributing delegated carriers,
         mu = d'_prov if a poisoned delegated carrier produced the marked patch, else 0.
         d'_prov is a placeholder equal to the cell's detector d' (O9, measured in P3), and
-        is one lookup (no sqrt(depth)).  The A7 alarm is "either score over tau_det".
+        is one lookup (no sqrt(depth)).
+        A7 READING (L2, fix-a7 27/09): provenance is an EXTRA observation channel, not part
+        of the alarm.  `alarm` is the patch score over tau_det in every world, so a plain
+        policy (B1, ...) behaves identically in A0 and A7.  Only a system that reads the
+        channel uses it: B1-prov (`reads_provenance = True`, baselines.B1Provenance),
+        whose commit alarm is "either score over tau_det" and whose patch is blocked on
+        it (runner step 5, `commit_alarm`), and Sentinel's belief, through its likelihood
+        (belief_pf reads Observation.provenance directly).
     checkpoint (every task)
         O8: psi_c = phi_c.  The checkpoint passes iff the task's patch passes its tests,
         i.e. `solved`, which is drawn from seed_of(rs, t, "solve") alone (N4) -- no poison
         label enters it, so it carries no information about poison (Fig. 1 t6 "passes
         tests").  Its likelihood ratio is 1 under every hypothesis.
 
-So B1's miss probability on a delegated patch is P_miss = Phi(z_{1-phi} - rho d') in A0 at
-every rho and every depth (sentinel-v3.md, formula section); A7 multiplies it by
-Phi(z_{1-phi} - d'_prov).
+So B1's miss probability on a delegated patch is P_miss = Phi(z_{1-phi} - rho d') at every
+rho and every depth, in A0 and A7 alike (sentinel-v3.md, formula section); B1-prov's in A7
+is that times Phi(z_{1-phi} - d'_prov), and its false-alarm rate 1 - (1 - phi)^2.
 
 The world-side scoring is v2's world_v2.DriftDetector, composed (never patched): its seeds
 (`v2-score` keyed on (seed, item, task), `v2-patch` keyed on (seed, task_id)), its drift
@@ -184,9 +191,10 @@ def alarm_loglik(alarm: bool, mean: float, tau: float) -> float:
 
 def p_miss_commit(rho: float, dprime: float, phi: float, *, via: str = "delegated",
                   depth: int = 1, dprime_provenance: float | None = None) -> float:
-    """Pr[a marked patch passes the commit review].  Delegated in A0:
-    Phi(z_{1-phi} - rho d') at every depth.  A7 (dprime_provenance given): times
-    Phi(z_{1-phi} - d'_prov) for a delegated patch (a direct one has clean provenance)."""
+    """Pr[a marked patch passes the commit review].  Delegated, patch score only (every
+    plain policy, A0 and A7): Phi(z_{1-phi} - rho d') at every depth.  A reader of the A7
+    provenance channel (dprime_provenance given, B1-prov): times Phi(z_{1-phi} - d'_prov)
+    for a delegated patch (a direct one has clean provenance)."""
     tau = tau_of(phi)
     p = p_miss(patch_mean(True, via, rho, dprime, depth), tau)
     if dprime_provenance is not None:
@@ -232,7 +240,8 @@ class Inspection:
     firing: tuple                          # per score: s > tau_det
     alarm_patch: bool                      # any score over tau_det (the patch / items)
     provenance: float | None = None        # A7 commit only
-    alarm: bool = False                    # alarm_patch, or (A7) provenance over tau_det
+    alarm: bool = False                    # = alarm_patch: what every policy sees
+    provenance_fired: bool = False         # A7 commit: provenance over tau_det (readers only)
     items: tuple = ()                      # evaluator-only: the inspected core.Items
     marker: bool | None = None             # evaluator-only: commit, the patch's marker
 
@@ -248,6 +257,18 @@ class Inspection:
                              scores=self.scores, alarm=self.alarm,
                              written_at=self.written_at, checkpoint=checkpoint,
                              provenance=self.provenance)
+
+    def commit_alarm(self, reads_provenance: bool) -> bool:
+        """The alarm a system acts on (runner step 5 blocks the patch on it): the patch
+        score's alarm, or -- for a system that reads the A7 provenance channel -- either
+        score over tau_det."""
+        return self.alarm or (bool(reads_provenance) and self.provenance_fired)
+
+
+def reads_provenance(policy) -> bool:
+    """Does `policy` read the A7 provenance channel in its alarm rule (B1-prov)?  Declared
+    as a class attribute, like library.Member.reads_belief; absent = False."""
+    return bool(getattr(policy, "reads_provenance", False))
 
 
 # ---------------------------------------------------------------------------------------
@@ -309,20 +330,21 @@ class ObservationModel:
     def commit(self, t: int, depth: int, *, has_marker: bool, via: str, task_id: str,
                seed: int) -> Inspection:
         """Review this task's patch (D20), plus (A7) the provenance of the contributing
-        delegated carriers."""
+        delegated carriers.  `alarm` is the patch score's only; the provenance score and
+        its firing are returned beside it for the systems that read them."""
         _check_depth(depth)
         _check_via(has_marker, via)
         deep = self._det.at_depth(depth)
         s = deep.score_patch(bool(has_marker), task_id, seed, via=via or "direct")
         fired = self.fires(s)
-        prov, alarm = None, fired
+        prov, prov_fired = None, False
         if self.dprime_provenance is not None:
             mu = provenance_mean(bool(has_marker) and via == "delegated", self.dprime_provenance)
             prov = random.Random(seed_of(seed, "v3-provenance", task_id)).gauss(mu, 1.0)
-            alarm = fired or self.fires(prov)
+            prov_fired = bool(self.fires(prov))
         return Inspection(target="commit", depth=depth, scores=(s,), written_at=(t,),
-                          firing=(fired,), alarm_patch=fired, provenance=prov, alarm=alarm,
-                          marker=bool(has_marker))
+                          firing=(fired,), alarm_patch=fired, provenance=prov, alarm=fired,
+                          provenance_fired=prov_fired, marker=bool(has_marker))
 
     def audit(self, t: int, action: A.AuditAction, store, seed: int, *, has_marker: bool,
               via: str, task_id: str) -> Inspection:

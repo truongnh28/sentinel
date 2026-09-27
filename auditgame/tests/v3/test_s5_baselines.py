@@ -11,6 +11,7 @@ import carrier_policies as CP
 from v3 import api as A
 from v3 import baselines as BL
 from v3 import config as C
+from v3 import observe as O
 
 HS = range(6, 15)                                       # draft S8: H ~ U{6..14}
 
@@ -326,7 +327,11 @@ class TestS5Baselines(unittest.TestCase):
         contributing skills (A7) against the cell detector's threshold (O9).  In A0 there
         is no provenance and B1-prov behaves as B1.  A commit alarm quarantines nothing:
         the runner blocks that task's patch (M1 fix 27/09), so the rule shows in
-        alarmed_target, and quarantine() stays None."""
+        alarmed_target, and quarantine() stays None.  B1-prov is the only baseline that
+        declares it reads the channel (L2, fix-a7): the runner blocks on its provenance
+        alarm, never on another baseline's."""
+        readers = [n for n, cls in BL.ALL.items() if O.reads_provenance(cls)]
+        self.assertEqual(readers, ["B1-prov"])
         a7 = C.sensitivities()[0][1]
         self.assertEqual(a7.provenance, "A7")
         for cell in every_cell():
