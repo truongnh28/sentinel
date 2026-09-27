@@ -1,0 +1,55 @@
+{
+ "dataset": "nebius/SWE-rebench-V2",
+ "file": "data/train-00000-of-00001.parquet",
+ "files": {
+  "swerebench_v2_eval_pool.jsonl.gz": {
+   "fields": [
+    "instance_id",
+    "repo",
+    "created_at",
+    "base_commit",
+    "patch",
+    "test_patch",
+    "FAIL_TO_PASS",
+    "image_name",
+    "language",
+    "license",
+    "flags",
+    "difficulty",
+    "intent_completeness",
+    "problem_statement"
+   ],
+   "rows": 1668,
+   "rows_are": "rows created on/after 2024-01-01 of the 20 chosen families (rules 2-5)",
+   "sha256_gz": "8731939cd6668cad988e929779769b7c9986a878a1789400f209febbe4fae1e5",
+   "sha256_jsonl": "7f973049fe763239de5585e841989aac9500df621520e788464419249d51a8f0"
+  },
+  "swerebench_v2_index.jsonl.gz": {
+   "fields": [
+    "instance_id",
+    "repo",
+    "created_at",
+    "base_commit",
+    "image_name",
+    "language",
+    "license",
+    "flags",
+    "difficulty",
+    "intent_completeness",
+    "n_fail_to_pass"
+   ],
+   "rows": 32079,
+   "rows_are": "every row of the parquet",
+   "sha256_gz": "d8836f7a3cfedd7659c8e5dd6526ce703aeb8fd658ec804cf33ee6c7cdb773c0",
+   "sha256_jsonl": "b1bfcdaeab5c1459f875e3e2fd760bb5cc33ce774567939be872798817343511"
+  }
+ },
+ "license": "CC-BY-4.0 (dataset); each repository under its own license",
+ "parquet_bytes": 428839266,
+ "parquet_rows": 32079,
+ "parquet_sha256": "0e0bf9355f892ad74ae98d4e1c404f39fd6654a8e351ee3e6ab162e4a64cd3ad",
+ "rebuild": "cd auditgame && <venv>/bin/python -m v3.corpus --fetch <parquet>",
+ "revision": "475dd5e8703bb5fb22dd3c60b5d038b019eba1e0",
+ "sha256_over": "the decompressed jsonl (one json.dumps(sort_keys=True) row per line)",
+ "what": "reduced copy of SWE-rebench-V2 for the v3 primary eval split (D-v3-1, T2)"
+}
