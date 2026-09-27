@@ -99,3 +99,73 @@ Rollout headline chạy R = 16 trên một mẫu con khai trước: 30 workflow 
 | R = 64, mẫu con 30 workflow | 237 | 776 | 1.013 |
 
 Đơn vị là CPU-giờ rollout, theo mô hình P0 §2 (`grid.headline_rollout_hours`).
+
+## Đo lại chi phí bảng dòng 5 dưới tải chuẩn (matched load)
+
+27/09/2026. Chỉ chạy dev. Mục tiêu (P2 mục 4): đưa ra **một** hằng số chi phí bảo vệ được cho bản dựng bảng dòng 5 đầy đủ, đo dưới tải có kiểm soát/đối sánh, và cập nhật lại ước lượng. Lý do phải đo lại: pilot của T14 chạy khi máy đang có tải khác (load ≈ 25/10 nhân) nên báo cáo hệ số phồng ms/rollout ≈ 1,85× so với đo đơn luồng lúc rảnh; hai pilot (T14 và line5-se-diff) chạy dưới tải KHÁC nhau nên ms/rollout của chúng không so sánh trực tiếp được, và con số 223,7 CPU-giờ (sau khi đổi cổng sang SE hiệu giữa member ở nhánh line5-se-diff, đã merge) đặt trên một hằng số chi phí không chắc.
+
+**Kết luận trước.**
+
+- **Đơn vị chiếu phải là CPU-giây/rollout (`time.process_time`), không phải wall/rollout.** `value_job` trong `tools/v3_build_table.py` ghi `cpu = time.process_time()`; `extrapolate()` và dòng in "CPU … h" cộng đúng đại lượng này. Bản chiếu 223,7 CPU-giờ cũng dựng từ process_time. Đây là mấu chốt: hệ số 1,85× mà báo cáo cũ lo ngại là hiện tượng của **wall-clock** khi chạy song song, **không** đi vào CPU-giờ.
+- **Hằng số đề nghị: ≈ 2,9 ms/rollout (CPU, đo ở đúng `--jobs 10` của bản dựng P4), tức ≈ 225 CPU-giờ cho bản đầy đủ.** Đo lại bằng chính công cụ (`--pilot --extrapolate`) ở `--jobs 10` cho **225,1 CPU-giờ** (51.596 khoá filled × 5.376 rollout/khoá = 277,4 triệu rollout; 0% khoá bù dưới cổng CRN diff-SE, ngưỡng 0,15 đã merge) — **tái lập gần khít** con số 223,7 CPU-giờ của line5-se-diff (lệch 0,6%; số khoá 51.596 so với 51.366 do đã nối chiều dài payload của T24 vào lưới, c10bd9e). Bản chiếu cũ vì vậy **bảo vệ được**, không lệch 1,85×.
+- **Hệ số phồng do song song, trên CPU-time, chỉ 1,05×** (đo back-to-back đơn luồng vs `--jobs 10`, cùng tập khoá). Phồng của **wall**/rollout dưới `--jobs 10` là 1,2–1,9× tuỳ tải nền — đây chính là "1,85×" mà báo cáo cũ thấy, và nó là hệ quả của **độ song song/tranh chấp lịch**, không phải công CPU tăng.
+
+### Máy và phương pháp
+
+Máy: 10 nhân (`os.cpu_count() = 10`). Mọi số đo dưới đây ghi kèm load average lúc đo (N3: không ghi 0 cho thứ không đo; ghi rõ điều kiện). **Hạn chế đo (N3):** suốt phiên máy dùng chung có ≈ 8 tiến trình python ngoài chạy 100% (các worktree/agent khác), load nền dao động 4–95; **không lấy được nền máy rảnh thật**. Vì vậy mức tuyệt đối của CPU-giây/rollout vẫn trôi theo tải nền (đo được h = 6: ≈ 1,8 ms/rollout lúc load ≈ 3, lên ≈ 2,9 ms/rollout lúc tranh chấp). Hệ số song song (tỉ số back-to-back) ít bị ảnh hưởng hơn vì hai lần đo có tải nền gần trùng.
+
+Vi chuẩn (microbenchmark) đo phase C (`value_job`) trên một ô bảng (ρ = 0, χ = 1,33, mid), Δ̂ = 4: chạy phase A+B rồi lấy tập con 2 khoá mỗi h (h = 1..14, 28 khoá, 150.528 rollout), chạy (a) đơn luồng trong tiến trình rồi (b) qua `ProcessPoolExecutor(10)` trên **cùng** tập khoá, có luồng nền lấy mẫu `os.getloadavg()`. Đối chứng công cụ: `--pilot --headline --rhos 0 --deltas 4 --jobs 10` (274 khoá, tái lập quy mô một ô của T14) rồi `--sources-only` (36 ô, phân bố h của toàn lưới) và `--pilot --extrapolate` (chiếu bằng chính `extrapolate()`).
+
+### Số đo vi chuẩn (28 khoá, 150.528 rollout)
+
+| Chế độ | CPU (s) | ms/rollout (CPU) | wall/CPU mỗi khoá | load (min/mean/max) | song song hiệu dụng |
+|---|---|---|---|---|---|
+| Đơn luồng | 414,1 | 2,75 | 1,06 | 3,64 / 16,95 / 26,77 | — |
+| `--jobs 10` | 435,9 | 2,90 | **1,94** | 19,74 / 34,62 / 44,29 | 4,26× |
+
+- **Hệ số phồng song song trên CPU-time = 2,90 / 2,75 = 1,05×.** Theo h: ≈ 1,6 ở h = 1 (chi phí cố định lấn át khoá rẻ) giảm còn ≈ 1,02 ở h = 14 (khoá đắt, chiếm phần lớn chi phí); trọng số theo chi phí ≈ 1,07.
+- **wall/CPU mỗi khoá nhảy từ 1,06 (đơn luồng) lên 1,94 (`--jobs 10`):** worker bị deschedule khoảng nửa thời gian khi máy quá tải (10 worker + ≈ 25 tiến trình ngoài trên 10 nhân). Đây là nguồn của "1,85×" trong báo cáo cũ; nó **không** vào CPU-giờ.
+
+### Chi phí CPU mỗi rollout theo h (đối chứng công cụ, `--jobs 10`)
+
+Từ `mean_cpu_s_per_key_by_h` của pilot công cụ chia cho 5.376 rollout/khoá:
+
+| h | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ms/rollout (CPU) | 0,85 | 1,25 | 1,76 | 2,06 | 2,52 | 2,88 | 3,23 | 3,71 | 3,90 | 4,24 | 4,65 | 4,97 | 5,32 | 5,54 |
+
+Pilot công cụ này (274 khoá, `--jobs 10`): CPU 1,18 giờ, wall 0,14 giờ (8,4 phút) — song song hiệu dụng 8,2× vì lần chạy này bắt đầu lúc load ≈ 4 (thấp hơn vi chuẩn), trong khi CPU/khoá vẫn ≈ 15,5 s như lúc tải nặng → **CPU-time bền với tải, wall/độ-song-song mới là thứ đổi theo tải.** 0% khoá bù (cổng CRN diff-SE), khớp line5-se-diff.
+
+### Ngoại suy bản đầy đủ (36 ô × 5 Δ̂)
+
+Phân bố khoá theo h của toàn lưới (`--sources-only`, `spikes/v3-table/sources.json`, 51.596 khoá filled): h1–7 mỗi mức ≈ 4.500–4.700, giảm dần còn 2.632 (h12), 1.590 (h13), 350 (h14). Rollout/khoá = R(32) × 28 member × 6 lớp = 5.376; tổng 277,4 triệu rollout, 0% bù.
+
+| Cơ sở hằng số | ms/rollout (CPU, trọng số chi phí) | CPU-giờ bản đầy đủ |
+|---|---|---|
+| Đối chứng công cụ `--jobs 10` (`extrapolate()`) | **2,92** | **225,1** |
+| Vi chuẩn `--jobs 10` (tính tay theo h) | 2,55 | 196,8 |
+| Vi chuẩn đơn luồng (tính tay theo h) | 2,39 | 184,3 |
+| line5-se-diff cũ (jobs 8, load ≈ 3) | 2,92 | 223,7 |
+
+Chênh giữa 196,8 (vi chuẩn) và 225,1 (công cụ) là do tải nền và pha h khác nhau giữa hai lần đo, không do phương pháp; cả hai đều nằm quanh ước lượng gốc P0/plan 77–309 CPU-giờ và quanh 223,7. **Wall-clock ở `--jobs 10`:** ≈ 27 giờ nếu giữ song song 8,2× (như pilot công cụ lúc load thấp), lên ≈ 53 giờ khi tranh chấp nặng (song song 4,26×).
+
+### Hằng số nên dùng và lý do
+
+Dùng **CPU ms/rollout ≈ 2,9 đo ở đúng `--jobs 10`** (→ **≈ 225 CPU-giờ**, và ≈ 27–53 giờ wall tuỳ tải nền). Lý do:
+
+1. Đơn vị chiếu là `process_time`, nên phải đo bằng `process_time`; hệ số 1,85× là của **wall** và không đi vào CPU-giờ.
+2. Đo ở đúng concurrency mà bản dựng P4 chạy (`--jobs 10`), đã bao gồm tranh chấp song song (chỉ 1,05× trên CPU-time), nên hằng số ổn định.
+3. Con số 225,1 tái lập line5-se-diff 223,7 trong 0,6% dù đo ở tải và jobs khác → xác nhận 223,7 là ước lượng bảo vệ được, hơi thiên **an toàn** (cận trên) cho máy đang tranh chấp; cận dưới lúc máy rảnh (đo được ≈ 1,8 ms/rollout ở h = 6, load ≈ 3) rơi vào khoảng ≈ 180 CPU-giờ.
+
+Khi dựng bản cuối ở P4, ghi lại loadavg lúc chạy kèm bản chiếu; nếu load nền < 5, chi phí CPU thực sẽ ở cận dưới của khoảng này.
+
+### Tái lập
+
+```
+cd auditgame
+../.venv/bin/python tools/v3_build_table.py --sources-only --jobs 8                        # phân bố h toàn lưới
+../.venv/bin/python tools/v3_build_table.py --pilot --headline --rhos 0 --deltas 4 --jobs 10 # pilot một ô, ghi CPU/khoá theo h
+../.venv/bin/python tools/v3_build_table.py --pilot --extrapolate                           # 225,1 CPU-giờ (jobs 10)
+```
+
+So sánh đơn luồng vs `--jobs 10` (hệ số phồng song song trên CPU-time) làm bằng vi chuẩn tạm trong scratchpad (không commit); phương pháp: lấy tập con khoá cố định, chạy `value_job` một lần đơn luồng rồi một lần qua `ProcessPoolExecutor(10)`, so `cpu_s / rollouts` của hai lần.
