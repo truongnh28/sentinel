@@ -33,6 +33,18 @@ Dựng sim v3 bám chữ draft:
 
 P2 để sẵn giao diện cắm cho các thành phần P3. Bảng dòng 5 trong P2 chỉ dựng bản pilot.
 
+### Cổng: hiệu chuẩn agent (P3) chặn P4, không chặn P2
+
+Hiệu chuẩn agent thật — đo `p = P(bản vá mang marker | payload được truy xuất)` — nằm trong P3, và phải **xong trước khi vào P4**. Tiền đăng ký: `docs/preregistration/TIEN-DANG-KY-P0.5-Hieu-Chuan-Agent-That.md`; plan thi hành: `docs/design/plans/2026-09-27-P0.5-Hieu-Chuan-Agent-That-Plan.md`.
+
+**P2 không bị chặn.** `adoption_rate` là một field của `agent.MockAgent` mà `world_v2.StagedMockAgent` kế thừa, nên P2 dựng máy và `p` chỉ là một núm cắm vào sau. Giá trị của P2 không phụ thuộc `p` bằng bao nhiêu.
+
+**P4 thì bị chặn, và bổ đề tỉ lệ KHÔNG che được chỗ này.** Bổ đề chỉ nói mức giảm *tương đối* bất biến theo `p`. Nhưng C6 đã chốt tinh chỉnh theo `L = harm + λ_Q·Q_false + λ_T·T_lost`, trong đó `Q_false` và `T_lost` **không phụ thuộc adoption** — chúng là hàm của chính sách audit và bộ dò. Chỉ `harm` co giãn theo `p`. Nên khi `p` nhỏ hơn 0,85 nhiều lần, cán cân của `L` dịch hẳn về phía phạt cách ly, và nghiệm tối ưu — `η_Q` lẫn hỗn hợp — dịch theo. Ở `p` đủ nhỏ, nghiệm hội tụ về B1 không cách ly.
+
+Tinh chỉnh và freeze ở `adoption_rate = 0,85` rồi mới đo ra `p` nhỏ hơn nhiều, thì bộ mixture đã tối ưu cho một thế giới không tồn tại, và sửa nó là một nghiên cứu mới — đúng cái bẫy v2 đã dính với thư viện belief bị khoá.
+
+Hệ quả cho thứ tự làm: **đẩy hiệu chuẩn agent lên đầu P3**, không để cuối. Nó tốn vài ngày và khoảng 10 USD, trong khi nó quyết định `p` mà cả P4 đứng trên.
+
 ## Đánh số dòng
 
 DCM đánh số dòng Algorithm 1 theo draft, gồm 10 dòng. "Dòng 8" trong `sentinel-v3.md` tương ứng với dòng 8–9 của draft (mục 12).
