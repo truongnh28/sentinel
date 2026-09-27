@@ -118,15 +118,18 @@ def _oracle(ep: RU.Episode, sigma, solved_sigma: bool = False) -> OR.SealedOracl
 
 def sleeper(wf, k: str, iota: int, sigma: int, eps: float) -> P.SleeperPayload:
     """The sleeper payload at (k, iota, sigma, eps), built as payload.plan_sleeper_all
-    builds it but without its feasibility filter (a particle names (iota, sigma) itself)."""
+    builds it but without its feasibility filter (a particle names (iota, sigma) itself).
+    wire-payload-length: its length is drawn (T24, D-v3-3), like every other payload the
+    grid writes -- a rollout plants the same drawn-length attacker the episode would."""
     repo = getattr(wf, "repo", "?")
     target = wf.tasks[sigma].topic
     pay = retrieval.payload_topic_like(target, eps)
-    return P.SleeperPayload(wf_id=wf.wf_id, repo=repo, carrier=k, iota=iota, sigma=sigma,
-                            epsilon=eps, marker=build.marker_for(repo, wf.wf_id, k, iota,
-                                                                 sigma, sigma - iota),
-                            topic=pay, target_topic=target,
-                            length_reason=build.payload_length_reason(pay))
+    sp = P.SleeperPayload(wf_id=wf.wf_id, repo=repo, carrier=k, iota=iota, sigma=sigma,
+                          epsilon=eps, marker=build.marker_for(repo, wf.wf_id, k, iota,
+                                                               sigma, sigma - iota),
+                          topic=pay, target_topic=target,
+                          length_reason=build.payload_length_reason(pay))
+    return P.with_default_length(sp)
 
 
 def _future_placement(wf, world, attack: AT.AttackV3, hyp: A.Hypothesis, t: int):
@@ -134,8 +137,10 @@ def _future_placement(wf, world, attack: AT.AttackV3, hyp: A.Hypothesis, t: int)
     delta = hyp.sigma - hyp.iota
     cands = [p for p in P.plan_sleeper_all(wf, ks[0], delta, attack.epsilon) if p.iota >= t]
     if cands:
-        first = cands[{"first": 0, "mid": len(cands) // 2,
-                       "last": len(cands) - 1}[attack.iota_rule]]
+        # wire-payload-length: plan_sleeper_all's candidates are still length=None; draw
+        # here so this branch matches sleeper()'s (used below and in the other branch).
+        first = P.with_default_length(cands[{"first": 0, "mid": len(cands) // 2,
+                                             "last": len(cands) - 1}[attack.iota_rule]])
         how = f"class rule {attack.iota_rule} over {len(cands)} feasible iota >= {t}"
     else:
         first = sleeper(wf, ks[0], hyp.iota, hyp.sigma, attack.epsilon)

@@ -234,12 +234,15 @@ class AttackV3:
             if reasons is not None:
                 reasons.append(_infeasible(self.name, wf, delta, ks[0], self.epsilon, detail))
             return None
-        first = _pick(cands, self.iota_rule)
+        # wire-payload-length: the length the grid actually writes is drawn (T24, D-v3-3),
+        # not v2's fixed 63; each seeded carrier draws its own, seeded by its own coordinates.
+        first = P.with_default_length(_pick(cands, self.iota_rule))
         pays = [first]
         for k in ks[1:]:
             # feasibility depends on the topics only, so the same (iota, sigma) holds
-            pays.append(next(p for p in P.plan_sleeper_all(wf, k, delta, self.epsilon)
-                             if p.sigma == first.sigma))
+            second = next(p for p in P.plan_sleeper_all(wf, k, delta, self.epsilon)
+                         if p.sigma == first.sigma)
+            pays.append(P.with_default_length(second))
         return Placement(tuple(pays), self.channel)
 
     def plan_in_cell(self, wf, cell: C.Cell, world: C.WorldV3 = C.PRIMARY,
@@ -441,7 +444,10 @@ def br_menu(wf, delta: int, world: C.WorldV3 = C.PRIMARY, eps_grid: tuple = BR_E
     channels = ("write",) if world.ingress_visible else CHANNELS
     out = []
     for eps in eps_grid:
-        per_k = {k: {p.sigma: p for p in P.plan_sleeper_all(wf, k, delta, eps, reasons=reasons)}
+        # wire-payload-length: draw once per (carrier, sigma), before the Placement fan-out
+        # over carrier pairs and channels, so every menu entry carries the drawn L (T24).
+        per_k = {k: {p.sigma: P.with_default_length(p)
+                    for p in P.plan_sleeper_all(wf, k, delta, eps, reasons=reasons)}
                  for k in CARRIERS}
         for ks in combinations(CARRIERS, world.n_seeded):
             for sigma in sorted(set.intersection(*(set(per_k[k]) for k in ks))):

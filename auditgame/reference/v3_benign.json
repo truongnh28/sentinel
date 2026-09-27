@@ -674,7 +674,7 @@
   "payload_length_rule": "build.py's rule for PAYLOAD_LENGTH = 63 (the median of len(content) over the benign memory items of the certification background), on v3's background (v3's drift on dev); L is drawn from that background's empirical length distribution, one draw per placement, so its median is the rule's and its spread is the background's",
   "payload_length_v2": 63,
   "payload_source": "v3/payload.py",
-  "payload_source_sha256": "8162f3a00099cf29d56a257705eeb087b734a30a37c75218e92eb696779adfb1",
+  "payload_source_sha256": "0da98cefe9ba1520e3b227e29cf07008c78fbff6586aaeed0b0d0d71e39ced11",
   "per_event": 1,
   "per_event_v2": 4,
   "seed": 20260916,

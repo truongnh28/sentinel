@@ -201,7 +201,13 @@ class TestInfraGlue(unittest.TestCase):
     #: RE-PINNED on fix-decisions (27/09) for ONE declared change only: O7, a branch
     #: quarantine removes the poisoned lineage (runner.Episode.removed_by_quarantine).  With
     #: that method patched back to whole-carrier removal the digest is the old f9177fdd...
-    PINNED_DECISIONS = "4e3fc76af7ae13ee30d90472a5face60a162df349d12d20284e5972cc3b19a4e"
+    #: RE-PINNED on wire-payload-length for ONE declared change only: AT.by_name(...).plan
+    #: now draws the payload's length (T24, D-v3-3) instead of v2's fixed L = 63, so the
+    #: item written at iota has different content/item_id and therefore a different
+    #: detector seed -- this moves the harm/decisions the episodes above record.  With
+    #: v3.payload.with_default_length reverted to the identity (length stays None) the
+    #: digest is the old 4e3fc76af7ae...
+    PINNED_DECISIONS = "f410562e229adb70d6ed722894198447ec9e45602e56951078b712122b000f05"
 
     @staticmethod
     def _decision_digest(reg) -> str:
