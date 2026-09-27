@@ -64,6 +64,7 @@ import pathlib
 import subprocess
 import sys
 import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import replace
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
@@ -395,6 +396,122 @@ def minimax(M: dict, F: dict, cap: float | None = None) -> dict:
 
 
 # ---------------------------------------------------------------------------------------
+# Deterministic --jobs N: the per-candidate measurements run in worker processes
+# ---------------------------------------------------------------------------------------
+#
+# Each per-candidate measurement -- one `measure(build, rho, ...)` call, i.e. one (step,
+# rho, candidate) with its own keyed-seed episodes -- is independent and deterministic given
+# its inputs (every draw goes through core.seed_of via R.run_episode / belief_pf, never a
+# worker-order-dependent RNG).  So they distribute across N processes exactly as
+# tools/v3_build_table.py distributes its phases (same ProcessPoolExecutor pattern; the
+# result does not depend on N).
+#
+# DETERMINISM.  The pool computes a CONTENT-KEYED cache {measure-key -> measure result};
+# results are placed back by job index, never by completion order.  The selection log and
+# every choice are then assembled by re-running the ORIGINAL single-process control flow
+# (tune / tune_rho) with `run` reading the cache instead of measuring -- so the log is built
+# in the same canonical order, the minimax LP and `choose` (the tie rule: value at 4 dp,
+# then lower FQ, then earlier grid value) run in the main process exactly as before, and the
+# tuned JSON and its `log_sha256` are byte-identical to the --jobs 1 run.  Only the wall-clock
+# `timing` block differs (it is not part of `log_sha256` and never was reproducible).
+
+
+def _mkey(step: str, rho: float, param: dict) -> tuple:
+    """The content key of one measurement: (step, rho, candidate...).  Built identically at
+    enumeration time and inside `run`, so a cached result is found by content, not order."""
+    r = float(rho)
+    if step == "tau5":
+        return ("tau5", r, param["tau5"])
+    if step == "sw_weights":
+        return ("sw_weights", r, param["sw_weights"])
+    if step == "line8":
+        return ("line8", r, param["tau"], param["eta_q"], param["member"])
+    raise ValueError(f"unknown measurement step {step!r}")
+
+
+def _enumerate_jobs(rhos, tau5_grid, sw_grid, tau_grid, eta_grid, members, belief_factory):
+    """Every measurement `tune_rho` will ask for, in the canonical (control-flow) order:
+    per rho -- tau5 candidates, sw_weights candidates, then (tau, eta, member) for line 8
+    when a belief factory is given.  Each job is (key, step, rho, descriptor); the worker
+    rebuilds the policy from the descriptor (never a pickled closure)."""
+    jobs = []
+    for rho in rhos:
+        r = float(rho)
+        for v in tau5_grid:
+            jobs.append((_mkey("tau5", r, {"tau5": v}), "tau5", r, ("tau5", v)))
+        for w in sw_grid:
+            jobs.append((_mkey("sw_weights", r, {"sw_weights": w}), "sw_weights", r, ("sw", w)))
+        if belief_factory is not None:
+            for tau in tau_grid:
+                for eta in eta_grid:
+                    for name in members:
+                        p = {"tau": tau, "eta_q": eta, "member": name}
+                        jobs.append((_mkey("line8", r, p), "line8", r,
+                                     ("line8", tau, eta, name)))
+    return jobs
+
+
+#: Per-worker state, set once by the pool initializer (mirrors v3_build_table._W).
+_W: dict = {}
+
+
+def _init_worker(settings: dict) -> None:
+    _W["settings"] = settings
+    by = {w.wf_id: w for w in corpus.dev_workflows()}
+    _W["wfs"] = [by[i] for i in settings["wf_ids"]]
+
+
+def _worker_build(desc: tuple, st: dict):
+    """Reconstruct the candidate's `build(ctx) -> PolicyV3` from a picklable descriptor,
+    exactly as the single-process control flow builds it in tune_rho."""
+    kind = desc[0]
+    if kind == "tau5":
+        return BL.factory(BL.B5RiskScore.name, tuned={"tau5": desc[1]})
+    if kind == "sw":
+        return BL.factory(BL.StageWeightedRandomised.name, tuned={"sw_weights": desc[1]})
+    if kind == "line8":
+        _, tau, eta, name = desc
+        bf, l8, band, dh_mode = st["belief_factory"], st["line8"], st["band"], st["delta_hat"]
+
+        def build(ctx):
+            dh = ctx.cell.delta if dh_mode == "cell" else None
+            b = bf(ctx, dh)
+            return MemberWithLine8(ctx, LIB.make_member(name, ctx, belief=b, band=band),
+                                   b, tau, eta, l8)
+        return build
+    raise ValueError(f"unknown job descriptor {desc!r}")
+
+
+def _measure_job(job: tuple) -> dict:
+    """One measurement in a worker.  Its own Plans() cache -- placement is deterministic, so
+    a per-worker cache changes nothing but avoids re-planning within the job."""
+    _key, step, rho, desc = job
+    st = _W["settings"]
+    build = _worker_build(desc, st)
+    return measure(build, rho, _W["wfs"], st["seeds"], attacks=st["attacks"],
+                   deltas=st["deltas"], world=st["world"], plans=Plans(),
+                   kernels=st["kernels"])
+
+
+def _run_measure_pool(jobs: list, n_jobs: int, settings: dict, progress=print) -> dict:
+    """Run every measurement across n_jobs processes; return {key -> measure result}.
+    Results are placed by job index (not completion order), so the cache is identical for
+    any n_jobs."""
+    out: list = [None] * len(jobs)
+    t0 = time.perf_counter()
+    with ProcessPoolExecutor(n_jobs, initializer=_init_worker, initargs=(settings,)) as ex:
+        futs = {ex.submit(_measure_job, jobs[i]): i for i in range(len(jobs))}
+        done = 0
+        for f in as_completed(futs):
+            out[futs[f]] = f.result()
+            done += 1
+            if progress and (done == len(jobs) or done % max(1, len(jobs) // 20) == 0):
+                progress(f"  measure: {done}/{len(jobs)} jobs, "
+                         f"{time.perf_counter() - t0:.0f} s")
+    return {jobs[i][0]: out[i] for i in range(len(jobs))}
+
+
+# ---------------------------------------------------------------------------------------
 # eta_Q on the grid edge
 # ---------------------------------------------------------------------------------------
 
@@ -464,13 +581,18 @@ def _entry(step, rho, param, m, kernels=KERNELS) -> dict:
 
 def tune_rho(rho, workflows, seeds, *, attacks, members, belief_factory, line8, tau5_grid,
              sw_grid, tau_grid, eta_grid, deltas, world, fq_cap, delta_hat, log, timing,
-             progress=print, kernels=KERNELS) -> dict:
+             progress=print, kernels=KERNELS, cache=None) -> dict:
     plans = Plans()
     blk: dict = {}
     kw = dict(attacks=attacks, deltas=deltas, world=world, plans=plans, kernels=kernels)
 
     def run(step, param, build):
-        m = measure(build, rho, workflows, seeds, **kw)
+        # --jobs N: the measurement was already computed in a worker; read it by content key
+        # (identical for any N).  Otherwise measure here, exactly as the single-process tool.
+        if cache is not None:
+            m = cache[_mkey(step, rho, param)]
+        else:
+            m = measure(build, rho, workflows, seeds, **kw)
         e = _entry(step, rho, param, m, kernels)
         log.append(e)
         tm = timing.setdefault(step, {"episodes": 0, "seconds": 0.0})
@@ -545,7 +667,7 @@ def tune(*, workflows=None, seeds=TUNE_SEEDS, rhos=C.RHO_GRID, split: str = DEV,
          sw_grid=SW_CANDIDATES, tau_grid=TAU_Q_GRID, eta_grid=ETA_Q_GRID,
          deltas=TUNE_DELTAS, world: C.WorldV3 = C.PRIMARY, fq_cap: float | None = None,
          delta_hat: str = "cell", smoke: bool = False, belief_label: str | None = None,
-         progress=print, kernels=KERNELS) -> dict:
+         progress=print, kernels=KERNELS, jobs: int = 1) -> dict:
     """The whole tuning.  Returns {"tuned": ..., "log": [...]}; tuned["log_sha256"] pins
     the log.  `delta_hat` = "cell" gives the belief the cell's Delta (v2's tuning passed
     the regime, D9b), "prior" gives None (O3's prior).  `kernels` = NOMINAL_ONLY is the
@@ -568,13 +690,26 @@ def tune(*, workflows=None, seeds=TUNE_SEEDS, rhos=C.RHO_GRID, split: str = DEV,
     log: list = []
     timing: dict = {}
     out_rho = {}
+    # --jobs N > 1: measure every candidate across N processes into a content-keyed cache,
+    # then assemble the log and choices below by the same single-process control flow (the
+    # tuned JSON and log_sha256 do not depend on N; only the wall-clock timing does).
+    cache = None
+    if jobs and jobs > 1:
+        jobs_list = _enumerate_jobs(rhos, tuple(tau5_grid), tuple(sw_grid), tuple(tau_grid),
+                                    tuple(eta_grid), members, belief_factory)
+        if jobs_list:
+            settings = {"wf_ids": [w.wf_id for w in workflows], "seeds": tuple(seeds),
+                        "attacks": attacks, "deltas": tuple(deltas), "world": world,
+                        "kernels": kernels, "belief_factory": belief_factory, "line8": line8,
+                        "delta_hat": delta_hat, "band": band}
+            cache = _run_measure_pool(jobs_list, jobs, settings, progress)
     for rho in rhos:
         out_rho[f"{rho:g}"] = tune_rho(
             float(rho), workflows, tuple(seeds), attacks=attacks, members=members,
             belief_factory=belief_factory, line8=line8, tau5_grid=tuple(tau5_grid),
             sw_grid=tuple(sw_grid), tau_grid=tuple(tau_grid), eta_grid=tuple(eta_grid),
             deltas=tuple(deltas), world=world, fq_cap=fq_cap, delta_hat=delta_hat, log=log,
-            timing=timing, progress=progress, kernels=kernels)
+            timing=timing, progress=progress, kernels=kernels, cache=cache)
     for tm in timing.values():
         tm["ms_per_episode"] = (1000.0 * tm["seconds"] / tm["episodes"]
                                 if tm["episodes"] else None)
@@ -681,6 +816,12 @@ def main(argv=None) -> int:
                     help="P4's real tuning: shorthand for --belief pf (the particle filter "
                          "and v3.line8); tunes tau / eta_Q over the full library")
     ap.add_argument("--fq-cap", type=float, default=None)
+    ap.add_argument("--jobs", type=int, default=1,
+                    help="worker processes for the per-candidate measurements (default 1 = "
+                         "single process, exactly as before).  The tuned JSON and its "
+                         "log_sha256 are identical for any N; only the wall-clock timing "
+                         "differs.  A full --real run is ~104 CPU-h; --jobs 8 finishes in "
+                         "~13 h on this 10-core machine.")
     ap.add_argument("--nominal-only", action="store_true",
                     help="the -transition uncertainty ablation's tuning: worst case over the "
                          f"nominal kernel only, written to {TUNED_NOMINAL_PATH.name}")
@@ -721,7 +862,7 @@ def main(argv=None) -> int:
         band = band_of(bf(ctx0, ctx0.cell.delta))
     res = tune(workflows=dev_workflows(n), seeds=seeds, rhos=a.rhos, belief_factory=bf,
                band=band, line8=line8, fq_cap=a.fq_cap, smoke=a.smoke,
-               belief_label=belief_label, kernels=kernels)
+               belief_label=belief_label, kernels=kernels, jobs=a.jobs)
     out, lp = write(res, a.out)
     t = res["tuned"]
     print(f"\nwrote {out} and {lp}; log sha256 {t['log_sha256']}")
