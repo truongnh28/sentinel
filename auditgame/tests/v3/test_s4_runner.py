@@ -5,6 +5,8 @@ Each test protects the DCM rows of v3/dcm/T06.csv that name it; its docstring ca
 row ids and the verbatim draft sentence.  Tasks are 0-based (task number = t + 1), as in
 v2's carrier_runner.  Run from auditgame/.
 """
+import dataclasses
+import inspect
 import unittest
 from dataclasses import replace
 
@@ -17,6 +19,8 @@ from v3 import attackers as AT
 from v3 import baselines as B
 from v3 import config as C
 from v3 import corpus as K
+from v3 import library as LIB
+from v3 import observe as O
 from v3 import oracle as OR
 from v3 import payload as P
 from v3 import runner as R
@@ -78,6 +82,44 @@ class Script(A.PolicyBase):
 
 def script(**kw):
     return lambda ctx: Script(ctx, **kw)
+
+
+class CommitFires(O.ObservationModel):
+    """The declared observation model whose commit review fires at the tasks in FIRE."""
+    FIRE: set = set()
+
+    def commit(self, t, *a, **kw):
+        ins = super().commit(t, *a, **kw)
+        on = t in self.FIRE
+        return dataclasses.replace(ins, firing=(on,), alarm_patch=on, alarm=on)
+
+
+def fires_at(ts):
+    return type("CommitFiresAt", (CommitFires,), {"FIRE": set(ts)})
+
+
+class Spy(A.PolicyBase):
+    """A non-oracle policy that offers every hook the oracle has and records every call."""
+    name = "spy"
+
+    def __init__(self, ctx):
+        super().__init__(ctx)
+        self.calls = []
+
+    def act(self, t, B_t):
+        self.calls.append(("act", t, B_t))
+        return self.action("commit")
+
+    def observe(self, t, obs):
+        self.calls.append(("observe", t, obs))
+
+    def quarantine(self, t):
+        self.calls.append(("quarantine", t))
+        return None
+
+    def quarantine_state(self, t, c):             # the oracle's hook: must never be called
+        self.calls.append(("quarantine_state", t, c))
+        return ()
 
 
 class TestS4Runner(unittest.TestCase):
@@ -384,9 +426,10 @@ class TestS4Runner(unittest.TestCase):
         self.assertEqual((pm.k, pm.iota, pm.sigma, pm.delay), (("memory",), 0, 4, 4))
         self.assertEqual((pm.cell_id, pm.wf_id, pm.harm, pm.H),
                          (C.cell_id(CELL), wf.wf_id, out.record.harm, len(wf.tasks)))
-        # B1 quarantines the branch on every commit alarm: the two logs name the same tasks
-        self.assertTrue(all(k == "commit" for _, k in pm.alarms))
-        self.assertEqual([t for t, _ in pm.alarms], [t for t, _ in out.record.quarantines])
+        # B1's commit alarms are published; each blocks that task's patch only, so B1
+        # never quarantines the branch (M1 fix 27/09)
+        self.assertTrue(pm.alarms and all(k == "commit" for _, k in pm.alarms))
+        self.assertEqual(out.record.quarantines, ())
         none = self.run_ep(wf, None, script(), seed=2).postmortem
         self.assertEqual((none.k, none.iota, none.sigma, none.harm), ((), None, None, 0.0))
         seen = []
@@ -394,6 +437,117 @@ class TestS4Runner(unittest.TestCase):
                            postmortems=(pm, none), order=2)
         self.assertEqual(seen[0].postmortems, (pm, none))
         self.assertEqual((out2.record.n_incidents_seen, out2.record.order), (2, 2))
+
+    # ---------------------------------------------------------------------------------
+    def test_commit_alarm_blocks_that_patch_only(self):
+        """D5.2.b1 O7 -- "Audit-at-Commit spends the entire budget inspecting the final commit
+        of each task at maximum depth.": a commit-review alarm BLOCKS THAT TASK'S PATCH ONLY
+        -- it never enters the branch (v2's patch_blocks, audit-at-commit); no other branch
+        item is removed and no quarantine is counted.  A blocked marked patch prevents its
+        harm; a blocked clean solved patch is one clean task lost (t_lost); a whole-branch
+        quarantine comes only from a policy's line 8 (M1 fix 27/09)."""
+        wf = _wf()
+        pl = _placement(wf, "memory")
+        seed = _surviving_seed(wf, pl)
+        b1 = B.factory("B1 audit-at-commit")
+        base = self.run_ep(wf, pl, b1, seed=seed, agent_factory=_sure_agent,
+                           observer=fires_at(()))
+        self.assertEqual(base.record.harm, 1.0, "no alarm: the marked patch of sigma lands")
+        self.assertEqual(base.record.t_lost, 0)
+        # the alarm at sigma blocks the marked patch: no harm, no quarantine, no FQ
+        ep = R.Episode(wf, pl, b1, C.PRIMARY, CELL, seed, agent_factory=_sure_agent,
+                       observer=fires_at({pl.sigma}))
+        for _ in range(pl.sigma + 1):
+            ep.step()
+        patches = [it for it in ep.store.items["branch"] if it.provenance == OR.PATCH_PROVENANCE]
+        blocked = [it for it in patches if it.item_id in ep.store.quarantined]
+        self.assertEqual([it.created_at for it in blocked], [pl.sigma], "only sigma's patch")
+        self.assertTrue(blocked[0].poisoned)
+        self.assertEqual(len(ep.store.live("branch")), len(patches) - 1 +
+                         sum(1 for it in ep.store.items["branch"]
+                             if it.provenance != OR.PATCH_PROVENANCE
+                             and it.item_id not in ep.store.quarantined))
+        r = ep.run().record
+        self.assertEqual((r.harm, r.fq, r.true_q, r.quarantines), (0.0, 0, 0, ()))
+        self.assertEqual(r.detected_at, pl.sigma)
+        self.assertEqual(ep.counters()["patch_blocks"], 1)
+        self.assertEqual(r.t_lost, 0, "a blocked marked patch is not a clean task lost")
+        # alarms on clean tasks: each solved clean patch blocked is one clean task lost
+        clean = self.run_ep(wf, None, b1, seed=seed).record
+        ep = R.Episode(wf, None, b1, C.PRIMARY, CELL, seed, observer=fires_at(range(len(TOPICS))))
+        r = ep.run().record
+        self.assertEqual(r.t_lost, clean.n_solved)
+        self.assertEqual(ep.counters()["clean_blocked"], clean.n_solved)
+        self.assertEqual((r.fq, r.clean_lost_branch, r.quarantines), (0, 0, ()))
+        self.assertAlmostEqual(R.loss_of(r), R.LAMBDA_T * clean.n_solved, places=12)
+        # an alarm on one clean task touches that patch only
+        ep = R.Episode(wf, None, b1, C.PRIMARY, CELL, seed, observer=fires_at({3}))
+        r = ep.run().record
+        gone = [it.created_at for it in ep.store.items["branch"]
+                if it.item_id in ep.store.quarantined]
+        self.assertEqual(gone, [3])
+        # a sweep alarm is not a block: the policy's line 8 decides
+        ep = R.Episode(wf, None, script(acts={t: "memory" for t in range(len(TOPICS))}),
+                       C.PRIMARY, CELL, seed, observer=fires_at(range(len(TOPICS))))
+        r = ep.run().record
+        self.assertEqual((ep.counters()["patch_blocks"], ep.counters()["clean_blocked"]), (0, 0))
+
+    # ---------------------------------------------------------------------------------
+    def test_carrier_state_reaches_the_oracle_control_only(self):
+        """D1.oracle D28 -- "evaluator-known carrier/trigger state": the runner hands c_t to
+        the Oracle (+) control after each task's audit, and the control quarantines every
+        carrier whose bit is 1 (L2, M1 fix 27/09).  No other policy ever receives c_t:
+        a non-oracle policy that offers the same hook is never called with it, the
+        defender's information set (EpisodeContext, Observation) carries no carrier
+        state, and the runner's only c_t hand-over is behind the OracleControl check."""
+        dev = K.dev_workflows()[:8]
+        cell = C.Cell(rho=0.0, delta=4)
+        att = AT.by_name("memory-first-write-e0.6")
+        n_attacked = 0
+        for wf in dev:
+            pl = att.plan(wf, 4)
+            if pl is None:
+                continue
+            n_attacked += 1
+            # the oracle: each task, its quarantines are exactly the poisoned carriers
+            ep = R.Episode(wf, pl, B.factory("Oracle (+)", attacked=pl.k), C.PRIMARY, cell, 1)
+            while ep.t < ep.H:
+                t = ep.t
+                ep.step()
+                q = [k for tq, k in ep.quarantines if tq == t]
+                self.assertEqual(ep.c_traj[-1], "0000", (wf.wf_id, t))
+                self.assertTrue(all(k in C.CARRIERS for k in q))
+            r = ep.finish().record
+            self.assertEqual((r.harm, r.fq), (0.0, 0), wf.wf_id)
+            self.assertGreaterEqual(r.true_q, 1)
+            # a non-oracle policy with the same hook never gets c_t
+            spies = []
+            R.Episode(wf, pl, lambda ctx: spies.append(Spy(ctx)) or spies[-1], C.PRIMARY,
+                      cell, 1).run()
+            self.assertFalse([c for c in spies[0].calls if c[0] == "quarantine_state"])
+            with self.assertRaises(TypeError):
+                ep2 = R.Episode(wf, pl, lambda ctx: Spy(ctx), C.PRIMARY, cell, 1)
+                ep2.oracle_quarantines(0, ep2.policy)
+        self.assertGreater(n_attacked, 0)
+        # the information set carries no carrier state
+        for cls in (A.EpisodeContext, A.Observation, A.PostMortem):
+            names = {f.name for f in dataclasses.fields(cls)}
+            self.assertFalse(names & {"c", "c_t", "c_traj", "hidden", "store"}, cls)
+        # only the Oracle control is an OracleControl: every other system of v3
+        ctx = R.context(dev[0], C.PRIMARY, cell, 0)
+        for name in B.ALL:
+            kw = {"attacked": ("memory",)} if name == "Oracle (+)" else {}
+            pol = B.make_baseline(name, ctx, **kw)
+            self.assertEqual(isinstance(pol, B.OracleControl), name == "Oracle (+)", name)
+        for cls in vars(LIB).values():
+            if inspect.isclass(cls) and issubclass(cls, A.PolicyBase):
+                self.assertFalse(issubclass(cls, B.OracleControl), cls)
+        # the runner's single c_t hand-over sits behind the OracleControl check
+        src = inspect.getsource(R.Episode)
+        self.assertEqual(src.count("quarantine_state("), 1)
+        self.assertEqual(src.count("oracle_quarantines("), 2)       # the def and one call
+        self.assertIn("if isinstance(pol, BL.OracleControl):\n            for k in "
+                      "self.oracle_quarantines(t, pol):", src)
 
 
 if __name__ == "__main__":
