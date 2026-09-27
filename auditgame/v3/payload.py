@@ -40,14 +40,29 @@ background (the benign corpus hands it v3's drift on dev), one independent draw 
 placement seeded from the placement's coordinates, and `SleeperPayload.at_length(L)` builds
 the payload with build.payload_content's construction at that L.  The rule is build.py's
 rule for 63 (the background's median, LENGTH_RULE) on a different background, drawn so that
-the variance is matched as well as the centre.  It is OPT-IN: a SleeperPayload with
-`length = None` (what the planner returns) is still v2's, byte for byte, so every other v3
-path is unchanged.  build.PAYLOAD_LENGTH is not touched.
+the variance is matched as well as the centre.  It is OPT-IN AT THE FIELD: a SleeperPayload with
+`length = None` (what the planner returns) is still v2's, byte for byte, so plan_sleeper_all
+and every test that reads it directly are unchanged.  build.PAYLOAD_LENGTH is not touched.
+
+WIRING INTO THE GRID (branch wire-payload-length, deviation D-v3-3 continued).  The planner
+staying at `length = None` left the benign-corpus gate certifying an attacker the grid did
+not run: v3/attackers.py (T7, the scripted menu and the best-response menu) and v3/rollout.py
+(T12, the future placement and the planted particle) built every SleeperPayload straight from
+plan_sleeper_all / this module's constructor, so every payload the grid actually wrote was
+still v2's L = 63.  `with_default_length` is now the one call each of those three entry
+points makes on a freshly planned SleeperPayload before it reaches a Placement or an episode,
+drawing L from `default_length_background()` (v3's own drift on dev, the same population
+v3/benign.py's gate certifies against) seeded by `DEFAULT_LENGTH_SEED` (T24's SEED,
+`analysis.benign_corpus.SEED`) and the placement's own coordinates -- so the draw is a pure
+function of (placement, background, seed), reproducible across runs and independent of call
+order.  v3/agent.py's V2_COMPAT path never calls it: it builds through v2's build.inject
+directly (tests/v3/test_infra_v2_compat.py), so it stays fixed at L = 63.
 
 Stdlib only; imports v2, never patches it.
 """
 from __future__ import annotations
 
+import functools
 import random
 import statistics
 from dataclasses import dataclass, replace
@@ -55,6 +70,7 @@ from dataclasses import dataclass, replace
 import build
 import prose_world
 import retrieval
+from analysis import benign_corpus as _benign_corpus_v2
 from core import CARRIERS, CarrierStore, Item, PoisonSpec, Workflow, seed_of
 
 # ---------------------------------------------------------------------------------------
@@ -214,6 +230,36 @@ def draw_length(lengths, sleeper: SleeperPayload, seed: int) -> int:
     rng = random.Random(seed_of(seed, "v3-payload-length", sleeper.wf_id, sleeper.carrier,
                                 sleeper.iota, sleeper.sigma, sleeper.epsilon))
     return rng.choice(xs)
+
+
+# ---------------------------------------------------------------------------------------
+# Wiring D-v3-3 into the grid (branch wire-payload-length): the default background and seed,
+# and the one call every grid entry point makes before a SleeperPayload reaches a Placement.
+# ---------------------------------------------------------------------------------------
+
+#: T24's seed, unchanged (analysis.benign_corpus.SEED): the draw stays reproducible and
+#: matches the benign-corpus gate's own draw byte for byte at the same coordinates.
+DEFAULT_LENGTH_SEED = _benign_corpus_v2.SEED
+
+
+@functools.lru_cache(maxsize=1)
+def default_length_background() -> tuple:
+    """The background the grid draws payload length from by default: v3's own drift on
+    dev (v3/benign.py's `length_background(dev_runs())`), the same population the P3
+    benign-corpus gate certifies against.  Imported locally (v3.benign imports
+    v3.attackers, which imports this module) so the cycle never forms at module load;
+    cached once per process since dev_runs() replays every dev workflow twice."""
+    from v3 import benign as _benign
+    return tuple(_benign.length_background(_benign.dev_runs()))
+
+
+def with_default_length(sp: SleeperPayload) -> SleeperPayload:
+    """`sp` with its payload length drawn from `default_length_background()`, seeded by
+    `DEFAULT_LENGTH_SEED` and `sp`'s own coordinates (module docstring, WIRING INTO THE
+    GRID).  v3/attackers.py and v3/rollout.py call this on every SleeperPayload they plan
+    before it reaches a Placement or an episode, so the grid runs the same drawn-length
+    attacker the benign-corpus gate certifies.  V2_COMPAT never calls it."""
+    return sp.at_length(draw_length(default_length_background(), sp, DEFAULT_LENGTH_SEED))
 
 
 def payload_length_reason_at(topic, L: int) -> str | None:

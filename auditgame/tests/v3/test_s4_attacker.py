@@ -166,7 +166,10 @@ class TestS4Attacker(unittest.TestCase):
                         self.assertIsNone(pl)
                         continue
                     i = {"first": 0, "mid": len(cands) // 2, "last": len(cands) - 1}[att.iota_rule]
-                    self.assertEqual(pl.payloads, (cands[i],), (name, wf.wf_id, d))
+                    # wire-payload-length: att.plan draws the payload's length (T24) before
+                    # handing it back, so cands[i] (still length=None) needs the same draw.
+                    self.assertEqual(pl.payloads, (P.with_default_length(cands[i]),),
+                                     (name, wf.wf_id, d))
                     self.assertEqual(pl.channel, att.channel)
                     n_plans += 1
         self.assertGreater(n_plans, 5000)
@@ -322,9 +325,15 @@ class TestS4Attacker(unittest.TestCase):
                     self.assertLessEqual(two.epsilon, A.EPS_MAX)
                     self.assertNotEqual(two.payloads[0].item(wf).item_id,
                                         two.payloads[1].item(wf).item_id)
-                    # the second payload is itself a feasible T3 placement
-                    self.assertIn(two.payloads[1],
-                                  P.plan_sleeper_all(wf, two.k[1], d, att.epsilon))
+                    # the second payload is itself a feasible T3 placement (wire-payload-
+                    # length: two.payloads[1] carries a drawn length, T3's candidates don't,
+                    # so compare on the planner's own fields, not the drawn length)
+                    cand2 = next(p for p in P.plan_sleeper_all(wf, two.k[1], d, att.epsilon)
+                                if p.sigma == two.payloads[1].sigma)
+                    self.assertEqual(
+                        (cand2.iota, cand2.sigma, cand2.epsilon, cand2.marker, cand2.topic),
+                        (two.payloads[1].iota, two.payloads[1].sigma, two.payloads[1].epsilon,
+                         two.payloads[1].marker, two.payloads[1].topic))
                 menu2 = A.br_menu(wf, d, _SEED2)
                 menu1 = A.br_menu(wf, d)
                 self.assertTrue(all(len(pl.k) == 2 and pl.within_budget(_SEED2) for pl in menu2))
