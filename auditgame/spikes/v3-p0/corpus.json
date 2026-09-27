@@ -1,0 +1,1532 @@
+{
+ "what": "sentinel-v3.md C14: fresh eval split built with corpus_v2's builder (P0 check)",
+ "v2": {
+  "families": [
+   "astropy/astropy",
+   "caddyserver/caddy",
+   "django/django",
+   "fastlane/fastlane",
+   "fluent/fluentd",
+   "laravel/framework",
+   "matplotlib/matplotlib",
+   "phpoffice/phpspreadsheet",
+   "preactjs/preact",
+   "projectlombok/lombok",
+   "pydata/xarray",
+   "pytest-dev/pytest",
+   "rubocop/rubocop",
+   "scikit-learn/scikit-learn",
+   "sharkdp/bat",
+   "sphinx-doc/sphinx",
+   "sympy/sympy"
+  ],
+  "eval_kish": 8.1,
+  "eval_workflows": 57,
+  "eval_families": 16,
+  "multilingual_families_touched": {
+   "caddyserver/caddy": 14,
+   "fastlane/fastlane": 7,
+   "fluent/fluentd": 12,
+   "laravel/framework": 13,
+   "phpoffice/phpspreadsheet": 10,
+   "preactjs/preact": 17,
+   "projectlombok/lombok": 17,
+   "rubocop/rubocop": 16,
+   "sharkdp/bat": 8
+  },
+  "multilingual_families_with_14_plus": {
+   "caddyserver/caddy": 14,
+   "preactjs/preact": 17,
+   "projectlombok/lombok": 17,
+   "rubocop/rubocop": 16
+  }
+ },
+ "fresh_families": {
+  "pylint-dev/pylint": {
+   "pool": "full",
+   "instances": 57,
+   "language": "Python"
+  },
+  "psf/requests": {
+   "pool": "full",
+   "instances": 44,
+   "language": "Python"
+  },
+  "mwaskom/seaborn": {
+   "pool": "full",
+   "instances": 22,
+   "language": "Python"
+  },
+  "redis/redis": {
+   "pool": "multilingual",
+   "instances": 12,
+   "language": "C"
+  },
+  "fmtlib/fmt": {
+   "pool": "multilingual",
+   "instances": 11,
+   "language": "C++"
+  },
+  "pallets/flask": {
+   "pool": "full",
+   "instances": 11,
+   "language": "Python"
+  },
+  "briannesbitt/carbon": {
+   "pool": "multilingual",
+   "instances": 10,
+   "language": "PHP"
+  },
+  "php-cs-fixer/php-cs-fixer": {
+   "pool": "multilingual",
+   "instances": 10,
+   "language": "PHP"
+  },
+  "apache/lucene": {
+   "pool": "multilingual",
+   "instances": 9,
+   "language": "Java"
+  },
+  "google/gson": {
+   "pool": "multilingual",
+   "instances": 9,
+   "language": "Java"
+  },
+  "jqlang/jq": {
+   "pool": "multilingual",
+   "instances": 9,
+   "language": "C"
+  },
+  "tokio-rs/tokio": {
+   "pool": "multilingual",
+   "instances": 9,
+   "language": "Rust"
+  },
+  "gin-gonic/gin": {
+   "pool": "multilingual",
+   "instances": 8,
+   "language": "Go"
+  },
+  "prometheus/prometheus": {
+   "pool": "multilingual",
+   "instances": 8,
+   "language": "Go"
+  },
+  "astral-sh/ruff": {
+   "pool": "multilingual",
+   "instances": 7,
+   "language": "Rust"
+  },
+  "gohugoio/hugo": {
+   "pool": "multilingual",
+   "instances": 7,
+   "language": "Go"
+  },
+  "tokio-rs/axum": {
+   "pool": "multilingual",
+   "instances": 7,
+   "language": "Rust"
+  },
+  "axios/axios": {
+   "pool": "multilingual",
+   "instances": 6,
+   "language": "JavaScript"
+  }
+ },
+ "languages": {
+  "Python": 4,
+  "Java": 2,
+  "Rust": 3,
+  "JavaScript": 1,
+  "PHP": 2,
+  "C++": 1,
+  "Go": 3,
+  "C": 2
+ },
+ "builder_seed": 2027,
+ "summary": {
+  "two_pass": {
+   "workflows": 36,
+   "families": 18,
+   "kish": 6.48,
+   "top2_share": 0.528,
+   "by_family": {
+    "pylint-dev/pylint": 10,
+    "psf/requests": 9,
+    "mwaskom/seaborn": 2,
+    "apache/lucene": 1,
+    "astral-sh/ruff": 1,
+    "axios/axios": 1,
+    "briannesbitt/carbon": 1,
+    "fmtlib/fmt": 1,
+    "gin-gonic/gin": 1,
+    "gohugoio/hugo": 1,
+    "google/gson": 1,
+    "jqlang/jq": 1,
+    "pallets/flask": 1,
+    "php-cs-fixer/php-cs-fixer": 1,
+    "prometheus/prometheus": 1,
+    "redis/redis": 1,
+    "tokio-rs/axum": 1,
+    "tokio-rs/tokio": 1
+   },
+   "python_workflows": 22,
+   "H": [
+    6,
+    6,
+    7,
+    7,
+    7,
+    7,
+    7,
+    8,
+    8,
+    8,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    11,
+    11,
+    12,
+    12,
+    13,
+    14,
+    14,
+    14,
+    14
+   ],
+   "rules": {
+    "H = family size": 14,
+    "v2 builder": 22
+   },
+   "per_delta": {
+    "0": {
+     "workflows": 36,
+     "families": 18,
+     "kish": 6.48,
+     "step4_topic_pair": 36
+    },
+    "1": {
+     "workflows": 36,
+     "families": 18,
+     "kish": 6.48,
+     "step4_topic_pair": 30
+    },
+    "2": {
+     "workflows": 36,
+     "families": 18,
+     "kish": 6.48,
+     "step4_topic_pair": 24
+    },
+    "4": {
+     "workflows": 36,
+     "families": 18,
+     "kish": 6.48,
+     "step4_topic_pair": 25
+    },
+    "8": {
+     "workflows": 26,
+     "families": 12,
+     "kish": 5.37,
+     "step4_topic_pair": 14
+    }
+   },
+   "hosting_every_delta": {
+    "workflows": 26,
+    "families": 12,
+    "kish": 5.37,
+    "dropped_families": [
+     "astral-sh/ruff",
+     "axios/axios",
+     "gin-gonic/gin",
+     "gohugoio/hugo",
+     "prometheus/prometheus",
+     "tokio-rs/axum"
+    ]
+   },
+   "seed_scan": {
+    "seeds": "1..500",
+    "workflows": {
+     "min": 32,
+     "median": 37.0,
+     "max": 42
+    },
+    "kish": {
+     "min": 5.78,
+     "median": 7.17,
+     "max": 8.94
+    }
+   }
+  },
+  "one_pass": {
+   "workflows": 26,
+   "families": 18,
+   "kish": 10.24,
+   "top2_share": 0.385,
+   "by_family": {
+    "psf/requests": 5,
+    "pylint-dev/pylint": 5,
+    "apache/lucene": 1,
+    "astral-sh/ruff": 1,
+    "axios/axios": 1,
+    "briannesbitt/carbon": 1,
+    "fmtlib/fmt": 1,
+    "gin-gonic/gin": 1,
+    "gohugoio/hugo": 1,
+    "google/gson": 1,
+    "jqlang/jq": 1,
+    "mwaskom/seaborn": 1,
+    "pallets/flask": 1,
+    "php-cs-fixer/php-cs-fixer": 1,
+    "prometheus/prometheus": 1,
+    "redis/redis": 1,
+    "tokio-rs/axum": 1,
+    "tokio-rs/tokio": 1
+   },
+   "python_workflows": 12,
+   "H": [
+    6,
+    6,
+    7,
+    7,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    11,
+    12,
+    12,
+    13,
+    14,
+    14
+   ],
+   "rules": {
+    "H = family size": 14,
+    "v2 builder": 12
+   },
+   "per_delta": {
+    "0": {
+     "workflows": 26,
+     "families": 18,
+     "kish": 10.24,
+     "step4_topic_pair": 26
+    },
+    "1": {
+     "workflows": 26,
+     "families": 18,
+     "kish": 10.24,
+     "step4_topic_pair": 21
+    },
+    "2": {
+     "workflows": 26,
+     "families": 18,
+     "kish": 10.24,
+     "step4_topic_pair": 17
+    },
+    "4": {
+     "workflows": 26,
+     "families": 18,
+     "kish": 10.24,
+     "step4_topic_pair": 18
+    },
+    "8": {
+     "workflows": 18,
+     "families": 12,
+     "kish": 7.36,
+     "step4_topic_pair": 9
+    }
+   },
+   "hosting_every_delta": {
+    "workflows": 18,
+    "families": 12,
+    "kish": 7.36,
+    "dropped_families": [
+     "astral-sh/ruff",
+     "axios/axios",
+     "gin-gonic/gin",
+     "gohugoio/hugo",
+     "prometheus/prometheus",
+     "tokio-rs/axum"
+    ]
+   },
+   "seed_scan": {
+    "seeds": "1..500",
+    "workflows": {
+     "min": 24,
+     "median": 26.0,
+     "max": 28
+    },
+    "kish": {
+     "min": 9.0,
+     "median": 10.96,
+     "max": 13.3
+    }
+   }
+  }
+ },
+ "c14b": {
+  "families": 7,
+  "instances": {
+   "astropy/astropy": 73,
+   "matplotlib/matplotlib": 150,
+   "pydata/xarray": 88,
+   "pytest-dev/pytest": 100,
+   "scikit-learn/scikit-learn": 197,
+   "sphinx-doc/sphinx": 143,
+   "sympy/sympy": 311
+  },
+  "instances_total": 1062,
+  "one_pass_workflows": 101
+ },
+ "dev_candidates": {
+  "v2_corpus_families": {
+   "astropy/astropy": 2,
+   "caddyserver/caddy": 2,
+   "django/django": 43,
+   "fastlane/fastlane": 1,
+   "fluent/fluentd": 1,
+   "laravel/framework": 2,
+   "matplotlib/matplotlib": 5,
+   "phpoffice/phpspreadsheet": 1,
+   "preactjs/preact": 2,
+   "projectlombok/lombok": 3,
+   "pydata/xarray": 3,
+   "pytest-dev/pytest": 3,
+   "rubocop/rubocop": 2,
+   "scikit-learn/scikit-learn": 6,
+   "sharkdp/bat": 1,
+   "sphinx-doc/sphinx": 8,
+   "sympy/sympy": 15
+  },
+  "v2_corpus_languages": {
+   "Python": 85,
+   "Go": 2,
+   "Ruby": 4,
+   "PHP": 3,
+   "JavaScript": 2,
+   "Java": 3,
+   "Rust": 1
+  }
+ },
+ "split": {
+  "two_pass": [
+   {
+    "repo": "apache/lucene",
+    "pool": "multilingual",
+    "H": 9,
+    "rule": "H = family size",
+    "instances": [
+     "apache__lucene-11760",
+     "apache__lucene-12022",
+     "apache__lucene-12196",
+     "apache__lucene-12212",
+     "apache__lucene-12626",
+     "apache__lucene-13170",
+     "apache__lucene-13301",
+     "apache__lucene-13494",
+     "apache__lucene-13704"
+    ]
+   },
+   {
+    "repo": "astral-sh/ruff",
+    "pool": "multilingual",
+    "H": 7,
+    "rule": "H = family size",
+    "instances": [
+     "astral-sh__ruff-15309",
+     "astral-sh__ruff-15330",
+     "astral-sh__ruff-15356",
+     "astral-sh__ruff-15394",
+     "astral-sh__ruff-15443",
+     "astral-sh__ruff-15543",
+     "astral-sh__ruff-15626"
+    ]
+   },
+   {
+    "repo": "axios/axios",
+    "pool": "multilingual",
+    "H": 6,
+    "rule": "H = family size",
+    "instances": [
+     "axios__axios-4731",
+     "axios__axios-4738",
+     "axios__axios-5085",
+     "axios__axios-5316",
+     "axios__axios-5892",
+     "axios__axios-6539"
+    ]
+   },
+   {
+    "repo": "briannesbitt/carbon",
+    "pool": "multilingual",
+    "H": 10,
+    "rule": "H = family size",
+    "instances": [
+     "briannesbitt__carbon-2665",
+     "briannesbitt__carbon-2752",
+     "briannesbitt__carbon-2762",
+     "briannesbitt__carbon-2813",
+     "briannesbitt__carbon-2981",
+     "briannesbitt__carbon-3005",
+     "briannesbitt__carbon-3041",
+     "briannesbitt__carbon-3073",
+     "briannesbitt__carbon-3098",
+     "briannesbitt__carbon-3103"
+    ]
+   },
+   {
+    "repo": "fmtlib/fmt",
+    "pool": "multilingual",
+    "H": 11,
+    "rule": "H = family size",
+    "instances": [
+     "fmtlib__fmt-1683",
+     "fmtlib__fmt-2310",
+     "fmtlib__fmt-2317",
+     "fmtlib__fmt-2457",
+     "fmtlib__fmt-3158",
+     "fmtlib__fmt-3248",
+     "fmtlib__fmt-3272",
+     "fmtlib__fmt-3729",
+     "fmtlib__fmt-3750",
+     "fmtlib__fmt-3863",
+     "fmtlib__fmt-3901"
+    ]
+   },
+   {
+    "repo": "gin-gonic/gin",
+    "pool": "multilingual",
+    "H": 8,
+    "rule": "H = family size",
+    "instances": [
+     "gin-gonic__gin-1805",
+     "gin-gonic__gin-1957",
+     "gin-gonic__gin-2121",
+     "gin-gonic__gin-2755",
+     "gin-gonic__gin-3227",
+     "gin-gonic__gin-3741",
+     "gin-gonic__gin-3820",
+     "gin-gonic__gin-4003"
+    ]
+   },
+   {
+    "repo": "gohugoio/hugo",
+    "pool": "multilingual",
+    "H": 7,
+    "rule": "H = family size",
+    "instances": [
+     "gohugoio__hugo-12171",
+     "gohugoio__hugo-12204",
+     "gohugoio__hugo-12343",
+     "gohugoio__hugo-12448",
+     "gohugoio__hugo-12562",
+     "gohugoio__hugo-12579",
+     "gohugoio__hugo-12768"
+    ]
+   },
+   {
+    "repo": "google/gson",
+    "pool": "multilingual",
+    "H": 9,
+    "rule": "H = family size",
+    "instances": [
+     "google__gson-1014",
+     "google__gson-1093",
+     "google__gson-1100",
+     "google__gson-2024",
+     "google__gson-2061",
+     "google__gson-2134",
+     "google__gson-2158",
+     "google__gson-2311",
+     "google__gson-2479"
+    ]
+   },
+   {
+    "repo": "jqlang/jq",
+    "pool": "multilingual",
+    "H": 9,
+    "rule": "H = family size",
+    "instances": [
+     "jqlang__jq-2235",
+     "jqlang__jq-2598",
+     "jqlang__jq-2650",
+     "jqlang__jq-2658",
+     "jqlang__jq-2681",
+     "jqlang__jq-2728",
+     "jqlang__jq-2750",
+     "jqlang__jq-2839",
+     "jqlang__jq-2919"
+    ]
+   },
+   {
+    "repo": "mwaskom/seaborn",
+    "pool": "full",
+    "H": 14,
+    "rule": "v2 builder",
+    "instances": [
+     "mwaskom__seaborn-2389",
+     "mwaskom__seaborn-2457",
+     "mwaskom__seaborn-2576",
+     "mwaskom__seaborn-2766",
+     "mwaskom__seaborn-2813",
+     "mwaskom__seaborn-2846",
+     "mwaskom__seaborn-2848",
+     "mwaskom__seaborn-2853",
+     "mwaskom__seaborn-2946",
+     "mwaskom__seaborn-2979",
+     "mwaskom__seaborn-2996",
+     "mwaskom__seaborn-3010",
+     "mwaskom__seaborn-3069",
+     "mwaskom__seaborn-3180"
+    ]
+   },
+   {
+    "repo": "mwaskom/seaborn",
+    "pool": "full",
+    "H": 14,
+    "rule": "v2 builder",
+    "instances": [
+     "mwaskom__seaborn-2766",
+     "mwaskom__seaborn-2813",
+     "mwaskom__seaborn-2846",
+     "mwaskom__seaborn-2848",
+     "mwaskom__seaborn-2853",
+     "mwaskom__seaborn-2946",
+     "mwaskom__seaborn-2979",
+     "mwaskom__seaborn-2996",
+     "mwaskom__seaborn-3010",
+     "mwaskom__seaborn-3069",
+     "mwaskom__seaborn-3180",
+     "mwaskom__seaborn-3187",
+     "mwaskom__seaborn-3190",
+     "mwaskom__seaborn-3202"
+    ]
+   },
+   {
+    "repo": "pallets/flask",
+    "pool": "full",
+    "H": 10,
+    "rule": "v2 builder",
+    "instances": [
+     "pallets__flask-4045",
+     "pallets__flask-4074",
+     "pallets__flask-4160",
+     "pallets__flask-4169",
+     "pallets__flask-4544",
+     "pallets__flask-4575",
+     "pallets__flask-4642",
+     "pallets__flask-4935",
+     "pallets__flask-4992",
+     "pallets__flask-5014"
+    ]
+   },
+   {
+    "repo": "php-cs-fixer/php-cs-fixer",
+    "pool": "multilingual",
+    "H": 10,
+    "rule": "H = family size",
+    "instances": [
+     "php-cs-fixer__php-cs-fixer-7523",
+     "php-cs-fixer__php-cs-fixer-7635",
+     "php-cs-fixer__php-cs-fixer-7663",
+     "php-cs-fixer__php-cs-fixer-7875",
+     "php-cs-fixer__php-cs-fixer-7998",
+     "php-cs-fixer__php-cs-fixer-8064",
+     "php-cs-fixer__php-cs-fixer-8075",
+     "php-cs-fixer__php-cs-fixer-8256",
+     "php-cs-fixer__php-cs-fixer-8331",
+     "php-cs-fixer__php-cs-fixer-8367"
+    ]
+   },
+   {
+    "repo": "prometheus/prometheus",
+    "pool": "multilingual",
+    "H": 8,
+    "rule": "H = family size",
+    "instances": [
+     "prometheus__prometheus-9248",
+     "prometheus__prometheus-10633",
+     "prometheus__prometheus-10720",
+     "prometheus__prometheus-11859",
+     "prometheus__prometheus-12874",
+     "prometheus__prometheus-13845",
+     "prometheus__prometheus-14861",
+     "prometheus__prometheus-15142"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 13,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-774",
+     "psf__requests-863",
+     "psf__requests-1142",
+     "psf__requests-1327",
+     "psf__requests-1339",
+     "psf__requests-1376",
+     "psf__requests-1537",
+     "psf__requests-1635",
+     "psf__requests-1657",
+     "psf__requests-1689",
+     "psf__requests-1713",
+     "psf__requests-1724",
+     "psf__requests-1733"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 7,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-1766",
+     "psf__requests-1768",
+     "psf__requests-1776",
+     "psf__requests-1888",
+     "psf__requests-1921",
+     "psf__requests-1944",
+     "psf__requests-1962"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 6,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-1963",
+     "psf__requests-2148",
+     "psf__requests-2153",
+     "psf__requests-2193",
+     "psf__requests-2317",
+     "psf__requests-2393"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 9,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-2413",
+     "psf__requests-2466",
+     "psf__requests-2617",
+     "psf__requests-2674",
+     "psf__requests-2678",
+     "psf__requests-2754",
+     "psf__requests-2821",
+     "psf__requests-2873",
+     "psf__requests-2931"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 9,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-3362",
+     "psf__requests-3718",
+     "psf__requests-3738",
+     "psf__requests-4106",
+     "psf__requests-4356",
+     "psf__requests-4718",
+     "psf__requests-5087",
+     "psf__requests-5414",
+     "psf__requests-6028"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 10,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-1327",
+     "psf__requests-1339",
+     "psf__requests-1376",
+     "psf__requests-1537",
+     "psf__requests-1635",
+     "psf__requests-1657",
+     "psf__requests-1689",
+     "psf__requests-1713",
+     "psf__requests-1724",
+     "psf__requests-1733"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 9,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-1766",
+     "psf__requests-1768",
+     "psf__requests-1776",
+     "psf__requests-1888",
+     "psf__requests-1921",
+     "psf__requests-1944",
+     "psf__requests-1962",
+     "psf__requests-1963",
+     "psf__requests-2148"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 11,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-2153",
+     "psf__requests-2193",
+     "psf__requests-2317",
+     "psf__requests-2393",
+     "psf__requests-2413",
+     "psf__requests-2466",
+     "psf__requests-2617",
+     "psf__requests-2674",
+     "psf__requests-2678",
+     "psf__requests-2754",
+     "psf__requests-2821"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 9,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-2873",
+     "psf__requests-2931",
+     "psf__requests-3362",
+     "psf__requests-3718",
+     "psf__requests-3738",
+     "psf__requests-4106",
+     "psf__requests-4356",
+     "psf__requests-4718",
+     "psf__requests-5087"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 14,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-4175",
+     "pylint-dev__pylint-4330",
+     "pylint-dev__pylint-4339",
+     "pylint-dev__pylint-4398",
+     "pylint-dev__pylint-4421",
+     "pylint-dev__pylint-4492",
+     "pylint-dev__pylint-4516",
+     "pylint-dev__pylint-4551",
+     "pylint-dev__pylint-4604",
+     "pylint-dev__pylint-4661",
+     "pylint-dev__pylint-4669",
+     "pylint-dev__pylint-4703",
+     "pylint-dev__pylint-4812",
+     "pylint-dev__pylint-4858"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 10,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-4970",
+     "pylint-dev__pylint-5136",
+     "pylint-dev__pylint-5175",
+     "pylint-dev__pylint-5201",
+     "pylint-dev__pylint-5231",
+     "pylint-dev__pylint-5446",
+     "pylint-dev__pylint-5595",
+     "pylint-dev__pylint-5613",
+     "pylint-dev__pylint-5730",
+     "pylint-dev__pylint-5743"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 10,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-5839",
+     "pylint-dev__pylint-5859",
+     "pylint-dev__pylint-5951",
+     "pylint-dev__pylint-6059",
+     "pylint-dev__pylint-6196",
+     "pylint-dev__pylint-6357",
+     "pylint-dev__pylint-6358",
+     "pylint-dev__pylint-6386",
+     "pylint-dev__pylint-6412",
+     "pylint-dev__pylint-6506"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 10,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-6517",
+     "pylint-dev__pylint-6526",
+     "pylint-dev__pylint-6528",
+     "pylint-dev__pylint-6556",
+     "pylint-dev__pylint-6820",
+     "pylint-dev__pylint-6903",
+     "pylint-dev__pylint-6937",
+     "pylint-dev__pylint-7080",
+     "pylint-dev__pylint-7097",
+     "pylint-dev__pylint-7114"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 12,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-7228",
+     "pylint-dev__pylint-7277",
+     "pylint-dev__pylint-7993",
+     "pylint-dev__pylint-8124",
+     "pylint-dev__pylint-8169",
+     "pylint-dev__pylint-8281",
+     "pylint-dev__pylint-8312",
+     "pylint-dev__pylint-8683",
+     "pylint-dev__pylint-8757",
+     "pylint-dev__pylint-8799",
+     "pylint-dev__pylint-8819",
+     "pylint-dev__pylint-8898"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 8,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-4398",
+     "pylint-dev__pylint-4421",
+     "pylint-dev__pylint-4492",
+     "pylint-dev__pylint-4516",
+     "pylint-dev__pylint-4551",
+     "pylint-dev__pylint-4604",
+     "pylint-dev__pylint-4661",
+     "pylint-dev__pylint-4669"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 14,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-4703",
+     "pylint-dev__pylint-4812",
+     "pylint-dev__pylint-4858",
+     "pylint-dev__pylint-4970",
+     "pylint-dev__pylint-5136",
+     "pylint-dev__pylint-5175",
+     "pylint-dev__pylint-5201",
+     "pylint-dev__pylint-5231",
+     "pylint-dev__pylint-5446",
+     "pylint-dev__pylint-5595",
+     "pylint-dev__pylint-5613",
+     "pylint-dev__pylint-5730",
+     "pylint-dev__pylint-5743",
+     "pylint-dev__pylint-5839"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 9,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-5859",
+     "pylint-dev__pylint-5951",
+     "pylint-dev__pylint-6059",
+     "pylint-dev__pylint-6196",
+     "pylint-dev__pylint-6357",
+     "pylint-dev__pylint-6358",
+     "pylint-dev__pylint-6386",
+     "pylint-dev__pylint-6412",
+     "pylint-dev__pylint-6506"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 10,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-6517",
+     "pylint-dev__pylint-6526",
+     "pylint-dev__pylint-6528",
+     "pylint-dev__pylint-6556",
+     "pylint-dev__pylint-6820",
+     "pylint-dev__pylint-6903",
+     "pylint-dev__pylint-6937",
+     "pylint-dev__pylint-7080",
+     "pylint-dev__pylint-7097",
+     "pylint-dev__pylint-7114"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 7,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-7228",
+     "pylint-dev__pylint-7277",
+     "pylint-dev__pylint-7993",
+     "pylint-dev__pylint-8124",
+     "pylint-dev__pylint-8169",
+     "pylint-dev__pylint-8281",
+     "pylint-dev__pylint-8312"
+    ]
+   },
+   {
+    "repo": "redis/redis",
+    "pool": "multilingual",
+    "H": 12,
+    "rule": "H = family size",
+    "instances": [
+     "redis__redis-9733",
+     "redis__redis-10068",
+     "redis__redis-10095",
+     "redis__redis-10764",
+     "redis__redis-11279",
+     "redis__redis-11510",
+     "redis__redis-11631",
+     "redis__redis-11734",
+     "redis__redis-12272",
+     "redis__redis-12472",
+     "redis__redis-13115",
+     "redis__redis-13338"
+    ]
+   },
+   {
+    "repo": "tokio-rs/axum",
+    "pool": "multilingual",
+    "H": 7,
+    "rule": "H = family size",
+    "instances": [
+     "tokio-rs__axum-682",
+     "tokio-rs__axum-691",
+     "tokio-rs__axum-734",
+     "tokio-rs__axum-1119",
+     "tokio-rs__axum-1730",
+     "tokio-rs__axum-1934",
+     "tokio-rs__axum-2096"
+    ]
+   },
+   {
+    "repo": "tokio-rs/tokio",
+    "pool": "multilingual",
+    "H": 9,
+    "rule": "H = family size",
+    "instances": [
+     "tokio-rs__tokio-4384",
+     "tokio-rs__tokio-4867",
+     "tokio-rs__tokio-4898",
+     "tokio-rs__tokio-6551",
+     "tokio-rs__tokio-6603",
+     "tokio-rs__tokio-6724",
+     "tokio-rs__tokio-6752",
+     "tokio-rs__tokio-6838",
+     "tokio-rs__tokio-7139"
+    ]
+   }
+  ],
+  "one_pass": [
+   {
+    "repo": "apache/lucene",
+    "pool": "multilingual",
+    "H": 9,
+    "rule": "H = family size",
+    "instances": [
+     "apache__lucene-11760",
+     "apache__lucene-12022",
+     "apache__lucene-12196",
+     "apache__lucene-12212",
+     "apache__lucene-12626",
+     "apache__lucene-13170",
+     "apache__lucene-13301",
+     "apache__lucene-13494",
+     "apache__lucene-13704"
+    ]
+   },
+   {
+    "repo": "astral-sh/ruff",
+    "pool": "multilingual",
+    "H": 7,
+    "rule": "H = family size",
+    "instances": [
+     "astral-sh__ruff-15309",
+     "astral-sh__ruff-15330",
+     "astral-sh__ruff-15356",
+     "astral-sh__ruff-15394",
+     "astral-sh__ruff-15443",
+     "astral-sh__ruff-15543",
+     "astral-sh__ruff-15626"
+    ]
+   },
+   {
+    "repo": "axios/axios",
+    "pool": "multilingual",
+    "H": 6,
+    "rule": "H = family size",
+    "instances": [
+     "axios__axios-4731",
+     "axios__axios-4738",
+     "axios__axios-5085",
+     "axios__axios-5316",
+     "axios__axios-5892",
+     "axios__axios-6539"
+    ]
+   },
+   {
+    "repo": "briannesbitt/carbon",
+    "pool": "multilingual",
+    "H": 10,
+    "rule": "H = family size",
+    "instances": [
+     "briannesbitt__carbon-2665",
+     "briannesbitt__carbon-2752",
+     "briannesbitt__carbon-2762",
+     "briannesbitt__carbon-2813",
+     "briannesbitt__carbon-2981",
+     "briannesbitt__carbon-3005",
+     "briannesbitt__carbon-3041",
+     "briannesbitt__carbon-3073",
+     "briannesbitt__carbon-3098",
+     "briannesbitt__carbon-3103"
+    ]
+   },
+   {
+    "repo": "fmtlib/fmt",
+    "pool": "multilingual",
+    "H": 11,
+    "rule": "H = family size",
+    "instances": [
+     "fmtlib__fmt-1683",
+     "fmtlib__fmt-2310",
+     "fmtlib__fmt-2317",
+     "fmtlib__fmt-2457",
+     "fmtlib__fmt-3158",
+     "fmtlib__fmt-3248",
+     "fmtlib__fmt-3272",
+     "fmtlib__fmt-3729",
+     "fmtlib__fmt-3750",
+     "fmtlib__fmt-3863",
+     "fmtlib__fmt-3901"
+    ]
+   },
+   {
+    "repo": "gin-gonic/gin",
+    "pool": "multilingual",
+    "H": 8,
+    "rule": "H = family size",
+    "instances": [
+     "gin-gonic__gin-1805",
+     "gin-gonic__gin-1957",
+     "gin-gonic__gin-2121",
+     "gin-gonic__gin-2755",
+     "gin-gonic__gin-3227",
+     "gin-gonic__gin-3741",
+     "gin-gonic__gin-3820",
+     "gin-gonic__gin-4003"
+    ]
+   },
+   {
+    "repo": "gohugoio/hugo",
+    "pool": "multilingual",
+    "H": 7,
+    "rule": "H = family size",
+    "instances": [
+     "gohugoio__hugo-12171",
+     "gohugoio__hugo-12204",
+     "gohugoio__hugo-12343",
+     "gohugoio__hugo-12448",
+     "gohugoio__hugo-12562",
+     "gohugoio__hugo-12579",
+     "gohugoio__hugo-12768"
+    ]
+   },
+   {
+    "repo": "google/gson",
+    "pool": "multilingual",
+    "H": 9,
+    "rule": "H = family size",
+    "instances": [
+     "google__gson-1014",
+     "google__gson-1093",
+     "google__gson-1100",
+     "google__gson-2024",
+     "google__gson-2061",
+     "google__gson-2134",
+     "google__gson-2158",
+     "google__gson-2311",
+     "google__gson-2479"
+    ]
+   },
+   {
+    "repo": "jqlang/jq",
+    "pool": "multilingual",
+    "H": 9,
+    "rule": "H = family size",
+    "instances": [
+     "jqlang__jq-2235",
+     "jqlang__jq-2598",
+     "jqlang__jq-2650",
+     "jqlang__jq-2658",
+     "jqlang__jq-2681",
+     "jqlang__jq-2728",
+     "jqlang__jq-2750",
+     "jqlang__jq-2839",
+     "jqlang__jq-2919"
+    ]
+   },
+   {
+    "repo": "mwaskom/seaborn",
+    "pool": "full",
+    "H": 14,
+    "rule": "v2 builder",
+    "instances": [
+     "mwaskom__seaborn-2389",
+     "mwaskom__seaborn-2457",
+     "mwaskom__seaborn-2576",
+     "mwaskom__seaborn-2766",
+     "mwaskom__seaborn-2813",
+     "mwaskom__seaborn-2846",
+     "mwaskom__seaborn-2848",
+     "mwaskom__seaborn-2853",
+     "mwaskom__seaborn-2946",
+     "mwaskom__seaborn-2979",
+     "mwaskom__seaborn-2996",
+     "mwaskom__seaborn-3010",
+     "mwaskom__seaborn-3069",
+     "mwaskom__seaborn-3180"
+    ]
+   },
+   {
+    "repo": "pallets/flask",
+    "pool": "full",
+    "H": 10,
+    "rule": "v2 builder",
+    "instances": [
+     "pallets__flask-4045",
+     "pallets__flask-4074",
+     "pallets__flask-4160",
+     "pallets__flask-4169",
+     "pallets__flask-4544",
+     "pallets__flask-4575",
+     "pallets__flask-4642",
+     "pallets__flask-4935",
+     "pallets__flask-4992",
+     "pallets__flask-5014"
+    ]
+   },
+   {
+    "repo": "php-cs-fixer/php-cs-fixer",
+    "pool": "multilingual",
+    "H": 10,
+    "rule": "H = family size",
+    "instances": [
+     "php-cs-fixer__php-cs-fixer-7523",
+     "php-cs-fixer__php-cs-fixer-7635",
+     "php-cs-fixer__php-cs-fixer-7663",
+     "php-cs-fixer__php-cs-fixer-7875",
+     "php-cs-fixer__php-cs-fixer-7998",
+     "php-cs-fixer__php-cs-fixer-8064",
+     "php-cs-fixer__php-cs-fixer-8075",
+     "php-cs-fixer__php-cs-fixer-8256",
+     "php-cs-fixer__php-cs-fixer-8331",
+     "php-cs-fixer__php-cs-fixer-8367"
+    ]
+   },
+   {
+    "repo": "prometheus/prometheus",
+    "pool": "multilingual",
+    "H": 8,
+    "rule": "H = family size",
+    "instances": [
+     "prometheus__prometheus-9248",
+     "prometheus__prometheus-10633",
+     "prometheus__prometheus-10720",
+     "prometheus__prometheus-11859",
+     "prometheus__prometheus-12874",
+     "prometheus__prometheus-13845",
+     "prometheus__prometheus-14861",
+     "prometheus__prometheus-15142"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 13,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-774",
+     "psf__requests-863",
+     "psf__requests-1142",
+     "psf__requests-1327",
+     "psf__requests-1339",
+     "psf__requests-1376",
+     "psf__requests-1537",
+     "psf__requests-1635",
+     "psf__requests-1657",
+     "psf__requests-1689",
+     "psf__requests-1713",
+     "psf__requests-1724",
+     "psf__requests-1733"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 7,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-1766",
+     "psf__requests-1768",
+     "psf__requests-1776",
+     "psf__requests-1888",
+     "psf__requests-1921",
+     "psf__requests-1944",
+     "psf__requests-1962"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 6,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-1963",
+     "psf__requests-2148",
+     "psf__requests-2153",
+     "psf__requests-2193",
+     "psf__requests-2317",
+     "psf__requests-2393"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 9,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-2413",
+     "psf__requests-2466",
+     "psf__requests-2617",
+     "psf__requests-2674",
+     "psf__requests-2678",
+     "psf__requests-2754",
+     "psf__requests-2821",
+     "psf__requests-2873",
+     "psf__requests-2931"
+    ]
+   },
+   {
+    "repo": "psf/requests",
+    "pool": "full",
+    "H": 9,
+    "rule": "v2 builder",
+    "instances": [
+     "psf__requests-3362",
+     "psf__requests-3718",
+     "psf__requests-3738",
+     "psf__requests-4106",
+     "psf__requests-4356",
+     "psf__requests-4718",
+     "psf__requests-5087",
+     "psf__requests-5414",
+     "psf__requests-6028"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 14,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-4175",
+     "pylint-dev__pylint-4330",
+     "pylint-dev__pylint-4339",
+     "pylint-dev__pylint-4398",
+     "pylint-dev__pylint-4421",
+     "pylint-dev__pylint-4492",
+     "pylint-dev__pylint-4516",
+     "pylint-dev__pylint-4551",
+     "pylint-dev__pylint-4604",
+     "pylint-dev__pylint-4661",
+     "pylint-dev__pylint-4669",
+     "pylint-dev__pylint-4703",
+     "pylint-dev__pylint-4812",
+     "pylint-dev__pylint-4858"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 10,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-4970",
+     "pylint-dev__pylint-5136",
+     "pylint-dev__pylint-5175",
+     "pylint-dev__pylint-5201",
+     "pylint-dev__pylint-5231",
+     "pylint-dev__pylint-5446",
+     "pylint-dev__pylint-5595",
+     "pylint-dev__pylint-5613",
+     "pylint-dev__pylint-5730",
+     "pylint-dev__pylint-5743"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 10,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-5839",
+     "pylint-dev__pylint-5859",
+     "pylint-dev__pylint-5951",
+     "pylint-dev__pylint-6059",
+     "pylint-dev__pylint-6196",
+     "pylint-dev__pylint-6357",
+     "pylint-dev__pylint-6358",
+     "pylint-dev__pylint-6386",
+     "pylint-dev__pylint-6412",
+     "pylint-dev__pylint-6506"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 10,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-6517",
+     "pylint-dev__pylint-6526",
+     "pylint-dev__pylint-6528",
+     "pylint-dev__pylint-6556",
+     "pylint-dev__pylint-6820",
+     "pylint-dev__pylint-6903",
+     "pylint-dev__pylint-6937",
+     "pylint-dev__pylint-7080",
+     "pylint-dev__pylint-7097",
+     "pylint-dev__pylint-7114"
+    ]
+   },
+   {
+    "repo": "pylint-dev/pylint",
+    "pool": "full",
+    "H": 12,
+    "rule": "v2 builder",
+    "instances": [
+     "pylint-dev__pylint-7228",
+     "pylint-dev__pylint-7277",
+     "pylint-dev__pylint-7993",
+     "pylint-dev__pylint-8124",
+     "pylint-dev__pylint-8169",
+     "pylint-dev__pylint-8281",
+     "pylint-dev__pylint-8312",
+     "pylint-dev__pylint-8683",
+     "pylint-dev__pylint-8757",
+     "pylint-dev__pylint-8799",
+     "pylint-dev__pylint-8819",
+     "pylint-dev__pylint-8898"
+    ]
+   },
+   {
+    "repo": "redis/redis",
+    "pool": "multilingual",
+    "H": 12,
+    "rule": "H = family size",
+    "instances": [
+     "redis__redis-9733",
+     "redis__redis-10068",
+     "redis__redis-10095",
+     "redis__redis-10764",
+     "redis__redis-11279",
+     "redis__redis-11510",
+     "redis__redis-11631",
+     "redis__redis-11734",
+     "redis__redis-12272",
+     "redis__redis-12472",
+     "redis__redis-13115",
+     "redis__redis-13338"
+    ]
+   },
+   {
+    "repo": "tokio-rs/axum",
+    "pool": "multilingual",
+    "H": 7,
+    "rule": "H = family size",
+    "instances": [
+     "tokio-rs__axum-682",
+     "tokio-rs__axum-691",
+     "tokio-rs__axum-734",
+     "tokio-rs__axum-1119",
+     "tokio-rs__axum-1730",
+     "tokio-rs__axum-1934",
+     "tokio-rs__axum-2096"
+    ]
+   },
+   {
+    "repo": "tokio-rs/tokio",
+    "pool": "multilingual",
+    "H": 9,
+    "rule": "H = family size",
+    "instances": [
+     "tokio-rs__tokio-4384",
+     "tokio-rs__tokio-4867",
+     "tokio-rs__tokio-4898",
+     "tokio-rs__tokio-6551",
+     "tokio-rs__tokio-6603",
+     "tokio-rs__tokio-6724",
+     "tokio-rs__tokio-6752",
+     "tokio-rs__tokio-6838",
+     "tokio-rs__tokio-7139"
+    ]
+   }
+  ]
+ }
+}
