@@ -8,7 +8,8 @@ The ceiling is read from analysis/gate2_v2.record(); nothing here can move it.
 
     cd auditgame
     ../.venv/bin/python tools/v3_benign.py            # measure, print, do not write
-    ../.venv/bin/python tools/v3_benign.py --write    # also write the manifest
+    ../.venv/bin/python tools/v3_benign.py --write    # also write the manifest (mode "x":
+                                                      # remove the old one first)
 
 Dev only: v3.benign reads v3.corpus.dev_workflows() and nothing else.
 """
@@ -110,6 +111,17 @@ def run(salts: bool = True) -> dict:
                                      main=_summary(sn),
                                      table=V.feature_table(pn, nn, V.FEATURES)),
     }
+    es, bg = result["features"]["edit_size"], P.length_stats(runs.lengths)
+    result["size_channel"] = dict(
+        distinct_pos=es["distinct_pos"], distinct_neg=es["distinct_neg"],
+        sd_pos=es["sd_pos"], sd_neg=es["sd_neg"], mean_pos=es["mean_pos"],
+        mean_neg=es["mean_neg"], smd=es["smd"], auc_single=es["auc_single"],
+        weight_edit_size=result["main"]["weights_mean"]["edit_size"],
+        weight_size_v2_features=comparisons["v2_features_same_items"]["main"]
+        ["weights_mean"]["size"],
+        background_median=bg["median"], background_mean=bg["mean"],
+        mean_pos_minus_background_median=round(es["mean_pos"] - bg["median"], 4),
+        mean_pos_minus_background_mean=round(es["mean_pos"] - bg["mean"], 4))
     man = dict(what="v3 P3 (T24): benign changes (drift) matched 1:1 to sleeper payloads on "
                     "dev; 4-feature surface discriminator under v2's split protocol",
                protocol=protocol(), corpus=corpus_record(events, runs, dropped),
@@ -133,7 +145,10 @@ def main() -> int:
     print(f"AUC (4 features, {mm['k']} splits): median {mm['auc_median']}, mean "
           f"{mm['auc_mean']}, mean CI95 [{mm['lo_mean']}, {mm['hi_mean']}]; "
           f"{mm['clear']}/{mm['k']} splits clear {V.CEILING}")
-    print(f"floor of the mean upper bound at AUC = 0.5 on this sample: {r['floor_hi']}")
+    print(f"floor of the mean upper bound at AUC = 0.5 on this sample: {r['floor_hi']} "
+          f"(independent, Hanley-McNeil); clustered by workflow: {r['floor_hi_clustered']} "
+          f"(design effect {r['clustered']['ratio_mean']}, "
+          f"events needed {r['clustered'].get('events_needed_clustered')})")
     for c, row in r["features"].items():
         print(f"  {c:17s} single-feature AUC {row['auc_single']:.4f}  smd {row['smd']:+.3f}  "
               f"drop-one hi_mean {r['drop_one'][c]['hi_mean']}")
@@ -148,8 +163,10 @@ def main() -> int:
         print(f"  salt family: {sf['passing']}/{sf['total']} salts pass -> {sf['verdict']}")
     print(f"VERDICT (ceiling {V.CEILING}, {V.CRITERION}): {r['verdict']}")
     if a.write:
-        MANIFEST.write_text(json.dumps(man, indent=1, ensure_ascii=False, sort_keys=True)
-                            + "\n", encoding="utf-8")
+        # mode "x": never overwrite a manifest in place; removing the old one first is the
+        # visible, deliberate step (git shows it as a change of a tracked file).
+        with open(MANIFEST, "x", encoding="utf-8") as fh:
+            fh.write(json.dumps(man, indent=1, ensure_ascii=False, sort_keys=True) + "\n")
         print(f"wrote {MANIFEST.relative_to(ROOT)}")
     return 0
 

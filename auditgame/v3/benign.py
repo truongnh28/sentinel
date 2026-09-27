@@ -386,9 +386,10 @@ def _fit(X: list, y: list, ncol: int, steps: int = 600, lr: float = 0.3) -> tupl
     return w, b
 
 
-def auc_with_ci(pos: list, neg: list, cols, seed: int,
-                test_fraction: float = TEST_FRACTION) -> tuple:
-    """(auc, lo, hi, weights) of one declared split."""
+def _split(pos: list, neg: list, cols, seed: int,
+           test_fraction: float = TEST_FRACTION) -> tuple:
+    """(test-fold scores, test-fold labels, test-fold row indices into pos + neg, weights)
+    of one declared split."""
     cols = tuple(cols)
     rows = [[float(f[c]) for c in cols] for f in pos + neg]
     y = [1.0] * len(pos) + [0.0] * len(neg)
@@ -400,6 +401,13 @@ def auc_with_ci(pos: list, neg: list, cols, seed: int,
     w, b = _fit([X[i] for i in tr], [y[i] for i in tr], len(cols))
     sc = [sum(wj * v for wj, v in zip(w, X[i])) + b for i in te]
     lab = [y[i] for i in te]
+    return sc, lab, te, w
+
+
+def auc_with_ci(pos: list, neg: list, cols, seed: int,
+                test_fraction: float = TEST_FRACTION) -> tuple:
+    """(auc, lo, hi, weights) of one declared split."""
+    sc, lab, _, w = _split(pos, neg, cols, seed, test_fraction)
     a = DSC._auc(sc, lab)
     n_pos = int(sum(lab))
     lo, hi = DSC._hanley_mcneil(a, n_pos, len(lab) - n_pos)
@@ -426,6 +434,111 @@ def floor_hi(n_pos: int, n_neg: int, test_fraction: float = TEST_FRACTION) -> fl
     the lowest mean upper bound the criterion can see on this sample size."""
     fp, fn = round(n_pos * test_fraction), round(n_neg * test_fraction)
     return DSC._hanley_mcneil(0.5, fp, fn)[1]
+
+
+def events_needed(ratio: float = 1.0, ceiling: float = CEILING,
+                  test_fraction: float = TEST_FRACTION, per_event: int = V3_PER_EVENT,
+                  n_max: int = 100000) -> int | None:
+    """The fewest events (per_event controls each) whose floor, scaled by `ratio` (the
+    design effect on the CI half-width; 1 = independent), is <= ceiling.  None when no
+    n <= n_max reaches it (N3: not a number that was not found)."""
+    for n in range(1, n_max + 1):
+        if min(round(n * test_fraction), round(n * per_event * test_fraction)) < 2:
+            continue
+        if 0.5 + (floor_hi(n, n * per_event, test_fraction) - 0.5) * ratio <= ceiling:
+            return n
+    return None
+
+
+# ---------------------------------------------------------------------------------------
+# The clustered floor (T24 step 4): T17's wild cluster bootstrap, clustered by workflow
+# ---------------------------------------------------------------------------------------
+# floor_hi assumes independent items; events and controls cluster by workflow (django
+# holds half of them).  For each split's test fold the AUC is linearised by its DeLong
+# placement values (AUC - theta ~ sum_i (V10_i - AUC) / n1 + sum_j (V01_j - AUC) / n0),
+# and T17's engine (v3.metrics.family_draws with Webb weights, v3.metrics.interval) draws
+# the sum twice on the same seed: once with one weight per WORKFLOW (clustered), once with
+# one weight per ITEM (independent).  The ratio of the two upper half-widths is the design
+# effect on the interval; floor_hi_clustered = 0.5 + (floor_hi - 0.5) * mean ratio over the
+# split seeds.  No new bootstrap: only the statistic fed to T17's draws is new.  numpy
+# comes in with v3.metrics, imported here only.
+
+def _placements(sc: list, lab: list) -> tuple:
+    import numpy as np
+    s, y = np.asarray(sc, dtype=float), np.asarray(lab, dtype=float) > 0.5
+    sp, sn = s[y], s[~y]
+    cmp = (sp[:, None] > sn[None, :]) + 0.5 * (sp[:, None] == sn[None, :])
+    return cmp.mean(1), cmp.mean(0), float(cmp.mean())
+
+
+def clustered_split(sc: list, lab: list, clusters: list, n_boot: int | None = None,
+                    seed: int | None = None) -> dict:
+    """One test fold: AUC, the wild-cluster (by `clusters`) and the per-item wild upper
+    bounds of its 95% interval, and their half-width ratio (None if undefined, N3)."""
+    import numpy as np
+    from v3 import metrics as M
+    n_boot = M.N_BOOT if n_boot is None else n_boot
+    seed = M.BOOT_SEED if seed is None else seed
+    v10, v01, auc = _placements(sc, lab)
+    y = np.asarray(lab, dtype=float) > 0.5
+    e = np.empty(len(lab))
+    e[y] = (v10 - auc) / len(v10)
+    e[~y] = (v01 - auc) / len(v01)
+    names = sorted(set(clusters))
+    ix = {g: i for i, g in enumerate(names)}
+    eg = np.zeros(len(names))
+    np.add.at(eg, [ix[g] for g in clusters], e)
+    F_c = M.family_draws(len(names), n_boot, M.rng_for("wild", seed), "wild")
+    F_i = M.family_draws(len(e), n_boot, M.rng_for("wild", seed), "wild")
+    hi_c = M.interval(auc + F_c @ eg)[1]
+    hi_i = M.interval(auc + F_i @ e)[1]
+    ratio = (hi_c - auc) / (hi_i - auc) if hi_i - auc > 1e-12 else None
+    return dict(auc=auc, hi_clustered=hi_c, hi_independent=hi_i, ratio=ratio,
+                n_clusters=len(names))
+
+
+def clusters_of(events: list) -> tuple:
+    """The workflow of every row of rows_of(events): (pos clusters, neg clusters)."""
+    return ([ev.wf_id for ev in events],
+            [c.wf_id for ev in events for c in ev.controls])
+
+
+def clustered_floor(events: list, cols=FEATURES, seeds=SPLIT_SEEDS) -> dict:
+    """floor_hi_clustered and its ingredients, over the declared split seeds."""
+    from v3 import metrics as M
+    pos, neg = rows_of(events)
+    cp, cn = clusters_of(events)
+    cl = cp + cn
+    per = {}
+    for s in seeds:
+        sc, lab, te, _ = _split(pos, neg, cols, s)
+        per[s] = clustered_split(sc, lab, [cl[i] for i in te])
+    ratios = [v["ratio"] for v in per.values() if v["ratio"] is not None]
+    fh = floor_hi(len(pos), len(neg))
+    out = dict(method="v3.metrics wild (Webb), clustered by workflow; design effect on "
+                      "the CI half-width, DeLong linearisation of the test-fold AUC",
+               n_boot=M.N_BOOT, boot_seed=M.BOOT_SEED,
+               n_workflows=len(set(cl)), floor_hi=round(fh, 4),
+               n_ratio_defined=len(ratios), n_splits=len(per),
+               hi_mean_clustered=round(statistics.fmean(v["hi_clustered"]
+                                                        for v in per.values()), 4),
+               hi_mean_independent_boot=round(statistics.fmean(v["hi_independent"]
+                                                               for v in per.values()), 4),
+               per_seed={s: dict(auc=round(v["auc"], 4), hi_clustered=round(v["hi_clustered"], 4),
+                                 hi_independent=round(v["hi_independent"], 4),
+                                 ratio=None if v["ratio"] is None else round(v["ratio"], 4),
+                                 n_clusters=v["n_clusters"])
+                         for s, v in per.items()})
+    if not ratios:
+        out.update(ratio_mean=None, floor_hi_clustered=None, events_needed_clustered=None,
+                   reason="no split has a defined half-width ratio (independent half-width 0)")
+        return out
+    r = statistics.fmean(ratios)
+    out.update(ratio_mean=round(r, 4),
+               floor_hi_clustered=round(0.5 + (fh - 0.5) * r, 4),
+               events_needed_independent=events_needed(1.0),
+               events_needed_clustered=events_needed(r))
+    return out
 
 
 # ---------------------------------------------------------------------------------------
@@ -464,6 +577,9 @@ def measure(events: list, drop_one: bool = True, per_delta: bool = True) -> dict
     out = dict(n_events=len(events), n_benign=len(neg), main=main, verdict=verdict(main),
                floor_hi=round(floor_hi(len(pos), len(neg)), 4),
                features=feature_table(pos, neg, FEATURES))
+    cf = clustered_floor(events)
+    out["floor_hi_clustered"] = cf["floor_hi_clustered"]
+    out["clustered"] = cf
     if drop_one:
         out["drop_one"] = {}
         for c in FEATURES:
