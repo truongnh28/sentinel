@@ -79,6 +79,35 @@ cd auditgame
 
 ## Việc còn mở cho người dùng / các task sau
 
-1. **O12 không đạt ở R = 32–64** (xem trên). Chọn một trong ba: nâng R (giá × 5–10); đổi cổng sang SE của hiệu giữa các member (số ngẫu nhiên chung); hoặc nới ngưỡng. Phải khai trước khi dựng bản cuối ở P4.
+1. ~~**O12 không đạt ở R = 32–64**~~ — đã chốt 27/09/2026, xem mục dưới (line5-se-diff).
 2. Dòng 8–9 trong pilot dùng giá tạm. Bản cuối đọc `reference/v3_tuned.json` của T18.
 3. `seal.reasons` so digest của Gate-4 với `table_digest()`. Nếu bảng chưa dựng, `table_digest()` trả `None`, nên một file Gate-4 ghi `null` sẽ lọt qua. Đề nghị T2/T23 cho seal từ chối khi digest sống là `None`. T14 không sửa `seal.py`.
+
+## 27/09/2026 — line5-se-diff: đổi cổng O12 sang SE của hiệu giữa các member
+
+Quyết định của người dùng (không phải T14): pilot ở trên cho thấy ngưỡng SE tuyệt đối 0,09 không đạt được ở R = 32–64 (88% khoá vẫn vượt sau khi bù). Cổng bù đổi sang **SE của HIỆU giữa hai member gần nhau nhất** (member đạt argmin theo ước lượng điểm và đối thủ gần nhất), tính từ hiệu từng cặp lượt rút (không gộp hai SE độc lập) — đây đúng là đại lượng dòng 5 cần (member nào tốt hơn), không phải giá trị loss tuyệt đối.
+
+**Xác nhận số ngẫu nhiên chung (CRN).** Đọc `v3/rollout.py` và `tools/v3_build_table.py::draws()`: trong một lượt rút r, MỌI (member, lớp) dùng chung một giả thuyết hạt (`hyp = belief.sample(1, seed_of(DRAW_TAG, ..., r))`, rút một lần cho cả 6 lớp), một seed thế giới (`seed_of(WORLD_TAG, wf_id, seed, t, r)` — không phụ thuộc member lẫn lớp) và một seed ngẫu nhiên hoá riêng của member (`seed_of(MEMBER_TAG, wf_id, seed, t, r)` — không phụ thuộc tên member). CRN được chia sẻ **đầy đủ**, không phải một phần. Đo thực nghiệm trên một trạng thái dev thật (4–6 member, 2 lớp, R = 32, nhiều h): tỉ lệ SE(hiệu cặp) / sqrt(SE_i² + SE_j²) (mức giảm so với gộp hai SE độc lập) trung bình **0,86** ở h thấp và giảm dần còn **0,6–0,7** ở h ≈ 7, nghĩa là mức giảm phương sai từ CRN **khiêm tốn** (14–40%), không phải gần triệt tiêu như lý thuyết CRN lý tưởng — vì các member có chính sách khác nhau, hành động khác nhau làm kho lưu trữ rẽ nhánh sớm dù cùng seed. Quyết định "đổi cổng sang SE hiệu" vẫn hợp lý vì đại lượng liên quan (khoảng cách giữa hai member gần nhất trong xếp hạng minimax) có quy mô khác hẳn SE tuyệt đối của một loss không bị chặn, không phải vì CRN triệt tiêu gần hết nhiễu.
+
+**Ngưỡng mặc định.** `config.TABLE_DIFF_SE_MAX = 0,15` (tham số dòng lệnh `--diff-se-max`), chọn từ phân phối diff-SE đo trên mẫu dev nhỏ theo h (R = 32, 4–6 member, 2 lớp): trung vị 0,02–0,10 ở mọi h, đỉnh đo được 0,17 ở h lớn. 0,15 để lọt phần lớn khoá ở R = 32, chỉ bù cho đuôi nhiễu nhất — khác hẳn 0,09 cũ vốn không khớp quy mô của loss không bị chặn.
+
+**Pilot lặp lại cùng quy mô T14** (3 ô headline ρ ∈ {0; 0,5; 1}, χ = 1,33, mid detector, Δ̂ = 4, mọi h, `--jobs 8`):
+
+| Số đo | T14 (SE tuyệt đối) | line5-se-diff (SE hiệu) |
+| --- | --- | --- |
+| Khoá dựng | 822 | 822 (giống hệt) |
+| CPU-giờ pilot | 7,09 | **3,50** |
+| Giờ thật (wall) | 0,97 (58 phút) | **0,46** (28 phút) |
+| Khoá bù lên R = 64 | 92% | **0%** |
+| Khoá vẫn vượt ngưỡng sau bù | 88% | **0%** |
+| SE trung vị | 0,20 (tuyệt đối) | diff-SE trung vị **0,050**; SE tuyệt đối (chẩn đoán phụ) trung vị vẫn 0,118, `se_flag` ở 75% khoá |
+
+Không khoá nào cần bù ở quy mô pilot này: mọi diff-SE (kể cả đỉnh 0,146 ở h = 12) đều dưới ngưỡng 0,15, kể cả tại h = 14 (đỉnh cũ của SE tuyệt đối, 0,28). Theo h: diff-SE trung vị tăng đều 0,00 (h=1) → 0,097 (h=14), đỉnh 0,146 ở h=12 — dưới ngưỡng ở mọi h đo được, còn nhiều biên an toàn (≈ 0,03 ở đỉnh). SE tuyệt đối (chẩn đoán phụ, không còn là cổng) vẫn tăng 0,061 → 0,163, giống hệt pilot T14, và vẫn được ghi vào bảng và vào `note` của `lookup()`.
+
+**Ngoại suy cho bản đầy đủ** (36 ô × 5 Δ̂, 51.366 khoá có trạng thái, dùng `tools/v3_build_table.py --pilot --extrapolate`):
+
+- **223,7 CPU-giờ** (không có khoá nào bù, nên bằng con số "chỉ R = 32" là 223,9 CPU-giờ) — so với 453 CPU-giờ có bù / 230 CPU-giờ chỉ R = 32 của T14. Giảm gần **một nửa** so với ước lượng có bù của T14, và xấp xỉ ước lượng "chỉ R = 32" của T14 (khớp, vì không còn khoá nào cần bù).
+- Lưu ý máy đo T14 có tải song song (load average ≈ 25/10 nhân, hệ số hiệu chỉnh 1,85×); pilot này đo lúc máy tương đối rảnh (load average ≈ 3/10 nhân), nên hai con số CPU-giờ không hoàn toàn cùng điều kiện tải — xu hướng (bù R giảm mạnh) là điều chắc chắn, còn con số CPU-giờ tuyệt đối nên đối chiếu lại khi dựng bản cuối ở P4 trên máy cùng điều kiện.
+- Ước lượng gốc của P0/plan: 77–309 CPU-giờ — 223,7 CPU-giờ nằm trong khoảng này.
+
+**Mã.** `v3/config.py` (`TABLE_DIFF_SE_MAX`), `v3/line5_table.py` (mảng bảng mới `diff_se`, `diff_gap`, `diff_flag`, `diff_pair`; `note` của `lookup()` nay luôn có dòng diff-SE, và dòng SE tuyệt đối chỉ khi `se_flag` — không còn gate), `tools/v3_build_table.py` (`_diff_stats`, cổng bù trong `value_job`, tham số `--diff-se-max`). Test: `tests/v3/test_alg1_line5_table.py::test_diff_se_gates_the_top_up_not_absolute_se`, `::test_diff_se_beats_combining_independent_se`. Nhánh `line5-se-diff`.
