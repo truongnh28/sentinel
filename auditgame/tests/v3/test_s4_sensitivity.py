@@ -73,6 +73,18 @@ class Script(A.PolicyBase):
         return self.quars.get(t)
 
 
+class LateBranchQuarantine(A.PolicyBase):
+    """A test-only scripted defender for the reversible-harm switch (C11): it never audits
+    and quarantines the branch once, at the last task of the horizon (placement-blind).
+    No system of the test's list quarantines the branch after sigma (M1: the baselines
+    never quarantine, a commit alarm only blocks that task's patch; the Oracle(+)
+    quarantines at sigma itself), so this is the policy on which C11 is visible."""
+    name = "late-branch-quarantine"
+
+    def quarantine(self, t):
+        return "branch" if t == self.ctx.H - 1 else None
+
+
 class SentinelShape(A.PolicyBase):
     """Algorithm 1's shape on the frozen api, for a world test until T15's Sentinel is on
     this branch: line 5 = a library member's distribution (L-SW-commit3), line 7 = the
@@ -258,11 +270,21 @@ class TestS4Sensitivity(unittest.TestCase):
                             carriers benignly at rate β, with observation statistics matched
                             to poisoning events."
           seed-2            D4.attacker     "Its budget constrains the number of carriers
-                            it may seed and the magnitude of each." """
+                            it may seed and the magnitude of each."
+        The one-factor checks run for every system.  "Changes some outcome" is asserted
+        with the baselines for five worlds; for `reversible` it is asserted with the
+        scripted LateBranchQuarantine instead, because C11 only matters for a branch
+        quarantine AFTER sigma and, since M1, none of the baselines ever quarantines (a
+        commit-review alarm blocks only that task's patch), while the Oracle(+) quarantines
+        at sigma itself and prevents harm in both worlds.  That is the world behaving as
+        specified, not a missing effect: with a quarantine at H-1 > sigma, harm stays in
+        the locked world and is removed in the reversible one."""
         self.assertEqual(sorted(SENS), sorted(["A7", "stage", "reversible", "ingress-hidden",
                                                "drift-persistent", "seed-2"]))
-        systems = ("B1 audit-at-commit", "B2 uniform random", "B3 audit-on-insertion",
-                   "B4 audit-on-retrieval", "B5 risk-score", "B6 two-stage")
+        systems = {n: B.factory(n) for n in (
+            "B1 audit-at-commit", "B2 uniform random", "B3 audit-on-insertion",
+            "B4 audit-on-retrieval", "B5 risk-score", "B6 two-stage")}
+        systems[LateBranchQuarantine.name] = LateBranchQuarantine
         base_plans = {(wf.wf_id, a): pl for wf, a, pl in _dev_plans(4)}
         for sname, world in C.sensitivities():
             field = [f for f in C.world_fields()
@@ -272,16 +294,17 @@ class TestS4Sensitivity(unittest.TestCase):
             plans = _dev_plans(4, world)
             self.assertGreater(len(plans), 5, sname)
             differs = False
+            late_harm = 0   # reversible: locked-world harm the late quarantine then removes
             for wf, a, pl in plans:
                 p0 = base_plans.get((wf.wf_id, a))
                 if p0 is None:
                     continue
                 if field != "n_seeded":
                     self.assertEqual(pl, p0, "the attacker's placement is the primary's")
-                for name in systems:
+                for name, fac in systems.items():
                     for seed in (0, 1):
-                        e0 = SW.episode_in_world(wf, p0, B.factory(name), C.PRIMARY, CELL, seed)
-                        e1 = SW.episode_in_world(wf, pl, B.factory(name), world, CELL, seed)
+                        e0 = SW.episode_in_world(wf, p0, fac, C.PRIMARY, CELL, seed)
+                        e1 = SW.episode_in_world(wf, pl, fac, world, CELL, seed)
                         c0, c1 = SW.components(e0), SW.components(e1)
                         self.assertEqual(c0, {f: getattr(C.PRIMARY, f)
                                               for f in C.world_fields()})
@@ -293,9 +316,20 @@ class TestS4Sensitivity(unittest.TestCase):
                         self.assertEqual(wdiff, [field])
                         self.assertEqual((r0.cell_id, r0.n_solved), (r1.cell_id, r1.n_solved))
                         self.assertEqual(r1.world_id, C.world_id(world))
+                        if name == LateBranchQuarantine.name:
+                            self.assertEqual(r0.quarantines, ((wf.H - 1, "branch"),))
+                            if sname == "reversible" and pl.sigma < wf.H - 1 and r0.harm:
+                                late_harm += 1
+                                self.assertEqual(r1.harm, 0,
+                                                 "reversible: the late quarantine undoes harm")
+                            continue
                         differs |= ((r0.harm, r0.fq, r0.t_lost, r0.c_traj, r0.quarantines)
                                     != (r1.harm, r1.fq, r1.t_lost, r1.c_traj, r1.quarantines))
-            self.assertTrue(differs, f"{sname}: the flipped factor changes some outcome")
+            if sname == "reversible":
+                self.assertGreater(late_harm, 0, "reversible: harm stays after a quarantine "
+                                   "after sigma in the locked world")
+            else:
+                self.assertTrue(differs, f"{sname}: the flipped factor changes some outcome")
 
     # ---------------------------------------------------------------------------------
     def test_h8_verdict_is_taken_from_ingress_visible_world(self):
