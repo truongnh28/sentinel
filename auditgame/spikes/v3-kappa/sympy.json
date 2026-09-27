@@ -1,0 +1,1113 @@
+{
+ "family": "sympy",
+ "reps": 3,
+ "workflows": [
+  {
+   "wf_id": "v2-049",
+   "looks": [
+    {
+     "task": "sympy__sympy-17655",
+     "version": "1.5",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.023355999999999932,
+       0.020313999999999943,
+       0.020982999999999974
+      ],
+      "queue": [
+       0.029901000000000066,
+       0.032591999999999954,
+       0.030590000000000006
+      ],
+      "skill": [
+       2.110238,
+       2.0842730000000005,
+       2.1993400000000003
+      ],
+      "commit": [
+       21.499614999999995,
+       20.852537000000005,
+       20.776663000000006
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 2,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 4,
+       "removed": 0,
+       "ran_pre": 11,
+       "ran_post": 11,
+       "flipped": 2,
+       "lineage": 4,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.30562999999999985,
+      0.11610499999999968,
+      0.04554500000000061,
+      0.05535699999999988,
+      0.057203000000001225,
+      0.060411999999999466
+     ]
+    },
+    {
+     "task": "sympy__sympy-17630",
+     "version": "1.5",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.024323000000009642,
+       0.02391099999999824,
+       0.023144999999999527
+      ],
+      "queue": [
+       0.038221000000007166,
+       0.03845899999998892,
+       0.03825500000000659
+      ],
+      "skill": [
+       1.1292650000000037,
+       1.376486000000014,
+       1.3651959999999832
+      ],
+      "commit": [
+       5.8503240000000005,
+       5.8365380000000044,
+       5.8918060000000025
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 2,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 2,
+       "removed": 0,
+       "ran_pre": 21,
+       "ran_post": 21,
+       "flipped": 2,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.21225499999999897,
+      0.06607899999998779,
+      0.04400200000000609,
+      0.051742000000004396,
+      0.05002899999998078,
+      0.05354599999999721
+     ]
+    },
+    {
+     "task": "sympy__sympy-17318",
+     "version": "1.5",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.032430000000005066,
+       0.03207100000000196,
+       0.0343249999999955
+      ],
+      "queue": [
+       0.037140000000007944,
+       0.036437999999989756,
+       0.04002700000002335
+      ],
+      "skill": [
+       1.396653999999998,
+       1.3228340000000003,
+       1.391939999999991
+      ],
+      "commit": [
+       19.642977999999985,
+       19.769931999999997,
+       19.556978000000015
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 2,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 3,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 3,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 5,
+       "removed": 4,
+       "ran_pre": 11,
+       "ran_post": 11,
+       "flipped": 1,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.21810899999999833,
+      0.16627499999999884,
+      0.04481300000000488,
+      0.045202000000003295,
+      0.0488420000000076,
+      0.05508499999996275
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-093",
+   "looks": [
+    {
+     "task": "sympy__sympy-13091",
+     "version": "1.1",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.458186000000012,
+       0.46357399999999416,
+       0.45031200000002514
+      ],
+      "queue": [
+       0.30338599999996063,
+       0.31419800000000464,
+       0.299948999999998
+      ],
+      "skill": [
+       1.4722289999999987,
+       1.3774540000000002,
+       1.4056440000000237
+      ],
+      "commit": [
+       5.380530999999991,
+       5.494949999999989,
+       5.319705000000027
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 21,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 12,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 45,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 2,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 56,
+       "removed": 56,
+       "ran_pre": 96,
+       "ran_post": 96,
+       "flipped": 2,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.537083999999993,
+      0.0932679999999948,
+      0.06925200000000586,
+      0.06691599999999198,
+      0.056667000000004464,
+      0.06766700000000014
+     ]
+    },
+    {
+     "task": "sympy__sympy-13031",
+     "version": "1.1",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.023383999999992966,
+       0.022799000000020442,
+       0.016787999999991143
+      ],
+      "queue": [
+       0.022872000000006665,
+       0.023042999999972835,
+       0.02306399999997666
+      ],
+      "skill": [
+       1.2024700000000053,
+       1.2229949999999974,
+       1.1702080000000024
+      ],
+      "commit": [
+       4.881382000000002,
+       4.9578200000000265,
+       5.010207000000008
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 2,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 2,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 8,
+       "removed": 4,
+       "ran_pre": 10,
+       "ran_post": 10,
+       "flipped": 1,
+       "lineage": 2,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.11779300000000603,
+      0.09079199999999332,
+      0.04599100000001499,
+      0.04601899999997272,
+      0.04792399999999475,
+      0.04396799999997825
+     ]
+    },
+    {
+     "task": "sympy__sympy-12489",
+     "version": "1.0",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.023200000000002774,
+       0.02717900000001805,
+       0.025597000000033177
+      ],
+      "queue": [
+       0.03252200000000016,
+       0.03460699999999406,
+       0.027658000000002403
+      ],
+      "skill": [
+       1.1705579999999998,
+       1.1332060000000297,
+       1.1480620000000101
+      ],
+      "commit": [
+       4.485849999999999,
+       4.494738999999981,
+       4.471297000000021
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 24,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 26,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 6,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 42,
+       "removed": 42,
+       "ran_pre": 9,
+       "ran_post": 9,
+       "flipped": 1,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.18879499999997051,
+      0.07757499999999595,
+      0.04414799999997854,
+      0.04461399999996729,
+      0.046405000000021346,
+      0.045900999999986425
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-097",
+   "looks": [
+    {
+     "task": "sympy__sympy-19637",
+     "version": "1.7",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.011512000000010403,
+       0.013179000000008045,
+       0.015457999999995309
+      ],
+      "queue": [
+       0.02527599999996255,
+       0.026273000000031743,
+       0.025646999999992204
+      ],
+      "skill": [
+       1.411576999999994,
+       1.3327600000000075,
+       1.2215220000000215
+      ],
+      "commit": [
+       5.758615999999989,
+       5.9644930000000045,
+       5.806881999999973
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 3,
+       "removed": 1,
+       "ran_pre": 49,
+       "ran_post": 49,
+       "flipped": 1,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.584257000000008,
+      0.05811499999995817,
+      0.06744299999999726,
+      0.0539049999999861,
+      0.05924699999999916,
+      0.05213900000003946
+     ]
+    },
+    {
+     "task": "sympy__sympy-19495",
+     "version": "1.7",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.013953999999984035,
+       0.014409000000028982,
+       0.013846999999969967
+      ],
+      "queue": [
+       0.0257909999999697,
+       0.023945999999966716,
+       0.023883999999981143
+      ],
+      "skill": [
+       1.3740449999999953,
+       1.3863810000000285,
+       1.3942009999999527
+      ],
+      "commit": [
+       5.631680999999986,
+       5.597699999999975,
+       5.703838000000019
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 2,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 4,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 10,
+       "removed": 9,
+       "ran_pre": 9,
+       "ran_post": 9,
+       "flipped": 1,
+       "lineage": 2,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.1223889999999983,
+      0.09846999999999184,
+      0.04912500000003206,
+      0.05222500000002128,
+      0.05164400000001024,
+      0.06313900000000672
+     ]
+    },
+    {
+     "task": "sympy__sympy-19346",
+     "version": "1.7",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.01524899999998297,
+       0.01680599999997412,
+       0.017295999999987544
+      ],
+      "queue": [
+       0.02352000000001908,
+       0.02516800000000785,
+       0.023731999999995423
+      ],
+      "skill": [
+       1.3363770000000272,
+       1.089841999999976,
+       1.037758999999994
+      ],
+      "commit": [
+       5.280261999999993,
+       5.580414000000019,
+       5.646642999999926
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 10,
+       "removed": 0,
+       "ran_pre": 43,
+       "ran_post": 43,
+       "flipped": 1,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.2035420000000272,
+      0.07591199999995979,
+      0.0619050000000243,
+      0.053779000000020005,
+      0.04590400000000727,
+      0.05574300000000676
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-098",
+   "looks": [
+    {
+     "task": "sympy__sympy-20916",
+     "version": "1.8",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.013148000000057891,
+       0.012899999999945067,
+       0.011326000000053682
+      ],
+      "queue": [
+       0.038020999999957894,
+       0.03706299999998919,
+       0.03731700000003002
+      ],
+      "skill": [
+       1.3600850000000264,
+       1.3796629999999936,
+       1.4676919999999427
+      ],
+      "commit": [
+       5.594596000000024,
+       5.894867000000033,
+       5.509280999999987
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 2,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 2,
+       "removed": 2,
+       "ran_pre": 2,
+       "ran_post": 2,
+       "flipped": 1,
+       "lineage": 5,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.42810899999994945,
+      0.1715820000000008,
+      0.060320999999987635,
+      0.06351499999999533,
+      0.051406000000042695,
+      0.054102000000000317
+     ]
+    },
+    {
+     "task": "sympy__sympy-20801",
+     "version": "1.8",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.03499799999997322,
+       0.03907000000003791,
+       0.03342200000003004
+      ],
+      "queue": [
+       0.02606900000000678,
+       0.02631900000000087,
+       0.027657000000090193
+      ],
+      "skill": [
+       1.4115939999999796,
+       1.4088610000000017,
+       1.4631839999999556
+      ],
+      "commit": [
+       10.52884199999994,
+       10.32349099999999,
+       9.03161299999988
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 2,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 2,
+       "removed": 2,
+       "ran_pre": 99,
+       "ran_post": 99,
+       "flipped": 1,
+       "lineage": 4,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.1187029999999254,
+      0.10245100000003049,
+      0.06311400000004141,
+      0.06003000000004022,
+      0.05994100000003755,
+      0.05747900000005757
+     ]
+    },
+    {
+     "task": "sympy__sympy-20590",
+     "version": "1.7",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.01206500000006372,
+       0.01202899999998408,
+       0.01315599999998085
+      ],
+      "queue": [
+       0.025220999999987725,
+       0.02517500000004702,
+       0.02728700000000117
+      ],
+      "skill": [
+       1.264581000000021,
+       1.2672759999999812,
+       1.2942149999999515
+      ],
+      "commit": [
+       5.440527999999972,
+       5.458992999999964,
+       5.432143999999994
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 5,
+       "removed": 0,
+       "ran_pre": 22,
+       "ran_post": 22,
+       "flipped": 1,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.2557299999999145,
+      0.1480009999999652,
+      0.04553100000003951,
+      0.04560199999997394,
+      0.050282000000095195,
+      0.050249999999948614
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-099",
+   "looks": [
+    {
+     "task": "sympy__sympy-23534",
+     "version": "1.11",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.015402999999992062,
+       0.018206000000020595,
+       0.01967899999999645
+      ],
+      "queue": [
+       0.025474000000031083,
+       0.02516000000002805,
+       0.025654000000031374
+      ],
+      "skill": [
+       1.3409689999999728,
+       1.0306489999999826,
+       0.9589980000000651
+      ],
+      "commit": [
+       4.967372000000012,
+       5.866436999999962,
+       5.939743000000021
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 1,
+       "removed": 1,
+       "ran_pre": 12,
+       "ran_post": 12,
+       "flipped": 1,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.673061999999959,
+      0.09020400000008522,
+      0.054826000000048225,
+      0.05012499999997999,
+      0.05403900000004569,
+      0.059857999999962885
+     ]
+    },
+    {
+     "task": "sympy__sympy-23413",
+     "version": "1.11",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.014083999999968455,
+       0.013963000000046577,
+       0.016139000000009673
+      ],
+      "queue": [
+       0.038300999999989926,
+       0.03570999999999458,
+       0.03778200000004972
+      ],
+      "skill": [
+       1.4046960000000013,
+       1.3991209999999796,
+       1.3879680000000008
+      ],
+      "commit": [
+       5.869489999999985,
+       5.843260999999984,
+       5.9151979999999185
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 7,
+       "removed": 4,
+       "ran_pre": 3,
+       "ran_post": 3,
+       "flipped": 1,
+       "lineage": 2,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.1298840000000041,
+      0.08873500000004242,
+      0.06014100000004419,
+      0.05015499999996109,
+      0.05507000000000062,
+      0.05482699999998886
+     ]
+    },
+    {
+     "task": "sympy__sympy-23262",
+     "version": "1.11",
+     "python": "env-sy39",
+     "cpu": {
+      "memory": [
+       0.021136999999953332,
+       0.019751999999982672,
+       0.02025199999997085
+      ],
+      "queue": [
+       0.027686000000073818,
+       0.02437800000001289,
+       0.02563899999995556
+      ],
+      "skill": [
+       1.424995000000024,
+       1.4023159999999848,
+       1.4000709999999685
+      ],
+      "commit": [
+       8.948684999999955,
+       9.247590000000002,
+       8.878640000000075
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 2,
+       "removed": 2,
+       "ran_pre": 116,
+       "ran_post": 116,
+       "flipped": 1,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.1117040000000884,
+      0.08404900000005,
+      0.055240000000083,
+      0.054934000000002925,
+      0.05086899999992056,
+      0.055156999999951495
+     ]
+    }
+   ]
+  }
+ ],
+ "date": "2026-09-27",
+ "commit": "5aafaa2f57f80694b9b722f399e860c0b1ee2711"
+}

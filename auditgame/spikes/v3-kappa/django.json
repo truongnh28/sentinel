@@ -1,0 +1,1776 @@
+{
+ "family": "django",
+ "reps": 3,
+ "workflows": [
+  {
+   "wf_id": "v2-003",
+   "looks": [
+    {
+     "task": "django__django-11163",
+     "version": "3.0",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.025845999999999925,
+       0.027467999999999937,
+       0.02601600000000004
+      ],
+      "queue": [
+       0.03258900000000009,
+       0.02751400000000004,
+       0.03090599999999999
+      ],
+      "skill": [
+       0.9379160000000004,
+       0.837342,
+       0.8104729999999991
+      ],
+      "commit": [
+       1.9398590000000002,
+       2.109882999999999,
+       2.204968000000001
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 1,
+       "removed": 1,
+       "ran_pre": 99,
+       "ran_post": 99,
+       "flipped": 1,
+       "lineage": 6,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.7717090000000001,
+      0.4006789999999998,
+      0.402701,
+      0.41553799999999974,
+      0.45812899999999956,
+      0.3992760000000004
+     ]
+    },
+    {
+     "task": "django__django-11149",
+     "version": "3.0",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.030526999999999305,
+       0.02883100000000205,
+       0.03217699999999901
+      ],
+      "queue": [
+       0.03745699999999985,
+       0.03786000000000023,
+       0.03734400000000093
+      ],
+      "skill": [
+       1.149693000000001,
+       1.1187179999999977,
+       1.072624999999995
+      ],
+      "commit": [
+       4.033617,
+       4.084683000000002,
+       4.1071319999999965
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 2,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 30,
+       "removed": 26,
+       "ran_pre": 26,
+       "ran_post": 26,
+       "flipped": 2,
+       "lineage": 5,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.5346489999999999,
+      0.3318480000000008,
+      0.2915780000000012,
+      0.29277899999999946,
+      0.27691599999999994,
+      0.31016699999999986
+     ]
+    },
+    {
+     "task": "django__django-11141",
+     "version": "3.1",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.013134000000000867,
+       0.013676000000000244,
+       0.013980000000000103
+      ],
+      "queue": [
+       0.03571200000000374,
+       0.03486300000000142,
+       0.03570600000000468
+      ],
+      "skill": [
+       0.7950270000000046,
+       0.9109340000000046,
+       0.8731480000000005
+      ],
+      "commit": [
+       2.173105999999997,
+       2.2277580000000015,
+       2.213367000000005
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 2,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 0,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 4,
+       "removed": 6,
+       "ran_pre": 6,
+       "ran_post": 6,
+       "flipped": 0,
+       "lineage": 4,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.8716959999999965,
+      0.3162970000000058,
+      0.3086049999999929,
+      0.3371789999999919,
+      0.29850299999999663,
+      0.31423699999999855
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-015",
+   "looks": [
+    {
+     "task": "django__django-14539",
+     "version": "4.0",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.01547199999999549,
+       0.013366000000004874,
+       0.014763999999999555
+      ],
+      "queue": [
+       0.025647000000006415,
+       0.024374999999999147,
+       0.02342000000000155
+      ],
+      "skill": [
+       0.9054220000000015,
+       0.7387150000000062,
+       0.7457600000000042
+      ],
+      "commit": [
+       1.5455490000000083,
+       1.7050539999999899,
+       2.000026999999996
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 2,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 3,
+       "removed": 2,
+       "ran_pre": 15,
+       "ran_post": 16,
+       "flipped": 1,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      1.6115020000000015,
+      0.5027510000000035,
+      0.42010700000000156,
+      0.43643299999999385,
+      0.38996099999999956,
+      0.35534800000000644
+     ]
+    },
+    {
+     "task": "django__django-14534",
+     "version": "4.0",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.01448300000001268,
+       0.015857999999994377,
+       0.013997000000003368
+      ],
+      "queue": [
+       0.02577800000000252,
+       0.023271999999998627,
+       0.02595099999999917
+      ],
+      "skill": [
+       0.7039170000000041,
+       0.8327430000000007,
+       0.8174819999999912
+      ],
+      "commit": [
+       1.9267310000000037,
+       1.9195349999999962,
+       1.943643999999999
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 1,
+       "removed": 1,
+       "ran_pre": 100,
+       "ran_post": 100,
+       "flipped": 1,
+       "lineage": 2,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.5261489999999966,
+      0.3072869999999952,
+      0.31867000000001156,
+      0.26269700000000995,
+      0.3188420000000036,
+      0.32366400000000084
+     ]
+    },
+    {
+     "task": "django__django-14500",
+     "version": "4.0",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.015318000000000609,
+       0.013422000000005596,
+       0.015458999999992784
+      ],
+      "queue": [
+       0.02524300000001034,
+       0.022450000000006298,
+       0.02249100000000226
+      ],
+      "skill": [
+       0.9584540000000032,
+       1.0101809999999887,
+       0.9198269999999837
+      ],
+      "commit": [
+       3.1032380000000046,
+       2.944016000000005,
+       3.039080999999996
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 2,
+       "removed": 3,
+       "ran_pre": 2,
+       "ran_post": 2,
+       "flipped": 1,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.4583379999999977,
+      0.38222600000001705,
+      0.3210070000000087,
+      0.29164699999998334,
+      0.3154610000000133,
+      0.3120259999999888
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-020",
+   "looks": [
+    {
+     "task": "django__django-15916",
+     "version": "4.2",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.02725900000000081,
+       0.021043999999989182,
+       0.025739999999998986
+      ],
+      "queue": [
+       0.025763999999995235,
+       0.02602099999998586,
+       0.025487999999995736
+      ],
+      "skill": [
+       0.8896469999999965,
+       0.7525049999999993,
+       0.6936429999999945
+      ],
+      "commit": [
+       2.4144589999999937,
+       2.4664320000000117,
+       2.413704999999993
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 3,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 3,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 2,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 3,
+       "removed": 10,
+       "ran_pre": 108,
+       "ran_post": 108,
+       "flipped": 2,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      1.533654999999996,
+      0.41865300000000616,
+      0.39002299999999934,
+      0.30886700000002065,
+      0.3343579999999946,
+      0.3553840000000008
+     ]
+    },
+    {
+     "task": "django__django-15863",
+     "version": "4.2",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.01921900000000676,
+       0.01701699999999562,
+       0.018519999999995207
+      ],
+      "queue": [
+       0.02433900000001188,
+       0.023021999999997433,
+       0.022790999999983796
+      ],
+      "skill": [
+       0.829915999999983,
+       0.820061999999993,
+       0.8216809999999839
+      ],
+      "commit": [
+       1.5859450000000095,
+       1.623045999999988,
+       1.449339000000009
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 1,
+       "removed": 1,
+       "ran_pre": 9,
+       "ran_post": 9,
+       "flipped": 1,
+       "lineage": 2,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.4709919999999954,
+      0.44121300000000474,
+      0.3624839999999949,
+      0.38878300000000365,
+      0.4105260000000044,
+      0.43874999999999886
+     ]
+    },
+    {
+     "task": "django__django-15851",
+     "version": "4.2",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.013047000000000253,
+       0.012726000000000681,
+       0.012528000000017414
+      ],
+      "queue": [
+       0.02421699999999305,
+       0.023662000000001626,
+       0.024350999999995793
+      ],
+      "skill": [
+       0.7301530000000014,
+       0.6709129999999988,
+       0.6782700000000119
+      ],
+      "commit": [
+       1.8165300000000002,
+       1.9973190000000045,
+       1.9015430000000038
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 1,
+       "removed": 1,
+       "ran_pre": 9,
+       "ran_post": 9,
+       "flipped": 1,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.70337099999999,
+      0.46976800000000196,
+      0.39800800000000436,
+      0.32926599999998984,
+      0.35495299999998053,
+      0.406517000000008
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-022",
+   "looks": [
+    {
+     "task": "django__django-16631",
+     "version": "5.0",
+     "python": "env-dj311",
+     "cpu": {
+      "memory": [
+       0.026048000000002958,
+       0.025603000000018028,
+       0.023743999999979337
+      ],
+      "queue": [
+       0.038156000000000745,
+       0.03586700000001031,
+       0.03718500000000802
+      ],
+      "skill": [
+       0.8981310000000065,
+       0.6364079999999888,
+       0.6846760000000103
+      ],
+      "commit": [
+       1.6303889999999939,
+       1.8147170000000017,
+       1.642471999999998
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 2,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 2,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 3,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 1,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 28,
+       "removed": 5,
+       "ran_pre": 5,
+       "ran_post": 5,
+       "flipped": 1,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.9125159999999823,
+      0.5102849999999961,
+      0.4471600000000109,
+      0.44616599999999096,
+      0.3689070000000072,
+      0.3994390000000152
+     ]
+    },
+    {
+     "task": "django__django-16612",
+     "version": "5.0",
+     "python": "env-dj311",
+     "cpu": {
+      "memory": [
+       0.015679999999989036,
+       0.01764900000002001,
+       0.017468000000008033
+      ],
+      "queue": [
+       0.02880100000000141,
+       0.028243999999986613,
+       0.027466000000003987
+      ],
+      "skill": [
+       0.6710979999999864,
+       0.6599629999999905,
+       0.860535999999982
+      ],
+      "commit": [
+       25.62585899999999,
+       25.838493,
+       25.940361000000024
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 2,
+       "evidence_failed": 2,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 3,
+       "removed": 1,
+       "ran_pre": 169,
+       "ran_post": 169,
+       "flipped": 2,
+       "lineage": 2,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.49877099999999075,
+      0.3730110000000053,
+      0.3361110000000025,
+      0.2748940000000175,
+      0.30614700000000994,
+      0.3969109999999887
+     ]
+    },
+    {
+     "task": "django__django-16595",
+     "version": "5.0",
+     "python": "env-dj311",
+     "cpu": {
+      "memory": [
+       0.015838999999971293,
+       0.016068000000046823,
+       0.013749000000018441
+      ],
+      "queue": [
+       0.02314599999996858,
+       0.022844000000020515,
+       0.024987000000010084
+      ],
+      "skill": [
+       0.5547670000000267,
+       0.5433790000000158,
+       0.5876679999999794
+      ],
+      "commit": [
+       1.4022360000000162,
+       1.6149829999999668,
+       1.5352750000000128
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 1,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 3,
+       "removed": 3,
+       "ran_pre": 18,
+       "ran_post": 18,
+       "flipped": 1,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.5304419999999936,
+      0.4037500000000307,
+      0.4306070000000375,
+      0.39072299999997995,
+      0.3754080000000215,
+      0.34661300000001916
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-056",
+   "looks": [
+    {
+     "task": "django__django-11133",
+     "version": "3.0",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.014389999999991687,
+       0.01663500000000795,
+       0.01753999999999678
+      ],
+      "queue": [
+       0.023789000000022043,
+       0.024594999999976608,
+       0.023969999999991387
+      ],
+      "skill": [
+       0.7505119999999863,
+       0.574975999999964,
+       0.5921020000000112
+      ],
+      "commit": [
+       1.4454790000000344,
+       1.338187000000005,
+       1.5583609999999908
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 1,
+       "removed": 1,
+       "ran_pre": 51,
+       "ran_post": 51,
+       "flipped": 1,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      2.044807999999989,
+      0.3606099999999799,
+      0.41215800000000513,
+      0.3794480000000249,
+      0.35510999999996784,
+      0.27277499999999577
+     ]
+    },
+    {
+     "task": "django__django-11119",
+     "version": "3.0",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.014247000000040089,
+       0.014730999999983396,
+       0.01397300000002133
+      ],
+      "queue": [
+       0.025026999999965938,
+       0.02504200000001333,
+       0.025228999999967527
+      ],
+      "skill": [
+       0.7842729999999563,
+       0.7606650000000172,
+       0.7761250000000359
+      ],
+      "commit": [
+       1.496024000000034,
+       1.531205,
+       1.5102679999999964
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 1,
+       "removed": 1,
+       "ran_pre": 6,
+       "ran_post": 6,
+       "flipped": 1,
+       "lineage": 2,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.3838660000000118,
+      0.29937900000001605,
+      0.28311699999997586,
+      0.29311399999997434,
+      0.2782049999999856,
+      0.2968309999999974
+     ]
+    },
+    {
+     "task": "django__django-11099",
+     "version": "3.0",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.011927000000014232,
+       0.011521000000016102,
+       0.011454999999983784
+      ],
+      "queue": [
+       0.021963999999996986,
+       0.021816999999998643,
+       0.021453999999977214
+      ],
+      "skill": [
+       0.882454000000024,
+       0.8655559999999696,
+       1.0411760000000356
+      ],
+      "commit": [
+       1.7069030000000112,
+       1.6500169999999912,
+       1.7669070000000318
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 2,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 3,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 3,
+       "evidence_ran": 3,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 2,
+       "removed": 2,
+       "ran_pre": 20,
+       "ran_post": 22,
+       "flipped": 2,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.29543499999999767,
+      0.31415500000002794,
+      0.3508099999999672,
+      0.4288139999999885,
+      0.4737930000000006,
+      0.4151920000000473
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-059",
+   "looks": [
+    {
+     "task": "django__django-11848",
+     "version": "3.1",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.01442399999999111,
+       0.01588400000002821,
+       0.015913000000011834
+      ],
+      "queue": [
+       0.02562999999997828,
+       0.026476999999999862,
+       0.024918999999982816
+      ],
+      "skill": [
+       0.7230030000000056,
+       0.8118479999999977,
+       0.8077350000000081
+      ],
+      "commit": [
+       1.6430819999999926,
+       1.6188140000000146,
+       1.6336460000000272
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 2,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 7,
+       "removed": 3,
+       "ran_pre": 44,
+       "ran_post": 45,
+       "flipped": 1,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.9560299999999984,
+      0.29449299999998857,
+      0.27105399999999236,
+      0.26468099999999595,
+      0.264507999999978,
+      0.2624209999999607
+     ]
+    },
+    {
+     "task": "django__django-11820",
+     "version": "3.1",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.03220499999997628,
+       0.030597999999997683,
+       0.025959999999997763
+      ],
+      "queue": [
+       0.02783199999998942,
+       0.02871999999999275,
+       0.030878000000001293
+      ],
+      "skill": [
+       0.9778490000000488,
+       1.0092879999999695,
+       0.9967570000000592
+      ],
+      "commit": [
+       1.9926310000000171,
+       2.036002999999994,
+       1.7046689999999671
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 2,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 7,
+       "removed": 1,
+       "ran_pre": 63,
+       "ran_post": 63,
+       "flipped": 2,
+       "lineage": 2,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.4183709999999792,
+      0.3686029999999789,
+      0.39894899999998756,
+      0.38645099999996546,
+      0.3958659999999554,
+      0.35809000000000424
+     ]
+    },
+    {
+     "task": "django__django-11815",
+     "version": "3.1",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.015995000000032178,
+       0.013849999999990814,
+       0.016977000000053977
+      ],
+      "queue": [
+       0.025087999999982458,
+       0.0226949999999988,
+       0.02586300000001529
+      ],
+      "skill": [
+       0.8025069999999914,
+       0.8172230000000127,
+       0.7940999999999576
+      ],
+      "commit": [
+       1.7469340000000102,
+       1.730115000000012,
+       1.7372869999999807
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 4,
+       "removed": 3,
+       "ran_pre": 37,
+       "ran_post": 37,
+       "flipped": 1,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.27952499999997826,
+      0.29049300000008316,
+      0.25433500000002596,
+      0.2706680000000006,
+      0.26849400000003243,
+      0.28267599999998083
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-071",
+   "looks": [
+    {
+     "task": "django__django-15315",
+     "version": "4.1",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.028216999999983727,
+       0.032791000000031545,
+       0.02567599999997583
+      ],
+      "queue": [
+       0.024251999999989948,
+       0.023413000000005013,
+       0.024537000000009357
+      ],
+      "skill": [
+       0.8990569999999707,
+       0.8957209999999804,
+       0.8951759999999922
+      ],
+      "commit": [
+       2.0099239999999554,
+       2.0128349999999955,
+       2.0510869999999954
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 1,
+       "removed": 5,
+       "ran_pre": 20,
+       "ran_post": 20,
+       "flipped": 1,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      1.4062440000000151,
+      0.31385800000003883,
+      0.28395799999998417,
+      0.2801939999999945,
+      0.3045420000000263,
+      0.3118920000000003
+     ]
+    },
+    {
+     "task": "django__django-15280",
+     "version": "4.1",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.02006699999998318,
+       0.022491999999999734,
+       0.02368600000005472
+      ],
+      "queue": [
+       0.0253479999999513,
+       0.024380000000064683,
+       0.024929999999983465
+      ],
+      "skill": [
+       1.049285999999995,
+       0.9846820000000207,
+       0.9852209999999673
+      ],
+      "commit": [
+       2.393835000000024,
+       2.416246000000001,
+       2.4583190000000172
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 0,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 3,
+       "removed": 2,
+       "ran_pre": 72,
+       "ran_post": 72,
+       "flipped": 0,
+       "lineage": 2,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.36723499999999376,
+      0.3079479999999535,
+      0.3023050000000467,
+      0.3291360000000054,
+      0.30130800000006275,
+      0.3263050000000476
+     ]
+    },
+    {
+     "task": "django__django-15278",
+     "version": "4.1",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.017818999999974494,
+       0.015448000000048978,
+       0.013851999999985765
+      ],
+      "queue": [
+       0.02448000000003958,
+       0.02464300000002595,
+       0.02597299999996494
+      ],
+      "skill": [
+       0.946000999999967,
+       1.0086330000000316,
+       0.930515000000014
+      ],
+      "commit": [
+       3.9913239999999632,
+       3.992793000000006,
+       4.002898000000016
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 9,
+       "removed": 4,
+       "ran_pre": 84,
+       "ran_post": 84,
+       "flipped": 1,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.32856099999997923,
+      0.32887199999998984,
+      0.3285619999999767,
+      0.34308400000003303,
+      0.31821100000001934,
+      0.3189439999999877
+     ]
+    }
+   ]
+  },
+  {
+   "wf_id": "v2-072",
+   "looks": [
+    {
+     "task": "django__django-15503",
+     "version": "4.1",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.017753999999968073,
+       0.01623499999999467,
+       0.018419999999991887
+      ],
+      "queue": [
+       0.02531600000003209,
+       0.023112000000026,
+       0.02511600000002545
+      ],
+      "skill": [
+       0.9828180000000089,
+       0.8301369999999793,
+       1.0649620000000368
+      ],
+      "commit": [
+       1.9509439999999927,
+       2.1907359999999585,
+       2.158750999999995
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 5,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 6,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 2,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 2,
+       "evidence_ran": 2,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 16,
+       "removed": 10,
+       "ran_pre": 79,
+       "ran_post": 80,
+       "flipped": 1,
+       "lineage": 3,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      1.1665519999999674,
+      0.3772939999999494,
+      0.3205330000000117,
+      0.37213800000000674,
+      0.3215950000000021,
+      0.2994370000000117
+     ]
+    },
+    {
+     "task": "django__django-15499",
+     "version": "4.1",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.02423399999997855,
+       0.022351000000071508,
+       0.02411899999998468
+      ],
+      "queue": [
+       0.02431699999999637,
+       0.025409999999965294,
+       0.024768999999935204
+      ],
+      "skill": [
+       0.8972529999999779,
+       0.8734600000000228,
+       0.9041890000000308
+      ],
+      "commit": [
+       2.0372409999999945,
+       2.088622999999984,
+       2.0177209999999945
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 13,
+       "removed": 0,
+       "ran_pre": 16,
+       "ran_post": 16,
+       "flipped": 1,
+       "lineage": 2,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.346631000000059,
+      0.34341000000000577,
+      0.32942100000002483,
+      0.3592530000000238,
+      0.44090700000003835,
+      0.47633699999994406
+     ]
+    },
+    {
+     "task": "django__django-15467",
+     "version": "4.1",
+     "python": "env-dj39",
+     "cpu": {
+      "memory": [
+       0.03442300000006071,
+       0.026570999999989908,
+       0.03310100000004468
+      ],
+      "queue": [
+       0.029602999999951862,
+       0.0311640000000466,
+       0.030889999999999418
+      ],
+      "skill": [
+       0.9001099999999838,
+       0.7123400000000402,
+       0.8114310000000273
+      ],
+      "commit": [
+       2.294939999999997,
+       2.456901000000016,
+       2.465283999999997
+      ]
+     },
+     "findings": {
+      "memory": {
+       "sources": 1,
+       "blob_mismatch": 0,
+       "unresolved": 0,
+       "claims": 1,
+       "claims_undefined": 0,
+       "markers": 0
+      },
+      "queue": {
+       "quotes": 1,
+       "quote_missing": 0,
+       "blob_mismatch": 0,
+       "tests": 1,
+       "test_missing": 0
+      },
+      "skill": {
+       "applies": true,
+       "contract_changed": 0,
+       "evidence_tests": 1,
+       "evidence_ran": 1,
+       "evidence_failed": 0,
+       "timed_out": false
+      },
+      "commit": {
+       "applies": true,
+       "compile_errors": 0,
+       "added": 3,
+       "removed": 1,
+       "ran_pre": 55,
+       "ran_post": 55,
+       "flipped": 1,
+       "lineage": 1,
+       "lineage_mismatch": 0,
+       "timed_out": false
+      }
+     },
+     "setup_cpu": [
+      0.6020900000000324,
+      0.4125259999999571,
+      0.36046699999997145,
+      0.3537689999999998,
+      0.33903100000003406,
+      0.3933799999999792
+     ]
+    }
+   ]
+  }
+ ],
+ "date": "2026-09-27",
+ "commit": "5aafaa2f57f80694b9b722f399e860c0b1ee2711"
+}
