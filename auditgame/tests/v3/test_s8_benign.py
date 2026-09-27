@@ -110,6 +110,26 @@ class TestS8Benign(unittest.TestCase):
         self.assertEqual(V.verdict(s), want)
         self.assertEqual(self.man["result"]["verdict"], want)
         self.assertIn(self.man["result"]["verdict"], ("đạt", "không đạt"))
+        # T24: both floors are recorded; the clustered one is T17's wild bootstrap by
+        # workflow and is reproduced from the live modules
+        r = self.man["result"]
+        self.assertEqual(r["floor_hi"], round(V.floor_hi(len(pos), len(neg)), 4))
+        cf = V.clustered_floor(self.events)
+        self.assertEqual(r["floor_hi_clustered"], cf["floor_hi_clustered"])
+        self.assertEqual(r["clustered"]["ratio_mean"], cf["ratio_mean"])
+        self.assertEqual(cf["n_workflows"], len({w for c in V.clusters_of(self.events)
+                                                 for w in c}))
+        p = self.man["protocol"]
+        self.assertEqual((p["per_event"], p["per_event_v2"], p["deviation_ref"]),
+                         (V.V3_PER_EVENT, 4, "docs/preregistration/lech-chuan-P3-benign.md"))
+        self.assertTrue((pathlib.Path("..") / p["deviation_ref"]).is_file())
+        # the diagnostic control class (v2's agent notes) must still separate completely:
+        # provenance_shape tells them apart; anything else means something broke
+        notes = V.build(self.runs, kind="v2-notes")
+        pn, nn = V.rows_of(notes)
+        sn = V.over_splits(pn, nn, V.FEATURES, seeds=(1, 2, 3))
+        self.assertEqual((sn["auc_median"], sn["auc_min"]), (1.0, 1.0))
+        self.assertEqual(self.man["comparisons"]["v2_notes_as_controls"]["main"]["auc_min"], 1.0)
 
     def test_benign_changes_are_the_agents_drift_process(self):
         """D4.drift: "A latent process independently modifies carriers benignly at rate β,
