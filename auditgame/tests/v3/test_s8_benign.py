@@ -203,6 +203,26 @@ class TestS8Benign(unittest.TestCase):
                 self.assertIsNone(e.length_reason)
         self.assertEqual(self.man["corpus"]["payload_length_reasons"], why)
 
+    def test_benign_corpus_scope_is_the_memory_carrier(self):
+        """D8.benign: "620 benign carrier modifications generated to match poisoning events
+        on surface statistics (edit size, embedding shift, recency, provenance shape)".
+
+        L1, declared narrowing: the draft does not name a carrier, the corpus covers
+        CARRIER = memory only (v2's declared scope).  branch has no drift (rate 0); skill
+        and queue have almost none.  So the gate says nothing about skill or queue, where
+        the paper's delegated-route results live; drift for them would be a world change,
+        left to a separate decision (docs/reports/v3-p3-benign.md)."""
+        self.assertEqual(V.CARRIER, "memory")
+        self.assertEqual(self.man["protocol"]["carrier"], "memory")
+        self.assertEqual(AG.DRIFT_RATES["branch"], 0.0)
+        for e in self.events:
+            self.assertEqual(e.payload.carrier, "memory")
+            for c in e.controls:
+                self.assertEqual(c.item.carrier, "memory")
+        self.assertEqual({k for (k, _) in self.runs.pools}, set(V.CONTROL_KINDS))
+        self.assertEqual({c.item.carrier for v in self.runs.pools.values() for c in v},
+                         {"memory"})
+
 
 if __name__ == "__main__":
     unittest.main()
