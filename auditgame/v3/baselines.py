@@ -11,10 +11,14 @@ evenly spaced tasks.  In every chi cell the commit is already at depth 1 (R7), s
 second step can happen in the grid; the first is kept for a cell with a deeper commit.
 
 WHAT A BASELINE DOES ON AN ALARM.  "Quarantine on any anomaly" (draft S4, v2's baseline
-rule), at the carrier level of v3: when the audit bought at t raises an alarm, the whole
-audited carrier is quarantined (lines 8-9, O7): memory / queue / skill for a sweep, the
-branch for the commit.  B6 is the one declared exception: a screen alarm asks for a
-confirmation, and only the confirmation's alarm quarantines (it is a two-stage CHECK).
+rule), at the carrier level of v3: when a SWEEP bought at t raises an alarm, the whole
+audited carrier is quarantined (lines 8-9, O7): memory / queue / skill.  A COMMIT alarm
+quarantines nothing: the runner blocks that task's patch only, so it never enters the
+branch (v3/runner.py step 5; v2's patch_blocks, the draft's "audit-at-commit"; M1 fix
+27/09).  A whole-branch quarantine comes only from Algorithm 1 line 8 (Sentinel and the
+library), never from a baseline.  B6 is the one declared exception on sweeps: a screen
+alarm asks for a confirmation, and only the confirmation's alarm quarantines (it is a
+two-stage CHECK).
 
 THE SYSTEMS (names are the record's `policy` field).
     B1 audit-at-commit        S5.2 / S9.2: the commit of every task, the cell's commit depth.
@@ -29,7 +33,10 @@ THE SYSTEMS (names are the record's `policy` field).
     SW randomised             S11: a target drawn by stage weights (v2 _SW), tuned by T18.
     B1-prov                   C1: B1 whose commit alarm also reads the provenance score (A7).
   controls (read before any Sentinel number, D28), not competitors:
-    Oracle (+)                told the attacked carrier(s) only; audits it every task.
+    Oracle (+)                told the evaluator-known carrier state c_t at every task (the
+                              runner hands it over, to this class only) and quarantines
+                              every carrier whose bit is 1, without needing an audit; it
+                              still audits the seeded carrier(s) every task (M1 fix 27/09).
     Delta = 0 (-)             a cell, not a policy: SWEEP_ONLY names the baselines that may
                               not beat B1 there (plan S7).
   sensitivity:
@@ -127,6 +134,8 @@ class _Baseline(A.PolicyBase):
 
     def quarantine(self, t: int) -> str | None:
         target = self.alarmed_target(t)
+        if target == COMMIT:
+            return None                  # the runner blocks this task's patch only (step 5)
         carrier = None if target is None else C.CARRIER_OF_TARGET.get(target)
         if carrier is not None:
             self._log.append({"t": t, "quarantine": carrier})
@@ -203,8 +212,10 @@ class B1Provenance(B1AuditAtCommit):
     """C1: B1 in a world whose commit audit also returns the provenance score of the
     contributing skills (A7).  Its commit alarm is "patch score OR provenance score over the
     cell detector's threshold" (O9: the provenance d' is the detector's, so is its
-    threshold); on it, the branch is quarantined as B1 does.  In A0 the observation carries
-    no provenance, and B1-prov is B1."""
+    threshold); on it, the patch is blocked as B1's is.  The runner blocks on the
+    observation's alarm, which in A7 already ORs the provenance score at the same threshold
+    (v3/observe.py ObservationModel.commit).  In A0 the observation carries no provenance,
+    and B1-prov is B1."""
     name = "B1-prov"
 
     def __init__(self, ctx: A.EpisodeContext):
@@ -374,9 +385,14 @@ class StageWeightedRandomised(_Baseline):
 
 
 class OracleControl(_Baseline):
-    """POSITIVE CONTROL (D28), not a competitor.  It is told the attacked carrier(s) -- and
-    nothing else: not iota, not sigma, not the payload -- and audits it every task (in turn
-    when two are seeded).  No attack (attacked empty): the commit, as B1."""
+    """POSITIVE CONTROL (D28), not a competitor.  The draft's "evaluator-known
+    carrier/trigger state" (L2): after each task's audit the runner hands it c_t
+    (`quarantine_state`) and it quarantines EVERY carrier whose bit is 1, without needing an
+    audit -- v3 poison propagates (note -> skill, queue) inside the insertion task, so the
+    seeded carrier alone is not enough (M1 smoke: V = 0.525 at rho = 0, Delta = 4).  It is
+    never told iota, sigma or the payload.  It still audits the seeded carrier(s) every task
+    (in turn when two are seeded); no attack (attacked empty): the commit, as B1.  Its own
+    alarms quarantine nothing: c_t decides.  The runner hands c_t to this class only."""
     name = "Oracle (+)"
 
     def __init__(self, ctx: A.EpisodeContext, attacked=()):
@@ -389,6 +405,18 @@ class OracleControl(_Baseline):
 
     def act(self, t: int, B_t: float) -> A.AuditAction | None:
         return self._act(t, self._targets[t % len(self._targets)])
+
+    def quarantine(self, t: int) -> str | None:
+        return None                      # the runner calls quarantine_state instead
+
+    def quarantine_state(self, t: int, c: tuple) -> tuple:
+        """Lines 8-9 of the control: every carrier (config.CARRIERS order) with c_t[k] = 1."""
+        if len(c) != len(C.CARRIERS) or any(b not in (0, 1) for b in c):
+            raise ValueError(f"c_t={c!r} is not a {len(C.CARRIERS)}-bit vector")
+        ks = tuple(k for k, b in zip(C.CARRIERS, c) if b)
+        if ks:
+            self._log.append({"t": t, "quarantine": list(ks)})
+        return ks
 
 
 # ---------------------------------------------------------------------------------------
