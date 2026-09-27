@@ -100,3 +100,6 @@ docs/paper/*.pdf
 
 # agent worktrees (Claude Code)
 .claude/
+
+# v3 run records (tools/v3_run.py)
+auditgame/spikes/v3-run/
