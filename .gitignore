@@ -97,3 +97,6 @@ auditgame/carriers/repo.path
 # Research PDFs stay in the author's local library.  The public repository uses
 # docs/paper/Paper-List-and-Code.md as its link-first bibliography instead.
 docs/paper/*.pdf
+
+# agent worktrees (Claude Code)
+.claude/
