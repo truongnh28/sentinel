@@ -2,7 +2,7 @@
 
 Ngày 27/09/2026. Nhánh `p3-benign-fix`, tách từ `int-p2` tại `6c94697`. Báo cáo này thay bản của `p3-benign`/`bd51a31` (bản đó: 620 mục, AUC trung vị 0,970, không đạt). Mọi số đo trên **dev** (100 workflow của v2 qua `v3.corpus.dev_workflows()`). Không có số nào từ eval, không lượt eval nào được chạy.
 
-Hai lệch chuẩn L1 (D-v3-2, D-v3-3) và dự đoán được ghim trong `docs/preregistration/lech-chuan-P3-benign.md`, commit `faffc1b`, **trước** mọi dòng code và trước khi xem AUC mới.
+Hai lệch chuẩn L1 (D-v3-3, D-v3-4) và dự đoán được ghim trong `docs/preregistration/lech-chuan-P3-benign.md`, commit `faffc1b`, **trước** mọi dòng code và trước khi xem AUC mới.
 
 ## 1. Kết luận cơ học: không đạt
 
@@ -20,7 +20,7 @@ Trần và tiêu chí không đổi. Không lùi về chuẩn điểm-ước-lư
 
 ## 2. Kênh kích thước: trước và sau
 
-Attacker rút độ dài payload L từ phân bố `len(content)` của drift v3 trên dev (D-v3-3, `v3/payload.py`: `draw_length`, `at_length`). Drift không bị cắt; `build.PAYLOAD_LENGTH = 63` không đổi.
+Attacker rút độ dài payload L từ phân bố `len(content)` của drift v3 trên dev (D-v3-4, `v3/payload.py`: `draw_length`, `at_length`). Drift không bị cắt; `build.PAYLOAD_LENGTH = 63` không đổi.
 
 | | Trước (`bd51a31`, L = 63) | Sau (L rút theo nền v3) |
 | --- | --- | --- |
@@ -79,7 +79,7 @@ N3: 11/797 payload có tag topic dài hơn hoặc bằng L đã rút, nên đư�
 
 | Mục | Giá trị |
 | --- | --- |
-| Tỉ lệ | 1 đối chứng mỗi sự kiện (`V3_PER_EVENT = 1`, D-v3-2); quy ước v2 `PER_EVENT = 4` được ghi trong manifest (`per_event_v2`) |
+| Tỉ lệ | 1 đối chứng mỗi sự kiện (`V3_PER_EVENT = 1`, D-v3-3); quy ước v2 `PER_EVENT = 4` được ghi trong manifest (`per_event_v2`) |
 | Hạn mức | `min(candidates[Δ] // 1)` = 160 sự kiện mỗi Δ (Δ = 8 chặn: 160 ứng viên) |
 | Đạt được | Δ = 0/1/2/4: 160; **Δ = 8: 157/160**. Ba vị trí ở Δ = 8 không còn thay đổi drift nào cùng repo chưa dùng; ghi theo N3 (`supply: 157 of 160 events`), không bù |
 | Tổng | **797 sự kiện, 797 thay đổi lành, cả 797 khác nhau**; con số của draft là 620 (xem mục 8) |
@@ -102,7 +102,7 @@ Cổng chỉ phủ carrier `memory` (dòng DCM L1 trong `v3/dcm/T24.csv`). Draft
 
 ## 9. Tệp và cách chạy lại
 
-- `auditgame/v3/payload.py`: `draw_length`, `length_stats`, `SleeperPayload.at_length`, `payload_content_at`, `LENGTH_RULE` (D-v3-3).
+- `auditgame/v3/payload.py`: `draw_length`, `length_stats`, `SleeperPayload.at_length`, `payload_content_at`, `LENGTH_RULE` (D-v3-4).
 - `auditgame/v3/benign.py`: `V3_PER_EVENT`, `events_per_delta`, `length_background`, `clustered_floor`.
 - `auditgame/tools/v3_benign.py`: in kết quả; `--write` ghi `auditgame/reference/v3_benign.json` bằng mode `"x"` (phải xoá manifest cũ trước). Chạy khoảng 2,5 phút, kể cả họ salt.
 - `auditgame/tests/v3/test_s8_benign.py`: 5 test, ứng với các dòng trong `auditgame/v3/dcm/T24.csv`. Test không đòi cổng đạt; chúng đòi tập đúng như đã khai, kênh kích thước đóng bằng kiến tạo, hai sàn tái lập được, đối chứng `v2-notes` vẫn 1,0.

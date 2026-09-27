@@ -51,7 +51,7 @@ SMD −1,2211; trọng số `size` đo được −5,4587 (trên F_match của v
 
 Cả hai ở level **L1**. Cả hai lệch khỏi **v2**, không lệch khỏi câu chữ của draft: draft (§8, Table 1) không nêu số đối chứng cho mỗi sự kiện và không nêu độ dài payload.
 
-### D-v3-2: `PER_EVENT` 4 → 1 (lệch khỏi quy ước v2)
+### D-v3-3: `PER_EVENT` 4 → 1 (lệch khỏi quy ước v2)
 
 - **So với cái gì:** `analysis/benign_corpus.PER_EVENT = 4` là hợp đồng của v2. Draft chỉ nói "620 benign carrier modifications generated to match poisoning events", không nói bao nhiêu đối chứng cho một sự kiện.
 - **Làm gì:** thêm hằng số phía v3 `V3_PER_EVENT = 1` trong `v3/benign.py`. `PER_EVENT = B.PER_EVENT` giữ nguyên (4) và được ghi vào manifest để so sánh. Không sửa v2.
@@ -60,7 +60,7 @@ Cả hai ở level **L1**. Cả hai lệch khỏi **v2**, không lệch khỏi c
 - Giữ `n_distinct_benign == n_benign`: không đối chứng nào dùng hai lần.
 - Nếu Δ nào không đủ sự kiện (vì hết đối chứng cùng repo), ghi lý do theo N3, không bù lặng lẽ.
 
-### D-v3-3: độ dài payload rút theo phân bố nền v3 (lệch khỏi hằng số v2)
+### D-v3-4: độ dài payload rút theo phân bố nền v3 (lệch khỏi hằng số v2)
 
 - **So với cái gì:** `build.PAYLOAD_LENGTH = 63` là hằng số của v2, dẫn xuất từ nền của v2. Draft không nói độ dài payload.
 - **Chiều sửa: sửa attacker, KHÔNG cắt thế giới.** Cắt drift xuống 63 là chỉnh thế giới cho vừa một hằng số mang từ thế giới khác sang; reviewer sẽ đọc thành benchmark tự chỉnh bài kiểm tra tính hợp lệ của chính nó. `build.py` nằm trong `freeze.SOURCE`, không sửa. Không thêm hàm drift riêng cho v3.
