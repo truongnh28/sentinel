@@ -16,10 +16,16 @@ v2's metrics_v2.gain_ci would report is recomputed on each re-deal.
    (c) v3 two-pass split, 3 seeds (C14(a): 36 workflows / 18 families)
    (d) v3 one-pass split, 3 seeds (26 workflows / 18 families)
    (e) v3 two-pass split, 10 seeds
+   (f) v3 one-pass split, 10 seeds
+   (g) v3 primary split (SWE-rebench-V2, v3/corpus.py): 96 workflows / 20 families, 10 seeds
+   (h) the same, 3 seeds
+   (i) its Delta = 8-hosting subset (H >= 9): 56 workflows / 20 families, 10 seeds
    A v3 family slot of size n draws one of the 16 v2 eval families uniformly with replacement
    and takes n of its workflows (a random permutation, then with-replacement extras if n
    exceeds the family).  Each workflow keeps k seeds drawn without replacement from 1..10,
    shared by both policies; its harm in a column is the mean over those seeds' records.
+   Every replicate is read by the pairs bootstrap (v2's gain_ci, the P0 baseline) and, on
+   an independent draw, by v3/metrics.py's wild cluster bootstrap (Webb weights, T17).
 
 Records: by default streamed from spikes/v2/eval-main.jsonl (4.5 GB, byte prefilter, then
 the headline cell's filter); --extract PATH reads an already-filtered JSON list instead.
@@ -43,6 +49,8 @@ sys.path.insert(0, str(HERE))
 import attackers_v2 as A
 import draft_setup as D
 import metrics_v2 as MV
+from v3 import corpus as VC
+from v3 import metrics as M3
 
 MAIN = HERE / "spikes" / "v2" / "eval-main.jsonl"
 SUMMARY = HERE / "spikes" / "v2" / "eval-summary.json"
@@ -62,6 +70,11 @@ KEEP = ("policy", "attack", "delta", "setting", "rho_patch", "wf", "repo", "seed
 #: sentinel-v3.md C14(a) split, if spikes/v3-p0/corpus.json is absent
 TWO_PASS = [10, 9, 2, 1] + [1] * 14
 ONE_PASS = [5, 5, 1, 1] + [1] * 14
+#: v3 primary split (v3/corpus.py, SWE-rebench-V2): workflows per family, and per family among
+#: the workflows with H >= 9 (the Delta = 8 cell).  Shape only; checked against
+#: corpus.EVAL_SUMMARY_PINNED's totals and Kish below.
+PRIMARY = [5] * 16 + [4] * 4
+PRIMARY_D8 = [4] * 8 + [3] * 3 + [2] * 6 + [1] * 3
 
 #: v2 curve_rho at alpha 0.0125 (eval-summary.json), asserted against the file AND recomputed
 V2_KNOWN = {"0": (49.2, 40.8046, 54.9194), "0.25": (49.15, 36.8892, 54.133),
@@ -205,6 +218,19 @@ def structure(kind, sizes, members, fam_of_wf, n_seeds, rng):
     return src, clu, n_clu, S
 
 
+def gain_ci_wild(Wb, Wc, clu, F, alpha) -> dict:
+    """gain_ci_np with v3/metrics.py's wild cluster bootstrap: F = Webb weights (n_boot x n_clu)."""
+    vb, vc = point_value(Wb), point_value(Wc)
+    b, c = M3.boot_value(Wb, clu, F, "wild"), M3.boot_value(Wc, clu, F, "wild")
+    dif = np.sort(b - c)
+    pos = b > 0
+    rel = np.sort(100.0 * (b[pos] - c[pos]) / b[pos])
+    return {"gain": 100.0 * (vb - vc) / vb if vb else float("nan"),
+            "lo": _q(rel, alpha / 2), "hi": _q(rel, 1 - alpha / 2),
+            "abs_diff": vb - vc, "abs_lo": _q(dif, alpha / 2), "abs_hi": _q(dif, 1 - alpha / 2),
+            "v_base": vb, "v_cand": vc, "n_zero_base": int((~pos).sum())}
+
+
 def stats(rows) -> dict:
     rel_w = np.array([r["hi"] - r["lo"] for r in rows])
     abs_w = np.array([r["abs_hi"] - r["abs_lo"] for r in rows])
@@ -281,25 +307,39 @@ def main() -> int:
     # --- plasmode ------------------------------------------------------------------------------
     two, one, src_sizes = v3_sizes()
     assert (sum(two), len(two), sum(one), len(one)) == (36, 18, 26, 18), (two, one)
+    pin = VC.EVAL_SUMMARY_PINNED["primary"]
+    assert (sum(PRIMARY), len(PRIMARY), round(VC.kish(PRIMARY), 2)) == \
+        (pin["workflows"], pin["families"], pin["kish"]), PRIMARY
+    assert (sum(PRIMARY_D8), len(PRIMARY_D8), round(VC.kish(PRIMARY_D8), 2)) == \
+        (pin["delta8"]["workflows"], pin["delta8"]["families"], pin["delta8"]["kish"]), PRIMARY_D8
     members = [np.flatnonzero(fam_of_wf == f) for f in range(len(fams))]
     scen = {"a": ("v2 actual, 10 seeds", "v2", None, 10),
             "b": ("v2 actual, 3 seeds", "v2", None, 3),
             "c": ("v3 two-pass, 3 seeds", "v3", two, 3),
             "d": ("v3 one-pass, 3 seeds", "v3", one, 3),
             "e": ("v3 two-pass, 10 seeds", "v3", two, 10),
-            "f": ("v3 one-pass, 10 seeds", "v3", one, 10)}
+            "f": ("v3 one-pass, 10 seeds", "v3", one, 10),
+            "g": ("v3 primary (SWE-rebench-V2), 10 seeds", "v3", PRIMARY, 10),
+            "h": ("v3 primary (SWE-rebench-V2), 3 seeds", "v3", PRIMARY, 3),
+            "i": ("v3 primary, Delta = 8 subset (H >= 9), 10 seeds", "v3", PRIMARY_D8, 10)}
     res = {}
     for si, (name, (label, kind, sizes, k)) in enumerate(scen.items()):
         rows = {f"{rho:g}": [] for rho in RHOS}
+        wild = {f"{rho:g}": [] for rho in RHOS}
         for rep in range(args.reps):
             rng = np.random.default_rng([2027, si, rep])
             src, clu, n_clu, S = structure(kind, sizes, members, fam_of_wf, k, rng)
             K = counts(clu, n_clu, args.n_boot, rng)       # one draw, shared by the four rhos
+            # the wild draw has its own stream, so the pairs numbers of (a)-(f) are unchanged
+            F = M3.family_draws(n_clu, args.n_boot, np.random.default_rng([2027, si, rep, 1]),
+                                "wild")
             for i, rho in enumerate(RHOS):
                 Wb, Wc = (reduce_seeds(H[p, i], src, S) for p in range(2))
                 rows[f"{rho:g}"].append(gain_ci_np(Wb, Wc, K, 0.05))
+                wild[f"{rho:g}"].append(gain_ci_wild(Wb, Wc, clu, F, 0.05))
         res[name] = {"label": label, "workflows": int(len(src)), "families": int(n_clu),
-                     "seeds": k, "by_rho": {r: stats(v) for r, v in rows.items()}}
+                     "seeds": k, "by_rho": {r: stats(v) for r, v in rows.items()},
+                     "wild_by_rho": {r: stats(v) for r, v in wild.items()}}
         print(f"scenario {name} ({label}) done ({time.time() - t0:.0f}s)")
 
     doc = {"what": "sentinel-v3 P0: plasmode precision of the headline gain CI "
@@ -308,6 +348,10 @@ def main() -> int:
                     "base": B1, "cand": SA},
            "params": {"reps": args.reps, "n_boot": args.n_boot, "alpha": 0.05, "gate_pct": GATE,
                       "v3_sizes_from": src_sizes, "two_pass": two, "one_pass": one,
+                      "primary": PRIMARY, "primary_delta8": PRIMARY_D8,
+                      "bootstraps": {"by_rho": "pairs (v2 gain_ci, the P0 baseline)",
+                                     "wild_by_rho": "v3/metrics.py wild, Webb weights, "
+                                                    "default_rng([2027, scenario, rep, 1])"},
                       "rng": "numpy default_rng([2027, scenario, rep])"},
            "validation1_alpha_0.0125": v1, "validation2_alpha_0.05": v2chk,
            "scenarios": res}
@@ -322,15 +366,18 @@ def main() -> int:
     print(hdr)
     for rho in RHOS:
         key = f"{rho:g}"
-        for name, s in res.items():
-            b = s["by_rho"][key]
+        for bs, name in [(bs, n) for bs in ("by_rho", "wild_by_rho") for n in res]:
+            s = res[name]
+            b = s[bs][key]
             rw, aw = b["rel_width"], b["abs_width"]
-            print(f"{key:>4} {name:2} {s['workflows']:>3}/{s['families']:<2} {s['seeds']:>2} "
+            tag = name + ("w" if bs == "wild_by_rho" else "")
+            print(f"{key:>4} {tag:2} {s['workflows']:>3}/{s['families']:<2} {s['seeds']:>2} "
                   f"{rw['median']:6.1f} [{rw['p10']:5.1f},{rw['p90']:5.1f}] "
                   f"{aw['median']:6.3f} [{aw['p10']:5.3f},{aw['p90']:5.3f}] "
                   f"{b['P_rel_width_le_10']:5.2f} {b['P_rel_width_le_15']:5.2f} "
                   f"{b['P_rel_width_le_20']:5.2f} {b['P_abs_width_le_0.06']:6.2f} "
                   f"{b['P_abs_width_le_0.1']:6.2f} {b['P_lo_ge_15']:6.2f} {b['median_gain']:6.1f}")
+    print("tag Xw = scenario X's replicates read by the wild bootstrap")
     print("scenarios: " + "; ".join(f"{n} = {s['label']}" for n, s in res.items()))
     print(f"wrote {OUT.relative_to(HERE)} ({time.time() - t0:.0f}s)")
     return 0
