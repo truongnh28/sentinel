@@ -234,6 +234,7 @@ class StageEpisode(R.Episode):
         self.spent = 0.0
         self.n_solved = self.fq = self.true_q = self.false_removed = 0
         self.benign_inspected = self.clean_lost_branch = 0
+        self.patch_blocks = self.clean_blocked = 0         # mirrors runner.Episode (M1 counters)
         self.detected_at: int | None = None
         self.audits = {s: [] for s in STAGES}
         self.c_traj: list = []
