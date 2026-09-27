@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""tools/v3_benign.py -- build the 620 benign changes on dev and run the 4-feature check (P3).
+"""tools/v3_benign.py -- build the benign changes on dev and run the 4-feature check (P3, T24).
 
 Writes the manifest reference/v3_benign.json (GENERATED, never hand-edited;
 tests/v3/test_s8_benign.py checks it against the live modules) and prints the verdict:
@@ -37,7 +37,10 @@ def module_sha() -> str:
 
 def protocol() -> dict:
     return dict(
-        n_benign=V.N_BENIGN, per_event=V.PER_EVENT, n_events=V.N_EVENTS, carrier=V.CARRIER,
+        n_benign_draft=V.N_BENIGN_DRAFT, per_event=V.V3_PER_EVENT, per_event_v2=V.PER_EVENT,
+        deviation_ref=V.DEVIATION_REF,
+        events_per_delta_rule="min over Delta of candidates[Delta] // per_event, balanced",
+        carrier=V.CARRIER,
         seed=V.SEED, epsilon=V.EPSILON, deltas=list(V.DELTAS), features=list(V.FEATURES),
         v2_features=list(V.V2_FEATURES), control_kind="drift",
         diagnostic_control_kind="v2-notes", ceiling=V.CEILING, criterion=V.CRITERION,
@@ -57,7 +60,8 @@ def corpus_record(events: list, runs, dropped: list) -> dict:
         per_repo=dict(sorted(collections.Counter(ev.repo for ev in events).items())),
         own_task_controls=sum(1 for ev in events for c in ev.controls
                               if c.wf_id == ev.wf_id and c.t == ev.iota),
-        dropped=len(dropped),
+        events_per_delta=V.events_per_delta(runs),
+        dropped=len(dropped), dropped_reasons=[list(d) for d in dropped],
         candidates={str(d): len(V.candidates(runs, d)) for d in V.DELTAS},
         pool_per_kind={k: sum(len(v) for (kk, _), v in runs.pools.items() if kk == k)
                        for k in V.CONTROL_KINDS})
@@ -93,8 +97,8 @@ def run(salts: bool = True) -> dict:
                                      main=_summary(sn),
                                      table=V.feature_table(pn, nn, V.FEATURES)),
     }
-    man = dict(what="v3 P3: 620 benign changes (drift) matched to sleeper payloads on dev; "
-                    "4-feature surface discriminator under v2's split protocol",
+    man = dict(what="v3 P3 (T24): benign changes (drift) matched 1:1 to sleeper payloads on "
+                    "dev; 4-feature surface discriminator under v2's split protocol",
                protocol=protocol(), corpus=corpus_record(events, runs, dropped),
                result=result, comparisons=comparisons)
     if salts:

@@ -1,6 +1,6 @@
-"""Draft S8 Table 1, "Benign matched changes": the 620 benign changes and the AUC check (P3).
+"""Draft S8 Table 1, "Benign matched changes": the benign changes and the AUC check (P3, T24).
 
-Each test protects one DCM row of v3/dcm/T33.csv; its docstring carries the id and the
+Each test protects one DCM row of v3/dcm/T24.csv; its docstring carries the id and the
 verbatim draft sentence.  Everything runs on dev (v3.corpus.dev_workflows); nothing here
 reads an eval split.  The tests do NOT require the check to pass: they require the corpus
 to be what the draft says, the ceiling to be 0.56, and the printed verdict to be the one
@@ -35,8 +35,11 @@ class TestS8Benign(unittest.TestCase):
         """D8.benign: "620 benign carrier modifications generated to match poisoning events
         on surface statistics (edit size, embedding shift, recency, provenance shape)".
 
-        L0: exactly 620 distinct changes, PER_EVENT = 4 (v2's contract) per event, so 155
-        events spread over Delta in (0, 1, 2, 4, 8); every control is a drift change of
+        L0+L1: V3_PER_EVENT = 1 control per event (D-v3-2; v2's PER_EVENT = 4 is recorded),
+        a quota of min over Delta of candidates // 1 = 160 events per Delta (Delta = 8
+        binds), so at most 800 events and as many distinct changes over Delta in (0, 1, 2,
+        4, 8), not the draft's 620 (docs/preregistration/lech-chuan-P3-benign.md); a Delta
+        short of its quota records the shortfall (N3); every control is a drift change of
         the payload's carrier and repo, read at the payload's age; the features are exactly
         the four the draft names; every workflow is a dev workflow; the manifest pins this
         corpus (digest) and this module (sha256)."""
@@ -44,16 +47,24 @@ class TestS8Benign(unittest.TestCase):
         self.assertEqual(self.man["protocol"], T.protocol(),
                          "reference/v3_benign.json is stale: rerun tools/v3_benign.py --write")
         self.assertEqual(V.corpus_digest(ev), self.man["corpus"]["digest"])
-        self.assertEqual((V.N_BENIGN, V.PER_EVENT, V.N_EVENTS), (620, 4, 155))
+        self.assertEqual((V.N_BENIGN_DRAFT, V.PER_EVENT, V.V3_PER_EVENT), (620, 4, 1))
+        self.assertEqual(V.events_per_delta(self.runs), 160)
         self.assertEqual(V.FEATURES,
                          ("edit_size", "embedding_shift", "recency", "provenance_shape"))
-        self.assertEqual(len(ev), 155)
-        self.assertEqual(self.dropped, [])
+        # N3: a Delta that cannot reach its quota of 160 says so; nothing is topped up.
+        per_delta = {d: sum(e.delta == d for e in ev) for d in V.DELTAS}
+        self.assertEqual({str(d): n for d, n in per_delta.items()},
+                         self.man["corpus"]["per_delta"])
+        short = {d for d, n in per_delta.items() if n < 160}
+        self.assertEqual(short, {d for (w, d, i, why) in self.dropped
+                                 if w is None and why.startswith("supply:")})
+        self.assertTrue(all(n <= 160 for n in per_delta.values()))
+        self.assertGreaterEqual(len(ev), 795)
+        self.assertEqual(len(ev), self.man["corpus"]["n_events"])
         contents = [c.item.content for e in ev for c in e.controls]
-        self.assertEqual(len(contents), 620)
-        self.assertEqual(len(set(contents)), 620, "a benign change is used twice")
-        self.assertEqual({d: sum(e.delta == d for e in ev) for d in V.DELTAS},
-                         {d: 31 for d in V.DELTAS})
+        self.assertEqual(len(contents), len(ev))
+        self.assertEqual(len(set(contents)), len(ev), "a benign change is used twice")
+        self.assertEqual(self.man["corpus"]["n_distinct_benign"], self.man["corpus"]["n_benign"])
         dev = {w.wf_id: w for w in K.dev_workflows()}
         pos, neg = V.rows_of(ev)
         for e, p in zip(ev, pos):
@@ -69,7 +80,7 @@ class TestS8Benign(unittest.TestCase):
                 self.assertIn(dev[c.wf_id].tasks[c.t].task_id, c.item.content)
         self.assertEqual({n["recency"] for n in neg}, set(V.DELTAS))
         self.assertEqual(sorted(n["recency"] for n in neg),
-                         sorted(p["recency"] for p in pos for _ in range(V.PER_EVENT)))
+                         sorted(p["recency"] for p in pos for _ in range(V.V3_PER_EVENT)))
 
     def test_surface_discriminator_verdict_is_printed_against_0_56(self):
         """D8.benign: "verified by a two-sample test that a discriminator trained on surface

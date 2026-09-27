@@ -1,4 +1,4 @@
-"""v3/benign.py -- the 620 benign changes and the 4-feature surface check (P3; D8.benign).
+"""v3/benign.py -- the benign changes and the 4-feature surface check (P3; D8.benign; T24).
 
 Draft S8, Table 1: "620 benign carrier modifications generated to match poisoning events
 on surface statistics (edit size, embedding shift, recency, provenance shape), verified by
@@ -6,15 +6,31 @@ a two-sample test that a discriminator trained on surface features achieves AUC 
 sentinel-v3.md S8, row "Thay doi lanh": generate exactly 620, check exactly the 4 features;
 if the check fails, print "khong dat" and never relax the ceiling (L0).
 
+T24 DEVIATIONS (L1), declared before the rerun in
+docs/preregistration/lech-chuan-P3-benign.md (DEVIATION_REF):
+    D-v3-2  V3_PER_EVENT = 1 control per event instead of v2's PER_EVENT = 4.  A deviation
+            from v2's convention, not from the draft (the draft does not say how many
+            controls an event gets).  The AUC's CI is bound by the SMALLER class, so 4:1
+            spends the sample on the class that does not limit the interval: at 620 the
+            criterion's floor is 0.5805 > 0.56 even for a perfectly matched corpus.  Events
+            per Delta = min over Delta of candidates[Delta] // V3_PER_EVENT (Delta = 8 has
+            160), balanced over the five Deltas: 800 events and 800 benign changes, NOT the
+            draft's 620 (N_BENIGN_DRAFT is recorded beside it).
+    D-v3-3  the payload's length is drawn from the length distribution of v3's own drift
+            on dev (v3/payload.py, `draw_length`), not v2's constant 63: see
+            `length_background`.
+
 WHAT IS REUSED FROM v2 (analysis/benign_corpus.py, analysis/discriminator.py,
 analysis/gate2_v2.py), unchanged and imported, never patched:
-    PER_EVENT = 4 controls per poisoning event (v2's contract, no reuse of a control),
+    PER_EVENT = 4 controls per poisoning event (v2's contract, recorded; T24 uses
+    V3_PER_EVENT, see above), no reuse of a control,
     CARRIER = "memory" (v2's declared scope), SEED, the age matching (a control is read at
     now = created_at + age, so its recency equals the payload's), the per-repo control
     pool, the split protocol (discriminator.SPLIT_SEEDS = 20 train/test splits, test
     fraction 0.4, logistic regression by the same gradient descent, Hanley-McNeil CI95),
     and the criterion pinned by gate2_v2.record(): the MEAN of the CI95 upper bounds over
-    the split seeds must be <= ceiling = 0.56.  620 / 4 = 155 events.
+    the split seeds must be <= ceiling = 0.56.  (v2's 620 / 4 = 155 events was the first
+    P3 run; T24 replaces it, see above.)
 
 WHERE v3's ITEM REPRESENTATION DIFFERS FROM v2, AND WHAT IS DONE ABOUT IT
     1. The payload.  v2's corpus scored attacks.MatchedAttack (payload written to look
@@ -75,9 +91,10 @@ from v3 import payload as P
 # The declared protocol (fixed before the first run; printed into the manifest)
 # ---------------------------------------------------------------------------------------
 
-N_BENIGN = 620                              # the draft's number
-PER_EVENT = B.PER_EVENT                     # v2's contract: 4
-N_EVENTS = N_BENIGN // PER_EVENT            # 155
+N_BENIGN_DRAFT = 620                        # the draft's number: recorded, not the target
+V3_PER_EVENT = 1          # lệch chuẩn D-v3-2: xem docs/preregistration/lech-chuan-P3-benign.md
+PER_EVENT = B.PER_EVENT   # giữ nguyên: quy ước v2, ghi vào record để so sánh
+DEVIATION_REF = "docs/preregistration/lech-chuan-P3-benign.md"
 CARRIER = B.CARRIER                         # v2's declared scope: memory
 SEED = B.SEED
 EPSILON = ATK.RULE_BR_EPS                   # 0.6, v3's default placement magnitude
@@ -91,7 +108,7 @@ V2_FEATURES = tuple(sorted(DSC.F_MATCH))
 CONTROL_KINDS = ("drift", "v2-notes")       # primary, diagnostic
 PASS, FAIL = "đạt", "không đạt"
 
-assert N_EVENTS * PER_EVENT == N_BENIGN
+assert (PER_EVENT, V3_PER_EVENT) == (4, 1)
 
 
 # ---------------------------------------------------------------------------------------
@@ -211,7 +228,7 @@ class Event:
     sigma: int
     payload: Item
     shift: float
-    controls: tuple                     # (Change, ...), PER_EVENT of them
+    controls: tuple                     # (Change, ...), V3_PER_EVENT of them
 
     def rows(self) -> tuple:
         pos = features(self.payload, self.sigma, self.shift)
@@ -229,18 +246,27 @@ def candidates(runs: DevRuns, delta: int) -> list:
     return out
 
 
-def build(runs: DevRuns | None = None, kind: str = "drift", n_events: int = N_EVENTS,
+def events_per_delta(runs: DevRuns) -> int:
+    """D-v3-2: the balanced design's events per Delta, min over DELTAS of
+    candidates[Delta] // V3_PER_EVENT (Delta = 8 binds)."""
+    return min(len(candidates(runs, d)) // V3_PER_EVENT for d in DELTAS)
+
+
+def build(runs: DevRuns | None = None, kind: str = "drift", n_events: int | None = None,
           dropped: list | None = None) -> list:
-    """N_EVENTS events, spread round-robin over DELTAS, each with PER_EVENT distinct
-    controls of `kind` from the same repo; no control is used twice in the corpus.
+    """n_events events (default: events_per_delta(runs) per Delta), spread round-robin over
+    DELTAS, each with V3_PER_EVENT distinct controls of `kind` from the same repo; no
+    control is used twice in the corpus.
 
     Source 1 (v2's rule): the change of the host workflow written at iota = sigma - Delta,
     the one with the payload's age.  Source 2 (v2's harvest top-up): other changes of the
-    same repo on dev, re-read at age Delta.  An event that cannot get PER_EVENT controls
+    same repo on dev, re-read at age Delta.  An event that cannot get V3_PER_EVENT controls
     is dropped with a reason (N3)."""
     if kind not in CONTROL_KINDS:
         raise ValueError(f"kind {kind!r} is not one of {CONTROL_KINDS}")
     runs = dev_runs() if runs is None else runs
+    if n_events is None:
+        n_events = events_per_delta(runs) * len(DELTAS)
     sink = dropped if dropped is not None else []
     queues = {}
     for d in DELTAS:
@@ -258,7 +284,7 @@ def build(runs: DevRuns | None = None, kind: str = "drift", n_events: int = N_EV
             wf, sp = queues[d].popleft()
             ev = _match(runs, kind, wf, sp, used)
             if ev is None:
-                sink.append((wf.wf_id, d, sp.iota, "fewer than PER_EVENT unused controls"))
+                sink.append((wf.wf_id, d, sp.iota, "fewer than V3_PER_EVENT unused controls"))
                 continue
             used.update(c.item.content for c in ev.controls)
             events.append(ev)
@@ -285,7 +311,7 @@ def _match(runs: DevRuns, kind: str, wf, sp, used: set):
         if c.item.content not in seen:
             seen.add(c.item.content)
             uniq.append(c)
-    need = PER_EVENT - len(controls)
+    need = V3_PER_EVENT - len(controls)
     if len(uniq) < need:
         return None
     rng = random.Random(seed_of(SEED, "v3-benign", "ctrl", wf.wf_id, sp.iota, sp.delta))
