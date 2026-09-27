@@ -5,7 +5,9 @@ Every manifest here is written to a temporary directory, and the unseal log and 
 file are redirected there too, so frozen/ is never written.  The dev smoke runs T6's runner
 on a few dev workflows; no test reads an eval workflow."""
 import hashlib
+import itertools
 import json
+import logging
 import pathlib
 import sys
 import tempfile
@@ -20,9 +22,12 @@ from v3 import api
 from v3 import attackers as A
 from v3 import config as C
 from v3 import corpus as K
+from v3 import exact as E
 from v3 import freeze_v3 as F
 from v3 import grid as G
+from v3 import runner as RU
 from v3 import seal
+from v3 import sentinel as S
 
 sys.path.insert(0, str(pathlib.Path("tools").resolve()))
 import v3_run as R  # noqa: E402
@@ -209,6 +214,43 @@ class TestInfraFreeze(_Tmp):
             self.assertIn(f"{hashlib.sha256(b).hexdigest()}  {n}\n", text)
             lines = b.count(b"\n")
             self.assertIn(f"#   {lines}  {len(b)}  {n}\n", text)
+
+    def test_decision_log_sha256_reproducible_across_runs(self):
+        """D33: a record's decision_log_sha256 pins the decision log, so it must be a
+        function of the inputs alone.  Sentinel's line-2 infeasibility record (H >= 6, the
+        exact solve refuses) carries the DECISION content -- state count, H, K, the
+        infeasible -> line 5 outcome -- but NOT the per-run wall-clock / RSS measurements,
+        which vary run to run.  The same episode run twice (same seed, cache cleared as a
+        fresh process would be, wall clock forced to a different rate) gives one digest."""
+        logging.getLogger("v3.line23").setLevel(logging.ERROR)
+        reg = S.registry(S.stub_parts())
+        cell = C.Cell(rho=0.5, delta=4)
+        wf = next(w for w in K.dev_workflows() if 6 <= w.H <= 10)
+        pl = A.by_name(A.held_out()[1]).plan(wf, cell.delta)
+
+        def once(step):
+            S._LINE23.clear()                         # a fresh process: recompute line 2
+            clock = itertools.count(1000.0, step)
+            with mock.patch.object(E.time, "perf_counter", lambda: next(clock)):
+                ep = RU.Episode(wf, pl, reg[S.SENTINEL], C.PRIMARY, cell, 1)
+                rec = ep.run().record
+            l2 = next(e for e in ep.policy.decision_log() if e.get("line") == 2)
+            return rec.decision_log_sha256, l2, ep.policy.line23_diagnostics
+
+        d1, l2a, diag1 = once(0.001)
+        d2, l2b, diag2 = once(0.050)
+        # the forced clock made the wall time differ between the runs ...
+        self.assertNotEqual(diag1["runtime_s"], diag2["runtime_s"])
+        # ... yet the pinned decision log is identical (the fix): D33 holds
+        self.assertEqual(d1, d2, "decision_log_sha256 must not depend on wall time / RSS")
+        # the record is the reproducible DECISION content, with no measurement in it
+        self.assertEqual(l2a, l2b)
+        self.assertIn("line23: infeasible", l2a["record"])
+        self.assertNotIn("runtime=", l2a["record"])
+        self.assertNotIn("MiB", l2a["record"])
+        # the measurements are still available, off the pinned digest, for the report
+        self.assertGreaterEqual(diag1["runtime_s"], 0.0)
+        self.assertIn("peak_rss_mib", diag1)
 
     def test_dev_smoke_records_carry_every_switch(self):
         """D9.grid: "Results are reported on the (Δ, 𝜒) grid rather than pooled" -- so every

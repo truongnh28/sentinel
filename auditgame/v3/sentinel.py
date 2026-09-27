@@ -547,6 +547,7 @@ class Sentinel(A.PolicyBase):
                                   LIB.make_library(ctx, belief=self.belief, band=self.band))
         # lines 2-3
         self.line3: FollowingLine3 | None = None
+        self.line23_diagnostics: dict | None = None   # non-pinned (D33): wall time, RSS
         self.trace.append((None, "2"))
         if spec.variant in (NO_RANDOM, STATELESS):
             self._log.append({"line": 2, "kind": "skipped",
@@ -556,7 +557,11 @@ class Sentinel(A.PolicyBase):
             res = line23_cached(model_context(ctx), self.delta_hat)
             entry = {"line": 2, "kind": res.kind}
             if res.record is not None:
-                entry["record"] = res.record.log_line()
+                # D33: only the reproducible decision content is pinned; the per-run
+                # measurements (wall time, RSS) go to a non-pinned diagnostic channel so
+                # the same inputs give the same decision_log_sha256 across runs.
+                entry["record"] = res.record.decision_line()
+                self.line23_diagnostics = res.record.diagnostics()
             self._log.append(entry)
             if res.exact:
                 self.line3 = FollowingLine3(ctx, res)

@@ -745,7 +745,28 @@ class InfeasibleRecord:
     peak_rss_bytes: int
     detail: str = ""
 
+    def decision_line(self) -> str:
+        """The reproducible DECISION content for the pinned decision log (D33): the state
+        count, the game shape (H, K, KH) and the infeasible -> line 5 outcome.  No
+        wall-clock or RSS measurement enters here, so the same inputs give the same digest
+        across runs; the per-run measurements live in `diagnostics()` and `log_line()`."""
+        return (f"line23: infeasible, states={self.states}, reason={self.reason}, "
+                f"H={self.H}, K={self.K}, KH={self.KH}"
+                + (f", {self.detail}" if self.detail else ""))
+
+    def diagnostics(self) -> dict:
+        """The per-run DIAGNOSTIC measurements kept OUT of the pinned digest (D33): wall
+        time and peak RSS (both vary run to run), plus the deterministic memory estimate.
+        For the frontier report / the non-pinned diagnostic channel, never the decision log."""
+        return {"reason": self.reason, "H": self.H, "K": self.K, "KH": self.KH,
+                "states": self.states, "runtime_s": round(self.runtime_s, 6),
+                "memory_est_mib": round(self.memory_bytes / 2**20, 1),
+                "peak_rss_mib": round(self.peak_rss_bytes / 2**20, 1)}
+
     def log_line(self) -> str:
+        """The full diagnostic view for the logging channel (LOG.warning) -- carries the
+        wall-clock runtime and is NOT what enters the pinned decision log (use
+        `decision_line()` for that)."""
         return (f"line23: infeasible, states={self.states}, runtime={self.runtime_s:.3f}s, "
                 f"memory={self.memory_bytes / 2**20:.1f}MiB, reason={self.reason}, "
                 f"H={self.H}, K={self.K}, KH={self.KH}"
