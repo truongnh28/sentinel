@@ -84,6 +84,19 @@ def _loss_high(snap, hyp, m, c, r):
     return 5.0 * random.Random(seed_of("t14-high", m, c, r)).random()
 
 
+def _loss_crn(snap, hyp, m, c, r):
+    """line5-se-diff: a big COMMON draw shared by every member at (c, r) -- the same random
+    stream the real rollout engine shares (v3/rollout.py: one hypothesis, one world seed, one
+    member-randomisation seed per r, common to every (member, class)) -- plus a small
+    member-specific offset and a small independent residual.  Any one member's absolute SE
+    is dominated by the common term (well over TABLE_SE_MAX); the paired difference between
+    two members cancels it and is dominated by the residual (well under TABLE_DIFF_SE_MAX)."""
+    common = 5.0 * random.Random(seed_of("t14-crn-common", c, r)).random()
+    idx = TINY_MEMBERS.index(m)
+    resid = 0.05 * (random.Random(seed_of("t14-crn-resid", m, c, r)).random() - 0.5)
+    return common + 0.2 * idx + resid
+
+
 class TestAlg1Line5Table(unittest.TestCase):
 
     def test_line5_table_is_built_on_dev_only(self):
@@ -256,13 +269,17 @@ class TestAlg1Line5Table(unittest.TestCase):
 
     def test_table_cell_se_below_declared_threshold(self):
         """DA1.l5 -- "at ← arg minπ ∈Π maxπA ∈ΠA b L(π, πA | bt , Bt ) ⊲ robust over a
-        restricted library" (Alg. 1 line 5 p.3).  O12: every table cell has R = 32 rollouts
-        per (member, class) and SE = sd / sqrt(n) <= 0.09; a cell over it is topped up once to
-        R = 64, and one still over it is flagged, and its lookup note says so."""
+        restricted library" (Alg. 1 line 5 p.3).  O12, as amended by line5-se-diff
+        (27/09/2026): T14's pilot found the absolute-SE target unreachable at R = 32-64
+        (loss unbounded); the top-up gate is the CRN-paired diff-SE of the two closest
+        members instead, and the absolute SE / se_flag stay as a REPORTED DIAGNOSTIC that
+        no longer gates a top-up."""
         self.assertEqual((T.R, T.SE_MAX, T.R_MAX), (C.TABLE_R, C.TABLE_SE_MAX, 2 * C.TABLE_R))
         self.assertEqual((C.TABLE_R, C.TABLE_SE_MAX), (32, 0.09))
+        self.assertEqual(T.DIFF_SE_MAX, C.TABLE_DIFF_SE_MAX)
         st = B.settings_of(rhos=[0.25], pilot=True)
-        self.assertEqual((st["r"], st["r_max"], st["se_max"]), (32, 64, 0.09))
+        self.assertEqual((st["r"], st["r_max"], st["se_max"], st["diff_se_max"]),
+                         (32, 64, 0.09, C.TABLE_DIFF_SE_MAX))
         tc = B.table_cell(0.25)
         wf = B.dev_workflows()[0]
         state = (wf.wf_id, len(TINY_CLASSES), B.SOURCE_SEEDS[0], 2)  # unattacked, t = 2
@@ -273,7 +290,7 @@ class TestAlg1Line5Table(unittest.TestCase):
             B._init_worker(s)
             results[name] = B.value_job((tc, 4, wf.H - 2, 0, [state]))
         low, high = results["low"], results["high"]
-        # low variance: R = 32 is enough, SE = sd / sqrt(32), under 0.09, not flagged
+        # low variance: R = 32 is enough on the absolute-SE diagnostic too, not flagged
         self.assertEqual(low["n"], 32)
         self.assertLessEqual(float(low["se"].max()), 0.09)
         self.assertFalse(low["se_flag"])
@@ -281,22 +298,80 @@ class TestAlg1Line5Table(unittest.TestCase):
         self.assertAlmostEqual(float(low["se"][0, 0]), float(np.std(v, ddof=1) / np.sqrt(32)),
                                places=12)
         self.assertAlmostEqual(float(low["L"][0, 0]), float(np.mean(v)), places=12)
-        # high variance: topped up to 64, still over, flagged
+        # _loss_high has no CRN sharing across members (seed keyed on m too), so its diff-SE
+        # is just as unbounded as its absolute SE: topped up to 64, still over BOTH gates
         self.assertEqual(high["n"], 64)
         self.assertGreater(float(high["se"].max()), 0.09)
         self.assertTrue(high["se_flag"])
-        # a flagged cell's lookup says so
+        self.assertGreater(high["diff_se"], T.DIFF_SE_MAX)
+        self.assertTrue(high["diff_flag"])
+        # a flagged cell's lookup says so (diff note always present; O12 only when flagged)
         tab, cid = synthetic_table()
         d4 = T.delta_pos(4)
         tab.cells[cid]["se_flag"][d4, 4, :] = True
         tab.cells[cid]["se"][d4, 4, :] = 0.2
+        tab.cells[cid]["diff_flag"][d4, 4, :] = True
+        tab.cells[cid]["diff_se"][d4, 4, :] = 0.2
         tab.cells[cid]["n"][d4, 4, :] = 64
         m = tab.lookup(L5.TableKey(cid, 4, 5, feats()))
-        self.assertIn("> 0.09 after R = 64 (O12)", m.note)
+        self.assertIn(f"> {T.DIFF_SE_MAX} after R = 64 (O12, line5-se-diff)", m.note)
+        self.assertIn("secondary diagnostic: SE 0.2000 > 0.09 after R = 64 (not gated)", m.note)
         self.assertEqual(m.n[0][0], 64)
         m = tab.lookup(L5.TableKey(cid, 4, 6, feats()))
         self.assertNotIn("O12", m.note)
         self.assertEqual(m.n[0][0], 32)
+
+    def test_diff_se_gates_the_top_up_not_absolute_se(self):
+        """DA1.l5 -- "at ← arg minπ ∈Π maxπA ∈ΠA b L(π, πA | bt , Bt ) ⊲ robust over a
+        restricted library" (Alg. 1 line 5 p.3).  line5-se-diff (27/09/2026): O12's top-up
+        gate moves from the absolute SE of a
+        cell's loss estimate to the SE of the CRN-paired DIFFERENCE between the two closest
+        members, because that is the quantity line 5's argmin/minimax needs (which member is
+        better), and because members share one hypothesis, one world seed and one member-
+        randomisation seed per draw r (v3/rollout.py: common random numbers), so their losses
+        at the same r are paired, not independent.  A key whose absolute SE is large but
+        whose members are driven by a shared common draw (the paired difference cancels it)
+        stays at R = 32; the old absolute-SE diagnostic still reports it as over 0.09."""
+        tc = B.table_cell(0.25)
+        wf = B.dev_workflows()[0]
+        state = (wf.wf_id, len(TINY_CLASSES), B.SOURCE_SEEDS[0], 2)
+        s = B.settings_of(rhos=[0.25], pilot=True, members=TINY_MEMBERS, classes=TINY_CLASSES,
+                          rollout_fn=_loss_crn, r=8, r_max=16, diff_se_max=0.05)
+        B._init_worker(s)
+        res = B.value_job((tc, 4, wf.H - 2, 0, [state]))
+        # the common draw dominates: every member's absolute SE is far over 0.09
+        self.assertGreater(float(res["se"].min()), 0.09)
+        self.assertTrue(res["se_flag"])
+        # but the paired diff-SE (member offsets are small and deterministic) stays low:
+        # no top-up needed, R stays at the initial 8
+        self.assertEqual(res["n"], 8)
+        self.assertLessEqual(res["diff_se"], 0.05)
+        self.assertFalse(res["diff_flag"])
+        # the winning pair is (lowest member index, next), since idx only ever raises V(m)
+        self.assertEqual(res["diff_pair"], (0, 1))
+        self.assertAlmostEqual(res["diff_gap"], 0.2, delta=0.05)
+
+    def test_diff_se_beats_combining_independent_se(self):
+        """DA1.l5 -- "at ← arg minπ ∈Π maxπA ∈ΠA b L(π, πA | bt , Bt ) ⊲ robust over a
+        restricted library" (Alg. 1 line 5 p.3).  line5-se-diff (27/09/2026): under CRN,
+        sd(loss_i - loss_j) from the PAIRED
+        per-draw differences is what the gate uses; it must not be approximated by combining
+        the two members' independent SEs (sqrt(se_i^2 + se_j^2)), which ignores their
+        covariance and overstates the noise on the quantity line 5 actually needs."""
+        tc = B.table_cell(0.25)
+        wf = B.dev_workflows()[0]
+        state = (wf.wf_id, len(TINY_CLASSES), B.SOURCE_SEEDS[0], 2)
+        s = B.settings_of(rhos=[0.25], pilot=True, members=TINY_MEMBERS, classes=TINY_CLASSES,
+                          rollout_fn=_loss_crn, r=16, r_max=16)
+        B._init_worker(s)
+        losses = B.draws(tc, 4, wf.H - 2, 0, [state], 0, 16, {}, _loss_crn)
+        Lm, se = B._stats(losses, TINY_MEMBERS, TINY_CLASSES)
+        diff_se, gap, pair = B._diff_stats(losses, TINY_MEMBERS, TINY_CLASSES, Lm)
+        i, j = pair
+        c = TINY_CLASSES[int(Lm[i].argmax())]
+        naive = float(np.sqrt(se[i, TINY_CLASSES.index(c)] ** 2 + se[j, TINY_CLASSES.index(c)] ** 2))
+        self.assertLess(diff_se, naive)
+        self.assertLess(diff_se, 0.3 * naive)         # the common draw's variance mostly cancels
 
 
 if __name__ == "__main__":

@@ -137,9 +137,17 @@ BETA_BASE = "dev-clean-runs"
 BETA_UPDATE = "same-cell-postmortems"                 # alarms outside (k, [iota, sigma)) = drift
 # O12: Monte Carlo error of line 5.
 TABLE_R = 32
-TABLE_SE_MAX = 0.09
+TABLE_SE_MAX = 0.09                                   # kept as a secondary diagnostic only
 ROLLOUT_SE_IS_GATE = False                            # headline rollout: SE printed, not gated
 ROLLOUT_R_GRID = (16, 32, 64)                         # Q13 / T19
+# line5-se-diff (27/09/2026, @truong): T14's pilot found TABLE_SE_MAX unreachable at R =
+# 32-64 (loss unbounded by lambda_Q FQ + lambda_T clean-lost; 88% of cells stayed over even
+# after topping up).  The top-up GATE moves from the absolute SE of a cell's loss estimate
+# to the SE of the CRN-paired DIFFERENCE between the argmin member and its closest
+# competitor (v3/rollout.py shares one hypothesis, one world seed and one member-randomisation
+# seed across every (member, class) of a draw r -- confirmed, not partial).  TABLE_SE_MAX
+# stays as a reported diagnostic; it no longer gates a top-up.
+TABLE_DIFF_SE_MAX = 0.15                              # measured basis: docs/reports/v3-p2-table.md
 # O13: one rollout per particle shared by every attacker class -- NOT used.
 N_A_SHARED_ROLLOUT = False
 # O14: the table has no budget key; line 5 drops members whose action at t exceeds B_t.
@@ -174,7 +182,9 @@ DECIDED_O = {
     "O10": {"ro_axis": list(RO_AXIS)},
     "O11": {"beta_base": BETA_BASE, "beta_update": BETA_UPDATE},
     "O12": {"table_r": TABLE_R, "table_se_max": TABLE_SE_MAX,
-            "rollout_se_is_gate": ROLLOUT_SE_IS_GATE},
+            "rollout_se_is_gate": ROLLOUT_SE_IS_GATE,
+            "table_diff_se_max": TABLE_DIFF_SE_MAX,
+            "top_up_gate": "crn_pairwise_diff_se (line5-se-diff, 27/09/2026)"},
     "O13": {"n_a_shared_rollout": N_A_SHARED_ROLLOUT},
     "O14": {"table_has_budget_key": TABLE_HAS_BUDGET_KEY,
             "line5_skip_unaffordable": LINE5_SKIP_UNAFFORDABLE,
