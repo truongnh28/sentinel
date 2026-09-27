@@ -98,6 +98,7 @@ OWNED_TESTS = {
     "T20": ("test_s4_sensitivity.py",),
     "T21": ("test_s8_smallgames.py",),
     "T22": ("test_infra_grid.py", "test_infra_freeze.py"),
+    "T24": ("test_s8_benign.py",),
 }
 
 
