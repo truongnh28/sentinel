@@ -96,17 +96,15 @@ class TestInfraV2Compat(unittest.TestCase):
 
     def test_each_mode_switch_is_an_observable_departure_from_v2(self):
         """Infra (T4): each AgentMode switch is a real departure: flipping any single
-        switch of V2_COMPAT to its v3 value, or all of them (V3_MODE), changes some write,
+        switch of V2_COMPAT to its v3 value, or all four (V3_MODE), changes some write,
         marker or route on these dev episodes -- so the compatibility above is not
-        vacuous for any of them.  (27/09: drift_size, the drift text sized to the
-        payload, is the fifth switch.)"""
+        vacuous for any of them."""
         cell = C.Cell(rho=0.0, delta=4)
         modes = {"v3": AG.V3_MODE,
-                 "sleeper": AG.AgentMode(True, False, False, "all-delegated", "pad"),
-                 "queue": AG.AgentMode(False, True, False, "all-delegated", "pad"),
-                 "draws": AG.AgentMode(False, False, True, "all-delegated", "pad"),
-                 "via": AG.AgentMode(False, False, False, "any-delegated", "pad"),
-                 "drift": AG.AgentMode(False, False, False, "all-delegated", "payload")}
+                 "sleeper": AG.AgentMode(True, False, False, "all-delegated"),
+                 "queue": AG.AgentMode(False, True, False, "all-delegated"),
+                 "draws": AG.AgentMode(False, False, True, "all-delegated"),
+                 "via": AG.AgentMode(False, False, False, "any-delegated")}
         key = lambda outs: [(_items(o.writes), o.patch_has_marker, o.patch_via) for o in outs]
         differs = {name: False for name in modes}
         for wf in CO.dev_workflows()[:_N_WF]:

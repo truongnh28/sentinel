@@ -198,11 +198,7 @@ class TestInfraGlue(unittest.TestCase):
     #: BEFORE the speedups (check_classes and minimax memoised) and unchanged after.  The
     #: two left-out fields carry the line-2 infeasibility record's wall time and RSS, so
     #: they are not reproducible run to run.
-    #: Re-pinned 27/09 (branch fix-drift) for ONE declared change: v3's drift text is
-    #: sized to the payload (v3.drift, AgentMode.drift_size = "payload").  With the drift
-    #: text swapped back to world_v2.drift_content the digest is still the old
-    #: f9177fdd04d0ff57f282622c4e34c7a920fdf779efa81eaea62f8742b83fbd17 (checked).
-    PINNED_DECISIONS = "2670cc56bd118744beb73e1efff6a54e4174f92fbe9b18b311321af447d19284"
+    PINNED_DECISIONS = "f9177fdd04d0ff57f282622c4e34c7a920fdf779efa81eaea62f8742b83fbd17"
 
     @staticmethod
     def _decision_digest(reg) -> str:
