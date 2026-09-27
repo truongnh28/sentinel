@@ -30,10 +30,14 @@ WHAT THE AGENT DOES AT TASK t (one call of run_task, after the runner's injectio
        even while the note it came from is still live and retrieved.  Otherwise the
        patch is "direct".  v2's rule was "delegated iff EVERY source is delegated"; the
        two agree whenever one source activates, which is all v2 ever had at sigma.
-    6. DRIFT.  v2's StagedMockAgent drift, unchanged: carrier c draws
+    6. DRIFT.  v2's StagedMockAgent drift draws, unchanged: carrier c draws
        seed_of(seed, t, "drift-v2", c) against draft_setup.BETA_WORLD[c] and writes a
-       benign revision (world_v2.drift_content) on a future task's topic.  Drift items
-       enter from the repository ("repo/docs/conventions.md", the payload's own
+       benign revision on a future task's topic.  Its text is v3.drift.drift_content
+       (27/09, the draft's "matched on edit size"): v2's drift text at exactly the
+       payload's length on that topic -- padded as v2 pads, and also cut on a word
+       boundary, which world_v2.drift_content never does.  It is the AgentMode
+       default (drift_size="payload"), so every v3 world uses it; V2_COMPAT keeps v2's.
+       Drift items enter from the repository ("repo/docs/conventions.md", the payload's own
        provenance), so they are INGRESS writes (`ingress_ids`).  Whether a drift event
        stays anomalous for one task or forever is world.drift (`drift_anomalous`).
     7. SOLVE.  seed_of(seed, t, "solve") < solve_rate and nothing else (N4): no world
@@ -47,7 +51,7 @@ draw is a function of (seed, t) alone -- what agent.MockAgent's docstring promis
 and two policies see the same agent on the same seed (common random numbers).
 
 v2 COMPATIBILITY (plan T4 acceptance).  AgentMode(sleeper=False, queue_propagation=False,
-state_free_draws=False, via_rule="all-delegated") -- V2_COMPAT -- is v2: retrieval is
+state_free_draws=False, via_rule="all-delegated", drift_size="pad") -- V2_COMPAT -- is v2: retrieval is
 the topic join and activation IS retrieval (v2's dormancy rule: the payload's topic
 join at sigma is the trigger), no poison enters the queue, v2's draw order and route
 rule.  tests/v3/test_infra_v2_compat.py checks it reproduces world_v2.StagedMockAgent
@@ -75,9 +79,11 @@ import prose_world as _PW
 import retrieval
 from agent import MockAgent, _query
 from core import CARRIERS, Item, seed_of
-from world_v2 import OpenGates, StagedMockAgent, StagedOutcome, drift_content
+from world_v2 import OpenGates, StagedMockAgent, StagedOutcome
+from world_v2 import drift_content as drift_content_v2
 
 from v3 import config as C
+from v3.drift import drift_content
 from v3 import payload as P
 
 # ---------------------------------------------------------------------------------------
@@ -104,6 +110,10 @@ DRIFT_VISIBLE = {"transient": D.DRIFT_VISIBLE_TASKS, "persistent": None}
 #: Patch routes (world_v2.StagedOutcome.patch_via): "" = the patch carries no marker.
 VIAS = ("", "direct", "delegated")
 VIA_RULES = ("any-delegated", "all-delegated")
+#: How the drift text is sized: "payload" = v3.drift.drift_content (exactly the payload's
+#: length, padded or cut on a word boundary); "pad" = world_v2.drift_content (pad only).
+DRIFT_SIZES = ("payload", "pad")
+_DRIFT_TEXT = {"payload": drift_content, "pad": drift_content_v2}
 #: The provenance of what enters through repository ingress (build.inject's payload and
 #: StagedMockAgent's drift use the same string).
 INGRESS_PROVENANCE = "repo/docs/conventions.md"
@@ -126,15 +136,18 @@ class AgentMode:
     queue_propagation: bool = True     # a queued call inherits poison (Q3)
     state_free_draws: bool = True      # the three uniforms are drawn every task
     via_rule: str = "any-delegated"    # Fig. 1 t5; v2: "all-delegated"
+    drift_size: str = "payload"        # 27/09 v3.drift; v2: "pad" (world_v2.drift_content)
 
     def __post_init__(self):
         if self.via_rule not in VIA_RULES:
             raise ValueError(f"via_rule={self.via_rule!r} is not one of {VIA_RULES}")
+        if self.drift_size not in DRIFT_SIZES:
+            raise ValueError(f"drift_size={self.drift_size!r} is not one of {DRIFT_SIZES}")
 
 
 V3_MODE = AgentMode()
 V2_COMPAT = AgentMode(sleeper=False, queue_propagation=False, state_free_draws=False,
-                      via_rule="all-delegated")
+                      via_rule="all-delegated", drift_size="pad")
 
 
 @dataclass
@@ -353,7 +366,7 @@ class SleeperMockAgent(StagedMockAgent):
             rd = random.Random(seed_of(seed, t, "drift-v2", c))
             if b and rd.random() < b:
                 topic = future[rd.randrange(len(future))]
-                it = Item(carrier=c, topic=topic, content=drift_content(topic, task.task_id, c),
+                it = Item(carrier=c, topic=topic, content=_DRIFT_TEXT[mode.drift_size](topic, task.task_id, c),
                           created_at=t, provenance=INGRESS_PROVENANCE, poisoned=False)
                 # ground truth before any gate sees it (as StagedMockAgent)
                 self.drift_ids.add(it.item_id)

@@ -16,6 +16,7 @@ from analysis import gate2_v2 as G2
 from v3 import agent as AG
 from v3 import benign as V
 from v3 import corpus as K
+from v3 import drift as DR
 
 sys.path.insert(0, str(pathlib.Path("tools").resolve()))
 import v3_benign as T  # noqa: E402
@@ -49,9 +50,9 @@ class TestS8Benign(unittest.TestCase):
                          ("edit_size", "embedding_shift", "recency", "provenance_shape"))
         self.assertEqual(len(ev), 155)
         self.assertEqual(self.dropped, [])
-        contents = [c.item.content for e in ev for c in e.controls]
-        self.assertEqual(len(contents), 620)
-        self.assertEqual(len(set(contents)), 620, "a benign change is used twice")
+        keys = [V.source_key(c) for e in ev for c in e.controls]
+        self.assertEqual(len(keys), 620)
+        self.assertEqual(len(set(keys)), 620, "a benign change is used twice")
         self.assertEqual({d: sum(e.delta == d for e in ev) for d in V.DELTAS},
                          {d: 31 for d in V.DELTAS})
         dev = {w.wf_id: w for w in K.dev_workflows()}
@@ -66,7 +67,11 @@ class TestS8Benign(unittest.TestCase):
                 self.assertEqual(dev[c.wf_id].repo, e.repo)
                 self.assertEqual((c.kind, c.item.carrier, c.item.poisoned),
                                  ("drift", V.CARRIER, False))
-                self.assertIn(dev[c.wf_id].tasks[c.t].task_id, c.item.content)
+                # 27/09: the drift text is cut to the payload's length and no longer
+                # carries the task id; the change's source is the writing task itself.
+                self.assertEqual(c.source, dev[c.wf_id].tasks[c.t].task_id)
+                self.assertEqual(c.item.content,
+                                 DR.drift_content(c.item.topic, c.source, V.CARRIER))
         self.assertEqual({n["recency"] for n in neg}, set(V.DELTAS))
         self.assertEqual(sorted(n["recency"] for n in neg),
                          sorted(p["recency"] for p in pos for _ in range(V.PER_EVENT)))
@@ -75,14 +80,17 @@ class TestS8Benign(unittest.TestCase):
         """D8.benign: "verified by a two-sample test that a discriminator trained on surface
         features achieves AUC ≤ 0.56. Without this, false quarantine is free".
 
-        L0: the ceiling is gate2_v2's 0.56, read and never restated; the criterion is v2's
-        pinned one (mean CI95 upper bound over discriminator.SPLIT_SEEDS, test fraction
-        0.4); the classifier is v2's algorithm (it reproduces discriminator.auc_with_ci on
-        v2's five features exactly); the verdict in the manifest is the one the criterion
-        gives on the rebuilt corpus -- "đạt" or "không đạt", never a relaxed ceiling."""
+        L0: the ceiling is gate2_v2's 0.56, read and never restated; the criterion is the
+        draft's statistic, the MEDIAN AUC over discriminator.SPLIT_SEEDS (test fraction
+        0.4), decided 27/09; v2's stricter rule (mean CI95 upper bound) is recorded as a
+        secondary check and never decides; the classifier is v2's algorithm (it reproduces
+        discriminator.auc_with_ci on v2's five features exactly); the verdict in the
+        manifest is the one the criterion gives on the rebuilt corpus -- "đạt" or
+        "không đạt", never a relaxed ceiling."""
         self.assertEqual(V.CEILING, 0.56)
         self.assertEqual(G2.record()["ceiling"], V.CEILING)
-        self.assertEqual(V.CRITERION, "mean_ci95_upper_over_split_seeds")
+        self.assertEqual(V.CRITERION, "median_auc_over_split_seeds")
+        self.assertEqual(V.CRITERION_V2, "mean_ci95_upper_over_split_seeds")
         self.assertEqual((V.SPLIT_SEEDS, V.TEST_FRACTION), (tuple(range(1, 21)), 0.4))
         p2, n2 = V.v2_rows_of(self.events)
         for seed in (1, 7, 20):
@@ -94,9 +102,11 @@ class TestS8Benign(unittest.TestCase):
         self.assertAlmostEqual(round(s["hi_mean"], 4), m["hi_mean"])
         self.assertAlmostEqual(round(s["auc_median"], 4), m["auc_median"])
         self.assertEqual(s["clear"], m["clear"])
-        want = V.PASS if s["hi_mean"] <= 0.56 else V.FAIL
+        want = V.PASS if s["auc_median"] <= 0.56 else V.FAIL
         self.assertEqual(V.verdict(s), want)
         self.assertEqual(self.man["result"]["verdict"], want)
+        want_v2 = V.PASS if s["hi_mean"] <= 0.56 else V.FAIL
+        self.assertEqual(self.man["result"]["verdict_v2"], want_v2)
         self.assertIn(self.man["result"]["verdict"], ("đạt", "không đạt"))
 
     def test_benign_changes_are_the_agents_drift_process(self):
@@ -104,7 +114,7 @@ class TestS8Benign(unittest.TestCase):
         with observation statistics matched to poisoning events."
 
         L1: a benign change is what v3's agent writes when the drift coin of the carrier
-        fires (world_v2.drift_content through the payload's ingress provenance).  The
+        fires (v3.drift.drift_content through the payload's ingress provenance).  The
         corpus generates one per (dev workflow, task) by running the agent with the
         carrier's rate at 1; the topic draw is the same draw, so wherever the nominal coin
         fires the generated change is byte-identical to the nominal drift item."""
@@ -122,6 +132,12 @@ class TestS8Benign(unittest.TestCase):
         prov = {c.item.provenance for e in self.events for c in e.controls}
         self.assertEqual(prov, {AG.INGRESS_PROVENANCE})
         self.assertEqual({e.payload.provenance for e in self.events}, prov)
+        # 27/09, "matched on edit size": every drift text has exactly the payload's
+        # length on its topic (v3.drift), and the payload keeps build's length rule.
+        for e in self.events:
+            self.assertEqual(len(e.payload.content), DR.target_length(e.payload.topic))
+            for c in e.controls:
+                self.assertEqual(len(c.item.content), DR.target_length(c.item.topic))
 
 
 if __name__ == "__main__":

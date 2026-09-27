@@ -2,7 +2,9 @@
 
 Ngày 27/09/2026. Nhánh `p3-benign`, tách từ `int-p2`. Mọi số trong báo cáo được đo trên **dev**, tức 100 workflow của v2 lấy qua `v3.corpus.dev_workflows()`. Không có số nào lấy từ eval, và không có lượt eval nào được chạy.
 
-**Kết luận: không đạt.** Bộ phân loại bề mặt trên 4 đặc trưng cho AUC trung vị 0,970, cận trên CI95 trung bình 0,998, và 0/20 split nằm dưới 0,56. Mức trần 0,56 được giữ nguyên.
+> Cập nhật 27/09: sau khi khớp drift theo kích thước và dùng thống kê trung vị của draft, kết quả là **đạt** (AUC trung vị 0,539). Luật phụ của v2 vẫn không đạt, và embedding shift vẫn tách ở Δ = 8. Xem § Sau khi khớp kích thước (27/09) ở cuối báo cáo.
+
+**Kết luận (lượt đầu): không đạt.** Bộ phân loại bề mặt trên 4 đặc trưng cho AUC trung vị 0,970, cận trên CI95 trung bình 0,998, và 0/20 split nằm dưới 0,56. Mức trần 0,56 được giữ nguyên.
 
 ## 1. Dựng tập
 
@@ -78,3 +80,80 @@ Hai chỗ biểu diễn của v3 khác v2, và vì sao kết quả khác:
 - `auditgame/tools/v3_benign.py`: in kết quả; thêm `--write` để ghi `auditgame/reference/v3_benign.json`. Chạy khoảng 2 phút, kể cả họ salt.
 - `auditgame/tests/v3/test_s8_benign.py`: 3 test, ứng với các dòng DCM trong `auditgame/v3/dcm/T33.csv`. Các test kiểm tập và kiểm rằng kết luận in ra đúng với tiêu chí; chúng không đòi phải đạt.
 - `tests/run_v3.py`: xanh (3/3, 50/50, 142/142). Freeze gốc sạch (`sha256:c789fa7362e0`).
+
+## § Sau khi khớp kích thước (27/09)
+
+Nhánh `fix-drift`, tách từ `int-p2` (đã gồm `p3-benign`). Vẫn chỉ đo trên dev, không chạm eval. Hai quyết định dưới đây do tác giả chốt ngày 27/09, **trước** lượt chạy lại.
+
+### Quyết định
+
+1. **Drift khớp edit size (L0).** Draft ghi thay đổi lành "matched on edit size". Thêm `auditgame/v3/drift.py` (không sửa `world_v2.py`):
+   - Độ dài đích `target_length(topic)` = độ dài payload trên cùng topic: L = 63, hoặc chỉ tag khi tag đã ≥ L (đúng luật `build.payload_length_reason`).
+   - Văn bản gốc là văn bản drift của v2. Ngắn hơn thì đệm "." như v2. Dài hơn thì cắt tại ranh giới từ cuối cùng trong ngân sách, bỏ khoảng trắng cuối, rồi đệm "."; chỉ cắt cứng khi không có ranh giới nào.
+   - Nối vào bước 6 của `v3/agent.py` qua công tắc mới `AgentMode.drift_size`, mặc định `"payload"`. Mọi thế giới v3 (`V3_MODE`) dùng hàm mới. `V2_COMPAT` giữ `"pad"`, tức `world_v2.drift_content`, nên v3 ở chế độ tương thích vẫn trùng v2 từng draw.
+2. **Thống kê của cổng** là thống kê draft nêu: **AUC trung vị qua 20 split của v2 ≤ 0,56** (`CRITERION = median_auc_over_split_seeds`). Luật chặt hơn của v2 (trung bình cận trên CI95 ≤ 0,56, `CRITERION_V2`) chỉ in ra như kiểm tra phụ, không quyết định. Trần giữ 0,56. Giữ đúng 620 thay đổi lành.
+
+### Một hệ quả phải xử lý: khoá "không dùng lại đối chứng"
+
+Trước đây `benign.py` coi hai đối chứng là một khi **văn bản** trùng nhau. Văn bản cũ `[{topic}] cập nhật quy ước {task_id}/{carrier}` là mã một-một của bộ ba (task viết, topic, carrier). Sau khi cắt về 63 ký tự, task id bị mất ở hầu hết văn bản: 993 thay đổi drift trên dev chỉ còn 307 văn bản khác nhau. Giữ khoá theo văn bản thì chỉ dựng được 71 sự kiện (284 đối chứng), không đủ 620.
+
+Vì vậy khoá được lấy trực tiếp từ bộ ba đó (`benign.source_key` = (task_id của task viết, topic, carrier); `Change.source` mang task_id). Trên văn bản drift cũ, khoá mới cho **đúng tập cũ**: digest `f4e1c39aac65` (đã kiểm). Đây không phải tinh chỉnh; nó chỉ giữ nguyên nghĩa cũ của quy tắc khi văn bản thôi mang task id.
+
+Hệ quả cần ghi rõ: 620 thay đổi là 620 item khác nhau (khác task, khác thời điểm, khác item_id), nhưng chỉ có **237 văn bản khác nhau**. Các đối chứng cùng văn bản vẫn khác nhau ở embedding shift, và recency lấy theo Δ của sự kiện. Dù vậy, chúng ít độc lập hơn con số 620 gợi ý. Đây đúng loại lo ngại mà docstring của `benign_corpus` v2 nêu với Hanley–McNeil: CI có thể hẹp hơn mức bằng chứng thật cho phép.
+
+### Kết quả
+
+Tập mới: 155 sự kiện × 4 = 620 thay đổi lành, 0 sự kiện bị loại, 31 sự kiện mỗi Δ, 91/620 là đối chứng của chính workflow tại ι. Digest `15013a9cedf8…` (`reference/v3_benign.json`).
+
+| Đại lượng | Trước (27/09, lượt đầu) | Sau khi khớp kích thước |
+| --- | --- | --- |
+| AUC trung vị / trung bình | 0,970 / 0,972 | **0,539 / 0,537** |
+| AUC min / max qua 20 split | — | 0,480 / 0,590 |
+| CI95 trung bình | [0,943; 0,998] | **[0,456; 0,619]** |
+| CI95 trung vị | — | [0,457; 0,620] |
+| Số split có cận trên ≤ 0,56 | 0/20 | 0/20 |
+| Sàn cận trên khi AUC = 0,5 | 0,5805 | 0,5805 |
+| **Kết luận (trung vị ≤ 0,56)** | — | **đạt** |
+| Kiểm tra phụ (luật v2: cận trên TB ≤ 0,56) | không đạt | **không đạt** (không thể đạt ở cỡ 620, vì sàn là 0,5805) |
+
+Edit size: 94,8% đối chứng (588/620) và 153/155 payload có đúng 63 ký tự. Phần còn lại là topic có tag ≥ 63, và topic của drift khác topic của payload.
+
+#### Theo đặc trưng
+
+| Đặc trưng | AUC một đặc trưng | SMD | Bỏ đặc trưng này: trung vị, CI95 TB → kết luận (luật v2) |
+| --- | --- | --- | --- |
+| edit_size | 0,481 (gập: 0,519) | −0,19 | 0,519, [0,438; 0,600] → đạt (không đạt) |
+| embedding_shift | **0,558** | +0,12 | 0,503, [0,421; 0,582] → đạt (không đạt) |
+| recency | 0,500 (khớp theo cách dựng) | 0 | 0,578, [0,503; 0,666] → **không đạt** (không đạt) |
+| provenance_shape | 0,500 (hằng ở cả hai lớp) | 0 | 0,539, [0,456; 0,619] → đạt (không đạt) |
+
+- Sau khi khớp kích thước, **embedding shift là đặc trưng tách mạnh nhất** (AUC một đặc trưng 0,558; payload làm dịch túi topic của carrier nhiều hơn drift). Bỏ nó thì trung vị về 0,503.
+- Bỏ recency lại làm trung vị tăng lên 0,578. Recency là hằng số giữa hai lớp trong cùng Δ, nhưng khi có mặt trong mô hình nó giúp hồi quy hiệu chỉnh embedding shift theo Δ. Không có nó, phần tách theo Δ = 8 (bên dưới) lộ ra nhiều hơn.
+
+#### Theo Δ, so sánh, họ salt
+
+| Phép đo | AUC trung vị | Cận trên TB | Kết luận (luật v2) |
+| --- | --- | --- | --- |
+| Δ = 0 | 0,475 | 0,672 | đạt (không đạt) |
+| Δ = 1 | 0,503 | 0,677 | đạt (không đạt) |
+| Δ = 2 | 0,486 | 0,655 | đạt (không đạt) |
+| Δ = 4 | 0,471 | 0,650 | đạt (không đạt) |
+| **Δ = 8** | **0,787** | 0,930 | **không đạt** (không đạt) |
+| Cùng item, F_match 5 đặc trưng của v2 | 0,525 | 0,614 | đạt (không đạt) |
+| Đối chứng là ghi chú agent (chẩn đoán) | 1,000 | 1,000 | không đạt (không đạt) |
+| Họ 17 salt của v2 (luật ≥ 14/17) | — | — | 15/17 đạt theo trung vị → đạt; 0/17 theo luật v2 |
+
+**Embedding shift vẫn tách ở Δ = 8.** Ở Δ = 8, AUC một đặc trưng của embedding shift là 0,753 (payload 0,353, drift 0,136). Bỏ nó thì trung vị Δ = 8 về 0,529. Giả thuyết, chưa kiểm: với Δ = 8, ι buộc phải nằm sớm trong workflow, khi carrier còn ít item, nên payload làm túi topic dịch nhiều. Còn drift lấy từ các task khác của cùng repo, tại những thời điểm carrier đầy hơn. Đây là tín hiệu thật, không bị tinh chỉnh; kết luận toàn cục "đạt" không che nó. Mỗi Δ chỉ có 31 sự kiện, nên sàn cận trên theo Δ là 0,683.
+
+### Test đã sửa (đều do thay đổi đã khai)
+
+- `tests/v3/test_s8_benign.py`:
+  - Tính "620 khác nhau" theo `source_key` thay vì theo văn bản.
+  - Thay kiểm tra "task_id nằm trong content" bằng hai kiểm tra: `c.source` là task_id của task viết, và content bằng `v3.drift.drift_content(topic, task_id, carrier)`.
+  - Tiêu chí mới: `CRITERION = median_auc_over_split_seeds`, kèm kiểm tra `verdict_v2` trong manifest.
+  - Thêm kiểm tra độ dài: mọi đối chứng và mọi payload có đúng `target_length(topic)`.
+- `tests/v3/test_infra_v2_compat.py::test_each_mode_switch_is_an_observable_departure_from_v2`: 4 mode lật một công tắc giờ ghi rõ `drift_size="pad"`; thêm mode `drift` (chỉ lật `drift_size`), và mode này cũng quan sát được là khác v2. `test_v2_compat_mode_reproduces_staged_mock_agent` không sửa, vẫn xanh nhờ `V2_COMPAT.drift_size = "pad"`.
+- `tests/v3/test_infra_glue.py`: digest quyết định `PINNED_DECISIONS` được **pin lại** thành `2670cc56bd11…` (trước là `f9177fdd04d0…`). Đã kiểm: khi đổi văn bản drift về `world_v2.drift_content`, digest trở lại đúng `f9177fdd04d0…`, nên thay đổi chỉ đến từ drift.
+- `v3/dcm/T33.csv`: cột decision của D8.benign (tiêu chí) và D4.drift (hàm drift) được cập nhật theo hai quyết định.
+
+`tests/run_v3.py --all`: 3/3, 57/57, 142/142, xanh hết. Freeze gốc: `clean sha256:c789fa7362e0`.

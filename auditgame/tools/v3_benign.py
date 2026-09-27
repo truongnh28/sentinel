@@ -3,8 +3,10 @@
 
 Writes the manifest reference/v3_benign.json (GENERATED, never hand-edited;
 tests/v3/test_s8_benign.py checks it against the live modules) and prints the verdict:
-"đạt" when the mean CI95 upper bound over v2's 20 split seeds is <= 0.56, else "không đạt".
-The ceiling is read from analysis/gate2_v2.record(); nothing here can move it.
+"đạt" when the median AUC over v2's 20 split seeds is <= 0.56 (the draft's statistic),
+else "không đạt".  v2's stricter rule (mean CI95 upper bound <= 0.56) is printed as a
+secondary check.  The ceiling is read from analysis/gate2_v2.record(); nothing here can
+move it.
 
     cd auditgame
     ../.venv/bin/python tools/v3_benign.py            # measure, print, do not write
@@ -41,7 +43,7 @@ def protocol() -> dict:
         seed=V.SEED, epsilon=V.EPSILON, deltas=list(V.DELTAS), features=list(V.FEATURES),
         v2_features=list(V.V2_FEATURES), control_kind="drift",
         diagnostic_control_kind="v2-notes", ceiling=V.CEILING, criterion=V.CRITERION,
-        split_seeds=list(V.SPLIT_SEEDS), test_fraction=V.TEST_FRACTION,
+        criterion_v2_secondary=V.CRITERION_V2, split_seeds=list(V.SPLIT_SEEDS), test_fraction=V.TEST_FRACTION,
         split="dev (v3.corpus.dev_workflows, 100 v2 workflows)",
         source="v3/benign.py", source_sha256=module_sha())
 
@@ -50,7 +52,8 @@ def corpus_record(events: list, runs, dropped: list) -> dict:
     contents = [c.item.content for ev in events for c in ev.controls]
     return dict(
         digest=V.corpus_digest(events), n_events=len(events), n_benign=len(contents),
-        n_distinct_benign=len(set(contents)),
+        n_distinct_benign=len({V.source_key(c) for ev in events for c in ev.controls}),
+        n_distinct_texts=len(set(contents)),
         dev_workflows=len(runs.workflows),
         workflows_hosting=len({ev.wf_id for ev in events}),
         per_delta={str(d): sum(1 for ev in events if ev.delta == d) for d in V.DELTAS},
@@ -65,7 +68,7 @@ def corpus_record(events: list, runs, dropped: list) -> dict:
 
 def _summary(s: dict) -> dict:
     keys = ("k", "auc_mean", "auc_median", "auc_min", "auc_max", "lo_mean", "hi_mean",
-            "hi_min", "hi_max", "clear", "weights_mean")
+            "lo_median", "hi_median", "hi_min", "hi_max", "clear", "weights_mean")
     out = {k: (round(s[k], 4) if isinstance(s[k], float) else s[k]) for k in keys if k in s}
     out["per_seed"] = {str(k): list(v) for k, v in s["per_seed"].items()}
     return out
@@ -77,7 +80,8 @@ def run(salts: bool = True) -> dict:
     events = V.build(runs, dropped=dropped)
     m = V.measure(events)
     main = m.pop("main")
-    result = dict(verdict=m.pop("verdict"), main=_summary(main), **m)
+    result = dict(verdict=m.pop("verdict"), verdict_v2=m.pop("verdict_v2"),
+                  main=_summary(main), **m)
     result["per_delta"] = {str(k): v for k, v in result["per_delta"].items()}
 
     pos2, neg2 = V.v2_rows_of(events)
@@ -87,9 +91,11 @@ def run(salts: bool = True) -> dict:
     sn = V.over_splits(pn, nn, V.FEATURES)
     comparisons = {
         "v2_features_same_items": dict(features=list(V.V2_FEATURES), verdict=V.verdict(s2),
+                                       verdict_v2=V.verdict_v2(s2),
                                        main=_summary(s2),
                                        table=V.feature_table(pos2, neg2, V.V2_FEATURES)),
         "v2_notes_as_controls": dict(n_events=len(notes), verdict=V.verdict(sn),
+                                     verdict_v2=V.verdict_v2(sn),
                                      main=_summary(sn),
                                      table=V.feature_table(pn, nn, V.FEATURES)),
     }
@@ -111,24 +117,31 @@ def main() -> int:
     r = man["result"]
     mm = r["main"]
     print(f"corpus: {man['corpus']['n_events']} events, {man['corpus']['n_benign']} benign "
-          f"changes ({man['corpus']['n_distinct_benign']} distinct), dev only, "
+          f"changes ({man['corpus']['n_distinct_benign']} distinct, "
+          f"{man['corpus']['n_distinct_texts']} distinct texts), dev only, "
           f"sha256 {man['corpus']['digest'][:12]}")
     print(f"AUC (4 features, {mm['k']} splits): median {mm['auc_median']}, mean "
-          f"{mm['auc_mean']}, mean CI95 [{mm['lo_mean']}, {mm['hi_mean']}]; "
+          f"{mm['auc_mean']}, mean CI95 [{mm['lo_mean']}, {mm['hi_mean']}], median CI95 "
+          f"[{mm['lo_median']}, {mm['hi_median']}]; "
           f"{mm['clear']}/{mm['k']} splits clear {V.CEILING}")
     print(f"floor of the mean upper bound at AUC = 0.5 on this sample: {r['floor_hi']}")
     for c, row in r["features"].items():
+        do = r["drop_one"][c]
         print(f"  {c:17s} single-feature AUC {row['auc_single']:.4f}  smd {row['smd']:+.3f}  "
-              f"drop-one hi_mean {r['drop_one'][c]['hi_mean']}")
+              f"drop-one median {do['auc_median']}, CI95 [{do['lo_mean']}, {do['hi_mean']}]"
+              f" -> {do['verdict']} (v2 rule: {do['verdict_v2']})")
     for d, row in r["per_delta"].items():
         print(f"  Delta={d}: median {row['auc_median']}, hi_mean {row['hi_mean']} -> "
-              f"{row['verdict']}")
+              f"{row['verdict']} (v2 rule: {row['verdict_v2']})")
     for name, c in man["comparisons"].items():
         print(f"  [{name}] median {c['main']['auc_median']}, hi_mean {c['main']['hi_mean']} "
-              f"-> {c['verdict']}")
+              f"-> {c['verdict']} (v2 rule: {c['verdict_v2']})")
     if "salt_family" in man:
         sf = man["salt_family"]
-        print(f"  salt family: {sf['passing']}/{sf['total']} salts pass -> {sf['verdict']}")
+        print(f"  salt family: {sf['passing']}/{sf['total']} salts pass -> {sf['verdict']} "
+              f"(v2 rule per salt: {sf['passing_v2']}/{sf['total']})")
+    print(f"secondary (v2's rule, {V.CRITERION_V2} <= {V.CEILING}): {r['verdict_v2']} "
+          f"(reported, not the verdict)")
     print(f"VERDICT (ceiling {V.CEILING}, {V.CRITERION}): {r['verdict']}")
     if a.write:
         MANIFEST.write_text(json.dumps(man, indent=1, ensure_ascii=False, sort_keys=True)
