@@ -32,7 +32,12 @@ before the run, and are not moved after it:
           share of MARKED delegated sigma-patches its commit review blocks is not above the
           share of CLEAN patches it blocks (the false-alarm rate) by more than 2 binomial SE
           -- the review carries no information on a delegated patch;
-       c. V(B1) is near flat in Delta: at every rho, max - min over Delta <= TOL_FLAT = 0.05;
+       c. V(B1) is near flat in Delta.  TWO criteria, BOTH declared here and both reported:
+          (i)  fixed tolerance (the M1 gate): at every rho, max - min over Delta <=
+               TOL_FLAT = 0.05;
+          (ii) noise-aware (supplementary, FLAT_CI_ALPHA): at every rho, the 95% wild-
+               cluster-bootstrap CI of the V(B1) difference between the extreme Deltas
+               (max-Delta minus min-Delta) contains 0.  The gate verdict stays (i);
   4. one B1 episode <= 1.1 ms (single process, measured apart from the grid);
   5. test_v3_leaves_v2_freeze_clean green (run separately).
 
@@ -83,6 +88,14 @@ SYSTEMS = tuple(BL.BASELINES) + (ORACLE,)
 NONE = "none (reference)"
 TOL_RHO = 0.02
 TOL_FLAT = 0.05
+#: Gate 3c, SECOND (noise-aware) criterion, DECLARED HERE before the run and not moved after
+#: it: at each rho, the (1 - FLAT_CI_ALPHA) wild-cluster-bootstrap CI (Webb weights, the
+#: v3/metrics engine, cluster = repo family) of the V(B1) difference between the extreme
+#: Deltas (max-Delta minus min-Delta) contains 0.  Reported BESIDE the fixed-tolerance
+#: verdict (TOL_FLAT); it never overrides it.  The V(B1) point difference is small versus the
+#: per-V bootstrap half-width (~0.04-0.06 at ~85 wf x 2 seeds), so 3c is checked as a
+#: hypothesis on the difference, not a fixed tolerance on it.
+FLAT_CI_ALPHA = 0.05
 CONTROL_MAX = M.CONTROL_MAX_HARM
 TIMING_BUDGET_MS = 1.1
 OUT = HERE / "spikes" / "v3-m1" / "m1-summary.json"
@@ -201,7 +214,7 @@ def work(job) -> dict:
     return out
 
 
-def time_b1(n_wf: int) -> dict:
+def time_b1(n_wf: int, seeds=SEEDS) -> dict:
     """Gate 4: B1 episodes, single process, rho = 0, Delta = 4, the scripted columns.
     Per-episode wall time of Episode(...).run() (placement planned outside)."""
     cell = cell_of(0.0, 4)
@@ -211,7 +224,7 @@ def time_b1(n_wf: int) -> dict:
             pl = AT.SCRIPTED[name].plan(wf, 4)
             if pl is None:
                 continue
-            for s in SEEDS:
+            for s in seeds:
                 eps.append((wf, pl, s))
     fac = BL.factory(B1)
     for wf, pl, s in eps[:50]:                                     # warm-up
@@ -313,12 +326,39 @@ def summarise(parts, n_wf) -> dict:
         "n_clean_patches": n_clean, "blocked_share_clean": _f(p_clean), "se": _f(se),
         "harm_rate_delegated_marked": _f(harm_del)}
     flat = {}
-    ok_c = True
+    ok_c = True                        # criterion (i): fixed tolerance -- the M1 gate verdict
+    ok_c_ci = True                     # criterion (ii): noise-aware CI on the difference
+    d_lo, d_hi = min(DELTAS), max(DELTAS)
     for r in RHOS:
         vs = [V[f"{B1}|{r}|{d}"] for d in DELTAS]
-        flat[str(r)] = {"V": vs, "range": max(vs) - min(vs)}
-        ok_c &= max(vs) - min(vs) <= TOL_FLAT
-    gates["3c V(B1) near flat in Delta"] = {"pass": ok_c, "tol": TOL_FLAT, "values": flat}
+        rng_ = max(vs) - min(vs)
+        # (ii) 95% wild-cluster-bootstrap CI of V(B1)@d_hi - V(B1)@d_lo (Webb weights, one
+        # family draw shared by both tables -> paired), reusing v3/metrics unchanged.
+        rs = rows[r]
+        t_hi = M.table(rs, B1, scripted, (d_hi,))
+        t_lo = M.table(rs, B1, scripted, (d_lo,))
+        bt = M.boot_values({"hi": t_hi, "lo": t_lo}, method="wild")
+        dif = bt.draws["hi"] - bt.draws["lo"]
+        lo, hi = M.interval(dif, alpha=FLAT_CI_ALPHA)
+        point = bt.point["hi"] - bt.point["lo"]
+        contains0 = bool(lo <= 0.0 <= hi)
+        flat[str(r)] = {"V": vs, "range": rng_,
+                        "diff_extreme": {"delta_hi": d_hi, "delta_lo": d_lo,
+                                         "point": _f(point), "ci_lo": _f(lo), "ci_hi": _f(hi),
+                                         "p_value": _f(M.p_value(dif)),
+                                         "contains_zero": contains0,
+                                         "n_workflows": len(bt.workflows),
+                                         "n_families": len(bt.families)}}
+        ok_c &= rng_ <= TOL_FLAT
+        ok_c_ci &= contains0
+    gates["3c V(B1) near flat in Delta"] = {
+        "pass": ok_c, "tol": TOL_FLAT, "values": flat,
+        "ci_criterion": {
+            "declared": ("at each rho, the (1 - alpha) wild-cluster-bootstrap CI of the V(B1) "
+                         "difference between the extreme Deltas (max-Delta minus min-Delta) "
+                         "contains 0"),
+            "alpha": FLAT_CI_ALPHA, "method": "wild", "n_boot": M.N_BOOT,
+            "delta_hi": d_hi, "delta_lo": d_lo, "pass": bool(ok_c_ci)}}
     return {"V": V, "V_heldout": Vh, "V_BR": VBR, "side": side, "n_episodes": n_ep,
             "controls": ctrl, "gates": gates, "counts": counts,
             "cpu_sec_by_system": sec,
@@ -332,14 +372,21 @@ def main(argv=None) -> int:
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 2))
     ap.add_argument("--workflows", type=int, default=C.DEV_N_WORKFLOWS)
     ap.add_argument("--timing-workflows", type=int, default=50)
+    ap.add_argument("--seeds", type=int, default=len(SEEDS),
+                    help=f"number of seeds 0..N-1 (default {len(SEEDS)}, the declared M1 "
+                         "slice); more seeds tightens V's bootstrap half-width for the "
+                         "gate 3c re-check.  Does not change the world.")
     ap.add_argument("--out", default=str(OUT))
     a = ap.parse_args(argv)
     refuse_unless_dev(a.split)
+    if a.seeds < 1:
+        raise SystemExit("--seeds must be >= 1")
+    seeds = tuple(range(a.seeds))
     n_wf = min(a.workflows, len(dev()))
     t_start = time.time()
-    timing = time_b1(min(a.timing_workflows, n_wf))
+    timing = time_b1(min(a.timing_workflows, n_wf), seeds)
     print(f"B1 timing: {timing['mean_ms']:.3f} ms mean over {timing['n']} episodes")
-    jobs = [(rho, d, wi, SEEDS) for rho in RHOS for d in DELTAS for wi in range(n_wf)]
+    jobs = [(rho, d, wi, seeds) for rho in RHOS for d in DELTAS for wi in range(n_wf)]
     parts = []
     t0 = time.time()
     with ProcessPoolExecutor(a.jobs) as ex:
@@ -353,7 +400,7 @@ def main(argv=None) -> int:
     summ["wall_sec_grid"] = grid_sec
     summ["wall_sec_total"] = time.time() - t_start
     summ["config"] = {"split": SPLIT, "world": C.world_name(C.PRIMARY), "rhos": list(RHOS),
-                      "deltas": list(DELTAS), "seeds": list(SEEDS), "chi": CHI,
+                      "deltas": list(DELTAS), "seeds": list(seeds), "chi": CHI,
                       "dprime": DPRIME, "k_delegated": K_D, "budget": C.BUDGET_PRIMARY,
                       "n_workflows": n_wf, "systems": list(SYSTEMS), "reference": NONE,
                       "scripted": sorted(AT.SCRIPTED), "held_out": AT.held_out(),
@@ -368,6 +415,15 @@ def main(argv=None) -> int:
           f"{grid_sec:.0f} s with {a.jobs} jobs -> {out}")
     for g, v in summ["gates"].items():
         print(f"  {'PASS' if v['pass'] else 'FAIL'}  {g}")
+    ci = summ["gates"]["3c V(B1) near flat in Delta"]["ci_criterion"]
+    print(f"  {'PASS' if ci['pass'] else 'FAIL'}  3c (ii) noise-aware: CI of V(B1) diff "
+          f"(Delta {ci['delta_hi']} - {ci['delta_lo']}) contains 0 at every rho "
+          f"[{a.seeds} seeds]")
+    for r in RHOS:
+        de = summ["gates"]["3c V(B1) near flat in Delta"]["values"][str(r)]["diff_extreme"]
+        print(f"      rho={r}: diff={de['point']:+.3f}  "
+              f"95% CI [{de['ci_lo']:+.3f}, {de['ci_hi']:+.3f}]  "
+              f"{'contains 0' if de['contains_zero'] else 'EXCLUDES 0'}")
     print(f"  {'PASS' if timing['pass'] else 'FAIL'}  4 B1 episode <= {TIMING_BUDGET_MS} ms "
           f"({timing['mean_ms']:.3f})")
     return 0
