@@ -111,6 +111,24 @@ class TestInfraSeal(unittest.TestCase):
             with self.assertRaises(S.SealedSplit):
                 S.eval_workflows(token, "primary")
 
+    def test_a_gate4_file_of_null_never_matches_an_unbuilt_live_digest(self):
+        """Layer 2d, correctness: a LIVE_DIGESTS entry that returns None (nothing built,
+        e.g. line5_table.table_digest() before a table exists) must refuse even when the
+        Gate-4 file also carries null for that key.  null == null must never be read as
+        "the digests match": the check exists to require a REAL built artifact, not to
+        tolerate the absence of one on both sides."""
+        gate = {f: "x" for f in S.GATE_FIELDS}
+        gate["line5_table"] = None          # the exact shape T14's build produces pre-table
+        self.gate.write_text(json.dumps(gate), encoding="utf-8")
+        with mock.patch.object(K, "EVAL_SPLIT_SHA256", "x"), \
+             mock.patch.object(K, "SECONDARY_SPLIT_SHA256", "x"), \
+             mock.patch.object(S, "_v2_freeze_header", return_value="freeze: clean x"), \
+             mock.patch.object(S, "_live", side_effect=lambda mod, fn:
+                                (None, None) if fn == "table_digest" else ("x", None)), \
+             mock.patch.object(S, "_git_status", return_value=""):
+            why = S.reasons({"split": "eval"})
+        self.assertTrue(any("line5_table" in r and "None" in r for r in why), why)
+
     def test_every_unseal_attempt_is_logged(self):
         """Plan S6 layer 3: every unseal() call appends one line to the unseal log, with
         what was asked, whether it was granted, why not, and the committed digests."""
