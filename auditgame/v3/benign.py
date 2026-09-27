@@ -1,4 +1,4 @@
-"""v3/benign.py -- the 620 benign changes and the 4-feature surface check (P3; D8.benign).
+"""v3/benign.py -- the benign changes and the 4-feature surface check (P3; D8.benign; T24).
 
 Draft S8, Table 1: "620 benign carrier modifications generated to match poisoning events
 on surface statistics (edit size, embedding shift, recency, provenance shape), verified by
@@ -6,15 +6,34 @@ a two-sample test that a discriminator trained on surface features achieves AUC 
 sentinel-v3.md S8, row "Thay doi lanh": generate exactly 620, check exactly the 4 features;
 if the check fails, print "khong dat" and never relax the ceiling (L0).
 
+T24 DEVIATIONS (L1), declared before the rerun in
+docs/preregistration/lech-chuan-P3-benign.md (DEVIATION_REF):
+    D-v3-2  V3_PER_EVENT = 1 control per event instead of v2's PER_EVENT = 4.  A deviation
+            from v2's convention, not from the draft (the draft does not say how many
+            controls an event gets).  The AUC's CI is bound by the SMALLER class, so 4:1
+            spends the sample on the class that does not limit the interval: at 620 the
+            criterion's floor is 0.5805 > 0.56 even for a perfectly matched corpus.  Events
+            per Delta = min over Delta of candidates[Delta] // V3_PER_EVENT (Delta = 8 has
+            160), balanced over the five Deltas: 800 events and 800 benign changes, NOT the
+            draft's 620 (N_BENIGN_DRAFT is recorded beside it).
+    D-v3-3  the payload's length is drawn from the length distribution of v3's own drift
+            on dev (v3/payload.py, `draw_length`), not v2's constant 63.  The background
+            is `length_background(runs)`: len(content) of every drift change of the pool
+            (forced drift on CARRIER over every dev workflow), the population the
+            controls are drawn from.  One draw per placement, seeded from SEED and the
+            placement.  build.PAYLOAD_LENGTH and the drift process are untouched.
+
 WHAT IS REUSED FROM v2 (analysis/benign_corpus.py, analysis/discriminator.py,
 analysis/gate2_v2.py), unchanged and imported, never patched:
-    PER_EVENT = 4 controls per poisoning event (v2's contract, no reuse of a control),
+    PER_EVENT = 4 controls per poisoning event (v2's contract, recorded; T24 uses
+    V3_PER_EVENT, see above), no reuse of a control,
     CARRIER = "memory" (v2's declared scope), SEED, the age matching (a control is read at
     now = created_at + age, so its recency equals the payload's), the per-repo control
     pool, the split protocol (discriminator.SPLIT_SEEDS = 20 train/test splits, test
     fraction 0.4, logistic regression by the same gradient descent, Hanley-McNeil CI95),
     and the criterion pinned by gate2_v2.record(): the MEAN of the CI95 upper bounds over
-    the split seeds must be <= ceiling = 0.56.  620 / 4 = 155 events.
+    the split seeds must be <= ceiling = 0.56.  (v2's 620 / 4 = 155 events was the first
+    P3 run; T24 replaces it, see above.)
 
 WHERE v3's ITEM REPRESENTATION DIFFERS FROM v2, AND WHAT IS DONE ABOUT IT
     1. The payload.  v2's corpus scored attacks.MatchedAttack (payload written to look
@@ -75,9 +94,10 @@ from v3 import payload as P
 # The declared protocol (fixed before the first run; printed into the manifest)
 # ---------------------------------------------------------------------------------------
 
-N_BENIGN = 620                              # the draft's number
-PER_EVENT = B.PER_EVENT                     # v2's contract: 4
-N_EVENTS = N_BENIGN // PER_EVENT            # 155
+N_BENIGN_DRAFT = 620                        # the draft's number: recorded, not the target
+V3_PER_EVENT = 1          # lệch chuẩn D-v3-2: xem docs/preregistration/lech-chuan-P3-benign.md
+PER_EVENT = B.PER_EVENT   # giữ nguyên: quy ước v2, ghi vào record để so sánh
+DEVIATION_REF = "docs/preregistration/lech-chuan-P3-benign.md"
 CARRIER = B.CARRIER                         # v2's declared scope: memory
 SEED = B.SEED
 EPSILON = ATK.RULE_BR_EPS                   # 0.6, v3's default placement magnitude
@@ -91,7 +111,7 @@ V2_FEATURES = tuple(sorted(DSC.F_MATCH))
 CONTROL_KINDS = ("drift", "v2-notes")       # primary, diagnostic
 PASS, FAIL = "đạt", "không đạt"
 
-assert N_EVENTS * PER_EVENT == N_BENIGN
+assert (PER_EVENT, V3_PER_EVENT) == (4, 1)
 
 
 # ---------------------------------------------------------------------------------------
@@ -170,6 +190,14 @@ class DevRuns:
     nominal: dict = field(default_factory=dict)       # wf_id -> store (nominal drift)
     pools: dict = field(default_factory=dict)         # (kind, repo) -> [Change]
     at: dict = field(default_factory=dict)            # (kind, wf_id, t) -> Change
+    lengths: list = field(default_factory=list)       # D-v3-3: length_background(self)
+
+
+def length_background(runs: DevRuns) -> list:
+    """D-v3-3: len(content) of every drift change of the pool, sorted -- v3's
+    certification background, from which the attacker draws its payload length."""
+    return sorted(len(c.item.content) for (k, _), v in runs.pools.items() if k == "drift"
+                  for c in v)
 
 
 def _before(store, carrier: str, t: int) -> list:
@@ -195,6 +223,7 @@ def dev_runs(workflows=None) -> DevRuns:
                             embedding_shift(_before(nominal, CARRIER, it.created_at), it))
                 out.pools.setdefault((kind, wf.repo), []).append(ch)
                 out.at[(kind, wf.wf_id, it.created_at)] = ch
+    out.lengths = length_background(out)
     return out
 
 
@@ -211,7 +240,9 @@ class Event:
     sigma: int
     payload: Item
     shift: float
-    controls: tuple                     # (Change, ...), PER_EVENT of them
+    controls: tuple                     # (Change, ...), V3_PER_EVENT of them
+    length: int = 0                     # D-v3-3: the drawn payload length L
+    length_reason: str | None = None    # N3: why the payload is not L long (tag >= L)
 
     def rows(self) -> tuple:
         pos = features(self.payload, self.sigma, self.shift)
@@ -229,18 +260,27 @@ def candidates(runs: DevRuns, delta: int) -> list:
     return out
 
 
-def build(runs: DevRuns | None = None, kind: str = "drift", n_events: int = N_EVENTS,
+def events_per_delta(runs: DevRuns) -> int:
+    """D-v3-2: the balanced design's events per Delta, min over DELTAS of
+    candidates[Delta] // V3_PER_EVENT (Delta = 8 binds)."""
+    return min(len(candidates(runs, d)) // V3_PER_EVENT for d in DELTAS)
+
+
+def build(runs: DevRuns | None = None, kind: str = "drift", n_events: int | None = None,
           dropped: list | None = None) -> list:
-    """N_EVENTS events, spread round-robin over DELTAS, each with PER_EVENT distinct
-    controls of `kind` from the same repo; no control is used twice in the corpus.
+    """n_events events (default: events_per_delta(runs) per Delta), spread round-robin over
+    DELTAS, each with V3_PER_EVENT distinct controls of `kind` from the same repo; no
+    control is used twice in the corpus.
 
     Source 1 (v2's rule): the change of the host workflow written at iota = sigma - Delta,
     the one with the payload's age.  Source 2 (v2's harvest top-up): other changes of the
-    same repo on dev, re-read at age Delta.  An event that cannot get PER_EVENT controls
+    same repo on dev, re-read at age Delta.  An event that cannot get V3_PER_EVENT controls
     is dropped with a reason (N3)."""
     if kind not in CONTROL_KINDS:
         raise ValueError(f"kind {kind!r} is not one of {CONTROL_KINDS}")
     runs = dev_runs() if runs is None else runs
+    if n_events is None:
+        n_events = events_per_delta(runs) * len(DELTAS)
     sink = dropped if dropped is not None else []
     queues = {}
     for d in DELTAS:
@@ -258,7 +298,7 @@ def build(runs: DevRuns | None = None, kind: str = "drift", n_events: int = N_EV
             wf, sp = queues[d].popleft()
             ev = _match(runs, kind, wf, sp, used)
             if ev is None:
-                sink.append((wf.wf_id, d, sp.iota, "fewer than PER_EVENT unused controls"))
+                sink.append((wf.wf_id, d, sp.iota, "fewer than V3_PER_EVENT unused controls"))
                 continue
             used.update(c.item.content for c in ev.controls)
             events.append(ev)
@@ -270,6 +310,7 @@ def build(runs: DevRuns | None = None, kind: str = "drift", n_events: int = N_EV
 
 
 def _match(runs: DevRuns, kind: str, wf, sp, used: set):
+    sp = sp.at_length(P.draw_length(runs.lengths, sp, SEED))
     payload = sp.item(wf)
     shift = embedding_shift(_before(runs.nominal[wf.wf_id], CARRIER, sp.iota), payload)
     controls = []
@@ -285,13 +326,13 @@ def _match(runs: DevRuns, kind: str, wf, sp, used: set):
         if c.item.content not in seen:
             seen.add(c.item.content)
             uniq.append(c)
-    need = PER_EVENT - len(controls)
+    need = V3_PER_EVENT - len(controls)
     if len(uniq) < need:
         return None
     rng = random.Random(seed_of(SEED, "v3-benign", "ctrl", wf.wf_id, sp.iota, sp.delta))
     controls += rng.sample(uniq, need)
     return Event(wf.wf_id, wf.repo, sp.delta, sp.iota, sp.sigma, payload, shift,
-                 tuple(controls))
+                 tuple(controls), sp.length, sp.length_reason)
 
 
 def rows_of(events: list) -> tuple:
@@ -345,9 +386,10 @@ def _fit(X: list, y: list, ncol: int, steps: int = 600, lr: float = 0.3) -> tupl
     return w, b
 
 
-def auc_with_ci(pos: list, neg: list, cols, seed: int,
-                test_fraction: float = TEST_FRACTION) -> tuple:
-    """(auc, lo, hi, weights) of one declared split."""
+def _split(pos: list, neg: list, cols, seed: int,
+           test_fraction: float = TEST_FRACTION) -> tuple:
+    """(test-fold scores, test-fold labels, test-fold row indices into pos + neg, weights)
+    of one declared split."""
     cols = tuple(cols)
     rows = [[float(f[c]) for c in cols] for f in pos + neg]
     y = [1.0] * len(pos) + [0.0] * len(neg)
@@ -359,6 +401,13 @@ def auc_with_ci(pos: list, neg: list, cols, seed: int,
     w, b = _fit([X[i] for i in tr], [y[i] for i in tr], len(cols))
     sc = [sum(wj * v for wj, v in zip(w, X[i])) + b for i in te]
     lab = [y[i] for i in te]
+    return sc, lab, te, w
+
+
+def auc_with_ci(pos: list, neg: list, cols, seed: int,
+                test_fraction: float = TEST_FRACTION) -> tuple:
+    """(auc, lo, hi, weights) of one declared split."""
+    sc, lab, _, w = _split(pos, neg, cols, seed, test_fraction)
     a = DSC._auc(sc, lab)
     n_pos = int(sum(lab))
     lo, hi = DSC._hanley_mcneil(a, n_pos, len(lab) - n_pos)
@@ -385,6 +434,111 @@ def floor_hi(n_pos: int, n_neg: int, test_fraction: float = TEST_FRACTION) -> fl
     the lowest mean upper bound the criterion can see on this sample size."""
     fp, fn = round(n_pos * test_fraction), round(n_neg * test_fraction)
     return DSC._hanley_mcneil(0.5, fp, fn)[1]
+
+
+def events_needed(ratio: float = 1.0, ceiling: float = CEILING,
+                  test_fraction: float = TEST_FRACTION, per_event: int = V3_PER_EVENT,
+                  n_max: int = 100000) -> int | None:
+    """The fewest events (per_event controls each) whose floor, scaled by `ratio` (the
+    design effect on the CI half-width; 1 = independent), is <= ceiling.  None when no
+    n <= n_max reaches it (N3: not a number that was not found)."""
+    for n in range(1, n_max + 1):
+        if min(round(n * test_fraction), round(n * per_event * test_fraction)) < 2:
+            continue
+        if 0.5 + (floor_hi(n, n * per_event, test_fraction) - 0.5) * ratio <= ceiling:
+            return n
+    return None
+
+
+# ---------------------------------------------------------------------------------------
+# The clustered floor (T24 step 4): T17's wild cluster bootstrap, clustered by workflow
+# ---------------------------------------------------------------------------------------
+# floor_hi assumes independent items; events and controls cluster by workflow (django
+# holds half of them).  For each split's test fold the AUC is linearised by its DeLong
+# placement values (AUC - theta ~ sum_i (V10_i - AUC) / n1 + sum_j (V01_j - AUC) / n0),
+# and T17's engine (v3.metrics.family_draws with Webb weights, v3.metrics.interval) draws
+# the sum twice on the same seed: once with one weight per WORKFLOW (clustered), once with
+# one weight per ITEM (independent).  The ratio of the two upper half-widths is the design
+# effect on the interval; floor_hi_clustered = 0.5 + (floor_hi - 0.5) * mean ratio over the
+# split seeds.  No new bootstrap: only the statistic fed to T17's draws is new.  numpy
+# comes in with v3.metrics, imported here only.
+
+def _placements(sc: list, lab: list) -> tuple:
+    import numpy as np
+    s, y = np.asarray(sc, dtype=float), np.asarray(lab, dtype=float) > 0.5
+    sp, sn = s[y], s[~y]
+    cmp = (sp[:, None] > sn[None, :]) + 0.5 * (sp[:, None] == sn[None, :])
+    return cmp.mean(1), cmp.mean(0), float(cmp.mean())
+
+
+def clustered_split(sc: list, lab: list, clusters: list, n_boot: int | None = None,
+                    seed: int | None = None) -> dict:
+    """One test fold: AUC, the wild-cluster (by `clusters`) and the per-item wild upper
+    bounds of its 95% interval, and their half-width ratio (None if undefined, N3)."""
+    import numpy as np
+    from v3 import metrics as M
+    n_boot = M.N_BOOT if n_boot is None else n_boot
+    seed = M.BOOT_SEED if seed is None else seed
+    v10, v01, auc = _placements(sc, lab)
+    y = np.asarray(lab, dtype=float) > 0.5
+    e = np.empty(len(lab))
+    e[y] = (v10 - auc) / len(v10)
+    e[~y] = (v01 - auc) / len(v01)
+    names = sorted(set(clusters))
+    ix = {g: i for i, g in enumerate(names)}
+    eg = np.zeros(len(names))
+    np.add.at(eg, [ix[g] for g in clusters], e)
+    F_c = M.family_draws(len(names), n_boot, M.rng_for("wild", seed), "wild")
+    F_i = M.family_draws(len(e), n_boot, M.rng_for("wild", seed), "wild")
+    hi_c = M.interval(auc + F_c @ eg)[1]
+    hi_i = M.interval(auc + F_i @ e)[1]
+    ratio = (hi_c - auc) / (hi_i - auc) if hi_i - auc > 1e-12 else None
+    return dict(auc=auc, hi_clustered=hi_c, hi_independent=hi_i, ratio=ratio,
+                n_clusters=len(names))
+
+
+def clusters_of(events: list) -> tuple:
+    """The workflow of every row of rows_of(events): (pos clusters, neg clusters)."""
+    return ([ev.wf_id for ev in events],
+            [c.wf_id for ev in events for c in ev.controls])
+
+
+def clustered_floor(events: list, cols=FEATURES, seeds=SPLIT_SEEDS) -> dict:
+    """floor_hi_clustered and its ingredients, over the declared split seeds."""
+    from v3 import metrics as M
+    pos, neg = rows_of(events)
+    cp, cn = clusters_of(events)
+    cl = cp + cn
+    per = {}
+    for s in seeds:
+        sc, lab, te, _ = _split(pos, neg, cols, s)
+        per[s] = clustered_split(sc, lab, [cl[i] for i in te])
+    ratios = [v["ratio"] for v in per.values() if v["ratio"] is not None]
+    fh = floor_hi(len(pos), len(neg))
+    out = dict(method="v3.metrics wild (Webb), clustered by workflow; design effect on "
+                      "the CI half-width, DeLong linearisation of the test-fold AUC",
+               n_boot=M.N_BOOT, boot_seed=M.BOOT_SEED,
+               n_workflows=len(set(cl)), floor_hi=round(fh, 4),
+               n_ratio_defined=len(ratios), n_splits=len(per),
+               hi_mean_clustered=round(statistics.fmean(v["hi_clustered"]
+                                                        for v in per.values()), 4),
+               hi_mean_independent_boot=round(statistics.fmean(v["hi_independent"]
+                                                               for v in per.values()), 4),
+               per_seed={s: dict(auc=round(v["auc"], 4), hi_clustered=round(v["hi_clustered"], 4),
+                                 hi_independent=round(v["hi_independent"], 4),
+                                 ratio=None if v["ratio"] is None else round(v["ratio"], 4),
+                                 n_clusters=v["n_clusters"])
+                         for s, v in per.items()})
+    if not ratios:
+        out.update(ratio_mean=None, floor_hi_clustered=None, events_needed_clustered=None,
+                   reason="no split has a defined half-width ratio (independent half-width 0)")
+        return out
+    r = statistics.fmean(ratios)
+    out.update(ratio_mean=round(r, 4),
+               floor_hi_clustered=round(0.5 + (fh - 0.5) * r, 4),
+               events_needed_independent=events_needed(1.0),
+               events_needed_clustered=events_needed(r))
+    return out
 
 
 # ---------------------------------------------------------------------------------------
@@ -423,6 +577,9 @@ def measure(events: list, drop_one: bool = True, per_delta: bool = True) -> dict
     out = dict(n_events=len(events), n_benign=len(neg), main=main, verdict=verdict(main),
                floor_hi=round(floor_hi(len(pos), len(neg)), 4),
                features=feature_table(pos, neg, FEATURES))
+    cf = clustered_floor(events)
+    out["floor_hi_clustered"] = cf["floor_hi_clustered"]
+    out["clustered"] = cf
     if drop_one:
         out["drop_one"] = {}
         for c in FEATURES:
