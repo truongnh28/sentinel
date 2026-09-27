@@ -23,13 +23,37 @@
   6. the summary reads the D28 controls first (metrics.Readout) and refuses eval records on
      an unclean freeze (seal.refusal).
 
-THE RUNNER SEAM.  The ONE call into the episode loop is `episode_runner()`: T10's
-v3/sequence.run_chain when it exists, else `run_chain_t6` on T6's v3/runner.run_episode
-(workflows in pinned order, v2's N4 survives filter, post-mortems of the same chain passed
-on).  Everything else is coded against api.EpisodeRecord.  Systems enter through
-`policy_factory`: baselines (T8) and the block schedule (T16) now; the Sentinel class
-(T15's V3_REGISTRY), B7 (T21) and Sentinel-rollout (T19) raise PolicyMissing until their
-tasks land, and a run naming them stops with exit 3 before anything is simulated.
+THE RUNNER SEAM.  The ONE call into the episode loop is `episode_runner()`, which returns
+`run_chain` (T6's runner, T10's sequence, T20's stage world, T12's rollout driver):
+  * the workflows of the split run in T10's pinned order (sequence.workflow_order, C12),
+    after v2's N4 survives filter; `order` is the position among the kept workflows;
+  * a held-out chain of a system with line 1 (the Sentinel class, T15) runs through
+    sequence.run_sequence: the post-mortems of the earlier workflows of the same (cell,
+    system, column, seed) are carried, line 1's arm is read off the name (delta_hat.
+    arm_of), the oracle arm is told each placement's true Delta, and every record is
+    checked against its step (Delta-hat, n_incidents_seen);
+  * every other chain (baselines, and every best-response chain) runs the same order
+    directly: a baseline has no line 1 (its record carries delta_hat None, which
+    run_sequence's step check refuses), and a best-response chain enumerates a MENU of
+    placements per workflow, so no single post-mortem per workflow exists -- its episodes
+    get no post-mortem (Delta-hat is line 1's prior), as before (declared, L1);
+  * the episode is runner.Episode in the carrier reading, stage_world.StageEpisode in the
+    stage reading (a system with its own lines 8-9 -- the Sentinel class -- keeps them:
+    keep_quarantine=True), and in the rollout world (world.line5 = "rollout",
+    Sentinel-rollout) it is driven by rollout.drive(ep, ep.policy.source), which binds the
+    state before every task.
+Everything else is coded against api.EpisodeRecord.  Systems enter through
+`policy_factory`: baselines (T8), the block schedule (T16) and T15's V3_REGISTRY (the
+Sentinel class, its ablations, the line-1 arms and Sentinel-rollout; every factory is
+bound to the placement with `for_placement`, so the oracle arm gets the true Delta, also
+in the attacker-chooses-Delta column).  B7 (T21) raises PolicyMissing until it lands, and
+a run naming it stops with exit 3 before anything is simulated.  Sentinel's parts (T14's
+line-5 table, T18's tuned tau / eta_Q) are checked with sentinel.check_ready before
+anything is simulated; a missing part stops the run with exit 3 and names it.
+
+DEV SMOKE PARTS.  `--stub-parts` (dev only; refused with eval) runs the Sentinel class on
+sentinel.stub_parts(): the StubTable and placeholder tau / eta_Q.  Its numbers are not
+results; the summary says so ("parts": "stub") and the default output is dev-stub/.
 
 EVAL TOKEN.  T6's runner takes the seal.Unsealed token; a token is valid only in the
 process that unsealed, so an eval run simulates in-process (--jobs is ignored there).
@@ -79,21 +103,13 @@ class PolicyMissing(RuntimeError):
 
 def episode_runner():
     """THE one call into the episode loop: run_chain(chain, workflows, factory_of, split,
-    token=None) -> list[api.EpisodeRecord].  If T10's v3/sequence.py defines run_chain it
-    is used (it owns line 1's Delta-hat over the post-mortems); until then the chain below,
-    on T6's v3/runner.run_episode, runs the same sequence and carries the post-mortems."""
-    try:
-        from v3 import sequence  # T10
-    except ImportError:
-        sequence = None
-    rc = getattr(sequence, "run_chain", None)
-    if callable(rc):
-        return rc
+    token=None) -> list[api.EpisodeRecord] (module docstring)."""
     try:
         from v3 import runner  # noqa: F401  (T6)
+        from v3 import sequence  # noqa: F401  (T10)
     except ImportError as e:
-        raise RunnerMissing(f"needs T6 (v3/runner.py): {e}") from e
-    return run_chain_t6
+        raise RunnerMissing(f"needs T6 (v3/runner.py) and T10 (v3/sequence.py): {e}") from e
+    return run_chain
 
 
 def _placements(chain: G.Chain, wf) -> list:
@@ -114,31 +130,98 @@ def _placements(chain: G.Chain, wf) -> list:
     return [] if pl is None else [(u.column, pl, False)]
 
 
-def run_chain_t6(chain: G.Chain, workflows: list, factory_of, split: str,
-                 token=None) -> list:
-    """The chain on T6's runner: workflows in pinned order, v2's N4 survives filter (the
-    sigma task is solved in the clean run; P0 GD 3 counts with it), the post-mortems of the
-    earlier workflows of the same (cell, system, column, seed) passed on (C12, O4)."""
+def schedule(chain: G.Chain, workflows: list) -> list:
+    """[(wf, [(column, placement, best_response), ...])] in T10's pinned order (C12), the
+    workflows with no surviving placement left out (N3; v2's N4 survives filter: the sigma
+    task is solved in the clean run, P0 GD 3 counts with it)."""
     import carrier_runner as CR
-    from v3 import runner as RN
-    u, out, pms = chain.unit, [], []
-    for order, wf in enumerate(workflows):
-        for col, pl, br in _placements(chain, wf):
-            if not CR.survives(wf, pl, chain.seed):
-                continue
-            eo = RN.run_episode(wf, pl, factory_of(pl), u.world, u.cell, chain.seed,
-                                split=split, token=token, order=order, attack=col,
-                                best_response=br, postmortems=tuple(pms))
+    from v3 import sequence as SQ
+    by_id = {wf.wf_id: wf for wf in workflows}
+    out = []
+    for wf_id in SQ.workflow_order(by_id):
+        wf = by_id[wf_id]
+        kept = [x for x in _placements(chain, wf) if CR.survives(wf, x[1], chain.seed)]
+        if kept:
+            out.append((wf, kept))
+    return out
+
+
+def has_line1(system: str) -> bool:
+    """A system with Algorithm 1's line 1 (T15's V3_REGISTRY): its chain carries the
+    post-mortems through sequence.run_sequence."""
+    try:
+        from v3 import sentinel as S
+    except ImportError:
+        return False
+    return system in S.V3_REGISTRY
+
+
+def episode(chain: G.Chain, wf, pl, factory, split: str, token=None, **kw):
+    """One episode of the chain's world (module docstring): runner.Episode, or the stage
+    world's StageEpisode; driven by rollout.drive in the rollout world."""
+    from v3 import stage_world as SW
+    u = chain.unit
+    ep = SW.episode_in_world(wf, pl, factory, u.world, u.cell, chain.seed,
+                             keep_quarantine=has_line1(u.system), split=split, token=token,
+                             **kw)
+    if u.world.line5 == "rollout":
+        src = getattr(ep.policy, "source", None)
+        if src is None or getattr(src, "name", None) != "rollout":
+            raise ValueError(f"{u.system!r} in the rollout world has no rollout source")
+        from v3 import rollout as RO
+        return RO.drive(ep, src)
+    return ep.run()
+
+
+def _run_sequenced(chain: G.Chain, sched: list, factory_of, split: str, token=None) -> list:
+    """A held-out chain of a line-1 system through T10's sequence.run_sequence."""
+    from v3 import budget as BU
+    from v3 import delta_hat as DH
+    from v3 import sequence as SQ
+    u = chain.unit
+    arm = DH.arm_of(u.system) or DH.ARM_POSTMORTEM
+    base = u.system[: len(u.system) - len(DH.system_name("", arm))]
+    by_id = {wf.wf_id: (wf, kept[0][1]) for wf, kept in sched}
+    man = SQ.order_manifest(list(by_id), split=split)
+    key = DH.HistoryKey(C.cell_id(u.cell), base, u.column, chain.seed)
+
+    def run_one(step):
+        wf, pl = by_id[step.wf_id]
+        eo = episode(chain, wf, pl, factory_of(pl), split, token, order=step.order,
+                     attack=u.column, best_response=False, postmortems=step.postmortems)
+        return eo.record, eo.postmortem
+
+    true_delta = ((lambda wf_id: int(by_id[wf_id][1].delta)) if arm == DH.ARM_ORACLE
+                  else None)
+    res = SQ.run_sequence(key, man, run_one, arm=arm, true_delta=true_delta,
+                          kappa=BU.cell_kappa(u.cell))
+    return list(res.records)
+
+
+def run_chain(chain: G.Chain, workflows: list, factory_of, split: str, token=None) -> list:
+    """One chain (module docstring): the workflows in pinned order, the survivors only."""
+    u = chain.unit
+    sched = schedule(chain, workflows)
+    if not u.is_br and has_line1(u.system):
+        return _run_sequenced(chain, sched, factory_of, split, token)
+    out, pms = [], []
+    for order, (wf, kept) in enumerate(sched):
+        for col, pl, br in kept:
+            eo = episode(chain, wf, pl, factory_of(pl), split, token, order=order,
+                         attack=col, best_response=br, postmortems=tuple(pms))
             out.append(eo.record)
             if not br:
                 pms.append(eo.postmortem)
     return out
 
 
-def policy_factory(name: str):
+def policy_factory(name: str, parts=None):
     """System name -> factory_of(placement) -> api.PolicyFactory.  Baselines (T8; the
-    Oracle is told the placement's carriers, D28) and the block schedule (T16) are here;
-    the Sentinel class (T15), B7 (T21) and the rollout arm (T19) are not yet."""
+    Oracle is told the placement's carriers, D28), the block schedule (T16) and T15's
+    V3_REGISTRY (bound to the placement: `for_placement` gives the oracle-Delta arm the
+    true Delta).  `parts` (sentinel.Parts) binds the Sentinel class to explicit parts (the
+    dev smoke's stub); None = the frozen parts, resolved at the first episode.  B7 (T21)
+    is not yet here."""
     from v3 import baselines as BL
     from v3 import budget as BU
     if name == BL.OracleControl.name:
@@ -156,7 +239,27 @@ def policy_factory(name: str):
     reg = getattr(S, "V3_REGISTRY", {})
     if name not in reg:
         raise PolicyMissing(f"{name!r} is not in v3.sentinel.V3_REGISTRY")
-    return lambda pl: reg[name]
+    f = reg[name] if parts is None else reg[name].with_parts(parts)
+    return f.for_placement
+
+
+def sentinel_parts(stub: bool):
+    """The parts the Sentinel class runs on: None (the frozen parts) or, for a dev smoke,
+    sentinel.stub_parts()."""
+    if not stub:
+        return None
+    from v3 import sentinel as S
+    return S.stub_parts()
+
+
+def missing_parts(systems, parts=None) -> list:
+    """sentinel.check_ready over the Sentinel-class systems among `systems` (empty = ready;
+    no Sentinel-class system = nothing to check)."""
+    names = [n for n in systems if has_line1(n)]
+    if not names:
+        return []
+    from v3 import sentinel as S
+    return S.check_ready(names, parts)
 
 
 # ---------------------------------------------------------------------------------------
@@ -249,17 +352,22 @@ def validate_record(rec: api.EpisodeRecord, chain: G.Chain, split: str) -> None:
 
 
 def _work(args) -> list:
-    chain, workflows, split = args
-    recs = episode_runner()(chain, workflows, policy_factory(chain.unit.system), split)
+    chain, workflows, split, stub = args
+    recs = episode_runner()(chain, workflows,
+                            policy_factory(chain.unit.system, sentinel_parts(stub)), split)
     for r in recs:
         validate_record(r, chain, split)
     return [r.to_json() for r in recs]
 
 
 def simulate(chains: list, workflows: list, split: str, out: pathlib.Path, jobs: int = 1,
-             run_chain=None, token=None) -> list:
+             run_chain=None, token=None, stub: bool = False) -> list:
     """Run every chain; one jsonl per block in `out`.  `run_chain` overrides the seam (the
-    tests pass a stub).  jobs > 1 runs dev chains in worker processes."""
+    tests pass a stub).  jobs > 1 runs dev chains in worker processes.  `stub` (dev only)
+    runs the Sentinel class on sentinel.stub_parts()."""
+    if stub and split != "dev":
+        raise Refused("stub parts are a dev smoke only")
+    parts = sentinel_parts(stub)
     out.mkdir(parents=True, exist_ok=True)
     by_block: dict = {}
     for ch in chains:
@@ -273,12 +381,13 @@ def simulate(chains: list, workflows: list, split: str, out: pathlib.Path, jobs:
                 rc = run_chain or episode_runner()
                 kw = {} if token is None else {"token": token}
                 for ch in chs:
-                    for r in rc(ch, workflows, policy_factory(ch.unit.system), split, **kw):
+                    for r in rc(ch, workflows, policy_factory(ch.unit.system, parts), split,
+                                **kw):
                         validate_record(r, ch, split)
                         fh.write(r.to_json() + "\n")
             else:
                 with ProcessPoolExecutor(jobs) as ex:
-                    for lines in ex.map(_work, [(ch, workflows, split) for ch in chs],
+                    for lines in ex.map(_work, [(ch, workflows, split, stub) for ch in chs],
                                         chunksize=4):
                         fh.writelines(line + "\n" for line in lines)
         written.append(name)
@@ -339,9 +448,14 @@ def main(argv=None, run_chain=None) -> int:
     ap.add_argument("--jobs", type=int, default=10)
     ap.add_argument("--count", action="store_true", help="print the grid counts and stop")
     ap.add_argument("--out", type=pathlib.Path, default=None)
+    ap.add_argument("--stub-parts", action="store_true",
+                    help="DEV SMOKE ONLY: the Sentinel class on sentinel.stub_parts() (the "
+                         "StubTable, placeholder tau / eta_Q); no number is a result")
     a = ap.parse_args(argv)
     if a.split == "eval" and a.workflows:
         ap.error("--workflows cuts dev only: an eval run is the whole pinned split")
+    if a.split == "eval" and a.stub_parts:
+        ap.error("--stub-parts is a dev smoke only: an eval run reads the frozen parts")
 
     header = F.header_line()
     print(header, flush=True)
@@ -353,6 +467,10 @@ def main(argv=None, run_chain=None) -> int:
 
     run_meta = {"split": a.split, "tool": "tools/v3_run.py", "blocks": a.blocks,
                 "systems": a.systems, "seeds": a.seeds}
+    if a.stub_parts:
+        run_meta["parts"] = "stub"
+        print("DEV SMOKE ONLY: Sentinel on stub parts (StubTable, placeholder tau / eta_Q) "
+              "-- no number here is a result", flush=True)
     token = None
     if a.split == "eval":
         try:
@@ -371,6 +489,12 @@ def main(argv=None, run_chain=None) -> int:
     except PolicyMissing as e:
         print(f"not run: {e}", flush=True)
         return EXIT_NO_RUNNER
+    parts = sentinel_parts(a.stub_parts)
+    missing = missing_parts(sorted({ch.unit.system for ch in chains}), parts)
+    if missing:
+        print(f"not run: Sentinel's parts are missing: {'; '.join(missing)} (sentinel."
+              f"check_ready; a dev smoke may pass --stub-parts)", flush=True)
+        return EXIT_NO_RUNNER
     if run_chain is None:
         try:
             episode_runner()
@@ -378,11 +502,13 @@ def main(argv=None, run_chain=None) -> int:
             print(f"not run: {e}", flush=True)
             return EXIT_NO_RUNNER
 
-    out = a.out or OUT_ROOT / a.split
+    out = a.out or OUT_ROOT / (a.split + ("-stub" if a.stub_parts else ""))
     wfs = workflows_for(a, token)
     meta = {**run_meta, "header_start": header, "n_chains": len(chains),
-            "n_workflows": len(wfs), **provenance()}
-    written = simulate(chains, wfs, a.split, out, a.jobs, run_chain=run_chain, token=token)
+            "n_workflows": len(wfs), "parts": "stub" if a.stub_parts else "frozen",
+            **provenance()}
+    written = simulate(chains, wfs, a.split, out, a.jobs, run_chain=run_chain, token=token,
+                       stub=a.stub_parts)
     print("records", pin_records(out, written), flush=True)
     try:
         summary = summarise(out, a.split, F.header_line())

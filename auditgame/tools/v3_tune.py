@@ -49,6 +49,8 @@ per-carrier Bayes on alarms); it is not a model, and a result built with it is m
     cd auditgame
     ../.venv/bin/python tools/v3_tune.py --smoke --out /tmp/x/v3_tuned_smoke.json
     ../.venv/bin/python tools/v3_tune.py                      # P4, after T9 / T12 / T15
+    ../.venv/bin/python tools/v3_tune.py --nominal-only       # -transition uncertainty:
+                                                              # reference/v3_tuned_nominal.json
 """
 from __future__ import annotations
 
@@ -77,6 +79,10 @@ from v3 import seal
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent              # auditgame/
 TUNED_PATH = ROOT / "reference" / "v3_tuned.json"
+#: The -transition uncertainty ablation's tuning (T15, sentinel.TUNED_NOMINAL_PATH): the
+#: same tuning with the robust objective restricted to the nominal kernel (--nominal-only).
+TUNED_NOMINAL_PATH = ROOT / "reference" / "v3_tuned_nominal.json"
+NOMINAL_ONLY = ("nominal",)
 DEV = R.DEV
 
 #: The three kernels of the robust objective (D5.robust): config.KERNEL, zeta apart.
@@ -235,9 +241,9 @@ def default_members(belief_factory=None, band: LIB.Band | None = None) -> dict:
 # ---------------------------------------------------------------------------------------
 
 
-def worlds(world: C.WorldV3 = C.PRIMARY) -> dict:
+def worlds(world: C.WorldV3 = C.PRIMARY, kernels=KERNELS) -> dict:
     """kernel -> the world that differs from `world` in the kernel only."""
-    return {k: replace(world, kernel=k) for k in KERNELS}
+    return {k: replace(world, kernel=k) for k in kernels}
 
 
 def cells(rho: float, deltas=TUNE_DELTAS) -> list:
@@ -262,14 +268,15 @@ class Plans:
 
 
 def measure(build, rho: float, workflows, seeds, *, attacks, deltas=TUNE_DELTAS,
-            world: C.WorldV3 = C.PRIMARY, split: str = DEV, plans: Plans | None = None) -> dict:
+            world: C.WorldV3 = C.PRIMARY, split: str = DEV, plans: Plans | None = None,
+            kernels=KERNELS) -> dict:
     """One policy under the three kernels: {"L": {kernel: {col: mean L}}, "fq": {kernel:
     FQ per episode}, "episodes": n, "seconds": s}.  build(ctx) -> PolicyV3."""
     require_dev(split)
     plans = plans or Plans()
     t0 = time.perf_counter()
     L, FQ, n = {}, {}, 0
-    for kern, w in worlds(world).items():
+    for kern, w in worlds(world, kernels).items():
         cols, fq, ne = {}, 0, 0
         for cell in cells(rho, deltas):
             for an in attacks:
@@ -291,21 +298,21 @@ def measure(build, rho: float, workflows, seeds, *, attacks, deltas=TUNE_DELTAS,
     return {"L": L, "fq": FQ, "episodes": n, "seconds": time.perf_counter() - t0}
 
 
-def worst_case(L: dict) -> float:
+def worst_case(L: dict, kernels=KERNELS) -> float:
     """C6 / D5.robust: max over the three kernels and over the columns of mean L."""
-    missing = [k for k in KERNELS if k not in L]
+    missing = [k for k in kernels if k not in L]
     if missing:
-        raise ValueError(f"worst case over {KERNELS} needs every kernel; missing {missing}")
-    vals = [v for k in KERNELS for v in L[k].values()]
+        raise ValueError(f"worst case over {kernels} needs every kernel; missing {missing}")
+    vals = [v for k in kernels for v in L[k].values()]
     if not vals:
         raise ValueError("no feasible column (N3): nothing to take a worst case over")
     return max(vals)
 
 
-def robust_matrix(L: dict) -> dict:
+def robust_matrix(L: dict, kernels=KERNELS) -> dict:
     """col -> max over the three kernels (the columns every kernel measured)."""
-    common = set.intersection(*(set(L[k]) for k in KERNELS))
-    return {c: max(L[k][c] for k in KERNELS) for c in sorted(common)}
+    common = set.intersection(*(set(L[k]) for k in kernels))
+    return {c: max(L[k][c] for k in kernels) for c in sorted(common)}
 
 
 def _r(x: float) -> float:
@@ -413,23 +420,23 @@ def _git_head() -> str | None:
 # ---------------------------------------------------------------------------------------
 
 
-def _entry(step, rho, param, m) -> dict:
+def _entry(step, rho, param, m, kernels=KERNELS) -> dict:
     return {"step": step, "rho": rho, "candidate": param,
-            "worst_L": _r(worst_case(m["L"])),
-            "by_kernel": {k: _r(max(m["L"][k].values())) for k in KERNELS if m["L"][k]},
+            "worst_L": _r(worst_case(m["L"], kernels)),
+            "by_kernel": {k: _r(max(m["L"][k].values())) for k in kernels if m["L"][k]},
             "fq": {k: _r(v) for k, v in m["fq"].items()}, "episodes": m["episodes"]}
 
 
 def tune_rho(rho, workflows, seeds, *, attacks, members, belief_factory, line8, tau5_grid,
              sw_grid, tau_grid, eta_grid, deltas, world, fq_cap, delta_hat, log, timing,
-             progress=print) -> dict:
+             progress=print, kernels=KERNELS) -> dict:
     plans = Plans()
     blk: dict = {}
-    kw = dict(attacks=attacks, deltas=deltas, world=world, plans=plans)
+    kw = dict(attacks=attacks, deltas=deltas, world=world, plans=plans, kernels=kernels)
 
     def run(step, param, build):
         m = measure(build, rho, workflows, seeds, **kw)
-        e = _entry(step, rho, param, m)
+        e = _entry(step, rho, param, m, kernels)
         log.append(e)
         tm = timing.setdefault(step, {"episodes": 0, "seconds": 0.0})
         tm["episodes"] += m["episodes"]
@@ -477,7 +484,7 @@ def tune_rho(rho, workflows, seeds, *, attacks, members, belief_factory, line8, 
                     b = belief_factory(ctx, dh)
                     return MemberWithLine8(ctx, mk(ctx, b), b, tau, eta, line8)
                 m, _e = run("line8", {"tau": tau, "eta_q": eta, "member": name}, build)
-                M[name] = robust_matrix(m["L"])
+                M[name] = robust_matrix(m["L"], kernels)
                 F[name] = max(m["fq"].values())
             mm = minimax(M, F, fq_cap)
             log.append({"step": "line8-minimax", "rho": rho, "candidate":
@@ -503,11 +510,16 @@ def tune(*, workflows=None, seeds=TUNE_SEEDS, rhos=C.RHO_GRID, split: str = DEV,
          sw_grid=SW_CANDIDATES, tau_grid=TAU_Q_GRID, eta_grid=ETA_Q_GRID,
          deltas=TUNE_DELTAS, world: C.WorldV3 = C.PRIMARY, fq_cap: float | None = None,
          delta_hat: str = "cell", smoke: bool = False, belief_label: str | None = None,
-         progress=print) -> dict:
+         progress=print, kernels=KERNELS) -> dict:
     """The whole tuning.  Returns {"tuned": ..., "log": [...]}; tuned["log_sha256"] pins
     the log.  `delta_hat` = "cell" gives the belief the cell's Delta (v2's tuning passed
-    the regime, D9b), "prior" gives None (O3's prior)."""
+    the regime, D9b), "prior" gives None (O3's prior).  `kernels` = NOMINAL_ONLY is the
+    -transition uncertainty ablation's tuning (the worst case over the nominal kernel
+    only); the result records its kernels (tuned["kernels"])."""
     require_dev(split)
+    kernels = tuple(kernels)
+    if not kernels or any(k not in KERNELS for k in kernels):
+        raise ValueError(f"kernels={kernels!r} must be a non-empty subset of {KERNELS}")
     if delta_hat not in ("cell", "prior"):
         raise ValueError(f"delta_hat={delta_hat!r}")
     workflows = dev_workflows() if workflows is None else list(workflows)
@@ -527,13 +539,14 @@ def tune(*, workflows=None, seeds=TUNE_SEEDS, rhos=C.RHO_GRID, split: str = DEV,
             belief_factory=belief_factory, line8=line8, tau5_grid=tuple(tau5_grid),
             sw_grid=tuple(sw_grid), tau_grid=tuple(tau_grid), eta_grid=tuple(eta_grid),
             deltas=tuple(deltas), world=world, fq_cap=fq_cap, delta_hat=delta_hat, log=log,
-            timing=timing, progress=progress)
+            timing=timing, progress=progress, kernels=kernels)
     for tm in timing.values():
         tm["ms_per_episode"] = (1000.0 * tm["seconds"] / tm["episodes"]
                                 if tm["episodes"] else None)
     tuned = {
         "split": DEV, "smoke": bool(smoke), "objective": "worst-case L over kernels "
-        f"{list(KERNELS)} (zeta = {C.ZETA}) and tuning columns (C6, D5.robust)",
+        f"{list(kernels)} (zeta = {C.ZETA}) and tuning columns (C6, D5.robust)",
+        "kernels": list(kernels),
         "grids": {"tau5": list(tau5_grid), "sw_weights": list(sw_grid),
                   "tau": list(tau_grid), "eta_q": list(eta_grid)},
         "setup": {"seeds": list(seeds), "workflows": [w.wf_id for w in workflows],
@@ -560,8 +573,14 @@ def tuned_for(tuned: dict, rho: float) -> dict:
 def write(result: dict, out: pathlib.Path) -> tuple:
     """Write <out> and <out>.log.jsonl; the log's sha256 must match the pin."""
     tuned, log = result["tuned"], result["log"]
-    if tuned["smoke"] and out.resolve() == TUNED_PATH.resolve():
-        raise ValueError(f"a smoke result may not be written to {TUNED_PATH}")
+    if tuned["smoke"] and out.resolve() in (TUNED_PATH.resolve(), TUNED_NOMINAL_PATH.resolve()):
+        raise ValueError(f"a smoke result may not be written to {out}")
+    kern = tuple(tuned.get("kernels", KERNELS))
+    if out.resolve() == TUNED_PATH.resolve() and kern != tuple(KERNELS):
+        raise ValueError(f"{TUNED_PATH.name} holds the robust tuning over {KERNELS}, not {kern}")
+    if out.resolve() == TUNED_NOMINAL_PATH.resolve() and kern != NOMINAL_ONLY:
+        raise ValueError(f"{TUNED_NOMINAL_PATH.name} holds the nominal-kernel-only tuning "
+                         f"(--nominal-only), not kernels {kern}")
     if log_sha256(log) != tuned["log_sha256"]:
         raise AssertionError("the selection log does not match its pinned sha256")
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -623,8 +642,14 @@ def main(argv=None) -> int:
     ap.add_argument("--belief", choices=("none", "stub"), default=None,
                     help="'stub' is smoke-only; P4 passes the particle filter via tune()")
     ap.add_argument("--fq-cap", type=float, default=None)
-    ap.add_argument("--out", type=pathlib.Path, default=TUNED_PATH)
+    ap.add_argument("--nominal-only", action="store_true",
+                    help="the -transition uncertainty ablation's tuning: worst case over the "
+                         f"nominal kernel only, written to {TUNED_NOMINAL_PATH.name}")
+    ap.add_argument("--out", type=pathlib.Path, default=None)
     a = ap.parse_args(argv)
+    kernels = NOMINAL_ONLY if a.nominal_only else KERNELS
+    if a.out is None:
+        a.out = TUNED_NOMINAL_PATH if a.nominal_only else TUNED_PATH
     require_dev(a.split)
     belief = a.belief or ("stub" if a.smoke else "none")
     if belief == "stub" and not a.smoke:
@@ -634,7 +659,7 @@ def main(argv=None) -> int:
     bf = stub_belief_factory if belief == "stub" else None
     res = tune(workflows=dev_workflows(n), seeds=seeds, rhos=a.rhos, belief_factory=bf,
                fq_cap=a.fq_cap, smoke=a.smoke,
-               belief_label="StubAlarmBelief (smoke only)" if bf else None)
+               belief_label="StubAlarmBelief (smoke only)" if bf else None, kernels=kernels)
     out, lp = write(res, a.out)
     t = res["tuned"]
     print(f"\nwrote {out} and {lp}; log sha256 {t['log_sha256']}")

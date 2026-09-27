@@ -578,14 +578,31 @@ class Readout:
 # Table-rollout fidelity (Q13, R2): printed, not a hypothesis
 # ---------------------------------------------------------------------------------------
 
+#: The rollout arm paired with a system in the fidelity row (Q13).  In a real run the two
+#: sides carry DIFFERENT names: "Sentinel" in the primary world (line5_source "table") and
+#: "Sentinel-rollout" (v3/sentinel.SENTINEL_ROLLOUT) in the headline-rollout world
+#: (line5_source "rollout"); both are read as one system here.
+ROLLOUT_PAIR = {"Sentinel": "Sentinel-rollout"}
+
+
 def table_rollout_fidelity(recs, policy, attacks, deltas, n_boot=N_BOOT, seed=BOOT_SEED,
-                           alpha=ALPHA, method="wild") -> dict:
+                           alpha=ALPHA, method="wild", rollout_policy=None) -> dict:
     """|V_table - V_rollout| of one system in one headline cell, from its records with
     line5_source 'table' and 'rollout', on common family draws.  `flag` when the point gap
-    exceeds config.TABLE_ROLLOUT_FLAG: the headline number then carries FIDELITY_LABEL."""
+    exceeds config.TABLE_ROLLOUT_FLAG: the headline number then carries FIDELITY_LABEL.
+
+    The table side is `policy`'s records with source 'table'; the rollout side is the
+    records with source 'rollout' of `policy` OR of its rollout arm (`rollout_policy`,
+    default ROLLOUT_PAIR.get(policy): "Sentinel" pairs with "Sentinel-rollout").  Records
+    of the other headline worlds (a 'rollout' record is only ever in the headline-rollout
+    world) are the caller's to exclude, as for `table`."""
     rs = rows(recs)
+    rp = ROLLOUT_PAIR.get(policy) if rollout_policy is None else rollout_policy
+    names = {policy} | ({rp} if rp else set())
     tab = table([r for r in rs if r["line5_source"] == "table"], policy, attacks, deltas)
-    rol = table([r for r in rs if r["line5_source"] == "rollout"], policy, attacks, deltas)
+    rol = table([dict(r, policy=policy) for r in rs
+                 if r["line5_source"] == "rollout" and r["policy"] in names],
+                policy, attacks, deltas)
     if not tab.cols or not rol.cols:
         return {"policy": policy, "v_table": tab.value, "v_rollout": rol.value, "diff": NAN,
                 "abs_diff": NAN, "lo": NAN, "hi": NAN, "abs_lo": NAN, "abs_hi": NAN,

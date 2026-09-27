@@ -5,6 +5,7 @@ Each test protects the DCM rows of v3/dcm/T20.csv that name it; its docstring ca
 row ids and the verbatim draft sentence.  DEV ONLY: every episode runs on the v2 corpus
 (v3/corpus.dev_workflows).  Run from auditgame/.
 """
+import logging
 import unittest
 from dataclasses import replace
 
@@ -14,10 +15,10 @@ from v3 import attackers as AT
 from v3 import baselines as B
 from v3 import config as C
 from v3 import corpus as K
-from v3 import library as L
 from v3 import observe as O
 from v3 import payload as P
 from v3 import runner as R
+from v3 import sentinel as S
 from v3 import stage_world as SW
 
 CELL = C.Cell(rho=0.25, delta=4)
@@ -85,28 +86,12 @@ class LateBranchQuarantine(A.PolicyBase):
         return "branch" if t == self.ctx.H - 1 else None
 
 
-class SentinelShape(A.PolicyBase):
-    """Algorithm 1's shape on the frozen api, for a world test until T15's Sentinel is on
-    this branch: line 5 = a library member's distribution (L-SW-commit3), line 7 = the
-    observation, lines 8-9 = quarantine the carrier of the alarmed target."""
-    name = "sentinel-shape"
-
-    def __init__(self, ctx):
-        super().__init__(ctx)
-        self.member = L.make_member("L-SW-commit3", ctx)
-        self._alarm = None
-
-    def act(self, t, B_t):
-        return self.member.act(t, B_t)
-
-    def observe(self, t, obs):
-        self._alarm = obs.bought.target if obs.alarm and obs.bought is not None else None
-
-    def quarantine(self, t):
-        return None if self._alarm is None else C.CARRIER_OF_TARGET[self._alarm]
-
-    def decision_log(self):
-        return self.member.decision_log()
+def _sentinel():
+    """T15's Sentinel on the smoke parts (sentinel.stub_parts: StubTable, placeholder tau /
+    eta_Q -- no number from it is a result).  It has its own lines 8-9, so it runs in the
+    stage world with keep_quarantine=True."""
+    logging.getLogger("v3.line23").setLevel(logging.ERROR)
+    return S.registry(S.stub_parts())[S.SENTINEL]
 
 
 class TestS4Sensitivity(unittest.TestCase):
@@ -202,13 +187,16 @@ class TestS4Sensitivity(unittest.TestCase):
         {none} ∪ {(audit, k, depth)} with cost κ (k, depth)": the same policy objects run in
         the carrier world and in the stage world (k a carrier / a stage), end to end on dev,
         with the same agent draws; a policy with its own lines 8-9 keeps them in the stage
-        world, and a stage episode resumes from a snapshot (the rollouts of line 5)."""
+        world, and a stage episode resumes from a snapshot (the rollouts of line 5).
+        The policy with its own lines 8-9 is T15's Sentinel (smoke parts); the stage
+        adapter forwards its record fields delta_hat and line5_source."""
         systems = {n: B.factory(n) for n in B.BASELINES}
-        systems["sentinel-shape"] = SentinelShape
+        sentinel = _sentinel()
+        systems[S.SENTINEL] = sentinel
         plans = _dev_plans(3)
         self.assertGreater(len(plans), 5)
         for name, fac in systems.items():
-            keep = name == "sentinel-shape"
+            keep = name == S.SENTINEL
             for wf, a, pl in plans[:6]:
                 for seed in (0, 1):
                     out = {}
@@ -228,12 +216,18 @@ class TestS4Sensitivity(unittest.TestCase):
                     if name == "B1 audit-at-commit":
                         self.assertEqual(out["stage"].audits["commit"],
                                          out["carrier"].audits["commit"])
+                    if name == S.SENTINEL:        # the stage adapter forwards the trace
+                        for rr in out.values():
+                            self.assertEqual(rr.delta_hat, C.DHAT_PRIOR)
+                            self.assertIn(rr.line5_source, ("table", "exact"))
+                    else:
+                        self.assertIsNone(out["stage"].delta_hat)
         # lines 8-9 pass through for Sentinel, not for a baseline's alarm rule
         seen_q = {True: 0, False: 0}
         for wf, a, pl in plans:
             for seed in range(3):
                 for keep in (True, False):
-                    r = SW.run_in_world(wf, pl, SentinelShape, STAGE, CELL, seed,
+                    r = SW.run_in_world(wf, pl, sentinel, STAGE, CELL, seed,
                                         keep_quarantine=keep).record
                     seen_q[keep] += len(r.quarantines)
         self.assertGreater(seen_q[True], 0)

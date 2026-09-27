@@ -258,8 +258,9 @@ class TestInfraFreeze(_Tmp):
             R.validate_record(ok, bad, "eval")
 
     def test_run_stops_before_simulating_a_system_whose_task_has_not_landed(self):
-        """Sentinel's class (T15) and B7 (T21) have no factory yet: a run naming them exits
-        3 and simulates nothing, after the freeze checks."""
+        """B7 (T21) has no factory yet, and Sentinel's class (T15) has no frozen parts yet
+        (T14's line-5 table, T18's tuned tau / eta_Q: sentinel.check_ready): a run naming
+        them exits 3 and simulates nothing, after the freeze checks."""
         calls = []
         rc = R.main(["--split", "dev", "--blocks", "attacker-delta", "--seeds", "1",
                      "--workflows", "1", "--jobs", "1", "--out", str(self.dir / "o")],

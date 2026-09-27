@@ -61,9 +61,29 @@ _EPS = 1e-9
 # ---------------------------------------------------------------------------------------
 
 
+#: minimax results by their exact input (the float rows): the LP is a deterministic
+#: function of L, and the line-5 table hands out the same L-hat for every episode that
+#: reaches the same key, so a repeated matrix is solved once.  Bounded; cleared when full.
+_MINIMAX: dict = {}
+MINIMAX_CACHE_MAX = 65536
+
+
 def minimax(L) -> tuple:
     """(x, value): x minimises max_a sum_i x_i L[i][a] over the simplex; value is that
-    worst case, re-read from x.  L is a non-empty list of equal-length non-empty rows."""
+    worst case, re-read from x.  L is a non-empty list of equal-length non-empty rows.
+    Memoised on the exact float rows (`_MINIMAX`): same input, same (x, value)."""
+    key = tuple(tuple(float(v) for v in r) for r in L)
+    hit = _MINIMAX.get(key)
+    if hit is None:
+        hit = _minimax(key)
+        if len(_MINIMAX) >= MINIMAX_CACHE_MAX:
+            _MINIMAX.clear()
+        _MINIMAX[key] = hit
+    x, value = hit
+    return list(x), value
+
+
+def _minimax(L) -> tuple:
     rows = [[float(v) for v in r] for r in L]
     if not rows or not rows[0] or any(len(r) != len(rows[0]) for r in rows):
         raise ValueError("minimax needs a non-empty rectangular matrix")
@@ -84,7 +104,7 @@ def minimax(L) -> tuple:
         raise RuntimeError("minimax LP returned an empty mixture")
     x = [v / s for v in x]
     value = max(sum(x[i] * rows[i][a] for i in range(P)) for a in range(K))
-    return x, value
+    return tuple(x), value
 
 
 def mixture_value(x, L) -> float:
@@ -97,8 +117,22 @@ def mixture_value(x, L) -> float:
 # ---------------------------------------------------------------------------------------
 
 
+#: The column sets check_classes has passed (the check reads only the fixed D18 tuning
+#: classes and the fixed held-out split, so a set that passed once passes always).
+_CLASSES_OK: set = set()
+
+
 def check_classes(classes) -> None:
-    """Refuse a column that is not a tuning column or can realise held-out behaviour."""
+    """Refuse a column that is not a tuning column or can realise held-out behaviour.
+    A column set that passed is remembered (`_CLASSES_OK`); a refusal is never cached."""
+    key = tuple(classes)
+    if key in _CLASSES_OK:
+        return
+    _check_classes(key)
+    _CLASSES_OK.add(key)
+
+
+def _check_classes(classes) -> None:
     tuning = set(AT.attacker_classes())
     bad = [c for c in classes if c not in tuning]
     if bad:

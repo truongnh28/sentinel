@@ -382,6 +382,17 @@ class CarrierPolicyInStages:
         self.name = inner.name
         self._dropped: list = []
 
+    # The record's trace fields (runner.finish reads them off the policy): the wrapped
+    # policy's, so a stage-world Sentinel record carries its line-1 Delta-hat and line-5
+    # source as a carrier-world one does; None for a policy without them (baselines).
+    @property
+    def delta_hat(self):
+        return getattr(self.inner, "delta_hat", None)
+
+    @property
+    def line5_source(self):
+        return getattr(self.inner, "line5_source", None)
+
     def act(self, t: int, B_t: float) -> A.AuditAction | None:
         return _to_stage(self.inner.act(t, B_t))
 

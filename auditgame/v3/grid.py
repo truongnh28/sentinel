@@ -40,6 +40,9 @@ file of tools/v3_run.py.  `p0` names the P0 block it is counted against.
                            rollout CPU-hours, not per episode
     sens:A7, sens:stage    C1 / C2 run these after the core ("luot bo sung sau loi")
     seed2-pairs            best response over carrier pairs when two are seeded (4*, off)
+    ablation-prior         the -regime-estimate ablation "Sentinel [dhat=prior]" (a Table 3
+                           row, never headline: C12), held-out, primary world, the Table 2
+                           headline cells
 
 DROPPED CELLS (N3: out of the denominator, with the reason).  H18: Delta = 0 and the
 attacker column (budget.BudgetUndefined -- B_min has no value there); every (rho, detector)
@@ -78,6 +81,7 @@ from v3 import baselines as BL
 from v3 import budget as BU
 from v3 import config as C
 from v3 import corpus as K
+from v3 import delta_hat as DH
 
 # ---------------------------------------------------------------------------------------
 # Systems (sentinel-v3.md S9; P0 GD 5: 16 systems, 6 of them in the Sentinel class)
@@ -87,13 +91,21 @@ B1 = BL.B1AuditAtCommit.name
 B2 = BL.B2UniformRandom.name
 #: B7 is the small-game minimax (T21); P0 GD 6 costs it per episode like B2.
 B7 = "B7"
-#: The Sentinel class (T15 builds V3_REGISTRY).  Names are PROVISIONAL until T15 lands;
-#: freeze_v3 pins whatever T15 registers, and metrics.is_sentinel reads the prefix.
+#: The Sentinel class: T15's V3_REGISTRY names (v3/sentinel.py; metrics.is_sentinel reads
+#: the prefix).  The line-1 arms carry delta_hat's tag (DH.system_name, = sentinel.
+#: ORACLE_DELTA / REGIME_PRIOR; restated through delta_hat so this module stays free of
+#: the particle filter) -- no untagged alias exists, so delta_hat.require_headline (C12)
+#: still catches an oracle or prior-only record in a headline set.
 SENTINEL = "Sentinel"
-SENTINEL_CLASS = (SENTINEL, "Sentinel oracle-Delta", "Sentinel -randomization",
+ORACLE_DELTA = DH.system_name(SENTINEL, DH.ARM_ORACLE)      # "Sentinel [dhat=oracle]"
+REGIME_PRIOR = DH.system_name(SENTINEL, DH.ARM_PRIOR)       # "Sentinel [dhat=prior]"
+SENTINEL_CLASS = (SENTINEL, ORACLE_DELTA, "Sentinel -randomization",
                   "Sentinel -alarm memory", "Sentinel -transition uncertainty",
                   "Sentinel -benign-drift")
 SENTINEL_ROLLOUT = "Sentinel-rollout"      # T15 reference arm, headline cells only (Q13)
+#: The -regime-estimate ablation (line 1 never leaves the prior): a Table 3 row in the
+#: headline cells, outside the headline and outside the core (block "ablation-prior").
+ABLATION_ROWS = (REGIME_PRIOR,)
 BASELINE_SYSTEMS = (B1, B2, BL.B3AuditOnInsertion.name, BL.B4AuditOnRetrieval.name,
                     BL.B5RiskScore.name, BL.B6TwoStage.name, B7, BL.CostGreedy.name,
                     BL.StageWeightedRandomised.name, BL.OracleControl.name)
@@ -290,6 +302,7 @@ def _enumerate(p0_model: bool) -> tuple:
                        (SENTINEL_ROLLOUT,), core=False)
     units += _br("headline-rollout-br", None, "headline-rollout", HEADLINE_WORLD, head,
                  lambda c: (SENTINEL_ROLLOUT,), core=False)
+    units += _held_out("ablation-prior", None, "primary", P, head, ABLATION_ROWS, core=False)
     units += _br("seed2-pairs", None, "seed-2", sens["seed-2"], _cells(),
                  lambda c: BR_SETS[A.br_systems(c, sens["seed-2"], core=False)], core=False)
     return tuple(units), tuple(dropped)
@@ -406,7 +419,7 @@ def count(split: str = "secondary", p0_model: bool = False, measure: str = "p0")
         e = episodes(u, hist, measure=measure)
         row["episodes"] += e
         row["units"] += 1
-        if u.system in SENTINEL_CLASS:
+        if u.system in SENTINEL_CLASS or u.system in ABLATION_ROWS:
             row["sentinel_class"] += e
     return out
 
@@ -484,6 +497,7 @@ def definition() -> dict:
     manifest (freeze_v3) hashes it, so a moved cell moves the freeze."""
     return {
         "systems": list(SYSTEMS), "sentinel_class": list(SENTINEL_CLASS),
+        "ablation_rows": list(ABLATION_ROWS),
         "h18_policies": list(H18_POLICIES), "held_out": list(HELD_OUT),
         "seeds": list(SEEDS), "survival": SURVIVAL,
         "br_trims": dict(A.BR_TRIMS), "br_eps": list(A.BR_EPS),

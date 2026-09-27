@@ -509,6 +509,19 @@ class TestS9Metrics(unittest.TestCase):
                                            "Sentinel-v3", ("a1",), (4,), n_boot=50)
         self.assertTrue(math.isnan(missing["diff"]))
         self.assertIn("nan", M.fidelity_line(missing))
+        # a real run: "Sentinel" (table, primary world) pairs with "Sentinel-rollout"
+        paired = []
+        for i, rp in enumerate(("r1", "r1", "r2", "r3", "r4")):
+            for s in (1, 2):
+                h = 0.2 + 0.05 * i
+                paired.append(rec(wf=f"w{i}", repo=rp, policy="Sentinel", seed=s, harm=h,
+                                  line5_source="table"))
+                paired.append(rec(wf=f"w{i}", repo=rp, policy="Sentinel-rollout", seed=s,
+                                  harm=h + 0.02, line5_source="rollout"))
+        self.assertEqual(M.ROLLOUT_PAIR["Sentinel"], "Sentinel-rollout")
+        pr = M.table_rollout_fidelity(paired, "Sentinel", ("a1",), (4,), n_boot=200)
+        self.assertAlmostEqual(pr["abs_diff"], 0.02, places=12)
+        self.assertEqual(pr["policy"], "Sentinel")
 
     def test_scorecard_frame_holds_h1_to_h20(self):
         """D9.scorecard (T4 of sentinel-v3.md): "They are placeholders that fix the analysis
