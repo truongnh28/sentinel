@@ -283,7 +283,7 @@ class TestS4Sensitivity(unittest.TestCase):
                                                "drift-persistent", "seed-2"]))
         systems = {n: B.factory(n) for n in (
             "B1 audit-at-commit", "B2 uniform random", "B3 audit-on-insertion",
-            "B4 audit-on-retrieval", "B5 risk-score", "B6 two-stage")}
+            "B4 audit-on-retrieval", "B5 risk-score", "B6 two-stage", "B1-prov")}
         systems[LateBranchQuarantine.name] = LateBranchQuarantine
         base_plans = {(wf.wf_id, a): pl for wf, a, pl in _dev_plans(4)}
         for sname, world in C.sensitivities():
