@@ -205,6 +205,28 @@ class TestS5Tuning(unittest.TestCase):
             res["tuned"]["smoke"] = False
             T.write(res, pathlib.Path(d) / "tuned.json")
 
+        # the hashed log is reproducible regardless of --jobs N: the per-candidate
+        # measurements run in N worker processes (tools/v3_build_table.py's deterministic
+        # ProcessPoolExecutor pattern -- the result does not depend on N), while the log and
+        # every choice are assembled by the same single-process control flow.  So the tuned
+        # JSON and its log_sha256 are byte-identical at --jobs 1 and --jobs N; only the
+        # wall-clock `timing` block, which is not part of log_sha256, differs.
+        kw = dict(rhos=(0.0, 0.25), belief_factory=T.stub_belief_factory,
+                  members=_sw_members(), tau_grid=(0.3, 0.5), eta_grid=(0.0, 0.1))
+        r1, r2 = tiny(jobs=1, **kw), tiny(jobs=4, **kw)
+        self.assertEqual(r1["log"], r2["log"])
+        self.assertEqual(r1["tuned"]["log_sha256"], r2["tuned"]["log_sha256"])
+        strip = lambda t: {k: v for k, v in t.items() if k != "timing"}   # noqa: E731
+        self.assertEqual(strip(r1["tuned"]), strip(r2["tuned"]))
+        # the parallel run actually distributed line-8 work (>1 (tau, eta, member) candidate)
+        self.assertGreater(sum(1 for e in r1["log"]
+                               if e["step"] == "line8" and "candidate" in e), 1)
+        T.check_tuned(r1["tuned"])
+        T.check_tuned(r2["tuned"])
+        # --jobs 1 is the default and leaves the single-process path untouched (no cache)
+        self.assertEqual(inspect.signature(T.tune).parameters["jobs"].default, 1)
+        self.assertIsNone(inspect.signature(T.tune_rho).parameters["cache"].default)
+
 
 if __name__ == "__main__":
     unittest.main()
