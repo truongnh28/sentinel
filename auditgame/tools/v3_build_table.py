@@ -5,6 +5,8 @@
     ../.venv/bin/python tools/v3_build_table.py --sources-only --jobs 8     # key counts, 36 cells
     ../.venv/bin/python tools/v3_build_table.py --pilot --rhos 0 --deltas 4 --jobs 8
     ../.venv/bin/python tools/v3_build_table.py --tuned reference/v3_tuned.json --jobs 10  # P4
+    ../.venv/bin/python tools/v3_build_table.py --tuned reference/v3_tuned.json --base-r 16 --jobs 10
+        # ^ half the base draw budget at the SAME diff-SE gate (line5-r-configurable)
 
 THREE PHASES (plan T14 "Trang thai nguon", "Gia tri")
   A. SOURCES.  In every table cell (rho, chi, detector; primary world, K_d = 2, b1) and every
@@ -20,15 +22,19 @@ THREE PHASES (plan T14 "Trang thai nguon", "Gia tri")
      state of that cell (v3/line5_table.py); each state gets its key (Delta-hat, h, bin);
      at most S_MAX states per key are kept, in the order of core.seed_of(PICK_TAG, key,
      state) -- deterministic, not the first ones met.
-  C. VALUES.  Per filled key, R = 32 draws per (member, class), assigned round-robin to the
-     key's kept states (draw r starts from state r mod S).  Draw r: the source episode is
-     replayed to task t (deterministic: every draw of the episode is keyed on its seed), a
-     hypothesis is drawn from ITS b_t with seed_of(DRAW_TAG, key, r), and the SAME
-     hypothesis is planted for every (member, class) (common random numbers, as T12's
-     engine does) and rolled out by rollout.RolloutEngine (world draws keyed on r).  L-hat
-     is the mean over the draws, SE = sd / sqrt(n).  A key whose largest SE is over 0.09 is
-     topped up once with draws 32..63 (R_MAX = 64); still over, it is flagged (O12).
-     Empty keys fall back by O16 (v3/line5_table.resolve_fallbacks).
+  C. VALUES.  Per filled key, R draws per (member, class) (R = --base-r, default C.TABLE_R =
+     32), assigned round-robin to the key's kept states (draw r starts from state r mod S).
+     Draw r: the source episode is replayed to task t (deterministic: every draw of the
+     episode is keyed on its seed), a hypothesis is drawn from ITS b_t with seed_of(DRAW_TAG,
+     key, r), and the SAME hypothesis is planted for every (member, class) (common random
+     numbers, as T12's engine does) and rolled out by rollout.RolloutEngine (world draws
+     keyed on r).  L-hat is the mean over the draws, SE = sd / sqrt(n).  A key whose CRN
+     diff-SE exceeds config.TABLE_DIFF_SE_MAX (0.15) is topped up ONCE to R_MAX = 2*base_r
+     (32/64 at the default; base_r = 16 -> 16/32), still over sets diff_flag (O12,
+     line5-se-diff).  Because draw r is keyed on r alone, a smaller base_r uses a strict
+     sub-sequence of the default draws -- same keying, same diff-SE gate, ~half the budget,
+     the SAME Sentinel policy under test (this is the Monte-Carlo draw budget, not a defender
+     parameter).  Empty keys fall back by O16 (v3/line5_table.resolve_fallbacks).
 
 DECLARED CHOICES (L1; DCM T14)
   * behaviour policy = uniform mixture of the 28 members, per task, plus lines 7-9 (plan T14);
@@ -476,6 +482,23 @@ def value_job(job: tuple) -> dict:
 # ---------------------------------------------------------------------------------------
 
 
+def base_r_and_max(base_r: int) -> tuple:
+    """line5-r-configurable (27/09/2026): the base draw budget and its SINGLE top-up ceiling.
+
+    The top-up DOUBLES the base budget: R_MAX = 2 * base_r.  This preserves O12's "one
+    top-up" design at any base_r and keeps R_MAX >= base_r.  base_r = C.TABLE_R (32) gives
+    (32, 64) -- the declared default (plan S8 "R = 32-64"), byte-identical to before.  A
+    smaller base_r (e.g. 16 -> (16, 32)) uses the first base_r keyed draws, a strict
+    sub-sequence of the base_r = 32 draws (draws are keyed on r via seed_of(DRAW_TAG, ...),
+    independent of base_r), and the top-up adds r = base_r.. under the UNCHANGED diff-SE
+    gate (config.TABLE_DIFF_SE_MAX = 0.15).  This is only the Monte-Carlo draw budget, not a
+    defender parameter: the Sentinel policy under test is unchanged."""
+    base_r = int(base_r)
+    if base_r < 1:
+        raise ValueError(f"--base-r must be >= 1 (got {base_r})")
+    return base_r, 2 * base_r
+
+
 def settings_of(*, rhos, pilot: bool, tuned=None, members=None, classes=None,
                 r: int = T.R, r_max: int = T.R_MAX, se_max: float = T.SE_MAX,
                 diff_se_max: float = T.DIFF_SE_MAX, s_max: int = S_MAX,
@@ -708,7 +731,7 @@ def _json_default(o):
     raise TypeError(type(o))
 
 
-def main(argv=None) -> int:
+def make_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--split", default=DEV, help="only 'dev' is accepted")
     ap.add_argument("--jobs", type=int, default=8)
@@ -727,6 +750,13 @@ def main(argv=None) -> int:
                     help="line5-se-diff (27/09/2026): top up a key once to R_MAX when the "
                          "CRN-paired diff-SE of its two closest members exceeds this (default "
                          "%(default)s; the old absolute SE stays a reported diagnostic only)")
+    ap.add_argument("--base-r", type=int, default=T.R,
+                    help="line5-r-configurable (27/09/2026): base Monte-Carlo draws per "
+                         "(member, class) per key; the single diff-SE top-up doubles it to "
+                         "R_MAX = 2*base_r (default %(default)s -> 32/64, byte-identical to "
+                         "before). A smaller base_r (e.g. 16 -> 16/32) uses the first base_r "
+                         "keyed draws at the SAME diff-SE gate (0.15): same precision, ~half "
+                         "the draw budget. Draw budget only -- the Sentinel policy is unchanged")
     ap.add_argument("--out", type=pathlib.Path, default=None)
     ap.add_argument("--report", type=pathlib.Path, default=None)
     ap.add_argument("--fidelity", type=int, default=0, metavar="N",
@@ -734,13 +764,18 @@ def main(argv=None) -> int:
     ap.add_argument("--extrapolate", action="store_true",
                     help="no build: CPU-hours of phase C for every key in sources.json, at "
                          "the cost per rollout measured in the build report")
-    a = ap.parse_args(argv)
+    return ap
+
+
+def main(argv=None) -> int:
+    a = make_parser().parse_args(argv)
     require_dev(a.split)
     if a.headline:
         a.chis, a.dprimes = [C.CHI_PRIMARY], [C.DPRIME_PRIMARY]
     tcs = [table_cell(r, x, d) for r in a.rhos for x in a.chis for d in a.dprimes]
+    base_r, r_max = base_r_and_max(a.base_r)
     settings = settings_of(rhos=a.rhos, pilot=a.pilot or a.sources_only, tuned=a.tuned,
-                          diff_se_max=a.diff_se_max)
+                          diff_se_max=a.diff_se_max, r=base_r, r_max=r_max)
     out = a.out or (T.PILOT_PATH if a.pilot else T.TABLE_PATH)
     rep_path = a.report or out.with_suffix(".report.json")
     if a.fidelity:

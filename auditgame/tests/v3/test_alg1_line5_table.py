@@ -218,6 +218,52 @@ class TestAlg1Line5Table(unittest.TestCase):
         # the seal and the v3 manifest read table_digest() with no argument
         self.assertEqual(inspect.signature(T.table_digest).parameters["path"].default, None)
         self.assertTrue(str(T.TABLE_PATH).endswith("v3_line5_table.npz"))
+        # ---- line5-r-configurable (27/09/2026): --base-r sets the base Monte-Carlo draw
+        #      budget only (not any defender parameter); the DEFAULT is byte-identical to
+        #      before, and a smaller base_r uses a strict SUB-SEQUENCE of the same keyed
+        #      draws (draw r is keyed on r alone), at the SAME diff-SE gate. ----------------
+        # (a) the default base R is C.TABLE_R (= T.R = 32) and its single top-up doubles it to
+        #     T.R_MAX (= 64): the declared 32/64 (O12), so the default build is unchanged.
+        self.assertEqual(C.TABLE_R, 32)
+        self.assertEqual(B.base_r_and_max(C.TABLE_R), (T.R, T.R_MAX))     # 32 -> (32, 64)
+        self.assertEqual(B.base_r_and_max(16), (16, 32))                  # 16 -> (16, 32)
+        with self.assertRaises(ValueError):
+            B.base_r_and_max(0)
+        self.assertEqual(B.make_parser().parse_args(["--pilot"]).base_r, C.TABLE_R)  # CLI default
+        self.assertEqual(B.make_parser().parse_args(["--base-r", "16"]).base_r, 16)
+        self.assertEqual(B.settings_of(rhos=[0.25], pilot=True)["r"], C.TABLE_R)  # settings default
+        # draws are keyed on r alone, so base_r = 16 draws are EXACTLY the first 16 of base_r
+        # = 32 (a strict sub-sequence): base_r = 32 reproduces today's r = 0..31 exactly.
+        tc = B.table_cell(0.25)
+        wf = B.dev_workflows()[0]
+        state = (wf.wf_id, len(TINY_CLASSES), B.SOURCE_SEEDS[0], 2)       # unattacked, t = 2
+        s = B.settings_of(rhos=[0.25], pilot=True, members=TINY_MEMBERS, classes=TINY_CLASSES,
+                          rollout_fn=_loss_low)
+        B._init_worker(s)
+        d32 = B.draws(tc, 4, wf.H - 2, 0, [state], 0, 32, {}, _loss_low)
+        d16 = B.draws(tc, 4, wf.H - 2, 0, [state], 0, 16, {}, _loss_low)
+        self.assertTrue(all(d16[k] == d32[k][:16] for k in d16))         # strict sub-sequence
+
+        def vjob(base_r):
+            r, r_max = B.base_r_and_max(base_r)
+            ss = B.settings_of(rhos=[0.25], pilot=True, members=TINY_MEMBERS,
+                               classes=TINY_CLASSES, rollout_fn=_loss_low, r=r, r_max=r_max)
+            B._init_worker(ss)
+            return B.value_job((tc, 4, wf.H - 2, 0, [state]))
+        # (a) byte-identical on this tiny case: base_r = 32 aggregates exactly the r = 0..31
+        #     keyed draws (low variance -> the diff-SE gate never fires, so n stays 32), and
+        #     the result is deterministic across runs.
+        ref, again = vjob(32), vjob(32)
+        self.assertEqual(ref["n"], 32)
+        self.assertEqual(ref["L"].tolist(), again["L"].tolist())
+        self.assertEqual(ref["L"].tolist(), B._stats(d32, TINY_MEMBERS, TINY_CLASSES)[0].tolist())
+        # (b) base_r = 16 runs, is deterministic across runs, and aggregates the sub-sequence.
+        v16a, v16b = vjob(16), vjob(16)
+        self.assertEqual(v16a["n"], 16)
+        self.assertEqual(v16a["L"].tolist(), v16b["L"].tolist())
+        self.assertEqual(v16a["L"].tolist(), B._stats(d16, TINY_MEMBERS, TINY_CLASSES)[0].tolist())
+        # the base R also travels in the table meta (build writes settings["r"]/["r_max"])
+        self.assertEqual((m["r"], m["r_max"]), (2, 2))        # this tiny build's declared R
 
     def test_empty_bins_fall_back_with_a_reason(self):
         """DA1.l5 -- "at ← arg minπ ∈Π maxπA ∈ΠA b L(π, πA | bt , Bt ) ⊲ robust over a
@@ -350,6 +396,28 @@ class TestAlg1Line5Table(unittest.TestCase):
         # the winning pair is (lowest member index, next), since idx only ever raises V(m)
         self.assertEqual(res["diff_pair"], (0, 1))
         self.assertAlmostEqual(res["diff_gap"], 0.2, delta=0.05)
+        # line5-r-configurable (27/09/2026): the SAME CRN diff-SE gate governs the top-up at a
+        # smaller base_r (only the Monte-Carlo draw budget changes, not the gate).  At base_r =
+        # 16 the CRN case still does NOT top up (the paired difference cancels), so R stays 16
+        # and the result is deterministic; a non-CRN high-variance case DOES top up, once, to
+        # R_MAX = 2*16 = 32.
+        r, r_max = B.base_r_and_max(16)
+        self.assertEqual((r, r_max), (16, 32))
+        s16 = B.settings_of(rhos=[0.25], pilot=True, members=TINY_MEMBERS, classes=TINY_CLASSES,
+                            rollout_fn=_loss_crn, r=r, r_max=r_max, diff_se_max=0.05)
+        B._init_worker(s16)
+        crn16a = B.value_job((tc, 4, wf.H - 2, 0, [state]))
+        crn16b = B.value_job((tc, 4, wf.H - 2, 0, [state]))
+        self.assertEqual(crn16a["n"], 16)                    # gate does not fire: no top-up
+        self.assertFalse(crn16a["diff_flag"])
+        self.assertLessEqual(crn16a["diff_se"], 0.05)
+        self.assertEqual(crn16a["L"].tolist(), crn16b["L"].tolist())    # deterministic
+        s16h = B.settings_of(rhos=[0.25], pilot=True, members=TINY_MEMBERS, classes=TINY_CLASSES,
+                             rollout_fn=_loss_high, r=r, r_max=r_max)
+        B._init_worker(s16h)
+        hi16 = B.value_job((tc, 4, wf.H - 2, 0, [state]))
+        self.assertEqual(hi16["n"], 32)                      # gate fires: one top-up to 2*base_r
+        self.assertTrue(hi16["diff_flag"])
 
     def test_diff_se_beats_combining_independent_se(self):
         """DA1.l5 -- "at ← arg minπ ∈Π maxπA ∈ΠA b L(π, πA | bt , Bt ) ⊲ robust over a

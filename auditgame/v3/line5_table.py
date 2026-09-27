@@ -88,9 +88,14 @@ P_LEVELS = C.BIN_P_ATTACK_LEVELS              # 5
 N_CARRIERS = C.BIN_TOP_CARRIER_LEVELS         # 4
 #: O16: the quantiles of p_attack whose values are the level edges.
 QUANTILES = tuple((i + 1) / P_LEVELS for i in range(P_LEVELS - 1))   # 0.2, 0.4, 0.6, 0.8
-#: O12.
-R = C.TABLE_R                                 # 32
-R_MAX = 2 * C.TABLE_R                         # 64: one top-up (plan S8 "R = 32-64")
+#: O12.  These are the DEFAULT base draw budget and its single top-up ceiling.  The BASE R
+#: is configurable per build via tools/v3_build_table.py --base-r N (line5-r-configurable,
+#: 27/09/2026): the value phase runs `base_r` draws per (member, class) and, when the CRN
+#: diff-SE gate fires, tops up ONCE to 2*base_r.  The DEFAULT is base_r = C.TABLE_R = 32, so
+#: the default build is byte-identical to before (r = 32, one top-up to 64); a smaller base_r
+#: uses the first base_r keyed draws (a strict sub-sequence) at the SAME diff-SE gate (0.15).
+R = C.TABLE_R                                 # 32: default base R (per-build via --base-r)
+R_MAX = 2 * C.TABLE_R                         # 64: default one top-up (plan S8 "R = 32-64")
 SE_MAX = C.TABLE_SE_MAX                       # 0.09: secondary diagnostic, no longer the gate
 DIFF_SE_MAX = C.TABLE_DIFF_SE_MAX             # 0.15: line5-se-diff top-up gate (27/09/2026)
 
@@ -346,6 +351,11 @@ class Line5Table:
 
     # ---- summaries (report) ----------------------------------------------------------
     def summary(self) -> dict:
+        # line5-r-configurable (27/09/2026): a key is "topped up" when its n exceeds the
+        # table's own BASE R (meta["r"], the --base-r the build used), not the module default
+        # -- a base_r = 16 build tops up to 32, which is not > R = 32.  Synthetic tables (no
+        # meta["r"]) fall back to the module R.
+        r_base = int(self.meta.get("r", R))
         out = {}
         for cid, arr in self.cells.items():
             built = [DELTA_KEYS.index(d) for d in self.meta["cells"][cid]["built_deltas"]]
@@ -357,7 +367,7 @@ class Line5Table:
                         "nearest_bin": int((rs == REASON_NEAREST_BIN).sum()),
                         "nearest_h": int((rs == REASON_NEAREST_H).sum()),
                         "empty_row": int((rs == REASON_EMPTY).sum()),
-                        "topped_up": int((arr["n"][built][filled] > R).sum()),
+                        "topped_up": int((arr["n"][built][filled] > r_base).sum()),
                         # line5-se-diff (27/09/2026): the gate.
                         "diff_se_max": float(diff_se.max()) if diff_se.size else None,
                         "diff_se_median": float(np.median(diff_se)) if diff_se.size else None,
