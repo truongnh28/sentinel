@@ -33,11 +33,27 @@ the lower h) with the same bin rule is used (REASON_NEAREST_H) -- a declared ext
 O16, which names only the same h.  A Delta-hat the build did not cover (a pilot) is
 REASON_NOT_BUILT and `lookup` raises KeyError: a partial table never answers silently.
 
-SE (O12).  Every filled key has R = 32 rollouts per (member, class); a key whose largest SE
-exceeds config.TABLE_SE_MAX (0.09) is topped up once to R_MAX = 64 (the upper end of the
-plan's "R = 32-64", S8); a key still above it carries se_flag and the note says so.
-Definition 1's loss is not bounded by 1 (lambda_Q FQ + lambda_T clean lost), so R = 32 alone
-does not guarantee 0.09.
+SE (O12).  Every filled key has R = 32 rollouts per (member, class); the ABSOLUTE SE (sd of
+one member's loss / sqrt(n)) is reported for every entry as a SECONDARY DIAGNOSTIC only
+(se, se_flag: se.max() > config.TABLE_SE_MAX = 0.09).  Definition 1's loss is not bounded by
+1 (lambda_Q FQ + lambda_T clean lost), so R = 32 alone does not make this bound, and T14's
+pilot found it unreachable even at R_MAX = 64 (88% of cells stayed over).
+
+line5-se-diff (27/09/2026, @truong): the top-up GATE is the CRN-paired DIFFERENCE SE
+instead -- the quantity line 5's argmin/minimax actually needs is not a member's absolute
+loss but WHICH member is better.  v3/rollout.py and tools/v3_build_table.py share one
+hypothesis draw, one world seed and one member-randomisation seed across every (member,
+class) of a draw r (common random numbers), so the loss samples of two members at the same
+r are paired, not independent; sd(loss_i - loss_j) computed from the paired differences is
+the right variance to gate on, not sd(loss_i) and sd(loss_j) combined as if independent.
+Per key: L-hat's two best members by point estimate of the minimax value V(m) = max_c
+L-hat[m, c] (the argmin and its closest competitor) are re-scored on their own per-draw
+paired difference (at each member's own argmax class); diff_se = sd(diff) / sqrt(n),
+diff_gap = V(second) - V(best).  A key whose diff_se exceeds config.TABLE_DIFF_SE_MAX
+(0.15, chosen from a small dev sample across h: see docs/reports/v3-p2-table.md's
+27/09/2026 addendum) is topped up once to R_MAX = 64; still over, diff_flag is set and the
+note says so.  The old se / se_flag stay in the table and in `lookup`'s note as a secondary
+diagnostic; they no longer gate a top-up.
 
 STORAGE.  One .npz, never committed (plan T14, R17); `table_digest()` pins its CONTENT (every
 array's name, dtype, shape and bytes, in sorted order), not the file's bytes, because a
@@ -75,7 +91,8 @@ QUANTILES = tuple((i + 1) / P_LEVELS for i in range(P_LEVELS - 1))   # 0.2, 0.4,
 #: O12.
 R = C.TABLE_R                                 # 32
 R_MAX = 2 * C.TABLE_R                         # 64: one top-up (plan S8 "R = 32-64")
-SE_MAX = C.TABLE_SE_MAX                       # 0.09
+SE_MAX = C.TABLE_SE_MAX                       # 0.09: secondary diagnostic, no longer the gate
+DIFF_SE_MAX = C.TABLE_DIFF_SE_MAX             # 0.15: line5-se-diff top-up gate (27/09/2026)
 
 REASON_FILLED = 0
 REASON_NEAREST_BIN = 1
@@ -87,7 +104,8 @@ REASONS = {REASON_FILLED: "filled", REASON_NEAREST_BIN: "nearest bin, same h (O1
            REASON_NOT_BUILT: "Delta-hat not built in this table",
            REASON_EMPTY: "no source state at any h for this Delta-hat"}
 
-ARRAYS = ("L", "se", "n", "states", "src", "reason", "se_flag")
+ARRAYS = ("L", "se", "n", "states", "src", "reason", "se_flag",
+          "diff_se", "diff_gap", "diff_flag", "diff_pair")
 
 
 # ---------------------------------------------------------------------------------------
@@ -309,8 +327,15 @@ class Line5Table:
         if r != REASON_FILLED:
             notes.append(f"{REASONS[r]}: values of Delta-hat {DELTA_KEYS[sd]}, h {shi + 1}, "
                          f"bin {sb}")
+        diff_se = float(arr["diff_se"][sd, shi, sb])
+        notes.append(f"diff-SE {diff_se:.4f} (pair {tuple(int(x) for x in arr['diff_pair'][sd, shi, sb])}, "
+                     f"gap {float(arr['diff_gap'][sd, shi, sb]):.4f})")
+        if bool(arr["diff_flag"][sd, shi, sb]):
+            notes.append(f"diff-SE {diff_se:.4f} > {DIFF_SE_MAX} after R = {n} "
+                         f"(O12, line5-se-diff)")
         if bool(arr["se_flag"][sd, shi, sb]):
-            notes.append(f"SE {float(se.max()):.4f} > {SE_MAX} after R = {n} (O12)")
+            notes.append(f"secondary diagnostic: SE {float(se.max()):.4f} > {SE_MAX} "
+                         f"after R = {n} (not gated)")
         m = A.LossMatrix(self.members, self.classes,
                          tuple(tuple(float(x) for x in row) for row in Lm),
                          tuple(tuple(float(x) for x in row) for row in se),
@@ -327,14 +352,20 @@ class Line5Table:
             rs = arr["reason"][built]
             filled = rs == REASON_FILLED
             se = arr["se"][built].max(axis=(-1, -2))[filled]
+            diff_se = arr["diff_se"][built][filled]
             out[cid] = {"keys": int(rs.size), "filled": int(filled.sum()),
                         "nearest_bin": int((rs == REASON_NEAREST_BIN).sum()),
                         "nearest_h": int((rs == REASON_NEAREST_H).sum()),
                         "empty_row": int((rs == REASON_EMPTY).sum()),
+                        "topped_up": int((arr["n"][built][filled] > R).sum()),
+                        # line5-se-diff (27/09/2026): the gate.
+                        "diff_se_max": float(diff_se.max()) if diff_se.size else None,
+                        "diff_se_median": float(np.median(diff_se)) if diff_se.size else None,
+                        "diff_flagged": int(arr["diff_flag"][built][filled].sum()),
+                        # secondary diagnostic (no longer gated).
                         "se_max": float(se.max()) if se.size else None,
                         "se_median": float(np.median(se)) if se.size else None,
-                        "se_flagged": int(arr["se_flag"][built][filled].sum()),
-                        "topped_up": int((arr["n"][built][filled] > R).sum())}
+                        "se_flagged": int(arr["se_flag"][built][filled].sum())}
         return out
 
 
@@ -345,7 +376,10 @@ def empty_cell(n_members: int, n_classes: int) -> dict:
             "n": np.zeros(shape, np.int16), "states": np.zeros(shape, np.int16),
             "src": np.full(shape, -1, np.int32),
             "reason": np.full(shape, REASON_NOT_BUILT, np.int8),
-            "se_flag": np.zeros(shape, bool)}
+            "se_flag": np.zeros(shape, bool),
+            "diff_se": np.zeros(shape, np.float32), "diff_gap": np.zeros(shape, np.float32),
+            "diff_flag": np.zeros(shape, bool),
+            "diff_pair": np.full(shape + (2,), -1, np.int16)}
 
 
 def load(path=None) -> Line5Table:

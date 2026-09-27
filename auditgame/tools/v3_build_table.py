@@ -418,8 +418,34 @@ def _stats(losses: dict, members, classes) -> tuple:
     return Lm, se
 
 
+def _diff_stats(losses: dict, members, classes, Lm: np.ndarray) -> tuple:
+    """line5-se-diff (27/09/2026): the top-up gate.  V(m) = max_c L-hat[m, c] (the minimax
+    value line 5 reads); best/second = the two smallest V by point estimate.  Each is scored
+    at its OWN argmax class, over the CRN-paired per-draw losses of that (member, class) --
+    v3/rollout.py and draws() share one hypothesis, one world seed and one member-
+    randomisation seed across every (member, class) of a draw r, so loss_i(r) and loss_j(r)
+    are paired, not independent: sd(loss_i - loss_j) is the right variance, not combining
+    sd(loss_i) and sd(loss_j) as if independent.  Returns (diff_se, gap, (best, second)) with
+    gap = V(second) - V(best); n < 2 (fewer than 2 members) returns diff_se = 0.0, no pair."""
+    if len(members) < 2:
+        return 0.0, 0.0, (-1, -1)
+    V = Lm.max(axis=1)
+    cidx = Lm.argmax(axis=1)
+    order = np.argsort(V, kind="stable")
+    best, second = int(order[0]), int(order[1])
+    cb, cs = classes[int(cidx[best])], classes[int(cidx[second])]
+    a = np.asarray(losses[(members[best], cb)], float)
+    b = np.asarray(losses[(members[second], cs)], float)
+    n = min(len(a), len(b))
+    d = a[:n] - b[:n]
+    diff_se = float(d.std(ddof=1) / math.sqrt(n)) if n > 1 else 0.0
+    gap = float(V[second] - V[best])
+    return diff_se, gap, (best, second)
+
+
 def value_job(job: tuple) -> dict:
-    """job = (tc, dh, h, b, states).  L-hat, SE, n for one key (O12 top-up)."""
+    """job = (tc, dh, h, b, states).  L-hat, SE (secondary diagnostic), diff-SE (the top-up
+    gate: line5-se-diff, 27/09/2026) and n for one key."""
     tc, dh, h, b, states = job
     st = _settings()
     members, classes = tuple(st["members"]), tuple(st["classes"])
@@ -428,15 +454,19 @@ def value_job(job: tuple) -> dict:
     fn = st.get("rollout_fn")
     losses = draws(tc, dh, h, b, states, 0, st["r"], cache, fn)
     Lm, se = _stats(losses, members, classes)
+    diff_se, diff_gap, pair = _diff_stats(losses, members, classes, Lm)
     n = st["r"]
-    if se.max() > st["se_max"] and st["r_max"] > st["r"]:
+    if diff_se > st["diff_se_max"] and st["r_max"] > st["r"]:
         more = draws(tc, dh, h, b, states, st["r"], st["r_max"], cache, fn)
         for k in losses:
             losses[k] += more[k]
         Lm, se = _stats(losses, members, classes)
+        diff_se, diff_gap, pair = _diff_stats(losses, members, classes, Lm)
         n = st["r_max"]
     return {"tc": tc, "key": (dh, h, b), "L": Lm, "se": se, "n": n, "states": len(states),
-            "se_flag": bool(se.max() > st["se_max"]),
+            "se_flag": bool(se.max() > st["se_max"]),               # secondary, not gated
+            "diff_se": diff_se, "diff_gap": diff_gap, "diff_pair": pair,
+            "diff_flag": bool(diff_se > st["diff_se_max"]),
             "rollouts": n * len(members) * len(classes),
             "cpu": time.process_time() - c0, "wall": time.perf_counter() - w0}
 
@@ -448,12 +478,14 @@ def value_job(job: tuple) -> dict:
 
 def settings_of(*, rhos, pilot: bool, tuned=None, members=None, classes=None,
                 r: int = T.R, r_max: int = T.R_MAX, se_max: float = T.SE_MAX,
-                s_max: int = S_MAX, source_seeds=SOURCE_SEEDS,
+                diff_se_max: float = T.DIFF_SE_MAX, s_max: int = S_MAX,
+                source_seeds=SOURCE_SEEDS,
                 rollout_move_on_alarm: bool = ROLLOUT_MOVE_ON_ALARM, rollout_fn=None) -> dict:
     l8, l8_src = line8_settings(tuned, rhos, pilot)
     return {"members": list(LIB.MEMBERS if members is None else members),
             "classes": list(AT.attacker_classes() if classes is None else classes),
-            "r": int(r), "r_max": int(r_max), "se_max": float(se_max), "s_max": int(s_max),
+            "r": int(r), "r_max": int(r_max), "se_max": float(se_max),
+            "diff_se_max": float(diff_se_max), "s_max": int(s_max),
             "source_seeds": list(source_seeds), "line8": l8, "line8_source": l8_src,
             "rollout_move_on_alarm": bool(rollout_move_on_alarm), "pilot": bool(pilot),
             "rollout_fn": rollout_fn}
@@ -507,6 +539,9 @@ def build(*, tcs, deltas, workflows=None, settings: dict, jobs: int = 1, split: 
             arr["L"][ix], arr["se"][ix] = v["L"], v["se"]
             arr["n"][ix], arr["states"][ix] = v["n"], v["states"]
             arr["se_flag"][ix] = v["se_flag"]
+            arr["diff_se"][ix], arr["diff_gap"][ix] = v["diff_se"], v["diff_gap"]
+            arr["diff_flag"][ix] = v["diff_flag"]
+            arr["diff_pair"][ix] = v["diff_pair"]
             filled[ix] = True
         arr["src"], arr["reason"] = T.resolve_fallbacks(filled, deltas)
         cells[cid] = arr
@@ -515,6 +550,8 @@ def build(*, tcs, deltas, workflows=None, settings: dict, jobs: int = 1, split: 
             "members": list(members), "classes": list(classes), "deltas": list(T.DELTA_KEYS),
             "h_max": T.H_MAX, "n_bins": T.N_BINS, "quantiles": list(T.QUANTILES),
             "r": settings["r"], "r_max": settings["r_max"], "se_max": settings["se_max"],
+            "diff_se_max": settings["diff_se_max"],
+            "top_up_gate": "crn_pairwise_diff_se (line5-se-diff, 27/09/2026)",
             "s_max": settings["s_max"], "source_seeds": settings["source_seeds"],
             "workflows": [w.wf_id for w in workflows], "line8": settings["line8"],
             "line8_source": settings["line8_source"],
@@ -530,6 +567,8 @@ def build(*, tcs, deltas, workflows=None, settings: dict, jobs: int = 1, split: 
               "values": [{"tc": tc_id(v["tc"]), "delta_hat": v["key"][0], "h": v["key"][1],
                           "bin": v["key"][2], "states": v["states"], "n": v["n"],
                           "se_max": float(v["se"].max()), "se_flag": v["se_flag"],
+                          "diff_se": v["diff_se"], "diff_gap": v["diff_gap"],
+                          "diff_pair": v["diff_pair"], "diff_flag": v["diff_flag"],
                           "rollouts": v["rollouts"], "cpu_s": v["cpu"], "wall_s": v["wall"]}
                          for v in vals],
               "wall_s": {"sources": t_src, "values": t_val}, "jobs": jobs}
@@ -684,6 +723,10 @@ def main(argv=None) -> int:
                     help="the 4 headline table cells (chi 1.33, mid detector, every rho)")
     ap.add_argument("--deltas", type=int, nargs="+", default=list(T.DELTA_KEYS))
     ap.add_argument("--tuned", type=pathlib.Path, default=None)
+    ap.add_argument("--diff-se-max", type=float, default=T.DIFF_SE_MAX,
+                    help="line5-se-diff (27/09/2026): top up a key once to R_MAX when the "
+                         "CRN-paired diff-SE of its two closest members exceeds this (default "
+                         "%(default)s; the old absolute SE stays a reported diagnostic only)")
     ap.add_argument("--out", type=pathlib.Path, default=None)
     ap.add_argument("--report", type=pathlib.Path, default=None)
     ap.add_argument("--fidelity", type=int, default=0, metavar="N",
@@ -696,7 +739,8 @@ def main(argv=None) -> int:
     if a.headline:
         a.chis, a.dprimes = [C.CHI_PRIMARY], [C.DPRIME_PRIMARY]
     tcs = [table_cell(r, x, d) for r in a.rhos for x in a.chis for d in a.dprimes]
-    settings = settings_of(rhos=a.rhos, pilot=a.pilot or a.sources_only, tuned=a.tuned)
+    settings = settings_of(rhos=a.rhos, pilot=a.pilot or a.sources_only, tuned=a.tuned,
+                          diff_se_max=a.diff_se_max)
     out = a.out or (T.PILOT_PATH if a.pilot else T.TABLE_PATH)
     rep_path = a.report or out.with_suffix(".report.json")
     if a.fidelity:
