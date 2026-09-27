@@ -48,8 +48,10 @@ per-carrier Bayes on alarms); it is not a model, and a result built with it is m
 
     cd auditgame
     ../.venv/bin/python tools/v3_tune.py --smoke --out /tmp/x/v3_tuned_smoke.json
-    ../.venv/bin/python tools/v3_tune.py                      # P4, after T9 / T12 / T15
-    ../.venv/bin/python tools/v3_tune.py --nominal-only       # -transition uncertainty:
+    ../.venv/bin/python tools/v3_tune.py --real                # P4: the particle filter (T9)
+                                                              # and v3.line8 (T12) ->
+                                                              # reference/v3_tuned.json
+    ../.venv/bin/python tools/v3_tune.py --real --nominal-only # -transition uncertainty:
                                                               # reference/v3_tuned_nominal.json
 """
 from __future__ import annotations
@@ -71,9 +73,11 @@ import draft_setup as D
 from v3 import api as A
 from v3 import attackers as AT
 from v3 import baselines as BL
+from v3 import belief_pf as PF
 from v3 import config as C
 from v3 import corpus
 from v3 import library as LIB
+from v3 import line8 as L8
 from v3 import runner as R
 from v3 import seal
 
@@ -138,6 +142,37 @@ def line8_rule(belief: A.BeliefAPI, tau: float, eta_q: float) -> str | None:
         mass = belief.carrier_mass()
         return max(C.CARRIERS, key=lambda k: (mass.get(k, 0.0), -C.CARRIERS.index(k)))
     return None
+
+
+def line8_real(belief: A.BeliefAPI, tau: float, eta_q: float) -> str | None:
+    """P4's line 8: route through T12's v3.line8 (a single source of truth) via the tool's
+    (belief, tau, eta_q) callable.  `Line8.decide` READS only -- it does not condition the
+    belief; MemberWithLine8.quarantine conditions it after this returns a carrier, exactly
+    as it does for `line8_rule`.  The two agree on every belief: `Line8.fires` is the same
+    strict pair of comparisons and `highest_posterior_carrier` the same argmax with the
+    same config.CARRIERS tie order (verified on a smoke case, T18/P4)."""
+    return L8.Line8(tau, eta_q).decide(belief)
+
+
+def band_of(belief: A.BeliefAPI) -> LIB.Band:
+    """The Prop. 6.1 band (p_floor, p0) from the belief's own prior, exactly as Sentinel
+    builds it at eval (v3.sentinel.band_of; T11 contract): band_prop61(p0, f), p0 =
+    prior_p_attack(), f = uninformable_share() over every target.  On the headline cells
+    this is the constant (0, p0): every seeded carrier's own sweep informs its hypothesis,
+    so no attack hypothesis is uninformable (f = 0), for every rho and Delta.  A BT member's
+    tau is then p_floor + u (p0 - p_floor) with u a declared band position (library)."""
+    return LIB.band_prop61(belief.prior_p_attack(), belief.uninformable_share())
+
+
+def pf_belief_factory(ctx: A.EpisodeContext, delta_hat=None) -> A.BeliefAPI:
+    """api.BeliefFactory: T9's real particle filter (v3.belief_pf.make_belief), betas at the
+    pinned dev base (belief_pf.beta_base) unless ctx carries post-mortems."""
+    return PF.make_belief(ctx, delta_hat)
+
+
+#: The particle filter's label recorded in the tuned output's setup.belief (real mode).
+PF_LABEL = (f"ParticleBelief (v3.belief_pf, N = {PF.N_PARTICLES} particles, Delta prior "
+            f"{PF.DELTA_PRIOR!r} from line 1's Delta-hat)")
 
 
 class StubAlarmBelief:
@@ -639,8 +674,12 @@ def main(argv=None) -> int:
     ap.add_argument("--seeds", type=int, nargs="+")
     ap.add_argument("--n-workflows", type=int)
     ap.add_argument("--rhos", type=float, nargs="+", default=list(C.RHO_GRID))
-    ap.add_argument("--belief", choices=("none", "stub"), default=None,
-                    help="'stub' is smoke-only; P4 passes the particle filter via tune()")
+    ap.add_argument("--belief", choices=("none", "stub", "pf"), default=None,
+                    help="'stub' is smoke-only; 'pf' is P4's real particle filter (T9) with "
+                         "line 8 = v3.line8 (T12); default 'stub' under --smoke, else 'none'")
+    ap.add_argument("--real", action="store_true",
+                    help="P4's real tuning: shorthand for --belief pf (the particle filter "
+                         "and v3.line8); tunes tau / eta_Q over the full library")
     ap.add_argument("--fq-cap", type=float, default=None)
     ap.add_argument("--nominal-only", action="store_true",
                     help="the -transition uncertainty ablation's tuning: worst case over the "
@@ -651,15 +690,38 @@ def main(argv=None) -> int:
     if a.out is None:
         a.out = TUNED_NOMINAL_PATH if a.nominal_only else TUNED_PATH
     require_dev(a.split)
+    if a.real and a.smoke:
+        ap.error("--real (the particle filter) and --smoke (the stub) are exclusive")
+    if a.real and a.belief in (None, "pf"):
+        a.belief = "pf"
+    elif a.real:
+        ap.error(f"--real means --belief pf, not --belief {a.belief}")
     belief = a.belief or ("stub" if a.smoke else "none")
     if belief == "stub" and not a.smoke:
         ap.error("--belief stub is smoke-only")
+    if belief == "pf" and a.smoke:
+        ap.error("--belief pf is the real filter; drop --smoke (use --n-workflows for a "
+                 "subsample correctness run)")
     seeds = tuple(a.seeds or (SMOKE_SEEDS if a.smoke else TUNE_SEEDS))
     n = a.n_workflows or (SMOKE_N_WORKFLOWS if a.smoke else None)
-    bf = stub_belief_factory if belief == "stub" else None
+    # The three pluggable parts (T18 docstring): the belief factory, line 8, the belief label.
+    if belief == "pf":
+        bf, line8, belief_label = pf_belief_factory, line8_real, PF_LABEL
+    elif belief == "stub":
+        bf, line8, belief_label = stub_belief_factory, line8_rule, "StubAlarmBelief (smoke only)"
+    else:
+        bf, line8, belief_label = None, line8_rule, None
+    # BT members read the Prop. 6.1 band; build it once from a representative dev belief
+    # (band_of is constant over the headline cells).  Without a real belief there is no band.
+    band = None
+    if bf is not None and belief == "pf":
+        wf0 = dev_workflows(1)[0]
+        ctx0 = R.context(wf0, C.PRIMARY, C.Cell(rho=float(a.rhos[0]),
+                                                delta=TUNE_DELTAS[0]), seeds[0])
+        band = band_of(bf(ctx0, ctx0.cell.delta))
     res = tune(workflows=dev_workflows(n), seeds=seeds, rhos=a.rhos, belief_factory=bf,
-               fq_cap=a.fq_cap, smoke=a.smoke,
-               belief_label="StubAlarmBelief (smoke only)" if bf else None, kernels=kernels)
+               band=band, line8=line8, fq_cap=a.fq_cap, smoke=a.smoke,
+               belief_label=belief_label, kernels=kernels)
     out, lp = write(res, a.out)
     t = res["tuned"]
     print(f"\nwrote {out} and {lp}; log sha256 {t['log_sha256']}")
