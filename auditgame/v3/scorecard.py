@@ -28,6 +28,10 @@ with the reason.  The rules, as written in sentinel-v3.md:
                    INCONCLUSIVE.  The draft states only the passing condition; REJECT vs
                    INCONCLUSIVE splits "not passed" and is declared here, before any number.
 
+H18 (author decision 27/09): "miss before sigma <= alpha" is unreachable on this grid and
+is recorded, not scored; H18's D pair reads the change in miss rate from Delta = 4 to 8 at
+the fixed budget level b1 (H18_CRITERION, metrics.h18_miss_change).
+
 Margins (Q12): delta = config.DELTA_REL_POINTS (10 points) for relative reductions and
 config.DELTA_ABS_HARM (0.10) for harm.  No other margin is declared: a P or E check on a
 quantity of another kind (a crossover Delta, a percentage of clean completion or FQ, a TV
@@ -262,6 +266,29 @@ class Hypothesis:
 
 HEAD = "headline cells (Delta in {4, 8}, chi 1.33, d' 2.21), each rho, held-out attackers"
 
+#: H18's criterion (author decision 27/09, before any H18 number; L1).  The old criterion
+#: is kept on record as UNREACHABLE and is not scored.
+H18_CRITERION = {
+    "primary_statistic": "the shape of the miss-before-sigma curve over the budget levels "
+                         "(b1, 2 / 1 / 0.5 x B_min), per Delta: metrics.h18_miss_curve",
+    "test": "rule D on the sign of V_miss(Delta = 8) - V_miss(Delta = 4) at a fixed budget "
+            "level: metrics.h18_miss_change (the frontier = the lowest miss rate over the "
+            "H18 policies, re-taken in every bootstrap draw; worst held-out column; "
+            "workflows with H >= 9, which hold both Deltas; family wild cluster bootstrap)",
+    "fixed_level": "b1",
+    "fixed_level_reason": "b1 = H x max kappa does not depend on Delta, so the budget is "
+                          "the same at Delta = 4 and 8; every B_min level is a multiple of "
+                          "B_min(Delta), which already falls like H/Delta",
+    "draft_sign": +1,      # the budget needed grows with Delta: fixed B misses more at 8
+    "note_sign": -1,       # the budget needed falls as H/Delta: fixed B misses less at 8
+    "old_criterion": "miss before sigma <= alpha (alpha = 0.05), budget.MissRate.meets",
+    "old_status": "unreachable",
+    "old_reason": "Prop. 5.7 needs K(n+1) <= Delta; with alpha = 0.05 and the draft's "
+                  "detectors n = 17-24 (K = 3 swept carriers), so K(n+1) = 54-75 > Delta "
+                  "<= 8 in every cell (T16): no policy reaches it on this grid",
+}
+H18_WHERE = "H18 grid, budget level b1 (fixed B across Delta), Delta 4 vs 8, H >= 9"
+
 HYPOTHESES = (
     Hypothesis("H1", "worst-case harm falls at least 15% vs B1, held-out, equal budget "
                "(projected 27.6%)", "G + P",
@@ -325,9 +352,13 @@ HYPOTHESES = (
                (Check("D", "sw_random_benefit_minus_half_sentinel_benefit", sign=+1, where=HEAD),)),
     Hypothesis("H18", "draft (Theorem 4): the budget must grow with Delta and chi; note "
                "(Thm 5.6): the minimum budget falls like H/Delta; 'independent of chi' only "
-               "on the price-only arm", "D; E cho vế χ",
-               (Check("D", "bmin_slope_in_delta", sign=+1, side="draft", where="H18 grid"),
-                Check("D", "bmin_slope_in_delta", sign=-1, side="note", where="H18 grid"),
+               "on the price-only arm.  Read (27/09) as the shape of the miss-rate curve "
+               "over the budget levels: at a fixed budget level the miss rate rises from "
+               "Delta = 4 to 8 (draft) or falls (note)", "D; E cho vế χ",
+               (Check("D", "h18_miss_change_d8_minus_d4", sign=+1, side="draft",
+                      where=H18_WHERE),
+                Check("D", "h18_miss_change_d8_minus_d4", sign=-1, side="note",
+                      where=H18_WHERE),
                 Check("E", "bmin_diff_chi_price_only", margin=None, side="note",
                       where="H18 grid, price-only arm"))),
     Hypothesis("H19", "draft (Corollary 5): commit is less sufficient with more carriers; note "
@@ -397,7 +428,7 @@ def score_all(estimates: dict, q=C.BH_Q) -> dict:
 
 def spec() -> dict:
     """The declared rules as data: margins, gate, BH q, outcomes, and every check."""
-    return {"outcomes": list(OUTCOMES), "rules": list(RULES),
+    return {"outcomes": list(OUTCOMES), "rules": list(RULES), "h18_criterion": H18_CRITERION,
             "margins": {"rel": MARGIN["rel"], "abs": MARGIN["abs"]},   # what _apply reads
             "gate_margin_pct": C.GATE_MARGIN_PCT, "bh_q": C.BH_Q,
             "hypotheses": [{"id": h.id, "claim": h.claim, "kind": h.kind,

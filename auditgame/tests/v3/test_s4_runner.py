@@ -13,7 +13,7 @@ from dataclasses import replace
 
 import carrier_runner
 import metrics as V2M
-from core import Task, Workflow
+from core import Item, Task, Workflow
 from v3 import agent as AG
 from v3 import api as A
 from v3 import attackers as AT
@@ -176,7 +176,8 @@ class TestS4Runner(unittest.TestCase):
     def test_quarantine_removes_whole_carrier(self):
         """D4.quarantine -- "may additionally quarantine (cost ηQ , removes a carrier) or
         continue.": lines 8-9 remove EVERY live item of the named carrier, poisoned or not,
-        and c_t[k] drops to 0."""
+        and c_t[k] drops to 0 -- for memory, skill and queue.  The branch removes its
+        poisoned lineage only (O7, 27/09): test_branch_quarantine_removes_poisoned_lineage_only."""
         wf = _wf()
         pl = _placement(wf, "memory")
         ep = R.Episode(wf, pl, script(quarantines={2: "memory"}), C.PRIMARY, CELL, 3)
@@ -199,6 +200,57 @@ class TestS4Runner(unittest.TestCase):
         self.assertEqual(out.record.false_removed, len(before))      # the benign notes too
         with self.assertRaises(ValueError):
             self.run_ep(wf, pl, script(quarantines={0: "commit"}))   # a target, not a carrier
+
+    # ---------------------------------------------------------------------------------
+    def test_branch_quarantine_removes_poisoned_lineage_only(self):
+        """D4.quarantine O7 -- "may additionally quarantine (cost ηQ , removes a carrier) or
+        continue.": author decision 27/09 (L1), after T13's finding that with whole-branch
+        removal the best loss equals the no-audit loss.  A BRANCH quarantine removes the
+        poisoned lineage only: the marked patches and every item whose derived_from chain
+        reaches a poisoned item.  Clean patches stay; clean_lost_branch counts only clean,
+        solved items actually removed.  memory / skill / queue keep whole-carrier removal."""
+        wf = _wf()
+        pl = _placement(wf, "memory")
+        seed = _surviving_seed(wf, pl)
+        s = pl.sigma
+        ep = R.Episode(wf, pl, script(quarantines={s: "branch"}), C.PRIMARY, CELL, seed,
+                       agent_factory=_sure_agent)
+        for _ in range(s):
+            ep.step()
+        clean_before = [it for it in ep.store.live("branch") if not it.poisoned]
+        self.assertGreater(len(clean_before), 0)
+        ep.step()                                      # task sigma: marked patch, then line 8
+        marked = [it for it in ep.store.items["branch"] if it.poisoned]
+        self.assertEqual(len(marked), 1)
+        self.assertIn(marked[0].item_id, ep.store.quarantined, "the marked patch goes")
+        self.assertTrue(all(it.item_id not in ep.store.quarantined for it in clean_before),
+                        "the clean patches stay")
+        self.assertEqual(ep.c_traj[-1][3], "0")
+        r = ep.run().record
+        self.assertEqual((r.harm, r.true_q, r.fq), (0.0, 1, 0))
+        self.assertEqual((r.clean_lost_branch, r.t_lost, r.false_removed), (0, 0, 0))
+        # a clean item derived from poison is in the lineage: removed, and counted as lost
+        ep = R.Episode(wf, pl, script(), C.PRIMARY, CELL, seed, agent_factory=_sure_agent)
+        for _ in range(s + 1):
+            ep.step()
+        mk = next(it for it in ep.store.live("branch") if it.poisoned)
+        child = Item("branch", mk.topic, "rebased on the marked patch", s, OR.PATCH_PROVENANCE,
+                     False, derived_from=(mk.item_id,))
+        grandchild = Item("branch", mk.topic, "built on the rebase", s, OR.PATCH_PROVENANCE,
+                          False, derived_from=(child.item_id,))
+        ep.store.write(child)
+        ep.store.write(grandchild)
+        ep.patch_solved[child.item_id] = ep.patch_solved[grandchild.item_id] = True
+        keep = [it for it in ep.store.live("branch") if it.item_id not in
+                {mk.item_id, child.item_id, grandchild.item_id}]
+        self.assertEqual({it.item_id for it in ep.removed_by_quarantine("branch")},
+                         {mk.item_id, child.item_id, grandchild.item_id})
+        ep.quarantine(s + 1, "branch")
+        self.assertEqual(ep.store.live("branch"), keep)
+        self.assertEqual((ep.clean_lost_branch, ep.false_removed, ep.true_q), (2, 2, 1))
+        # the other carriers: whole-carrier removal, unchanged
+        for k in ("memory", "skill", "queue"):
+            self.assertEqual(ep.removed_by_quarantine(k), ep.store.live(k))
 
     # ---------------------------------------------------------------------------------
     def test_harm_read_at_horizon_end(self):
@@ -291,6 +343,10 @@ class TestS4Runner(unittest.TestCase):
                         seed=seed, agent_factory=_sure_agent).record,
             self.run_ep(wf, None, script(quarantines={t: "branch" for t in range(H)}),
                         seed=seed).record,
+            # since 27/09 (O7) a branch quarantine loses no clean patch: t_lost comes from
+            # clean solved patches blocked at the commit review
+            self.run_ep(wf, None, B.factory("B1 audit-at-commit"), seed=seed,
+                        observer=fires_at(range(H))).record,
         ]
         seen = set()
         for r in cases:
@@ -307,8 +363,9 @@ class TestS4Runner(unittest.TestCase):
     # ---------------------------------------------------------------------------------
     def test_false_quarantine_counts_clean_carrier_removals(self):
         """O7 D4.def1 -- "Defender loss is L = E[verified harm]+λQ E[false quarantines]+…λT
-        E[clean tasks lost]": FQ = one quarantine of a carrier with c_t[k] = 0; a branch
-        quarantine loses the clean solved patches in it, counted as clean tasks lost."""
+        E[clean tasks lost]": FQ = one quarantine of a carrier with c_t[k] = 0.  A branch
+        quarantine removes the poisoned lineage only (author decision 27/09, L1): on a
+        clean branch it is one FQ and removes nothing, so no clean task is lost."""
         wf = _wf()
         H = len(wf.tasks)
         seed = 5
@@ -316,17 +373,14 @@ class TestS4Runner(unittest.TestCase):
         r = self.run_ep(wf, None, script(quarantines={2: "queue", 3: "memory"}), seed=seed).record
         self.assertEqual((r.fq, r.true_q, r.t_lost), (2, 0, 0))
         self.assertEqual(r.quarantines, ((2, "queue"), (3, "memory")))
-        # a branch quarantine at the last task loses every solved clean patch
+        # a branch quarantine of a clean branch: one FQ, nothing removed, nothing lost
+        self.assertGreater(clean.n_solved, 0)
         r = self.run_ep(wf, None, script(quarantines={H - 1: "branch"}), seed=seed).record
         self.assertEqual(r.fq, 1)
-        self.assertEqual(r.clean_lost_branch, clean.n_solved)
-        self.assertEqual(r.t_lost, clean.n_solved)
-        self.assertGreaterEqual(r.false_removed, r.clean_lost_branch)
-        # twice: the second removes only what was written since
+        self.assertEqual((r.clean_lost_branch, r.t_lost, r.false_removed), (0, 0, 0))
         r2 = self.run_ep(wf, None, script(quarantines={2: "branch", H - 1: "branch"}),
                          seed=seed).record
-        self.assertEqual(r2.fq, 2)
-        self.assertEqual(r2.clean_lost_branch, clean.n_solved)
+        self.assertEqual((r2.fq, r2.clean_lost_branch, r2.t_lost), (2, 0, 0))
         # a poisoned carrier is a true quarantine, not an FQ
         pl = _placement(wf, "memory")
         r = self.run_ep(wf, pl, script(quarantines={1: "memory", 2: "memory"}), seed=seed).record

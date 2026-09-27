@@ -97,3 +97,17 @@ The peak RSS of the frontier process reached 2.7 GiB, at the K = 4, H = 5 solve.
 3. **The defender chooses the response after an alarm** ("choose") as the primary, because the draft's defender "chooses validation, quarantine or continuation". The forced response is kept as a sensitivity.
 4. **When the plan runs, Sentinel's lines 8–9 would override the response.** `ExactLine3Policy` then leaves the tree, logs it, and returns None; T15 decides how the two combine.
 5. **The feasibility limits come from config** (`LINE23_MAX_SEQUENCES = 10^6`, `LINE23_MAX_SECONDS = 60`), set in W0 before this measurement.
+
+## Addendum 27/09: O7 decided
+
+The author decided (L1) that a branch quarantine removes only the poisoned lineage: the marked patches, plus every item whose `derived_from` chain reaches a poisoned item. Clean patches stay. Memory, skill and queue keep whole-carrier removal. The runner (`Episode.removed_by_quarantine`) and the exact game (`Game.branch_lineage = True`, the default) use the same accounting. `branch_lineage=False` keeps the old game, so the finding above stays reproducible.
+
+At ρ = 0.5, χ = 1.33, mid detector, b1 and Δ̂ = 1:
+
+| H | whole branch (old) | poisoned lineage (new) |
+|---|---|---|
+| 3 | 0.739 | 0.502 |
+| 4 | 0.828 | 0.547 |
+| 5 | 0.850 (= no-audit loss) | 0.582 |
+
+With the lineage rule the value no longer depends on λ_T (`test_exact_branch_quarantine_loses_no_clean_patch`).

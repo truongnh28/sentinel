@@ -15,8 +15,8 @@ rule), at the carrier level of v3: when a SWEEP bought at t raises an alarm, the
 audited carrier is quarantined (lines 8-9, O7): memory / queue / skill.  A COMMIT alarm
 quarantines nothing: the runner blocks that task's patch only, so it never enters the
 branch (v3/runner.py step 5; v2's patch_blocks, the draft's "audit-at-commit"; M1 fix
-27/09).  A whole-branch quarantine comes only from Algorithm 1 line 8 (Sentinel and the
-library), never from a baseline.  B6 is the one declared exception on sweeps: a screen
+27/09).  A branch quarantine (since 27/09: the poisoned lineage only, O7) comes only from
+Algorithm 1 line 8 (Sentinel and the library), never from a baseline.  B6 is the one declared exception on sweeps: a screen
 alarm asks for a confirmation, and only the confirmation's alarm quarantines (it is a
 two-stage CHECK).
 

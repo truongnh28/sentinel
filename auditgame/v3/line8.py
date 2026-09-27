@@ -16,7 +16,8 @@ is quarantined.
 
 WHAT IS DONE.  `quarantine(t, belief)` returns the carrier and conditions the belief on its
 removal (api.BeliefAPI.condition_on_quarantine: c[k] = 0); the runner removes EVERY live
-item of the carrier (O7, v3/runner.py Episode.quarantine).  tau and eta_Q are tuned per rho
+item of memory / skill / queue, and only the poisoned lineage of the branch (O7, author
+decision 27/09; v3/runner.py Episode.removed_by_quarantine).  tau and eta_Q are tuned per rho
 on dev (T18, C6); nothing here has a default for them.
 
 Stdlib only.

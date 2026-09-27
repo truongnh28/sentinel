@@ -446,6 +446,9 @@ def eval_summary(split: str = "primary") -> dict:
         "languages_by_family": dict(collections.Counter(lang[f] for f in fam)),
         "languages_by_workflow": dict(collections.Counter(lang[s["family"]] for s in specs)),
         "H_histogram": {str(h): n for h, n in sorted(collections.Counter(hs).items())},
+        # a count per workflow id (ids are positional, v3e-NNN): what the headline rollout
+        # subsample of grid.py reads (author decision 27/09) -- no instance, no outcome
+        "H_by_workflow": {s["wf_id"]: len(s["instances"]) for s in specs},
         "rules": dict(collections.Counter(s["rule"] for s in specs)),
         "per_delta": per_delta,
     }

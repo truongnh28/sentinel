@@ -447,6 +447,71 @@ def seven_metrics(recs, policy, heldout, deltas, small_game_recs=None, b7="B7") 
 
 
 # ---------------------------------------------------------------------------------------
+# H18: the shape of the miss-rate curve (author decision 27/09; scorecard.H18_CRITERION)
+# ---------------------------------------------------------------------------------------
+
+#: H18's pair of Deltas and the workflows that hold both (Delta = 8 needs H >= 9, C14):
+#: the change is read on the same workflows at both Deltas.
+H18_DELTA_PAIR = (4, 8)
+H18_MIN_H = H18_DELTA_PAIR[1] + 1
+
+
+def miss_table(recs, policy, attacks, deltas, min_H: int = H18_MIN_H) -> Table:
+    """The Table of `missed_before_sigma` (H18) over the ATTACKED records (sigma set) of
+    workflows with H >= min_H: V = the worst attacker column's workflow-weighted miss rate."""
+    rs = [r for r in rows(recs) if r["sigma"] is not None and r["H"] >= min_H]
+    return table(rs, policy, attacks, deltas, field="missed_before_sigma")
+
+
+def h18_miss_curve(recs_by_level: dict, policies, attacks, deltas=H18_DELTA_PAIR,
+                   min_H: int = H18_MIN_H) -> dict:
+    """The primary H18 statistic's curve: budget level -> Delta -> {policy: V_miss,
+    "frontier": the lowest V_miss over `policies`}.  One cell per level (the caller's
+    records of one rho / chi arm / budget level, spanning the Deltas)."""
+    out = {}
+    for level, recs in recs_by_level.items():
+        out[level] = {}
+        for d in deltas:
+            vals = {p: miss_table(recs, p, attacks, (d,), min_H).value for p in policies}
+            fin = [v for v in vals.values() if _is_finite(v)]
+            out[level][d] = {**vals, "frontier": min(fin) if fin else NAN}
+    return out
+
+
+def h18_miss_change(recs, policies, attacks, deltas=H18_DELTA_PAIR, min_H: int = H18_MIN_H,
+                    n_boot=N_BOOT, seed=BOOT_SEED, alpha=ALPHA, method="wild") -> dict:
+    """H18's test statistic (rule D): the change in miss rate from Delta = deltas[0] to
+    deltas[1] at ONE budget level, V_miss(8) - V_miss(4) of the frontier (the lowest miss
+    rate over `policies`, re-taken in every draw), on the workflows that hold both Deltas,
+    with the family-cluster bootstrap of this module (one draw shared by every table).
+    Draft side predicts > 0 (the budget needed grows with Delta); note side < 0 (it falls
+    as H/Delta).  Returns point, lo, hi, p and the per-policy points."""
+    d0, d1 = deltas
+    rs = rows(recs)
+    tabs = {}
+    for p in policies:
+        for d in deltas:
+            t = miss_table(rs, p, attacks, (d,), min_H)
+            if t.cols:
+                tabs[(p, d)] = t
+    have = [p for p in policies if (p, d0) in tabs and (p, d1) in tabs]
+    if not have:
+        return {"point": NAN, "lo": NAN, "hi": NAN, "p": NAN, "policies": {}, "alpha": alpha,
+                "n_workflows": 0, "n_repos": 0, "method": method, "n_boot": n_boot}
+    bt = boot_values({k: tabs[k] for p in have for k in ((p, d0), (p, d1))}, n_boot, seed,
+                     method)
+    lo_pt = min(bt.point[(p, d0)] for p in have)
+    hi_pt = min(bt.point[(p, d1)] for p in have)
+    dr = (np.min([bt.draws[(p, d1)] for p in have], axis=0)
+          - np.min([bt.draws[(p, d0)] for p in have], axis=0))
+    lo, hi = interval(dr, alpha)
+    return {"point": hi_pt - lo_pt, "lo": lo, "hi": hi, "p": p_value(dr), "alpha": alpha,
+            "policies": {p: bt.point[(p, d1)] - bt.point[(p, d0)] for p in have},
+            "frontier": {d0: lo_pt, d1: hi_pt}, "n_workflows": len(bt.workflows),
+            "n_repos": len(bt.families), "method": method, "n_boot": n_boot}
+
+
+# ---------------------------------------------------------------------------------------
 # Benjamini-Hochberg (sentinel-v3.md S9: q = 0.05)
 # ---------------------------------------------------------------------------------------
 

@@ -201,6 +201,7 @@ def _run_sequenced(chain: G.Chain, sched: list, factory_of, split: str, token=No
 def run_chain(chain: G.Chain, workflows: list, factory_of, split: str, token=None) -> list:
     """One chain (module docstring): the workflows in pinned order, the survivors only."""
     u = chain.unit
+    workflows = G.chain_workflows(u, workflows, split)      # headline rollout: 27/09 subsample
     sched = schedule(chain, workflows)
     if not u.is_br and has_line1(u.system):
         return _run_sequenced(chain, sched, factory_of, split, token)

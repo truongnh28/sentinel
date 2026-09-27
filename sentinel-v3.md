@@ -90,9 +90,15 @@ Không chờ thầy. Chỗ nào chạy hai phiên bản thì phiên bản chính
 | Nhãn LLM | Mức attacker LLM đổi tên M0–M3 (A0–A3 trong tiền đăng ký 20/09) để khỏi trùng thế giới A0 |
 | K\_d chính | 2 (skill, queue uỷ nhiệm, như D20 của v2); trục K\_d ∈ {1, 2, 3} cho H19 |
 | Mặc định kỹ thuật O1–O16 | Theo `docs/plans/v3-p2-plan.md` §1, riêng O3 dùng q = 0,1 như C12 |
-| Dòng 5 | Bảng tính trước là chính (L1); rollout thật chỉ ở ô headline. Lõi ước tính 509–1.039 CPU-giờ (3,7–7,6 ngày với 10 job), thay vì 228 ngày trở lên nếu rollout mỗi task (`docs/reports/v3-p0-chi-phi.md`). **Sửa 27/09 (P2):** ước tính này chỉ còn đúng cho split phụ; trên split chính 96 workflow, rollout headline ở R = 16 tốn 797 CPU-giờ (`docs/reports/v3-p2-cost.md`); cách xử lý đang chờ quyết định (mục "Nhật ký P2") |
+| Dòng 5 | Bảng tính trước là chính (L1); rollout thật chỉ ở ô headline. Lõi ước tính 509–1.039 CPU-giờ (3,7–7,6 ngày với 10 job), thay vì 228 ngày trở lên nếu rollout mỗi task (`docs/reports/v3-p0-chi-phi.md`). **Sửa 27/09 (P2):** ước tính này chỉ còn đúng cho split phụ; trên split chính 96 workflow, rollout headline ở R = 16 tốn 797 CPU-giờ (`docs/reports/v3-p2-cost.md`); đã chốt: R = 16 trên mẫu con 30 workflow (dòng "Rollout headline" bên dưới) |
 | Báo động commit (M1, 27/09) | Báo động ở commit review chỉ chặn patch của task đó; patch sạch đã giải mà bị chặn tính một clean lost, patch có marker bị chặn thì ngăn được harm của nó. Không baseline nào tự gỡ cả branch; gỡ branch chỉ còn qua dòng 8 (belief) của Sentinel và thành viên thư viện (`docs/reports/v3-p2-m1.md` §1) |
 | Oracle (+) (M1, 27/09) | Sau audit của mỗi task, runner trao trạng thái carrier c\_t do evaluator biết cho riêng `OracleControl`; oracle gỡ mọi carrier có bit 1, không cần audit. Không policy nào khác nhận c\_t. Lệch chữ D28 của v2, L2 |
+| Kế toán O7 (27/09, P2) | Gỡ carrier branch chỉ gỡ **dòng dõi bị nhiễm**: các patch có marker và mọi mục mà chuỗi `derived_from` chạm tới một mục bị nhiễm. Patch sạch ở lại, nên `clean_lost_branch` chỉ đếm mục sạch thật sự bị gỡ. Memory, skill, queue vẫn gỡ cả carrier. L1. Game giải chính xác của T13 (`v3/exact.py`, `Game.branch_lineage`) dùng cùng kế toán; `branch_lineage=False` tái lập phát hiện cũ (ρ = 0,5, Δ̂ = 1, H = 5: 0,850 = loss không audit; kế toán mới 0,582). Nhánh `fix-decisions`; test `test_branch_quarantine_removes_poisoned_lineage_only`, `test_exact_branch_quarantine_loses_no_clean_patch` |
+| Tiêu chí H18 (27/09, P2) | "Bỏ sót trước σ ≤ α" **không đạt được** trên lưới này: với α = 0,05 và detector của draft, n = 17–24, K = 3 nên K(n+1) = 54–75 > Δ ≤ 8 ở mọi ô (T16). Tiêu chí cũ được giữ trong hồ sơ, không chấm. Thống kê chính của H18 là **hình dạng đường tỉ lệ bỏ sót theo các mức ngân sách** (`metrics.h18_miss_curve`). Vế draft: ngân sách cần tăng theo Δ; vế ghi chú: giảm như H/Δ. Phép kiểm là dấu của V\_miss(Δ = 8) − V\_miss(Δ = 4) ở một mức ngân sách cố định, luật D (draft +1, ghi chú −1). Mức cố định là b1, vì b1 = H·max κ không phụ thuộc Δ (mọi mức B\_min là bội của B\_min(Δ), vốn đã giảm như H/Δ). V\_miss là tỉ lệ bỏ sót ở cột held-out tệ nhất, lấy biên thấp nhất qua bốn policy H18 (tính lại trong mỗi lần rút), trên các workflow H ≥ 9 (chứa cả hai Δ), CI bootstrap cụm theo họ (wild). `scorecard.H18_CRITERION`, `metrics.h18_miss_change`. L1 |
+| Lịch khối khi ngân sách dưới một khối (27/09, P2) | Khi điều kiện của Mệnh đề 5.7 không đạt và B thấp hơn giá một khối đủ (tổng giá K lần quét), lịch khối mua **lần quét đơn rẻ nhất mua được** thay vì không mua gì. Nhịp như một khối cỡ 1: task p, 2p, … với p = max(1, ⌈κ·H/B⌉), nên chi tới task t ≤ B·t/H. Nơi điều kiện đạt, lịch của Mệnh đề 5.7 giữ nguyên. Ghi `single_sweep` vào log. L1. Test `test_block_schedule_buys_single_sweeps_below_one_block` (tiêu ở 1× và 0,5× B\_min) |
+| Rollout headline (27/09, P2) | R = 16 trên mẫu con khai trước gồm **30 workflow đầu tiên của split eval chính theo thứ tự ghim của T10** (`sequence.workflow_order`). Ghim trong `v3/grid.py` bằng id và số đếm (`HEADLINE_ROLLOUT_WORKFLOWS`, sha256 thứ tự 11239b71e085…, histogram H {6: 4, 7: 4, 8: 3, 9: 1, 10: 3, 11: 6, 12: 2, 13: 4, 14: 3}), không đọc nội dung. `grid.chain_workflows` áp mẫu con cho khối headline-rollout trên split chính; `tools/v3_run.py` gọi nó. Chi phí: **253 CPU-giờ** (held-out 59, BR 194), thay vì 797 trên cả 96 workflow (R = 64 trên mẫu con: 1.013) |
+| Thư viện và H7 (27/09) | Thư viện giữ như draft (luật "tiêu hết ngân sách trước", O14 không đổi). H7 báo cáo đúng số đo; luật tiêu trước giải thích bán kính phủ ở game nhỏ (trung bình 0,40, max 1,0 so với 0,07 của draft; toàn bộ sai lệch nằm ở 192 game ngân sách chặn) |
+| Cổng benign | Cổng benign: xem T24 và `docs/preregistration/lech-chuan-P3-benign.md`. |
 
 
 ## Kiến trúc
@@ -146,7 +152,7 @@ Mười mục của §4 và Figure 1 đều có cách dựng và một test mang
 | Kênh ingress | §10.6: best response chèn qua ingress vì insertion audit không thấy kênh này | Giả định mô hình, không phải phát hiện: chạy cả hai phiên bản (insertion audit thấy / không thấy ingress) để H8 không đúng do cách dựng | L1, chạy cả hai | `test_ingress_visibility_is_a_switch` |
 | Hành động | {none} ∪ {(audit, k, depth)}, một hành động mỗi task, Σκ ≤ B | Đúng chữ; hai cách đọc k theo C2 | L0 + C2 | `test_one_action_per_task_within_budget` |
 | Quan sát | Alarm (ψ, φ) và kết quả checkpoint thực thi | Checkpoint = test SWE-bench trên patch ở tập chạy thật; trong sim là kênh (ψ\_c, φ\_c) khai trước. Commit review thấy bản vá uỷ nhiệm với độ tách ρ·d′ ở mọi độ sâu (D20 của v2; chứng minh Theorem 4 của draft). ρ là độ lộ payload trong patch, trục ρ ∈ {0; 0,25; 0,5; 1} giữ trong lõi; provenance là trục riêng A0/A7 (C1) | L0 / L1 | `test_checkpoint_channel_declared` |
-| Quarantine | Chi phí η\_Q; gỡ cả carrier có hậu nghiệm cao nhất | Đúng chữ (O7: gỡ branch mất mọi patch sạch đã vào branch). Báo động commit chỉ chặn patch của task đó, không gỡ branch (M1). Kế toán O7 khi gỡ branch đang chờ quyết định (mục "Nhật ký P2") | L0 | `test_quarantine_removes_whole_carrier`, `test_commit_alarm_blocks_that_patch_only` |
+| Quarantine | Chi phí η\_Q; gỡ cả carrier có hậu nghiệm cao nhất | Đúng chữ (O7: gỡ branch mất mọi patch sạch đã vào branch). Báo động commit chỉ chặn patch của task đó, không gỡ branch (M1). Từ 27/09 gỡ branch chỉ gỡ dòng dõi bị nhiễm (bảng "Quyết định đã chốt", L1) | L0 + L1 | `test_quarantine_removes_whole_carrier`, `test_commit_alarm_blocks_that_patch_only` |
 | Harm | Sealed oracle chấm ở cuối horizon; harm hiện ở module khác | Oracle chấm trạng thái repo cuối horizon. Gỡ branch sau σ có xoá được tổn hại hay không là một công tắc theo C11 | L1, chạy cả hai | `test_harm_read_at_horizon_end` |
 | Loss | L = harm + λ\_Q·FQ + λ\_T·clean lost; V\* = min max L | Đúng chữ; λ khai trước | L0 | `test_loss_matches_definition_1` |
 | Drift | Tốc độ β, thống kê quan sát khớp với poisoning; không nói drift tồn tại bao lâu | 620 thay đổi lành khớp bề mặt. Hai phiên bản: drift thoáng qua (chính) và drift dai dẳng. Với drift dai dẳng và β > α/(1 − α), Mệnh đề 5.11 của ghi chú chứng minh không chính sách nào phân biệt được | L1, chạy cả hai | `test_drift_matched_on_four_surface_features` |
@@ -198,7 +204,7 @@ Ba giả thuyết này không đo được trên lưới Table 1, nên có thí 
 
 | Thí nghiệm | Thiết kế |
 | --- | --- |
-| Lưới ngân sách (H18) | Mức B: b1 = H·max κ (lỏng, như C4) và b2–b4 = {2; 1; 0,5} × B\_min(Δ) của Định lý 5.6, tính theo từng ô. B1 khi ngân sách chặn: giảm đều độ sâu commit để tổng vừa B (chính); "dùng hết rồi dừng" là độ nhạy. Định nghĩa lại B1 là quyết định 17 ngày 27/09, chờ thầy ký cùng C4. Tiêu chí thành công: tỉ lệ bỏ sót trước σ ≤ α, sim ghi log. Policy: B1, Sentinel, lịch khối của Mệnh đề 5.7, uniform random, và arm "χ chỉ đổi giá" (giữ độ sâu và κ̄, C16). Điều kiện K(n+1) ≤ Δ của lịch khối không đạt ở ô nào (P2; mục "Nhật ký P2") |
+| Lưới ngân sách (H18) | Mức B: b1 = H·max κ (lỏng, như C4) và b2–b4 = {2; 1; 0,5} × B\_min(Δ) của Định lý 5.6, tính theo từng ô. B1 khi ngân sách chặn: giảm đều độ sâu commit để tổng vừa B (chính); "dùng hết rồi dừng" là độ nhạy. Định nghĩa lại B1 là quyết định 17 ngày 27/09, chờ thầy ký cùng C4. Tiêu chí thành công: tỉ lệ bỏ sót trước σ ≤ α, sim ghi log (từ 27/09: không đạt được trên lưới này, giữ trong hồ sơ; H18 đọc hình dạng đường tỉ lệ bỏ sót, xem "Quyết định đã chốt"). Policy: B1, Sentinel, lịch khối của Mệnh đề 5.7, uniform random, và arm "χ chỉ đổi giá" (giữ độ sâu và κ̄, C16). Điều kiện K(n+1) ≤ Δ của lịch khối không đạt ở ô nào (P2; mục "Nhật ký P2") |
 | Trục K\_d (H19) | K\_d ∈ {1, 2, 3} là số carrier uỷ nhiệm (carrier mà commit chỉ thấy qua bản vá uỷ nhiệm); chạy ở cấu hình chính, mỗi ρ |
 | Bán kính phủ (H7) | Chỉ đo trên 240 game nhỏ, nơi π\* tồn tại; 28 member được port sang game nhỏ. Bán kính là TV đều theo mọi lịch sử, so với π\* |
 
@@ -456,13 +462,13 @@ Smoke M1 lộ hai lỗi thế giới. Cả hai được sửa trước lượt c
 
 ### Phát hiện O7 (T13)
 
-Ở ρ = 0,5 và Δ̂ = 1, giá trị chính xác bão hoà ở 0,85 từ H ≥ 4, bằng đúng loss khi không audit. Nguyên nhân là kế toán O7: gỡ cả branch muộn làm mất khoảng 0,62·t patch sạch với λ\_T = 0,5, đắt hơn harm nó ngăn. Attacker vì vậy đặt placement muộn, và không chính sách audit nào có lợi ở đó. Đây là tính chất của loss đã khai, không phải của bộ giải, và dòng 5 gặp cùng đánh đổi. **Chờ quyết định**; đề xuất: khi gỡ branch, chỉ gỡ dòng dõi bị nhiễm (các patch sinh từ nguồn có poison), không gỡ cả branch.
+Ở ρ = 0,5 và Δ̂ = 1, giá trị chính xác bão hoà ở 0,85 từ H ≥ 4, bằng đúng loss khi không audit. Nguyên nhân là kế toán O7: gỡ cả branch muộn làm mất khoảng 0,62·t patch sạch với λ\_T = 0,5, đắt hơn harm nó ngăn. Attacker vì vậy đặt placement muộn, và không chính sách audit nào có lợi ở đó. Đây là tính chất của loss đã khai, không phải của bộ giải, và dòng 5 gặp cùng đánh đổi. **Đã chốt 27/09:** gỡ branch chỉ gỡ dòng dõi bị nhiễm (bảng "Quyết định đã chốt"); game chính xác dùng cùng kế toán, giá trị ở H = 5 từ 0,850 xuống 0,582.
 
 ### H18: lịch khối không bao giờ đạt điều kiện (T16)
 
 - Không policy nào đạt tiêu chí "bỏ sót trước σ ≤ 0,05".
 - Lịch khối của Mệnh đề 5.7 cần K(n+1) ≤ Δ. Với α = 0,05 và detector của draft, số quan sát cần n = 17 (χ = 1,04; 1,33 và hai arm chỉ đổi giá) tới 24 (χ = 2,11), K = 3 carrier quét, nên K(n+1) = 54–75, trong khi Δ ≤ 8. Điều kiện không đạt ở ô nào; policy dùng khối dày nhất (quét mỗi task) và log `precondition_met = False`.
-- Hệ quả: dưới giá của một khối, lịch khối không mua được gì. **Chờ quyết định** cách đọc H18.
+- Hệ quả: dưới giá của một khối, lịch khối không mua được gì. **Đã chốt 27/09:** tiêu chí cũ ghi là không đạt được; H18 đọc hình dạng đường tỉ lệ bỏ sót (dấu thay đổi giữa Δ = 4 và 8 ở mức b1, luật D); dưới giá một khối, lịch khối mua lần quét đơn rẻ nhất (bảng "Quyết định đã chốt").
 
 ### H7 trên 240 game nhỏ (T21; dev/P2, không phải kết quả eval)
 
@@ -473,13 +479,13 @@ Smoke M1 lộ hai lỗi thế giới. Cả hai được sửa trước lượt c
 | Bán kính phủ so với π\* gần nhất (TV đều theo mọi lịch sử) | 1,0 | 0,40 | 0,07 |
 | Regret của hỗn hợp 28 member so với B7 | 1,0 | 0,168 | 0,09 |
 
-Khi ngân sách lỏng (m ≥ H, 48 game), bán kính và regret đều bằng 0; toàn bộ sai lệch nằm ở 192 game có ngân sách chặn (bán kính trung bình 0,50). Nguyên nhân là luật "tiêu hết ngân sách trước" của thư viện (O14: member audit mọi task cho tới khi hết m lần, rồi dừng), nên thư viện không phủ được các π\* dàn audit ra. Đổi luật này trong thư viện: **chờ quyết định**.
+Khi ngân sách lỏng (m ≥ H, 48 game), bán kính và regret đều bằng 0; toàn bộ sai lệch nằm ở 192 game có ngân sách chặn (bán kính trung bình 0,50). Nguyên nhân là luật "tiêu hết ngân sách trước" của thư viện (O14: member audit mọi task cho tới khi hết m lần, rồi dừng), nên thư viện không phủ được các π\* dàn audit ra. **Đã chốt 27/09:** giữ thư viện như draft; H7 báo cáo đúng số đo, luật tiêu trước giải thích bán kính.
 
 ### Chi phí lưới (T22, `docs/reports/v3-p2-cost.md`)
 
 - Mô hình đếm tái lập đúng bảng P0 tới từng episode. Sau phần cắt BR của plan §8, lõi trên đơn vị P0 là 11,48 triệu episode (split phụ), dưới 16,39 triệu của P0.
 - Trên split chính 96 workflow, phần mô phỏng vẫn rẻ (9,5–20 CPU-giờ), nhưng rollout headline tỉ lệ với số workflow: **797 CPU-giờ ở R = 16** (held-out 183, BR 614), 3.189 ở R = 64. Ngân sách lõi 509–1.039 CPU-giờ chỉ còn đúng cho split phụ.
-- **Chờ quyết định**; đề xuất: R = 16 trên một mẫu con khoảng 30 workflow, chọn trước theo luật cố định.
+- **Đã chốt 27/09:** R = 16 trên 30 workflow đầu của split chính theo thứ tự ghim của T10: 253 CPU-giờ (held-out 59, BR 194).
 
 ### Độ chính xác trên split SWE-rebench-V2 (`docs/reports/v3-p0.md` §2b)
 
@@ -506,10 +512,6 @@ Một lần gọi tương tác `corpus._specs("primary")` đã in số workflow 
 
 | # | Việc | Đề xuất | Nguồn |
 | --- | --- | --- | --- |
-| 1 | Kế toán O7 khi gỡ branch (loss bão hoà ở mức không audit) | Chỉ gỡ dòng dõi bị nhiễm | T13, `v3-p2-line23.md` |
-| 2 | H18: không policy nào đạt bỏ sót trước σ ≤ 0,05; lịch khối không đạt điều kiện ở ô nào | Chưa có | T16 |
-| 3 | H7: luật tiêu hết ngân sách trước của thư viện | Đổi luật trong thư viện | T21 |
-| 4 | Chi phí rollout headline trên split chính (797 CPU-giờ ở R = 16) | R = 16 trên mẫu con khoảng 30 workflow chọn trước | T22, `v3-p2-cost.md` |
 | 5 | Lưới ε của BR giữ {0,3; 0,6; 1,0} (lõi tăng tới 17,2 triệu episode trên đơn vị P0) và ngoại lệ không cắt BR ở cột "attacker chọn Δ" của thế giới tổn hại gỡ được | Giữ cả hai | T22, `v3-p2-cost.md` |
 | 6 | Dung sai cho lần kiểm cổng 3c tiếp theo | Dung sai theo nhiễu, khai trước (CI của hiệu V giữa hai Δ chứa 0), hoặc thêm seed | M1, `v3-p2-m1.md` §6 |
 

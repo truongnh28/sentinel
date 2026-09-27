@@ -37,7 +37,10 @@ file of tools/v3_run.py.  `p0` names the P0 block it is counted against.
 
     Outside the core (counted, never in the core total):
     headline-rollout       Sentinel-rollout in the Table 2 cells (Q13, T19); costed by
-                           rollout CPU-hours, not per episode
+                           rollout CPU-hours, not per episode.  AUTHOR DECISION 27/09: R = 16
+                           on a pre-declared subsample of the primary eval split, its first
+                           30 workflows in T10's pinned order (HEADLINE_ROLLOUT_WORKFLOWS;
+                           ids and counts only, never content); `chain_workflows` applies it
     sens:A7, sens:stage    C1 / C2 run these after the core ("luot bo sung sau loi")
     seed2-pairs            best response over carrier pairs when two are seeded (4*, off)
     ablation-prior         the -regime-estimate ablation "Sentinel [dhat=prior]" (a Table 3
@@ -82,6 +85,7 @@ from v3 import budget as BU
 from v3 import config as C
 from v3 import corpus as K
 from v3 import delta_hat as DH
+from v3 import sequence as SQ
 
 # ---------------------------------------------------------------------------------------
 # Systems (sentinel-v3.md S9; P0 GD 5: 16 systems, 6 of them in the Sentinel class)
@@ -137,6 +141,24 @@ H18_CHI_ARMS = tuple((chi, False) for chi in C.CHI_LEVELS) + tuple(
 H18_BMIN_LEVELS = tuple(b for b in C.BUDGET_LEVELS if b != C.BUDGET_PRIMARY)
 KD_EXTRA = tuple(k for k in C.KD_LEVELS if k != C.K_D_PRIMARY)
 HEADLINE_WORLD = replace(C.PRIMARY, line5="rollout")
+
+#: AUTHOR DECISION 27/09 (L1): the headline rollout (blocks headline-rollout*) runs at
+#: R = 16 on a subsample declared before any run: the FIRST 30 workflows of the primary
+#: eval split in T10's pinned order (sequence.workflow_order over its 96 ids).  Pinned as
+#: ids (positional, v3e-NNN) and as the H histogram of those 30 (counts, from
+#: corpus.eval_summary's H_by_workflow): no instance, no content, no outcome.
+HEADLINE_ROLLOUT_R = 16
+HEADLINE_ROLLOUT_N = 30
+HEADLINE_ROLLOUT_SPLIT = "primary"
+HEADLINE_ROLLOUT_WORKFLOWS = (
+    "v3e-093", "v3e-059", "v3e-029", "v3e-038", "v3e-076", "v3e-065", "v3e-087", "v3e-046",
+    "v3e-083", "v3e-049", "v3e-069", "v3e-051", "v3e-060", "v3e-003", "v3e-037", "v3e-016",
+    "v3e-052", "v3e-028", "v3e-070", "v3e-033", "v3e-007", "v3e-032", "v3e-050", "v3e-061",
+    "v3e-079", "v3e-035", "v3e-056", "v3e-077", "v3e-030", "v3e-034")
+HEADLINE_ROLLOUT_ORDER_SHA256 = "11239b71e0857d4face8737f393e13d4cd2cb663ed12b58a94f46285eae39e01"
+HEADLINE_ROLLOUT_H_HISTOGRAM = {6: 4, 7: 4, 8: 3, 9: 1, 10: 3, 11: 6, 12: 2, 13: 4, 14: 3}
+#: the run tool's names for the primary eval split
+_PRIMARY_NAMES = ("primary", "eval")
 
 #: P0's episode counts (docs/reports/v3-p0-chi-phi.md S3, S6.2), on its unit.
 P0_EPISODES = {"main": 3_049_805, "br": 4_037_837, "attacker-delta": 1_514_189,
@@ -410,13 +432,15 @@ def rollout_seconds(u: Unit, hist: dict, R: int, seeds: int = len(SEEDS),
 
 
 def count(split: str = "secondary", p0_model: bool = False, measure: str = "p0") -> dict:
-    """block -> {'episodes', 'sentinel_class', 'units', 'p0', 'core'} on `split`."""
+    """block -> {'episodes', 'sentinel_class', 'units', 'p0', 'core'} on `split` (the
+    headline rollout on its pinned subsample, headline_rollout_histogram)."""
     hist = histogram(split)
+    head = headline_rollout_histogram(split)
     out: dict = {}
     for u in units(p0_model):
         row = out.setdefault(u.block, {"episodes": 0.0, "sentinel_class": 0.0, "units": 0,
                                        "p0": u.p0, "core": u.core})
-        e = episodes(u, hist, measure=measure)
+        e = episodes(u, head if is_headline_rollout(u) else hist, measure=measure)
         row["episodes"] += e
         row["units"] += 1
         if u.system in SENTINEL_CLASS or u.system in ABLATION_ROWS:
@@ -447,9 +471,46 @@ def cpu_hours(split: str = "secondary", p0_model: bool = False,
     return {"core_simulation": h}
 
 
-def headline_rollout_hours(split: str = "secondary", R: int = 16) -> dict:
-    """The headline rollout block (outside the core) in rollout CPU-hours."""
-    hist = histogram(split)
+def headline_rollout_subsample(wf_ids, n: int = HEADLINE_ROLLOUT_N) -> tuple:
+    """The first n of `wf_ids` in T10's pinned order (sequence.workflow_order): ids in,
+    ids out."""
+    return SQ.workflow_order(wf_ids)[:n]
+
+
+def is_headline_rollout(u: Unit) -> bool:
+    return u.block.startswith("headline-rollout")
+
+
+def chain_workflows(u: Unit, workflows: list, split: str) -> list:
+    """The workflows a chain of unit u runs on (the decision of 27/09): the headline
+    rollout on the primary eval split keeps HEADLINE_ROLLOUT_WORKFLOWS only, by id, in the
+    order given (the run re-derives T10's order over them); every other chain, and every
+    split other than the primary eval split, runs every workflow.  Raises if a pinned id is
+    missing: the subsample is declared, not re-drawn."""
+    if not is_headline_rollout(u) or split not in _PRIMARY_NAMES:
+        return list(workflows)
+    keep = set(HEADLINE_ROLLOUT_WORKFLOWS)
+    out = [wf for wf in workflows if wf.wf_id in keep]
+    missing = keep - {wf.wf_id for wf in out}
+    if missing:
+        raise ValueError(f"the headline rollout subsample names {len(missing)} workflow(s) "
+                         "absent from the split")
+    return out
+
+
+def headline_rollout_histogram(split: str, subsample: bool = True) -> dict:
+    """H -> workflows the headline rollout runs on: the pinned subsample on the primary
+    split (subsample=False: the whole split, the cost before the decision)."""
+    if subsample and split in _PRIMARY_NAMES:
+        return dict(HEADLINE_ROLLOUT_H_HISTOGRAM)
+    return histogram(split)
+
+
+def headline_rollout_hours(split: str = "secondary", R: int = HEADLINE_ROLLOUT_R,
+                           subsample: bool = True) -> dict:
+    """The headline rollout block (outside the core) in rollout CPU-hours, on the
+    workflows it runs on (headline_rollout_histogram)."""
+    hist = headline_rollout_histogram(split, subsample)
     out = {"held-out": 0.0, "br": 0.0}
     for u in units():
         if u.block.startswith("headline-rollout"):
@@ -506,6 +567,10 @@ def definition() -> dict:
         "supplementary_sensitivities": list(SUPPLEMENTARY_SENSITIVITIES),
         "h18_deltas": list(H18_DELTAS),
         "h18_chi_arms": [list(a) for a in H18_CHI_ARMS],
+        "headline_rollout": {"R": HEADLINE_ROLLOUT_R, "n": HEADLINE_ROLLOUT_N,
+                             "split": HEADLINE_ROLLOUT_SPLIT,
+                             "workflows": list(HEADLINE_ROLLOUT_WORKFLOWS),
+                             "order_sha256": HEADLINE_ROLLOUT_ORDER_SHA256},
         "units": [[u.block, u.world_name, C.cell_id(u.cell), u.system, u.column, u.core,
                    list(u.flags)] for u in units()],
         "dropped": [[d.block, d.world_name, C.cell_id(d.cell), list(d.systems), d.reason]
@@ -548,9 +613,15 @@ def report_tables() -> str:
         lines += ["", "CPU-giờ mô phỏng lõi (Sentinel tra bảng): "
                   + ", ".join(f"{m} {v:.1f}" for m, v in cpu.items()), ""]
         for R in C.ROLLOUT_R_GRID:
-            hr = headline_rollout_hours(split, R)
-            lines.append(f"- Rollout headline R = {R}: held-out {hr['held-out']:.0f} "
-                         f"CPU-giờ, BR {hr['br']:.0f} CPU-giờ")
+            hr = headline_rollout_hours(split, R, subsample=False)
+            lines.append(f"- Rollout headline R = {R}, cả split: held-out "
+                         f"{hr['held-out']:.0f} CPU-giờ, BR {hr['br']:.0f} CPU-giờ")
+        if split in _PRIMARY_NAMES:
+            hr = headline_rollout_hours(split, HEADLINE_ROLLOUT_R)
+            lines.append(f"- Rollout headline R = {HEADLINE_ROLLOUT_R} trên mẫu con "
+                         f"{HEADLINE_ROLLOUT_N} workflow (quyết định 27/09): held-out "
+                         f"{hr['held-out']:.0f} CPU-giờ, BR {hr['br']:.0f} CPU-giờ, tổng "
+                         f"{hr['held-out'] + hr['br']:.0f}")
         lines.append("")
     return "\n".join(lines)
 

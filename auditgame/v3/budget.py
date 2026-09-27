@@ -18,7 +18,10 @@ n_alpha = (l_alpha - eps_c)^+ / D_s, every policy that meets R(alpha) with budge
 with these declared readings (L1, DCM row D6.thm4):
 
   * alpha = ALPHA = 0.05, the value of every check in theory/checks/ (and v2's
-    scoring.ALPHA_TASK).  H18's success criterion is "miss before sigma <= alpha".
+    scoring.ALPHA_TASK).  H18's former success criterion "miss before sigma <= alpha" is
+    unreachable on this grid (n = 17-24, K(n+1) > Delta) and is kept on record only; since
+    27/09 H18 reads the shape of the miss-rate curve (scorecard.H18_CRITERION,
+    metrics.h18_miss_change).
   * K = the three SWEPT carriers (memory, queue, skill).  The branch carrier is audited only
     through the commit, and model D of the note has no commit-only carrier (Def. 5.1(iii));
     kbar is taken over the swept carriers, never over the commit price (Remark 5.10(2)).
@@ -51,8 +54,8 @@ draft_setup.target_kappa_for_chi on the range scale).
 
 BLOCK SCHEDULE (Prop. 5.7): see `block_schedule` and `BlockSchedule`.
 
-T16b: the H18 cells (`h18_cells`), the K_d axis of H19 (`kd_cells`), and H18's success
-criterion read from the runner's logged `missed_before_sigma` (`miss_rate`).
+T16b: the H18 cells (`h18_cells`), the K_d axis of H19 (`kd_cells`), and the miss rate
+read from the runner's logged `missed_before_sigma` (`miss_rate`).
 """
 from __future__ import annotations
 
@@ -255,7 +258,7 @@ def schedule_with_block(H: int, b: int, order: list) -> list:
     """sched[t] for t = 1..H (index 0 unused): for every j with (j+1) b <= H, sweep the
     carriers of `order` (cheapest first) at tasks (j+1)b - K + 1, ..., (j+1)b."""
     K = len(order)
-    if b < K:
+    if b < K or K < 1:
         raise ValueError(f"block length b={b} < K={K}")
     sched = [None] * (H + 1)
     j = 0
@@ -308,6 +311,14 @@ class BlockSchedule(api.PolicyBase):
         schedule (a sweep at every task), is used; precondition_met = False is logged.
       * b is then raised to ceil(K kbar H / B) if needed, so that the spend up to task t
         stays within B t / H (Prop. 5.7(c)); budget_paced = True is logged.
+      * SINGLE-SWEEP FALLBACK (author decision 27/09, L1).  When the precondition fails
+        AND B is below the price of one full block (sum of the K sweep prices), no block
+        fits and the schedule above would buy nothing.  Instead the policy buys the
+        CHEAPEST AFFORDABLE SINGLE SWEEP: the cheapest swept carrier k0 with kappa_k0 <= B,
+        paced as a block of one, at tasks p, 2p, ... (1-based), p = max(1, ceil(kappa_k0 H
+        / B)), so the spend up to task t stays within B t / H.  single_sweep = True and
+        the carrier are logged; the counting test runs on its sweeps as before.  Where
+        the precondition holds, Prop. 5.7's schedule is unchanged.
       * The test at task t uses the first min(n, m) sweeps of the carrier within the last
         Delta tasks [t-Delta+1, t]; at t = sigma - 1 that window is [iota, sigma-1], so
         with the precondition met this is T_theta exactly.  Evaluated after every sweep
@@ -343,12 +354,22 @@ class BlockSchedule(api.PolicyBase):
             b_budget = math.ceil(spend_per_block * H / ctx.budget - 1e-9)
         self.b = max(b_theory, b_budget, K)
         self.budget_paced = self.b > b_theory
-        self.sched = schedule_with_block(H, self.b, self.order)
+        self.single_sweep = None
+        affordable = [t for t in self.order if ctx.kappa[t] <= ctx.budget + 1e-9]
+        if (not self.precondition_met and ctx.budget < spend_per_block - 1e-9
+                and affordable):
+            k0 = affordable[0]                                 # order is cheapest first
+            self.single_sweep = k0
+            self.b = max(1, math.ceil(ctx.kappa[k0] * H / ctx.budget - 1e-9))
+            self.sched = schedule_with_block(H, self.b, [k0])
+        else:
+            self.sched = schedule_with_block(H, self.b, self.order)
         self._hist = {t: [] for t in SWEEP_TARGETS}           # (t, alarm) of bought sweeps
         self._pending = None
         self._log.append({"b": self.b, "n": self.n, "order": list(self.order),
                           "precondition_met": self.precondition_met,
-                          "budget_paced": self.budget_paced})
+                          "budget_paced": self.budget_paced,
+                          "single_sweep": self.single_sweep})
 
     def act(self, t: int, B_t: float) -> api.AuditAction | None:
         task = t + 1
@@ -420,8 +441,9 @@ def kd_cells(deltas: tuple = C.DELTAS) -> list:
 
 @dataclass(frozen=True)
 class MissRate:
-    """H18's success criterion, "ti le bo sot truoc sigma <= alpha", over the ATTACKED
-    episodes (an unattacked record has nothing to miss).  `meets` is rate <= alpha."""
+    """The miss-before-sigma rate over the ATTACKED episodes (an unattacked record has
+    nothing to miss).  `meets` is the FORMER H18 criterion rate <= alpha, unreachable on
+    this grid and kept on record only (scorecard.H18_CRITERION, author decision 27/09)."""
     n_attacked: int
     n_missed: int
     alpha: float

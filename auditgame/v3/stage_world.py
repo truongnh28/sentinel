@@ -34,7 +34,8 @@ THE STAGE WORLD (world.audit_reading = "stage")
                task_id)), so the two worlds share every draw (common random numbers).
     o_t        the scores of every inspected object, their written_at, alarm = any firing,
                the checkpoint (O8), A7's provenance on a commit gate.
-    lines 8-9  unchanged: the policy may still quarantine a whole carrier (O7).
+    lines 8-9  unchanged: the policy may still quarantine a carrier (O7; the branch loses
+               its poisoned lineage only, runner.Episode.removed_by_quarantine).
     accounting (L1, declared here) -- the stage reading's "quarantine" is the gate's
                rejection (v2 GateResult.false_blocks / true_blocks):
                  fq                 + one per BENIGN object a gate rejects, + the policy's

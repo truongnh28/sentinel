@@ -198,7 +198,10 @@ class TestInfraGlue(unittest.TestCase):
     #: BEFORE the speedups (check_classes and minimax memoised) and unchanged after.  The
     #: two left-out fields carry the line-2 infeasibility record's wall time and RSS, so
     #: they are not reproducible run to run.
-    PINNED_DECISIONS = "f9177fdd04d0ff57f282622c4e34c7a920fdf779efa81eaea62f8742b83fbd17"
+    #: RE-PINNED on fix-decisions (27/09) for ONE declared change only: O7, a branch
+    #: quarantine removes the poisoned lineage (runner.Episode.removed_by_quarantine).  With
+    #: that method patched back to whole-carrier removal the digest is the old f9177fdd...
+    PINNED_DECISIONS = "4e3fc76af7ae13ee30d90472a5face60a162df349d12d20284e5972cc3b19a4e"
 
     @staticmethod
     def _decision_digest(reg) -> str:

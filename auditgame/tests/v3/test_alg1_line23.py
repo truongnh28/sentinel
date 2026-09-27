@@ -3,6 +3,7 @@
 Each test protects the DCM rows of v3/dcm/T13.csv that name it; its docstring carries the
 row ids and the verbatim draft sentence.  Run from auditgame/.
 """
+import dataclasses
 import logging
 import unittest
 
@@ -154,6 +155,32 @@ class TestAlg1Line23(unittest.TestCase):
                 self.assertGreaterEqual(E.evaluate(tree, pol)["value"], v - 1e-7)
                 checked += 1
         self.assertGreater(checked, 200)
+
+    def test_exact_branch_quarantine_loses_no_clean_patch(self):
+        """DA1.l2 O7: "Small games (KH ≤ 40 belief-state discretisation) are solved exactly by
+        backward induction over a discretised belief simplex."
+
+        The exact game's accounting follows the runner's O7 rule of 27/09 (L1): a branch
+        (commit-target) quarantine removes the marked patch only and loses no clean patch,
+        so the value no longer depends on lambda_T.  T13's finding is reproduced with the
+        old whole-branch accounting (branch_lineage=False): at rho = 0.5, Delta-hat = 1 the
+        value climbs to the no-audit loss (the adoption rate, 0.85); with the lineage rule
+        it stays well below it."""
+        cell = C.Cell(rho=0.5, delta=1)
+        self.assertEqual(C.BRANCH_QUARANTINE_REMOVES, "poisoned-lineage")
+        self.assertTrue(E.v3_game(_ctx(3, cell), 1).branch_lineage)
+        for H in (3, 4):
+            ctx = _ctx(H, cell)
+            new = E.v3_game(ctx, 1)
+            old = E.v3_game(ctx, 1, branch_lineage=False)
+            v_new = E.solve_tree(E.build_tree(new)).value
+            v_old = E.solve_tree(E.build_tree(old)).value
+            self.assertLess(v_new, v_old - 0.2, H)
+            self.assertLess(v_new, new.adoption - 0.2, H)
+            # lambda_T enters only through clean patches a quarantine removes: none now
+            moved = dataclasses.replace(new, lam_t=5.0)
+            self.assertAlmostEqual(E.solve_tree(E.build_tree(moved)).value, v_new, places=7)
+        self.assertGreater(v_old, 0.8)                  # H = 4: close to 0.85 (T13, H >= 4)
 
 
 if __name__ == "__main__":

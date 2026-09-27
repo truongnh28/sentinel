@@ -326,6 +326,51 @@ class TestS9Budget(unittest.TestCase):
         with self.assertRaises(B.BudgetUndefined):
             B.BlockSchedule(context(C.Cell(rho=0.0, delta=0), 10, 41.0))
 
+    def test_block_schedule_buys_single_sweeps_below_one_block(self):
+        """D6.thm4 (H18): "To distinguish a poisoned state from a benign one with error ≤ α at
+        the moment of decision, the required audit budget satisfies".
+
+        Author decision 27/09 (L1): when Prop. 5.7's precondition fails and B is below the
+        price of one full block, the block schedule used to buy nothing.  It now buys the
+        cheapest affordable single sweep, paced as a block of one (spend up to task t within
+        B t / H).  Checked through the runner at 1 x and 0.5 x B_min on dev workflows
+        (9 <= H <= 16, so B_min(Delta = 8) is one window): it spends, within B, on the cheapest carrier only.  Where a full block is
+        affordable the schedule is the block schedule, unchanged."""
+        wfs = [w for w in K.dev_workflows() if 9 <= len(w.tasks) <= 16][:4]
+        self.assertTrue(wfs)
+        cases = [(C.Cell(rho=0.5, delta=8, chi="2.11", budget="1xBmin"), True),
+                 (C.Cell(rho=0.5, delta=8, chi="2.11", budget="0.5xBmin"), True),
+                 (C.Cell(rho=0.0, delta=4, chi="2.11", budget="1xBmin"), False)]
+        for cell, below in cases:
+            kap = B.cell_kappa(cell)
+            block = sum(kap[t] for t in B.SWEEP_TARGETS)
+            cheapest = min(B.SWEEP_TARGETS, key=lambda t: kap[t])
+            for w in wfs:
+                H = len(w.tasks)
+                Bud = B.budget_of(cell, H)
+                self.assertEqual(Bud < block, below, (cell, H, Bud, block))
+                pol = B.BlockSchedule(context(cell, H, Bud))
+                self.assertFalse(pol.precondition_met)
+                self.assertEqual(pol.single_sweep, cheapest if below else None)
+                self.assertEqual(pol.decision_log()[0]["single_sweep"], pol.single_sweep)
+                if below:
+                    # what the schedule would buy without the fallback: nothing
+                    b_old = max(len(B.SWEEP_TARGETS), math.ceil(block * H / Bud - 1e-9))
+                    self.assertEqual([k for k in B.schedule_with_block(H, b_old, pol.order)
+                                      if k], [])
+                r = R.run_episode(w, None, B.block_schedule_factory, C.PRIMARY, cell, 0).record
+                self.assertGreater(r.spent, 0.0, (C.cell_id(cell), H))
+                self.assertLessEqual(r.spent, r.budget + 1e-9)
+                bought = [k for k, ts in r.audits.items() for _ in ts]
+                if below:
+                    self.assertEqual(set(bought), {cheapest})
+                    self.assertEqual(len(bought), H // pol.b)
+                    for t in r.audits[cheapest]:
+                        n_before = sum(1 for s in r.audits[cheapest] if s <= t)
+                        self.assertLessEqual(n_before * kap[cheapest], Bud * (t + 1) / H + 1e-9)
+                else:
+                    self.assertEqual(set(bought), set(B.SWEEP_TARGETS))
+
     def test_missed_before_sigma_is_logged(self):
         """D6.thm4 (H18): "To distinguish a poisoned state from a benign one with error ≤ α at
         the moment of decision, the required audit budget satisfies".
