@@ -23,12 +23,12 @@ def _item(carrier, t, *, poisoned=False, tag="x", topic="auth"):
                 created_at=t, provenance="agent/notes", poisoned=poisoned)
 
 
-def _miss_rate(model, *, has_marker, via, depth, n, seed=SEED):
+def _miss_rate(model, *, has_marker, via, depth, n, seed=SEED, reads_provenance=False):
     missed = 0
     for i in range(n):
         ins = model.commit(t=3, depth=depth, has_marker=has_marker, via=via,
                            task_id=f"task-{i}", seed=seed)
-        missed += not ins.alarm
+        missed += not ins.commit_alarm(reads_provenance)
     return missed / n
 
 
@@ -146,8 +146,11 @@ class TestS4Observe(unittest.TestCase):
         A0 (primary) reads the patch only: no provenance field.  A7 reads the same patch
         score AND a provenance score of the contributing delegated carriers, mean d'_prov
         when a poisoned delegated carrier produced the marked patch, 0 otherwise; d'_prov
-        is a placeholder equal to the cell's detector d' (O9), with no sqrt(depth).  The
-        A7 alarm is 'either score over tau_det'.  Sweeps carry no provenance in either."""
+        is a placeholder equal to the cell's detector d' (O9), with no sqrt(depth).
+        Provenance is an extra channel (L2, fix-a7): the observation's alarm is the patch
+        score's in both worlds; a system that reads the channel (B1-prov) alarms on
+        'either score over tau_det' (Inspection.commit_alarm).  Sweeps carry no
+        provenance in either."""
         self.assertEqual(C.A7_PROVENANCE_DPRIME, "cell-detector-dprime")
         a7 = dataclasses.replace(C.PRIMARY, provenance="A7")
         n = 3000
@@ -168,8 +171,14 @@ class TestS4Observe(unittest.TestCase):
                     tainted = marker and via == "delegated"
                     self.assertEqual(O.provenance_mean(tainted, m7.dprime_provenance),
                                      m7.dprime_provenance if tainted else 0.0)
-                    self.assertEqual(i7.alarm, i7.alarm_patch or m7.detector.fires(i7.provenance))
+                    self.assertEqual(i7.alarm, i7.alarm_patch, "A7 alarm = patch score only")
+                    self.assertEqual(i7.alarm, i0.alarm)
+                    self.assertEqual(i7.provenance_fired, m7.detector.fires(i7.provenance))
+                    self.assertEqual(i7.commit_alarm(False), i7.alarm)
+                    self.assertEqual(i7.commit_alarm(True), i7.alarm_patch or i7.provenance_fired)
                     self.assertEqual(i0.alarm, i0.alarm_patch)
+                    self.assertFalse(i0.provenance_fired)
+                    self.assertEqual(i0.commit_alarm(True), i0.alarm, "A0: nothing to read")
                     o0 = i0.observation(t=4, requested=None, checkpoint=None)
                     o7 = i7.observation(t=4, requested=None, checkpoint=None)
                     self.assertIsNone(o0.provenance)
@@ -183,18 +192,27 @@ class TestS4Observe(unittest.TestCase):
             st.write(_item("skill", 1, poisoned=True))
             for m in (m0, m7):
                 self.assertIsNone(m.sweep(t=2, target="skill", depth=1, store=st, seed=SEED).provenance)
-            # A7 miss of a delegated patch: both scores under tau
+            # A7 miss of a delegated patch for a reader (B1-prov): both scores under tau
             det = cell.detector()
             want = O.p_miss_commit(rho, det.d_prime, det.phi, dprime_provenance=det.d_prime)
             self.assertAlmostEqual(want, _N.cdf(det.tau_det - rho * det.d_prime)
                                    * _N.cdf(det.tau_det - det.d_prime), places=12)
-            got = _miss_rate(m7, has_marker=True, via="delegated", depth=1, n=n)
+            got = _miss_rate(m7, has_marker=True, via="delegated", depth=1, n=n,
+                             reads_provenance=True)
             self.assertLess(abs(got - want), _mc_tol(want, n), f"A7 rho={rho}")
             self.assertLess(want, O.p_miss_commit(rho, det.d_prime, det.phi))
-            # A7's false-alarm cost: either of two clean scores over tau
-            fa = 1 - _miss_rate(m7, has_marker=False, via="", depth=1, n=n)
+            # ... and for a plain policy (B1) exactly A0's miss, draw for draw
+            plain = O.p_miss_commit(rho, det.d_prime, det.phi)
+            got7 = _miss_rate(m7, has_marker=True, via="delegated", depth=1, n=n)
+            self.assertEqual(got7, _miss_rate(m0, has_marker=True, via="delegated", depth=1, n=n))
+            self.assertLess(abs(got7 - plain), _mc_tol(plain, n), f"A7 plain rho={rho}")
+            # false alarms: a reader pays either of two clean scores over tau,
+            # 1 - (1 - phi)^2; a plain policy pays phi in A7 as in A0
+            fa = 1 - _miss_rate(m7, has_marker=False, via="", depth=1, n=n, reads_provenance=True)
             want_fa = 1 - (1 - det.phi) ** 2
             self.assertLess(abs(fa - want_fa), _mc_tol(want_fa, n))
+            fa_plain = 1 - _miss_rate(m7, has_marker=False, via="", depth=1, n=n)
+            self.assertLess(abs(fa_plain - det.phi), _mc_tol(det.phi, n))
 
     # ---- H8: the insertion audit and the ingress channel ------------------------------
 

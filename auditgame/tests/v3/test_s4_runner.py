@@ -7,6 +7,7 @@ v2's carrier_runner.  Run from auditgame/.
 """
 import dataclasses
 import inspect
+import math
 import unittest
 from dataclasses import replace
 
@@ -491,6 +492,64 @@ class TestS4Runner(unittest.TestCase):
                        C.PRIMARY, CELL, seed, observer=fires_at(range(len(TOPICS))))
         r = ep.run().record
         self.assertEqual((ep.counters()["patch_blocks"], ep.counters()["clean_blocked"]), (0, 0))
+
+    # ---------------------------------------------------------------------------------
+    def test_commit_audit_reads_provenance_of_contributing_skills(self):
+        """D7.commit-prov C1 O9 -- "Audit actions. Insertion audit (content and provenance
+        check on new memory records), … commit audit (patch review, differential testing,
+        provenance of contributing skills).": A7 is the world where the commit review CAN
+        read the provenance of the contributing skills; provenance is an extra observation
+        channel that only the systems reading it use (L2, fix-a7 27/09).  B1 is the same
+        system in A0 and A7 (record for record); B1-prov is B1 in A0 and differs from it in
+        A7, where the runner blocks its patch on either score over tau_det, so its
+        false-alarm rate on clean patches is 1 - (1 - phi)^2 (B1's stays phi)."""
+        a7 = replace(C.PRIMARY, provenance="A7")
+        dev = K.dev_workflows()
+        a = AT.by_name(AT.held_out()[0])
+
+        def strip(rec):
+            d = rec.to_dict()
+            for f in ("world", "world_id"):
+                d.pop(f)
+            return d
+
+        for cell in (C.Cell(rho=0.0, delta=4), C.Cell(rho=0.5, delta=1)):
+            for wf in dev[:6]:
+                pl = a.plan(wf, cell.delta)
+                for seed in range(3):
+                    runs = {}
+                    for name in ("B1 audit-at-commit", "B1-prov"):
+                        for world in (C.PRIMARY, a7):
+                            out = self.run_ep(wf, pl, B.factory(name), world=world,
+                                              cell=cell, seed=seed)
+                            runs[name, world.provenance] = out
+                    b1_0, b1_7 = runs["B1 audit-at-commit", "A0"], runs["B1 audit-at-commit", "A7"]
+                    self.assertEqual(strip(b1_0.record), strip(b1_7.record), "B1: A0 = A7")
+                    self.assertEqual(b1_0.postmortem.alarms, b1_7.postmortem.alarms)
+                    self.assertEqual(runs["B1-prov", "A0"].postmortem.alarms,
+                                     b1_0.postmortem.alarms, "B1-prov is B1 in A0")
+        # false alarms on clean workflows: B1-prov in A7 pays 1 - (1 - phi)^2, B1 phi
+        cell = C.Cell(rho=0.5, delta=4)
+        phi = cell.detector().phi
+        rate = {}
+        for name in ("B1 audit-at-commit", "B1-prov"):
+            for world in (C.PRIMARY, a7):
+                alarms = commits = 0
+                for wf in dev:
+                    for seed in range(4):
+                        out = self.run_ep(wf, None, B.factory(name), world=world, cell=cell,
+                                          seed=seed)
+                        alarms += len(out.postmortem.alarms)
+                        commits += len(out.record.audits["commit"])
+                rate[name, world.provenance] = (alarms / commits, commits)
+        tol = lambda p, n: 4.0 * math.sqrt(p * (1 - p) / n)
+        for key, want in ((("B1 audit-at-commit", "A0"), phi), (("B1 audit-at-commit", "A7"), phi),
+                          (("B1-prov", "A0"), phi), (("B1-prov", "A7"), 1 - (1 - phi) ** 2)):
+            got, n = rate[key]
+            self.assertLess(abs(got - want), tol(want, n), f"{key}: {got} vs {want}")
+        self.assertEqual(rate["B1 audit-at-commit", "A0"], rate["B1 audit-at-commit", "A7"])
+        self.assertGreater(rate["B1-prov", "A7"][0], rate["B1 audit-at-commit", "A7"][0],
+                           "B1-prov differs from B1 in A7")
 
     # ---------------------------------------------------------------------------------
     def test_carrier_state_reaches_the_oracle_control_only(self):

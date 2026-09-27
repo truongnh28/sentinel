@@ -31,7 +31,8 @@ THE SYSTEMS (names are the record's `policy` field).
                               confirmed on the next task.
     cost-greedy               S10.1: a target drawn with probability proportional to 1/kappa.
     SW randomised             S11: a target drawn by stage weights (v2 _SW), tuned by T18.
-    B1-prov                   C1: B1 whose commit alarm also reads the provenance score (A7).
+    B1-prov                   C1: B1 whose commit alarm also reads the provenance score (A7);
+                              the only baseline that reads that channel (L2, fix-a7).
   controls (read before any Sentinel number, D28), not competitors:
     Oracle (+)                told the evaluator-known carrier state c_t at every task (the
                               runner hands it over, to this class only) and quarantines
@@ -212,11 +213,14 @@ class B1Provenance(B1AuditAtCommit):
     """C1: B1 in a world whose commit audit also returns the provenance score of the
     contributing skills (A7).  Its commit alarm is "patch score OR provenance score over the
     cell detector's threshold" (O9: the provenance d' is the detector's, so is its
-    threshold); on it, the patch is blocked as B1's is.  The runner blocks on the
-    observation's alarm, which in A7 already ORs the provenance score at the same threshold
-    (v3/observe.py ObservationModel.commit).  In A0 the observation carries no provenance,
-    and B1-prov is B1."""
+    threshold); on it, the patch is blocked as B1's is.  Provenance is an extra channel
+    that only its readers use (L2, fix-a7 27/09): the observation's `alarm` is the patch
+    score's in every world, so B1 is the same system in A0 and A7; this class declares
+    `reads_provenance`, and the runner blocks its patch on either score over tau_det
+    (observe.Inspection.commit_alarm).  In A0 the observation carries no provenance, and
+    B1-prov is B1."""
     name = "B1-prov"
+    reads_provenance = True
 
     def __init__(self, ctx: A.EpisodeContext):
         super().__init__(ctx)

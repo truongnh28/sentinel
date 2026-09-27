@@ -19,7 +19,9 @@ ORDER INSIDE TASK t (plan T6)
     4. agent        SleeperMockAgent.run_task (T4).
     5. audit        ObservationModel.audit (T5) on the bought action; o_t goes to the policy
                     (policy.observe, every task, also when nothing was bought).  A commit
-                    review whose alarm fires BLOCKS THIS TASK'S PATCH ONLY (`block_patch`):
+                    review whose alarm fires BLOCKS THIS TASK'S PATCH ONLY (`block_patch`);
+                    the alarm is the patch score's, or in A7 for a system that reads the
+                    provenance channel (B1-prov) either score's (Inspection.commit_alarm):
                     the patch never enters the branch (v2's patch_blocks, the draft's
                     "audit-at-commit"; M1 fix 27/09).  It is not a quarantine: no FQ, no
                     other branch item is touched.
@@ -249,7 +251,8 @@ class Episode:
             else:
                 self.benign_inspected += sum(1 for it in ins.items if not it.poisoned)
             obs = ins.observation(t, requested, checkpoint)
-            if obs.alarm:
+            # A7 (L2): the provenance score fires only for a system that reads it (B1-prov)
+            if ins.commit_alarm(O.reads_provenance(pol)):
                 self.alarms.append((t, bought.target))
                 if bought.target == "commit":
                     self.block_patch(t, o)
