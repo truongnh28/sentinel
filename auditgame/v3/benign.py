@@ -17,8 +17,11 @@ docs/preregistration/lech-chuan-P3-benign.md (DEVIATION_REF):
             160), balanced over the five Deltas: 800 events and 800 benign changes, NOT the
             draft's 620 (N_BENIGN_DRAFT is recorded beside it).
     D-v3-3  the payload's length is drawn from the length distribution of v3's own drift
-            on dev (v3/payload.py, `draw_length`), not v2's constant 63: see
-            `length_background`.
+            on dev (v3/payload.py, `draw_length`), not v2's constant 63.  The background
+            is `length_background(runs)`: len(content) of every drift change of the pool
+            (forced drift on CARRIER over every dev workflow), the population the
+            controls are drawn from.  One draw per placement, seeded from SEED and the
+            placement.  build.PAYLOAD_LENGTH and the drift process are untouched.
 
 WHAT IS REUSED FROM v2 (analysis/benign_corpus.py, analysis/discriminator.py,
 analysis/gate2_v2.py), unchanged and imported, never patched:
@@ -187,6 +190,14 @@ class DevRuns:
     nominal: dict = field(default_factory=dict)       # wf_id -> store (nominal drift)
     pools: dict = field(default_factory=dict)         # (kind, repo) -> [Change]
     at: dict = field(default_factory=dict)            # (kind, wf_id, t) -> Change
+    lengths: list = field(default_factory=list)       # D-v3-3: length_background(self)
+
+
+def length_background(runs: DevRuns) -> list:
+    """D-v3-3: len(content) of every drift change of the pool, sorted -- v3's
+    certification background, from which the attacker draws its payload length."""
+    return sorted(len(c.item.content) for (k, _), v in runs.pools.items() if k == "drift"
+                  for c in v)
 
 
 def _before(store, carrier: str, t: int) -> list:
@@ -212,6 +223,7 @@ def dev_runs(workflows=None) -> DevRuns:
                             embedding_shift(_before(nominal, CARRIER, it.created_at), it))
                 out.pools.setdefault((kind, wf.repo), []).append(ch)
                 out.at[(kind, wf.wf_id, it.created_at)] = ch
+    out.lengths = length_background(out)
     return out
 
 
@@ -229,6 +241,8 @@ class Event:
     payload: Item
     shift: float
     controls: tuple                     # (Change, ...), V3_PER_EVENT of them
+    length: int = 0                     # D-v3-3: the drawn payload length L
+    length_reason: str | None = None    # N3: why the payload is not L long (tag >= L)
 
     def rows(self) -> tuple:
         pos = features(self.payload, self.sigma, self.shift)
@@ -296,6 +310,7 @@ def build(runs: DevRuns | None = None, kind: str = "drift", n_events: int | None
 
 
 def _match(runs: DevRuns, kind: str, wf, sp, used: set):
+    sp = sp.at_length(P.draw_length(runs.lengths, sp, SEED))
     payload = sp.item(wf)
     shift = embedding_shift(_before(runs.nominal[wf.wf_id], CARRIER, sp.iota), payload)
     controls = []
@@ -317,7 +332,7 @@ def _match(runs: DevRuns, kind: str, wf, sp, used: set):
     rng = random.Random(seed_of(SEED, "v3-benign", "ctrl", wf.wf_id, sp.iota, sp.delta))
     controls += rng.sample(uniq, need)
     return Event(wf.wf_id, wf.repo, sp.delta, sp.iota, sp.sigma, payload, shift,
-                 tuple(controls))
+                 tuple(controls), sp.length, sp.length_reason)
 
 
 def rows_of(events: list) -> tuple:

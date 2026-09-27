@@ -25,14 +25,17 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+import build  # noqa: E402
 from v3 import benign as V  # noqa: E402
+from v3 import payload as P  # noqa: E402
 
 MANIFEST = ROOT / "reference" / "v3_benign.json"
 MODULE = ROOT / "v3" / "benign.py"
+PAYLOAD_MODULE = ROOT / "v3" / "payload.py"
 
 
-def module_sha() -> str:
-    return hashlib.sha256(MODULE.read_bytes()).hexdigest()
+def module_sha(path: pathlib.Path = MODULE) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def protocol() -> dict:
@@ -46,7 +49,12 @@ def protocol() -> dict:
         diagnostic_control_kind="v2-notes", ceiling=V.CEILING, criterion=V.CRITERION,
         split_seeds=list(V.SPLIT_SEEDS), test_fraction=V.TEST_FRACTION,
         split="dev (v3.corpus.dev_workflows, 100 v2 workflows)",
-        source="v3/benign.py", source_sha256=module_sha())
+        payload_length_rule=P.LENGTH_RULE, payload_length_v2=build.PAYLOAD_LENGTH,
+        payload_length_background="len(content) of every drift change of the pool "
+                                  "(v3.benign.length_background: forced drift on memory "
+                                  "over every dev workflow)",
+        source="v3/benign.py", source_sha256=module_sha(),
+        payload_source="v3/payload.py", payload_source_sha256=module_sha(PAYLOAD_MODULE))
 
 
 def corpus_record(events: list, runs, dropped: list) -> dict:
@@ -64,7 +72,12 @@ def corpus_record(events: list, runs, dropped: list) -> dict:
         dropped=len(dropped), dropped_reasons=[list(d) for d in dropped],
         candidates={str(d): len(V.candidates(runs, d)) for d in V.DELTAS},
         pool_per_kind={k: sum(len(v) for (kk, _), v in runs.pools.items() if kk == k)
-                       for k in V.CONTROL_KINDS})
+                       for k in V.CONTROL_KINDS},
+        payload_length_background=P.length_stats(runs.lengths),
+        payload_length_drawn=P.length_stats([ev.length for ev in events]),
+        payload_length_reasons=[[ev.wf_id, ev.delta, ev.iota, ev.sigma, ev.length,
+                                 ev.length_reason] for ev in events
+                                if ev.length_reason is not None])
 
 
 def _summary(s: dict) -> dict:

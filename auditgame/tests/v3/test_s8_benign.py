@@ -16,6 +16,7 @@ from analysis import gate2_v2 as G2
 from v3 import agent as AG
 from v3 import benign as V
 from v3 import corpus as K
+from core import CarrierStore
 
 sys.path.insert(0, str(pathlib.Path("tools").resolve()))
 import v3_benign as T  # noqa: E402
@@ -133,6 +134,54 @@ class TestS8Benign(unittest.TestCase):
         prov = {c.item.provenance for e in self.events for c in e.controls}
         self.assertEqual(prov, {AG.INGRESS_PROVENANCE})
         self.assertEqual({e.payload.provenance for e in self.events}, prov)
+
+    def test_payload_length_drawn_from_v3_drift_closes_the_size_channel(self):
+        """D8.benign: "620 benign carrier modifications generated to match poisoning events
+        on surface statistics (edit size, embedding shift, recency, provenance shape)".
+
+        L1, D-v3-3 (docs/preregistration/lech-chuan-P3-benign.md): the ATTACKER draws its
+        payload length from the length distribution of v3's own drift on dev
+        (payload.draw_length over benign.length_background), so edit size is matched by
+        construction, spread included -- not by dropping the feature and not by cutting
+        the drift.  build.PAYLOAD_LENGTH stays 63, the default payload stays v2's bytes,
+        at L = 63 the drawn-length construction reproduces them, and a payload whose tag
+        is at least L wide carries an N3 reason."""
+        import build
+        from v3 import payload as P
+        self.assertEqual(build.PAYLOAD_LENGTH, 63)
+        bg = P.length_stats(self.runs.lengths)
+        self.assertEqual(self.man["corpus"]["payload_length_background"], bg)
+        self.assertEqual(self.runs.lengths, V.length_background(self.runs))
+        es = self.man["result"]["features"]["edit_size"]
+        self.assertGreaterEqual(es["distinct_pos"], 40)
+        # the spread is matched, not only the centre
+        self.assertLess(abs(es["sd_pos"] - bg["sd"]), 0.25 * bg["sd"])
+        pos, _ = V.rows_of(self.events)
+        sizes = [p["edit_size"] for p in pos]
+        import statistics
+        self.assertLessEqual(abs(statistics.median(sizes) - bg["median"]), 2)
+        self.assertLessEqual(abs(es["mean_pos"] - bg["mean"]), 2)
+        self.assertLessEqual(abs(statistics.fmean(sizes) - bg["mean"]), 2)
+        n_checked = 0
+        for wf in self.runs.workflows[:20]:
+            for sp in P.plan_sleeper_all(wf, V.CARRIER, 1, V.EPSILON):
+                self.assertIsNone(sp.length)
+                v2 = build.inject(CarrierStore(), wf, sp.spec())
+                a, b = sp.item(wf), sp.at_length(build.PAYLOAD_LENGTH).item(wf)
+                self.assertEqual((a.content, a.item_id), (v2.content, v2.item_id))
+                self.assertEqual((b.content, b.item_id), (v2.content, v2.item_id))
+                n_checked += 1
+        self.assertGreater(n_checked, 20)
+        why = []
+        for e in self.events:
+            self.assertIn(e.length, self.runs.lengths)
+            if len(e.payload.content) != e.length:
+                self.assertIsNotNone(e.length_reason)
+                self.assertGreater(len(e.payload.content), e.length)
+                why.append([e.wf_id, e.delta, e.iota, e.sigma, e.length, e.length_reason])
+            else:
+                self.assertIsNone(e.length_reason)
+        self.assertEqual(self.man["corpus"]["payload_length_reasons"], why)
 
 
 if __name__ == "__main__":
