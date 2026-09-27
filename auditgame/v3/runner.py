@@ -26,9 +26,12 @@ ORDER INSIDE TASK t (plan T6)
                     "audit-at-commit"; M1 fix 27/09).  It is not a quarantine: no FQ, no
                     other branch item is touched.
     6. line 7       inside policy.observe.
-    7. lines 8-9    policy.quarantine(t) names a carrier or None; the runner removes EVERY
-                    live item of it (store.quarantine over store.live(k)).  A whole-branch
-                    quarantine therefore comes only from a policy's line 8, never from a
+    7. lines 8-9    policy.quarantine(t) names a carrier or None.  memory, skill, queue:
+                    the runner removes EVERY live item of it (store.quarantine over
+                    store.live(k)).  branch: only the POISONED LINEAGE -- marked patches and
+                    items whose derived_from chain reaches a poisoned item; clean patches
+                    stay (O7, author decision 27/09, L1; `removed_by_quarantine`).  A
+                    branch quarantine comes only from a policy's line 8, never from a
                     commit alarm by itself.
                     The Oracle (+) control (baselines.OracleControl, and only it) is handed
                     the evaluator-known carrier state c_t instead (`oracle_quarantines`,
@@ -37,11 +40,14 @@ ORDER INSIDE TASK t (plan T6)
     8. lock         SealedOracle.task_end: at sigma, harm is locked if world.harm == "locked".
     9. read         after the last task the sealed oracle reads the branch (v3/oracle.py).
 
-ACCOUNTING OF A WHOLE-CARRIER QUARANTINE (O7)
+ACCOUNTING OF A QUARANTINE (O7; branch = poisoned lineage only since 27/09, see step 7).
+The whole-branch removal of T13's finding (docs/reports/v3-p2-line23.md: a late branch
+quarantine lost ~0.62 t clean patches, so the best loss equalled the no-audit loss) is gone:
     true_q            quarantines of a carrier with c_t[k] = 1 (just before removal)
     fq                quarantines of a carrier with c_t[k] = 0: the draft's "false quarantines"
     false_removed     benign items removed (v2 D15, item level)
     clean_lost_branch clean, solved patches removed by a branch quarantine: a clean task lost
+                      (only a clean patch derived from poison can be removed now)
     t_lost            clean tasks lost = clean_lost_branch + clean solved patches BLOCKED at
                       the commit review (step 5).  A blocked marked patch is harm prevented,
                       not a loss (`patch_blocks` in counters()).
@@ -300,13 +306,40 @@ class Episode:
                 raise ValueError(f"the oracle names {k!r}, not a carrier of {CARRIERS}")
         return ks
 
+    def removed_by_quarantine(self, k: str) -> list:
+        """The live items a quarantine of carrier k removes (O7, author decision 27/09, L1).
+
+        memory, skill, queue: every live item (whole-carrier removal).
+        branch: the POISONED LINEAGE only -- every live branch item that is poisoned (a
+        marked patch, a seeded branch item) or whose derived_from chain reaches a poisoned
+        item (quarantined sources included, state._items_by_id).  Clean patches stay, so
+        clean_lost_branch counts only clean items actually removed."""
+        live = self.store.live(k)
+        if k != OR.BRANCH:
+            return live
+        idx = S._items_by_id(self.store)
+        memo: dict = {}
+
+        def tainted(it, seen=()) -> bool:
+            if it.item_id in memo:
+                return memo[it.item_id]
+            if it.poisoned:
+                memo[it.item_id] = True
+                return True
+            seen = seen + (it.item_id,)
+            r = any(p in idx and p not in seen and tainted(idx[p], seen)
+                    for p in it.derived_from)
+            memo[it.item_id] = r
+            return r
+        return [it for it in live if tainted(it)]
+
     def quarantine(self, t: int, k: str) -> None:
-        """Remove every live item of carrier k (O7 accounting, module docstring)."""
+        """Quarantine carrier k: remove `removed_by_quarantine(k)` (O7 accounting, module
+        docstring).  TP / FQ is read off c_t[k] just before removal, as before."""
         if k not in CARRIERS:
             raise ValueError(f"quarantine names {k!r}, not a carrier of {CARRIERS}")
-        live = self.store.live(k)
-        poisoned = any(it.poisoned for it in live)
-        for it in live:
+        poisoned = any(it.poisoned for it in self.store.live(k))
+        for it in self.removed_by_quarantine(k):
             self.store.quarantine(it.item_id)
             if not it.poisoned:
                 self.false_removed += 1

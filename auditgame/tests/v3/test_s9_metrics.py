@@ -570,6 +570,67 @@ class TestS9Metrics(unittest.TestCase):
             S.MARGIN["rel"] = old
         self.assertEqual(dg, S.rules_digest())
 
+    def test_h18_reads_the_miss_rate_change_at_a_fixed_budget(self):
+        """D6.thm4 (H18, author decision 27/09): "Theorem 4 makes this precise: the budget
+        required to distinguish harmful persistence from benign state change grows with
+        trigger delay and with carrier heterogeneity".
+
+        "Miss before sigma <= alpha" is unreachable on this grid (n = 17-24, K(n+1) > Delta)
+        and is kept on record, not scored.  The primary statistic is the shape of the
+        miss-rate curve over the budget levels; the test is rule D on the sign of
+        V_miss(Delta = 8) - V_miss(Delta = 4) at the fixed level b1 (the frontier over the
+        H18 policies, on workflows with H >= 9): draft +1, note -1."""
+        crit = S.H18_CRITERION
+        self.assertEqual(crit["old_status"], "unreachable")
+        self.assertEqual((crit["draft_sign"], crit["note_sign"], crit["fixed_level"]),
+                         (1, -1, "b1"))
+        self.assertIn("h18_criterion", S.spec())
+        h18 = {c.side: c for c in S.BY_ID["H18"].checks if c.rule == "D"}
+        self.assertEqual({s: (c.quantity, c.sign) for s, c in h18.items()},
+                         {"draft": ("h18_miss_change_d8_minus_d4", 1),
+                          "note": ("h18_miss_change_d8_minus_d4", -1)})
+        self.assertEqual(M.H18_DELTA_PAIR, (4, 8))
+        self.assertEqual(M.H18_MIN_H, 9)
+        # synthetic: 12 families x 2 workflows (H = 10); P2 is the frontier; misses fall
+        # from Delta = 4 to 8.  An H = 6 workflow (no Delta = 8) must not enter.
+        rng = np.random.default_rng(18)
+        recs = []
+        miss = {("P1", 4): 0.9, ("P1", 8): 0.7, ("P2", 4): 0.6, ("P2", 8): 0.2}
+        for g in range(12):
+            for i in range(2):
+                for (pol, d), pm in miss.items():
+                    for a in ("a1", "a2"):
+                        for s in (1, 2, 3):
+                            recs.append(rec(wf=f"f{g}w{i}", repo=f"f{g}", policy=pol,
+                                            attack=a, delta=d, seed=s, H=10, iota=0,
+                                            sigma=d, missed_before_sigma=bool(rng.random() < pm)))
+        short = [rec(wf="short", repo="f0", policy="P2", attack=a, delta=4, seed=1, H=6,
+                     iota=0, sigma=4, missed_before_sigma=False) for a in ("a1", "a2")]
+        clean = [rec(wf="f0w0", repo="f0", policy="P2", attack="none", delta=4, seed=1,
+                     H=10, iota=None, sigma=None, k=(), missed_before_sigma=False)]
+        allr = recs + short + clean
+        ch = M.h18_miss_change(allr, ("P1", "P2"), ("a1", "a2"), n_boot=2000)
+        self.assertEqual(ch["n_workflows"], 24, "H = 6 and unattacked records are out")
+        self.assertEqual(ch["n_repos"], 12)
+        f4 = M.miss_table(recs, "P2", ("a1", "a2"), (4,)).value
+        f8 = M.miss_table(recs, "P2", ("a1", "a2"), (8,)).value
+        self.assertAlmostEqual(ch["frontier"][4], f4, places=12)
+        self.assertAlmostEqual(ch["frontier"][8], f8, places=12)
+        self.assertAlmostEqual(ch["point"], f8 - f4, places=12)
+        self.assertLess(ch["hi"], 0.0)
+        self.assertLess(ch["p"], 0.05)
+        self.assertEqual(set(ch["policies"]), {"P1", "P2"})
+        curve = M.h18_miss_curve({"b1": allr}, ("P1", "P2"), ("a1", "a2"))
+        self.assertAlmostEqual(curve["b1"][4]["frontier"], f4, places=12)
+        self.assertAlmostEqual(curve["b1"][8]["P1"],
+                               M.miss_table(recs, "P1", ("a1", "a2"), (8,)).value, places=12)
+        e = S.Estimate(lo=ch["lo"], hi=ch["hi"], point=ch["point"], p=ch["p"])
+        out = S.score_all({"h18_miss_change_d8_minus_d4": e})
+        sides = {c.side: res.outcome for c, res in out["H18"] if c.rule == "D"}
+        self.assertEqual(sides, {"draft": REJECT, "note": MATCH})
+        # no record: no estimate
+        self.assertTrue(math.isnan(M.h18_miss_change([], ("P1",), ("a1",))["point"]))
+
     def test_learning_curve_prints_delta_hat_by_incidents_seen(self):
         """DA1.l1 (C12, R4, R5): "Δ, χb ← estimate delay and heterogeneity from history" --
         the learning curve: Delta-hat and harm by the number of post-mortems seen, the

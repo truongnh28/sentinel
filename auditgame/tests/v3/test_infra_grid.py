@@ -164,6 +164,51 @@ class TestInfraGrid(unittest.TestCase):
         self.assertGreater(G.by_p0_block("primary")["total"],
                            G.by_p0_block("secondary")["total"])
 
+    def test_headline_rollout_runs_r16_on_the_first_30_in_pinned_order(self):
+        """Author decision 27/09: the headline rollout runs at R = 16 on a pre-declared
+        subsample of the primary eval split -- its first 30 workflows in T10's pinned order.
+        The pinned ids are that rule applied to the split's ids (read as ids and counts
+        only: corpus.eval_summary's H_by_workflow), the pinned H histogram is theirs, the
+        run keeps them by id on the primary split only, and the cost falls from 797 to
+        253 rollout CPU-hours."""
+        from v3 import corpus as K
+        from v3 import sequence as SQ
+        self.assertEqual((G.HEADLINE_ROLLOUT_R, G.HEADLINE_ROLLOUT_N,
+                          G.HEADLINE_ROLLOUT_SPLIT), (16, 30, "primary"))
+        h_by = K.eval_summary("primary")["H_by_workflow"]
+        self.assertEqual(len(h_by), 96)
+        sub = G.headline_rollout_subsample(list(h_by))
+        self.assertEqual(sub, G.HEADLINE_ROLLOUT_WORKFLOWS)
+        self.assertEqual(sub, SQ.workflow_order(h_by)[:30])
+        self.assertEqual(SQ.order_sha256(list(sub)), G.HEADLINE_ROLLOUT_ORDER_SHA256)
+        self.assertEqual(dict(Counter(h_by[w] for w in sub)), G.HEADLINE_ROLLOUT_H_HISTOGRAM)
+        self.assertEqual(sum(G.HEADLINE_ROLLOUT_H_HISTOGRAM.values()), 30)
+        self.assertEqual(G.definition()["headline_rollout"]["workflows"], list(sub))
+
+        class W:                                             # an id is all the filter reads
+            def __init__(self, i):
+                self.wf_id = i
+        wfs = [W(i) for i in h_by]
+        head = next(u for u in self.units if u.block == "headline-rollout")
+        main = next(u for u in self.units if u.block == "main")
+        for split in ("primary", "eval"):
+            self.assertEqual({w.wf_id for w in G.chain_workflows(head, wfs, split)}, set(sub))
+            self.assertEqual(len(G.chain_workflows(main, wfs, split)), 96)
+        self.assertEqual(len(G.chain_workflows(head, wfs, "dev")), 96)
+        with self.assertRaises(ValueError):
+            G.chain_workflows(head, wfs[:10], "eval")
+        full = G.headline_rollout_hours("primary", 16, subsample=False)
+        new = G.headline_rollout_hours("primary", 16)
+        self.assertAlmostEqual(full["held-out"] + full["br"], 797.4, delta=0.5)
+        self.assertAlmostEqual(new["held-out"], 59.3, delta=0.5)
+        self.assertAlmostEqual(new["br"], 193.9, delta=0.5)
+        self.assertEqual(G.headline_rollout_hours("secondary", 16),
+                         G.headline_rollout_hours("secondary", 16, subsample=False))
+        cnt = G.count("primary")["headline-rollout"]["episodes"]
+        u_hist = G.headline_rollout_histogram("primary")
+        self.assertAlmostEqual(cnt, sum(G.episodes(u, u_hist) for u in self.units
+                                        if u.block == "headline-rollout"), places=6)
+
     def test_definition_digest_is_stable_and_every_chain_is_a_unit_seed(self):
         self.assertEqual(G.definition_digest(), G.definition_digest())
         ch = G.chains(["kd"], seeds=C.SEEDS[:2])

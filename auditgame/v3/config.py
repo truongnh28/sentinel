@@ -118,9 +118,14 @@ POSTMORTEM_ALWAYS = True
 ATTACKER_DELTA_CLASSES = ("fixed-delta-per-sequence", "uniform-delta-mix-per-workflow")
 # O6: B1 when the budget binds and commit is already at depth 1.
 B1_BINDING_RULE = ("lower-depth-evenly-while-above-1", "drop-commit-at-evenly-spaced-tasks")
-# O7: accounting of whole-carrier quarantine.
+# O7: accounting of a carrier quarantine.  Author decision 27/09 (L1), after T13's finding
+# (docs/reports/v3-p2-line23.md: with whole-branch removal the best loss equals the no-audit
+# loss): a BRANCH quarantine removes only the poisoned lineage (marked patches and items
+# whose derived_from chain reaches a poisoned item); clean patches stay.  memory, skill and
+# queue keep whole-carrier removal.
 FQ_UNIT = "carrier-quarantine-with-c_t[k]=0"
-BRANCH_QUARANTINE_LOSES_CLEAN_PATCHES = True          # they count as clean tasks lost
+BRANCH_QUARANTINE_REMOVES = "poisoned-lineage"        # was "every-live-item" before 27/09
+BRANCH_QUARANTINE_LOSES_CLEAN_PATCHES = False         # only a clean item derived from poison
 # O8: the executable checkpoint carries no information about poison (t6 of Fig. 1).
 CHECKPOINT_PSI_EQUALS_PHI = True
 # O9: A7 provenance d' is a placeholder equal to the cell's detector d' (measured in P3).
@@ -162,6 +167,7 @@ DECIDED_O = {
     "O5": {"classes": list(ATTACKER_DELTA_CLASSES)},
     "O6": {"b1_binding_rule": list(B1_BINDING_RULE)},
     "O7": {"fq_unit": FQ_UNIT,
+           "branch_quarantine_removes": BRANCH_QUARANTINE_REMOVES,
            "branch_quarantine_loses_clean_patches": BRANCH_QUARANTINE_LOSES_CLEAN_PATCHES},
     "O8": {"checkpoint_psi_equals_phi": CHECKPOINT_PSI_EQUALS_PHI},
     "O9": {"a7_provenance_dprime": A7_PROVENANCE_DPRIME},

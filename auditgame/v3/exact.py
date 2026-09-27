@@ -44,9 +44,13 @@ audit -> observe -> quarantine.
                           (rho d' on a delegated patch, d' sqrt(d) direct, A7 provenance).
     response    after an alarm the defender chooses quarantine (whole carrier of the
                 audited target) or continue ("choose"; "always" = quarantine on alarm).
-                A quarantine of a clean carrier is one FQ (O7); a branch quarantine loses
-                the clean patches written since the last one (solve rate each, O7).
-                A branch quarantine at sigma removes the marked patch before harm locks.
+                A quarantine of a clean carrier is one FQ (O7).  A branch quarantine
+                removes the poisoned lineage only (author decision 27/09, L1, as the
+                runner): the marked patch goes, the clean patches stay, so it loses no
+                clean task (Game.branch_lineage; False = the whole-branch accounting of
+                T13's finding, a clean patch lost per task since the last one at the
+                solve rate).  A branch quarantine at sigma removes the marked patch
+                before harm locks.
     close       end of task sigma: a marked patch still in the branch is harm 1 (locked).
 
 The checkpoint is not in the tree: O8 makes its likelihood ratio 1, so it is merged.
@@ -128,6 +132,9 @@ class Game:
     activate_after_audit   True = the payload fires at the END of task sigma, so an audit
                 at sigma still removes it (smallgame's window {iota..iota+Delta});
                 False = the agent at sigma runs before the audit (v3, plan T6 order).
+    branch_lineage  True (since 27/09, O7): a branch quarantine removes the marked patch
+                only and loses no clean patch.  False: the whole-branch accounting that
+                T13 measured (lam_t x solve rate per clean patch since the last one).
     """
     H: int
     hidden: tuple
@@ -148,6 +155,7 @@ class Game:
     lam_t: float = 0.0
     respond: str = "choose"
     activate_after_audit: bool = False
+    branch_lineage: bool = True
     name: str = ""
 
     def __post_init__(self):
@@ -176,9 +184,11 @@ class Game:
 
 
 def v3_game(ctx: A.EpisodeContext, delta_hat: int, *, respond: str = "choose",
-            targets: tuple | None = None, kernel: dict | None = None) -> Game:
+            targets: tuple | None = None, kernel: dict | None = None,
+            branch_lineage: bool = C.BRANCH_QUARANTINE_REMOVES == "poisoned-lineage") -> Game:
     """The line-3 game of one episode: the cell's depths, prices, detector, rho,
-    delegated set and budget, the world's kernel, Definition 1's lambdas (v2 metrics)."""
+    delegated set and budget, the world's kernel, Definition 1's lambdas (v2 metrics), and
+    the O7 branch accounting (branch_lineage=False reproduces T13's whole-branch game)."""
     unsupported = world_unsupported(ctx.world)
     if unsupported:
         raise ValueError(f"the exact game does not model {unsupported}")
@@ -216,7 +226,7 @@ def v3_game(ctx: A.EpisodeContext, delta_hat: int, *, respond: str = "choose",
                 p_queue=kernel["queue"] * kernel["queue_inherits"],
                 adoption=kernel["adoption"], solve_rate=kernel["solve"],
                 lam_q=M2.LAMBDA_Q, lam_t=M2.LAMBDA_T, respond=respond,
-                activate_after_audit=False, name=f"v3:{C.cell_id(cell)}:H{ctx.H}")
+                activate_after_audit=False, branch_lineage=branch_lineage, name=f"v3:{C.cell_id(cell)}:H{ctx.H}")
 
 
 def coverage_game(H: int, K: int, delta: int, m: int) -> Game:
@@ -482,9 +492,10 @@ def build_tree(game: Game, *, deadline: float | None = None, keep_children: bool
             return np.matmul(Wb, m.lock), loss
 
         def quarantine(Wb, a, lb):
-            """Remove the carrier of target a: FQ, the branch's clean patches, the map."""
+            """Remove the carrier of target a: FQ, the map; with branch_lineage False the
+            branch's clean patches too (O7)."""
             loss = (Wb * m.fq[a]).sum(-1)
-            if a == "commit":
+            if a == "commit" and not game.branch_lineage:
                 n_tasks = (t - lb).astype(float)[None, :]
                 loss = loss + game.lam_t * game.solve_rate * (
                     n_tasks * Wb.sum(-1) - (Wb * m.marked).sum(-1))

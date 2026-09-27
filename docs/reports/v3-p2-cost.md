@@ -87,3 +87,15 @@ Smoke toàn lưới vẫn chưa chạy được. Còn thiếu:
 - B7 (T21);
 - Sentinel-rollout (T19);
 - thế giới stage (T20).
+
+## Rollout headline sau quyết định 27/09
+
+Rollout headline chạy R = 16 trên một mẫu con khai trước: 30 workflow đầu tiên của split eval chính theo thứ tự ghim của T10 (`sequence.workflow_order`). Mẫu con được ghim trong `v3/grid.py` (`HEADLINE_ROLLOUT_WORKFLOWS`, sha256 thứ tự `11239b71e085…`) chỉ bằng id và số đếm. Histogram H của 30 workflow: {6: 4, 7: 4, 8: 3, 9: 1, 10: 3, 11: 6, 12: 2, 13: 4, 14: 3}. `grid.chain_workflows` chỉ áp mẫu con cho khối headline-rollout trên split chính.
+
+| Rollout headline | held-out | BR | Tổng |
+|---|---|---|---|
+| R = 16, cả 96 workflow (trước quyết định) | 183 | 614 | 797 |
+| **R = 16, mẫu con 30 workflow** | **59** | **194** | **253** |
+| R = 64, mẫu con 30 workflow | 237 | 776 | 1.013 |
+
+Đơn vị là CPU-giờ rollout, theo mô hình P0 §2 (`grid.headline_rollout_hours`).
