@@ -1,0 +1,3 @@
+# draft-pdf-sha256: c37643f0971c3457c176c39607e1be6782007c85988c053e4b5ab0aa8be7263a
+id,where,quote,level,c_ref,decision,module,test,phase,result_ref
+D6.thm4,§6.2 p.4 Theorem 4,"To distinguish a poisoned state from a benign one with error ≤ α at the moment of decision, the required audit budget satisfies",L2,C13; H18,B_min(Delta) = K * kappa-bar * n_alpha * floor((H - 1) / Delta) (theory note Thm 5.6); the draft's direction stays in the scorecard (H18),v3/budget.py,tests/v3/test_s9_budget.py::TestS9Budget::test_bmin_matches_theory_note_theorem_5_6,P2,

@@ -1,0 +1,4 @@
+# draft-pdf-sha256: c37643f0971c3457c176c39607e1be6782007c85988c053e4b5ab0aa8be7263a
+id,where,quote,level,c_ref,decision,module,test,phase,result_ref
+D8.scale,§8 p.5 Workflows,"100 multi-step repair workflows over 15 repositories, 6–14 tasks each",L2,C14; Q10; D-v3-1,"eval = config.EVAL_SOURCE_PRIMARY: SWE-rebench-V2 instances created from 01/2024, 20 untouched families, at most 5 workflows each, one pass with H ~ U{6..14}, no instance reused, weighted by workflow; the SWE-bench one-pass split is the secondary analysis; dev = the v2 corpus (100 workflows)",v3/corpus.py,tests/v3/test_s8_corpus.py::TestS8Corpus::test_eval_split_is_one_pass_20_untouched_families_capped_at_5,P2,EVAL_SPLIT_SHA256
+D8.heldout-family,§8 p.5 Held-out attacker policies,Repository families are also held out.,L0,C14,eval families share no family and no instance with dev,v3/corpus.py,tests/v3/test_s8_corpus.py::TestS8Corpus::test_eval_families_disjoint_from_dev,P2,
