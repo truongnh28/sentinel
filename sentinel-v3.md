@@ -12,7 +12,7 @@ v3 là nền của cả bài báo viết lại bám draft lẫn luận văn. Ng�
 - **Mục tiêu 2:** kiểm bằng thí nghiệm các kết quả lý thuyết đã chứng minh hoặc sửa trong ghi chú lý thuyết (`theory/`).
 - **Mục tiêu 3:** đưa đủ ba lớp attacker của draft vào, kể cả 3 LLM attacker.
 - **Mục tiêu 4:** làm lõi tối thiểu trước (mục Lộ trình); phần còn lại xếp sau và khai trước dưới dạng lượt bổ sung có freeze riêng.
-- **Không làm:** tinh chỉnh lại trên 57 workflow eval của v2. Tập này đã bị chạm hai lần (lượt chính và D35).
+- **Không làm:** dùng 57 workflow eval của v2 cho bất kỳ khẳng định xác nhận nào; tập này đã bị chạm hai lần (lượt chính và D35). Chúng vẫn được dùng làm dev cho v3, vì tập eval v3 tách rời hoàn toàn.
 - **Không làm:** dùng số v2 làm kết quả v3. Dữ liệu v2 chỉ còn vai trò tập dev và bằng chứng thiết kế.
 - **Người quyết:** @truong tự chốt C1–C16 ngày 27/09 (mục "Quyết định đã chốt"); không chờ chữ ký của thầy. Bù lại, mọi quyết định được ghi ngày, lý do và hash ở Cổng 0, trước khi viết code P2, và không sửa sau khi thấy số. Mọi điểm C vẫn cài dạng công tắc.
 - **Thời gian:** 3–4 tháng chỉ đủ cho lõi tối thiểu cộng một phần phần sau; toàn bộ phạm vi dài hơn. Chi phí từng khối ghi ở mục Rủi ro.
@@ -86,6 +86,7 @@ Không chờ thầy. Chỗ nào chạy hai phiên bản thì phiên bản chính
 | Seed | 10 (lệch chữ, L2; lý do ở `docs/reports/v3-p0.md` §2) |
 | δ | 10 điểm cho mức giảm tương đối, 0,10 cho harm (theo độ rộng CI dự kiến với 10 seed) |
 | B1 khi ngân sách chặn | Giảm đều độ sâu commit; "dùng hết rồi dừng" là độ nhạy |
+| Độ sâu commit của B1 | Theo cấu hình độ sâu của ô χ (C16): commit ở độ sâu 1 trong cả ba mức, vì χ ≤ 2,11 chỉ đạt được khi commit không ở độ sâu 3. B1 vì vậy kiểm commit ở độ sâu của ô, không phải "maximum depth" (lệch chữ, L2). Khi ngân sách chặn, B1 bỏ commit ở các task cách đều (O6). Dự phóng P0 của mô hình phủ giả định độ sâu 3, nên phải tính lại với commit ở độ sâu 1 trước Cổng 4 |
 | Nhãn LLM | Mức attacker LLM đổi tên M0–M3 (A0–A3 trong tiền đăng ký 20/09) để khỏi trùng thế giới A0 |
 | K\_d chính | 2 (skill, queue uỷ nhiệm, như D20 của v2); trục K\_d ∈ {1, 2, 3} cho H19 |
 | Mặc định kỹ thuật O1–O16 | Theo `docs/plans/v3-p2-plan.md` §1, riêng O3 dùng q = 0,1 như C12 |
@@ -177,8 +178,8 @@ Benchmark giữ đúng lưới của Table 1, trừ ba chỗ không làm đúng 
 
 | Mục | Draft nói | v3 dựng | Mức |
 | --- | --- | --- | --- |
-| Quy mô | 100 workflow / 15 repo, 6–14 task | Theo C14. Chính (đã chốt, một lượt, không dùng lại instance): 26 workflow / 18 họ chưa chạm (pylint 5, requests 5, seaborn 1, flask 1; 14 họ Multilingual mỗi họ 1), Kish 10,24; đã đếm bằng `auditgame/tools/v3_p0_corpus.py`. Ô Δ = 8 chỉ có 18 workflow / 12 họ (Kish 7,36). Phụ: 1.062 instance mới trên 7 họ Python v2 đã eval (101 workflow một lượt) | L2 |
-| Số instance | 4.500 | = số workflow × 5 mức Δ × 3 mức χ × 3 detector; danh nghĩa 26 × 5 × 3 × 3 = 1.170, thực tế 1.098 vì ô Δ = 8 chỉ có 18 workflow; nhân thêm 4 mức ρ | L2 theo C14 |
+| Quy mô | 100 workflow / 15 repo, 6–14 task | Theo C14 (D-v3-1). Chính: SWE-rebench-V2, instance từ 01/2024, 20 họ chưa chạm, tối đa 5 workflow mỗi họ, một lượt, không dùng lại instance: ước tính khoảng 96 workflow, Kish ≈ 20; số chính xác do T2 đếm khi dựng tập. Phụ: 26 workflow / 18 họ từ SWE-bench (một lượt, Kish 10,24) và 1.062 instance mới trên 7 họ Python v2 đã eval | L2 |
+| Số instance | 4.500 | = số workflow × 5 mức Δ × 3 mức χ × 3 detector, trừ các ô Δ = 8 trên workflow có H ≤ 8; nhân thêm 4 mức ρ. Số chính xác do T2 đếm | L2 theo C14 |
 | Δ | {0, 1, 2, 4, 8} | Đúng chữ, cộng cột "attacker chọn Δ" (C10) | L0 |
 | χ | {0; 0,5; 1,34}, "achieved by equalising or differentiating audit depths" | Theo C3 và C16: bằng độ sâu chỉ đạt \[1,04; 3,13\], nên 0 và 0,5 không dựng được; lưới chốt theo phương án thầy ký ở C16, kèm arm "χ chỉ đổi giá" | L2 theo C16 |
 | Thay đổi lành | 620, khớp edit size, embedding shift, recency, provenance shape; AUC ≤ 0,56 | Sinh đúng 620, kiểm đúng 4 đặc trưng. Không đạt thì in "không đạt", không nới mức trần | L0 |
@@ -303,7 +304,7 @@ Endpoint chính giữ đúng §9.4: harm tệ nhất giảm ít nhất 15% so v�
 | Hệ thống | B1–B7 và Sentinel | Thêm cost-greedy allocator (§10.1), stage-weighted ngẫu nhiên hoá (§11) và B1-prov (C1) để kiểm câu của chính draft |
 | Chỉ số | Worst-case verified harm (primary), clean completion, FQ, audit cost CPU-phút, detection delay, exploitability, regret so với B7 | Đủ bảy |
 | Seed | 3 | **10** (như v2, D24). Với 3 seed, CI của mức giảm trên tập C14 rộng 38–46 điểm ở ρ ≤ 0,5 và cổng 15% chỉ đạt 6–46% số lần dù hiệu ứng lớn như v2; 10 seed cho 20–33 điểm và 31–98% (`docs/reports/v3-p0.md` §2). Lệch chữ, L2 |
-| Khoảng tin cậy | Cluster bootstrap theo họ repo | Wild cluster bootstrap (Cameron–Gelbach–Miller, có trong reading list) vì chỉ có 18 cluster (họ), Kish 10,24 |
+| Khoảng tin cậy | Cluster bootstrap theo họ repo | Wild cluster bootstrap (Cameron–Gelbach–Miller, có trong reading list) vì chỉ có khoảng 20 cluster (họ) |
 | So sánh phụ | Benjamini–Hochberg (reading list) | BH, q = 0,05 |
 | Cách in | Trên lưới (Δ, χ), không gộp | Đúng chữ; Table 2, Table 3, Figure 3 in đúng hàng cột như draft, cột dự phóng cạnh cột đo |
 | Freeze | Hash policy và thư viện attacker; harness từ chối policy không có trong manifest | Đúng chữ |
@@ -322,7 +323,7 @@ Bốn câu hỏi nghiên cứu giữ nguyên chữ của draft:
 - **Độ nhạy:** mọi công tắc khác (A7, kiểm theo giai đoạn, tổn hại gỡ được, ingress ẩn, drift dai dẳng, gieo 2 carrier) đổi một yếu tố mỗi lần so với cấu hình chính.
 - **Mỗi H chấm ở cấu hình chính**, trừ: H7 trên 240 game nhỏ; H11 ở lớp LLM; H18 trên lưới ngân sách; H19 trên trục K\_d; H20 ở cột "attacker chọn Δ".
 - **H8:** phán quyết lấy từ thế giới insertion audit thấy ingress; ở thế giới kia H8 đúng theo cấu tạo, nên chỉ in.
-- **Xu hướng theo Δ** (H3, H5, H18) tính trên tập con chứa được mọi Δ (26 workflow / 12 họ, C14), hoặc khai khác.
+- **Xu hướng theo Δ** (H3, H5, H18) tính trên tập con các workflow có H ≥ 9 (chứa được mọi Δ; T2 đếm), hoặc khai khác.
 
 ## Bảng điểm dự đoán
 
@@ -390,7 +391,7 @@ flowchart TB
   P2["P2 · Sim v3 theo chữ · 3–4 tuần<br/>sleeper, lan nhiều carrier, gỡ cả carrier; 4 thế giới C1 × C2;<br/>trục ρ ∈ {0; 0,25; 0,5; 1} ở mọi thế giới; Sentinel đúng Algorithm 1"]
   P3["P3 · Thành phần thật, song song · 4–6 tuần<br/>4 kiểm tra thật + CPU-phút; detector học; 620 thay đổi lành;<br/>payload đã công bố; 3 LLM attacker; hiệu chuẩn agent"]
   G2{{"Cổng 2–3: 100% ma trận có test xanh; test Figure 1 xanh; cổng AUC in đạt hoặc không đạt"}}
-  P4["P4 · Tập eval mới và freeze · 1 tuần<br/>Tập theo C14 (26 workflow / 18 họ); tinh chỉnh trên dev theo L; freeze manifest"]
+  P4["P4 · Tập eval mới và freeze · 1 tuần<br/>Tập theo C14 (SWE-rebench-V2, ~96 workflow / 20 họ); tinh chỉnh trên dev theo L; freeze manifest"]
   G4{{"Cổng 4: manifest và luật bảng điểm đã hash trước lượt chạy"}}
   P5["P5 · Một lượt eval duy nhất · 1 tuần<br/>Đối chứng đọc trước; điền Table 2, Table 3, Figure 3 như draft; bảng điểm; phán quyết §3.5"]
   G5{{"Cổng 5: mọi số có con trỏ tái lập"}}
@@ -433,14 +434,14 @@ Rủi ro lớn nhất không phải số xấu mà là số xấu bị đọc sa
 | --- | --- | --- |
 | Sentinel đúng draft vẫn bằng B1 khi attacker chọn Δ | v2: arm "−regime estimate" bằng B1 ở mọi ρ; ghi chú lý thuyết: Mệnh đề 6.3(a) | Chỉ là cột phụ (C10); endpoint chính là ô Δ cố định. Nếu đúng thì in như kết quả đã dự đoán (H20) |
 | Bộ ước lượng Δ không hơn tiên nghiệm | Belief trong một workflow không mang thông tin trước σ; lịch sử khoảng cách truy xuất của repo giống nhau ở cả 5 ô Δ nên Δ̂ là hằng, và 14/18 họ không có lịch sử repo. Mô hình phủ: Δ̂ = 1 ở mọi ô thì mức giảm dừng ở 9–30% và Sentinel tệ hơn B1 3–18% tại Δ = 0 | Post-mortem các workflow trước trong cùng ô (C12); in đường học theo số sự cố đã thấy và arm oracle làm cận trên |
-| Tập eval mới nhỏ | 26 workflow / 18 họ, Kish 10,24; 14 họ chỉ có 1 workflow; ô Δ = 8 chỉ còn 18 workflow / 12 họ | δ chốt ở P0 từ phân tích độ chính xác; luật P mới trả "không kết luận" khi CI rộng; phương án (b) của C14 làm phân tích phụ cỡ lớn hơn |
+| Tập eval mới | SWE-rebench-V2: ~96 workflow / 20 họ (D-v3-1); nguy cơ nhiễm dữ liệu khi chạy agent thật; phân tích độ chính xác P0 làm trên tập SWE-bench nhỏ | Tính lại độ chính xác trên tập V2 khi T2 dựng xong, trước Cổng 4; luật P trả "không kết luận" khi CI rộng |
 | Agent thật không làm theo lời khuyên độc | Pilot: 0/7 | Đưa lượt hiệu chuẩn lên trước P5; nếu vẫn gần 0 thì in là kết quả |
 | Payload không qua cổng AUC 0,56 | v2: cổng hợp lệ đỏ, 203/205 test đạt | Payload theo mô hình ε ba chiều; không đạt thì mọi số harm mang nhãn |
 | Thư viện belief vẫn bị khoá | v2: 12/12 member belief-threshold khoá | Kiểm Prop. 6.1 của paper v2 là cổng trước tinh chỉnh |
 | Tập eval bị nhiễm | v2: D30, D35 | Dựng và hash tập mới trước mọi tinh chỉnh; không để trợ lý AI tự thiết kế lần chạm thứ hai |
 | Chứng minh có lỗ hổng | Ghi chú đã qua một vòng soát bằng agent (4 lỗi, đã sửa) | Người kiểm độc lập là con người; phần sai in thành phản ví dụ |
 | Model LLM từ chối | Pilot có trường refusals | In tỉ lệ từ chối; luật thay model khai trước |
-| Khối lượng tính toán vượt dự kiến | Dòng 5 chạy rollout mỗi task; giải chính xác belief MDP với H ≤ 10 có thể không tính nổi; 4 thế giới nhân khối lượng lên 4; trục ρ nhân thêm 4 | Lõi tối thiểu chỉ chạy một thế giới provenance (A0) nhưng giữ đủ 4 mức ρ; dòng 5 chạy rollout, bảng tính trước là phương án dự phòng L1 đã khai, kèm đo sai số; đo thời gian chạy trên dev trước khi chốt lưới |
+| Khối lượng tính toán vượt dự kiến | Rollout mỗi task không tính nổi (đã chuyển sang bảng tính trước); giải chính xác belief MDP với H ≤ 10 có thể không tính nổi; 4 thế giới nhân khối lượng lên 4; trục ρ nhân thêm 4 | Lõi tối thiểu chỉ chạy một thế giới provenance (A0) nhưng giữ đủ 4 mức ρ; dòng 5 chạy rollout, bảng tính trước là phương án dự phòng L1 đã khai, kèm đo sai số; đo thời gian chạy trên dev trước khi chốt lưới |
 | Trễ tiến độ | — | Lõi tối thiểu trước; P3 song song P2; LLM attacker chỉ chạy ở ô headline |
 
 ## Tài liệu gốc
