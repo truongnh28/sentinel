@@ -452,9 +452,15 @@ def main(argv=None, run_chain=None) -> int:
     ap.add_argument("--stub-parts", action="store_true",
                     help="DEV SMOKE ONLY: the Sentinel class on sentinel.stub_parts() (the "
                          "StubTable, placeholder tau / eta_Q); no number is a result")
+    ap.add_argument("--headline", action="store_true",
+                    help="dev only: keep only headline cells (chi = CHI_PRIMARY, dprime = "
+                         "DPRIME_PRIMARY); matches a headline-scoped line-5 table. A strict "
+                         "subset of the chains -- no number changes, only which cells run.")
     a = ap.parse_args(argv)
     if a.split == "eval" and a.workflows:
         ap.error("--workflows cuts dev only: an eval run is the whole pinned split")
+    if a.split == "eval" and a.headline:
+        ap.error("--headline cuts dev only: an eval run is the whole pinned split")
     if a.split == "eval" and a.stub_parts:
         ap.error("--stub-parts is a dev smoke only: an eval run reads the frozen parts")
 
@@ -482,6 +488,11 @@ def main(argv=None, run_chain=None) -> int:
 
     chains = G.chains(a.blocks, seeds=C.SEEDS[: a.seeds], systems=a.systems,
                       core_only=a.blocks is None)
+    if a.headline:
+        chains = [ch for ch in chains if ch.unit.cell.chi == C.CHI_PRIMARY
+                  and ch.unit.cell.dprime == C.DPRIME_PRIMARY]
+        print(f"--headline: {len(chains)} chains at cells chi={C.CHI_PRIMARY} "
+              f"dprime={C.DPRIME_PRIMARY}", flush=True)
     for name in sorted({ch.unit.system for ch in chains}):
         F.require_frozen(name)
     try:
