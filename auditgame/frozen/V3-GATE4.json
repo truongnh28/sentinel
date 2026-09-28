@@ -1,0 +1,10 @@
+{
+  "eval_split_sha256": "e34e747c36f1581941b7fad46c82a3f64475bb73522a4eb95cf6458c7e820fa0",
+  "secondary_split_sha256": "ed4e3dcb55e757b73d81bf8b7005e88f1f56685c396c745acd6dc0cfb71f5123",
+  "v3_manifest": "9c4c0d018b1869941e35e5fe1ebe54bfa3f872b7d4adfb4194c66a2ef5c0eeb6",
+  "scorecard_rules": "21b8c093254abbff09876db07b5b5eca19034b71457434a56f270dea171c840c",
+  "line5_table": "sha256:83ecff91b36983809f148aa0057f7a3d06f05ac689826c8f63f7566d83ebf368",
+  "signed_by": "Truong Nguyen",
+  "date": "2026-09-29"
+}
+
