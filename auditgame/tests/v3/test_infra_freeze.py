@@ -300,13 +300,24 @@ class TestInfraFreeze(_Tmp):
             R.validate_record(ok, bad, "eval")
 
     def test_run_stops_before_simulating_a_system_whose_task_has_not_landed(self):
-        """B7 (T21) has no factory yet, and Sentinel's class (T15) has no frozen parts yet
-        (T14's line-5 table, T18's tuned tau / eta_Q: sentinel.check_ready): a run naming
-        them exits 3 and simulates nothing, after the freeze checks."""
+        """A run naming a system whose task has not landed exits 3 and simulates nothing,
+        after the freeze checks: B7 (T21) has no factory, and the Sentinel class (T15)
+        needs T14's line-5 table and T18's tuned tau / eta_Q (sentinel.check_ready).
+
+        The not-landed state is FORCED here (an empty sentinel.Parts) instead of being
+        inferred from build artefacts happening to be absent.  From P4 on, the table
+        (spikes/v3-table/) and the tuned files (reference/) DO exist in a working copy, so
+        the ambient condition no longer holds -- but the guard this test covers must still
+        fire, and that is what is asserted."""
+        from v3 import sentinel as S
+        self.assertEqual(S.check_ready(["Sentinel"], S.Parts()),
+                         ["line-5 table (T14)",
+                          f"tuned tau / eta_Q ({S.TUNED_PATH.name}, T18)"])
         calls = []
-        rc = R.main(["--split", "dev", "--blocks", "attacker-delta", "--seeds", "1",
-                     "--workflows", "1", "--jobs", "1", "--out", str(self.dir / "o")],
-                    run_chain=_stub_run_chain(calls))
+        with mock.patch.object(S, "default_parts", return_value=S.Parts()):
+            rc = R.main(["--split", "dev", "--blocks", "attacker-delta", "--seeds", "1",
+                         "--workflows", "1", "--jobs", "1", "--out", str(self.dir / "o")],
+                        run_chain=_stub_run_chain(calls))
         self.assertEqual(rc, R.EXIT_NO_RUNNER)
         self.assertEqual(calls, [])
 
