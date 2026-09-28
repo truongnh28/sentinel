@@ -459,8 +459,16 @@ def main(argv=None, run_chain=None) -> int:
     a = ap.parse_args(argv)
     if a.split == "eval" and a.workflows:
         ap.error("--workflows cuts dev only: an eval run is the whole pinned split")
+    # D-v3-7 (docs/preregistration/TIEN-DANG-KY-pham-vi-eval-headline.md, registered before
+    # the Gate-4 file existed): the eval is run in TWO declared passes -- pass 1 the headline
+    # cells (chi = CHI_PRIMARY, dprime = DPRIME_PRIMARY, every rho and Delta), pass 2 the rest
+    # of the grid once the full line-5 table is built.  --headline selects pass 1; its scope
+    # goes into run_meta, so the unseal log records which pass this was.
     if a.split == "eval" and a.headline:
-        ap.error("--headline cuts dev only: an eval run is the whole pinned split")
+        print("D-v3-7: eval pass 1, headline cells only "
+              f"(chi = {C.CHI_PRIMARY}, dprime = {C.DPRIME_PRIMARY}); pass 2 (the remaining "
+              "cells) is registered in docs/preregistration/"
+              "TIEN-DANG-KY-pham-vi-eval-headline.md", flush=True)
     if a.split == "eval" and a.stub_parts:
         ap.error("--stub-parts is a dev smoke only: an eval run reads the frozen parts")
 
@@ -473,7 +481,9 @@ def main(argv=None, run_chain=None) -> int:
         return 0
 
     run_meta = {"split": a.split, "tool": "tools/v3_run.py", "blocks": a.blocks,
-                "systems": a.systems, "seeds": a.seeds}
+                "systems": a.systems, "seeds": a.seeds,
+                # D-v3-7: which declared eval pass this is (True = pass 1, headline cells).
+                "headline": bool(a.headline)}
     if a.stub_parts:
         run_meta["parts"] = "stub"
         print("DEV SMOKE ONLY: Sentinel on stub parts (StubTable, placeholder tau / eta_Q) "
