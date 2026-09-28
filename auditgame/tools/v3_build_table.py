@@ -65,8 +65,10 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import hashlib
 import json
 import math
+import os
 import pathlib
 import random
 import sys
@@ -312,13 +314,19 @@ def source_job(job: tuple) -> dict:
             "cpu": time.process_time() - c0, "wall": time.perf_counter() - w0}
 
 
-def run_pool(fn, jobs: list, n_jobs: int, settings: dict, progress, label: str) -> list:
+def run_pool(fn, jobs: list, n_jobs: int, settings: dict, progress, label: str,
+             on_result=None) -> list:
+    """on_result(job, result), when given, is called in the MAIN process as each job's
+    result is collected (round-robin over as_completed for n_jobs > 1) -- the hook the
+    phase-C checkpoint uses to persist a value-job the instant its future is in hand."""
     out = [None] * len(jobs)
     t0 = time.perf_counter()
     if n_jobs <= 1:
         _init_worker(settings)
         for i, j in enumerate(jobs):
             out[i] = fn(j)
+            if on_result is not None:
+                on_result(j, out[i])
             _progress(progress, label, i + 1, len(jobs), t0)
         return out
     with ProcessPoolExecutor(n_jobs, initializer=_init_worker, initargs=(settings,)) as ex:
@@ -327,6 +335,8 @@ def run_pool(fn, jobs: list, n_jobs: int, settings: dict, progress, label: str) 
         from concurrent.futures import as_completed
         for f in as_completed(futs):
             out[futs[f]] = f.result()
+            if on_result is not None:
+                on_result(jobs[futs[f]], out[futs[f]])
             done += 1
             _progress(progress, label, done, len(jobs), t0)
     return out
@@ -478,6 +488,152 @@ def value_job(job: tuple) -> dict:
 
 
 # ---------------------------------------------------------------------------------------
+# Phase-C checkpoint / resume (line5-table-resume, 28/09/2026)
+# ---------------------------------------------------------------------------------------
+#
+# The value phase (C) is the expensive one (~115 CPU-h): each value-job computes L-hat for
+# ONE key by keyed CRN draws.  A value-job is keyed on its (table cell, Delta-hat, h, bin),
+# so its result is a pure function of the config -- the same key recomputes to the same
+# bytes.  We persist each value-job's result the instant its future is collected (crash-safe
+# append: one JSON object per line, flush + os.fsync), so a machine shutdown loses at most
+# the jobs still in flight.  --resume then reloads the completed jobs and submits only the
+# rest.  Phases A+B are cheap and re-run normally (deterministic -> identical keys), so a
+# resumed build assembles byte-identically to a single-shot build (test_table_build_is_
+# deterministic): a loaded result equals its recomputed result, and final assembly is
+# order-independent (it matches each value by (table cell, key), not by position).
+
+#: The checkpoint format / build-code version.  Part of the header config digest, so a code
+#: change that could alter a value-job's result should bump this to refuse a stale resume.
+CKPT_VERSION = "v3-line5-ckpt-1"
+
+
+def checkpoint_path(out) -> pathlib.Path:
+    """The checkpoint beside the build's .npz output (both under spikes/v3-table/, gitignored)."""
+    out = pathlib.Path(out)
+    return out.with_name(out.stem + ".ckpt.jsonl")
+
+
+def value_job_id(tc: dict, dh, h, b) -> str:
+    """A stable, canonical id for the value-job of one key: table cell x Delta-hat x h x bin.
+    Keys are unique per build, and re-running phases A+B on the same config yields the same
+    keys, so this id is stable across a resume."""
+    return f"{tc_id(tc)}|{int(dh)}|{int(h)}|{int(b)}"
+
+
+def value_job_id_of_job(job: tuple) -> str:
+    tc, dh, h, b, _states = job
+    return value_job_id(tc, dh, h, b)
+
+
+def value_job_id_of_result(v: dict) -> str:
+    dh, h, b = v["key"]
+    return value_job_id(v["tc"], dh, h, b)
+
+
+def config_fingerprint(*, tcs, deltas, settings: dict) -> dict:
+    """The build inputs a checkpoint's value-jobs depend on.  A resume onto a DIFFERENT
+    fingerprint is refused, never silently mixed."""
+    return {"code_version": CKPT_VERSION,
+            "schema": T.SCHEMA_VERSION,
+            # the tuned file's log_sha256 (or the pilot placeholder) travels in line8_source.
+            "line8_source": settings["line8_source"],
+            "base_r": int(settings["r"]),
+            "r_max": int(settings["r_max"]),
+            "diff_se_max": float(settings["diff_se_max"]),
+            "rhos": sorted(float(tc["rho"]) for tc in tcs),
+            "chis": sorted(str(tc["chi"]) for tc in tcs),
+            "dprimes": sorted(float(tc["dprime"]) for tc in tcs),
+            "deltas": [int(d) for d in deltas],
+            "members": list(settings["members"]),
+            "classes": list(settings["classes"]),
+            "s_max": int(settings["s_max"]),
+            "source_seeds": [int(s) for s in settings["source_seeds"]]}
+
+
+def config_digest(fingerprint: dict) -> str:
+    return "sha256:" + hashlib.sha256(
+        C.canonical_json(fingerprint).encode("ascii")).hexdigest()
+
+
+def _ckpt_result_to_json(v: dict) -> dict:
+    """A value-job result -> plain JSON.  L / se are stored as float lists; float64 round-
+    trips exactly through JSON (repr), and the exact float64 casts back to the SAME float32
+    the table stores -- so a loaded result is byte-identical to its recomputation."""
+    return {"tc": v["tc"], "key": [int(x) for x in v["key"]],
+            "L": np.asarray(v["L"], float).tolist(),
+            "se": np.asarray(v["se"], float).tolist(),
+            "n": int(v["n"]), "states": int(v["states"]),
+            "se_flag": bool(v["se_flag"]),
+            "diff_se": float(v["diff_se"]), "diff_gap": float(v["diff_gap"]),
+            "diff_flag": bool(v["diff_flag"]),
+            "diff_pair": [int(x) for x in v["diff_pair"]],
+            "rollouts": int(v["rollouts"]), "cpu": float(v["cpu"]), "wall": float(v["wall"])}
+
+
+def _ckpt_result_from_json(d: dict) -> dict:
+    return {"tc": d["tc"], "key": tuple(int(x) for x in d["key"]),
+            "L": np.asarray(d["L"], float), "se": np.asarray(d["se"], float),
+            "n": int(d["n"]), "states": int(d["states"]),
+            "se_flag": bool(d["se_flag"]),
+            "diff_se": float(d["diff_se"]), "diff_gap": float(d["diff_gap"]),
+            "diff_flag": bool(d["diff_flag"]),
+            "diff_pair": tuple(int(x) for x in d["diff_pair"]),
+            "rollouts": int(d["rollouts"]), "cpu": float(d["cpu"]), "wall": float(d["wall"])}
+
+
+def load_checkpoint(path, digest: str) -> dict | None:
+    """The completed value-jobs {job_id: result} of a MATCHING checkpoint, or None if the
+    file is absent/empty.  A present checkpoint whose header config digest differs from
+    `digest` is REFUSED (ValueError) -- never silently mixed with a different config."""
+    path = pathlib.Path(path)
+    if not path.exists():
+        return None
+    lines = [ln for ln in path.read_text().splitlines() if ln.strip()]
+    if not lines:
+        return None
+    head = json.loads(lines[0]).get("header")
+    if not head or "config_digest" not in head:
+        raise ValueError(f"{path}: not a line-5 checkpoint (no header). Delete it or run fresh.")
+    if head["config_digest"] != digest:
+        raise ValueError(
+            f"{path}: checkpoint config {head['config_digest']} does not match this run's "
+            f"config {digest} (tuned/base_r/diff_se_max/grid/version differ). Delete the stale "
+            f"checkpoint or run without --resume.")
+    out = {}
+    for ln in lines[1:]:
+        rec = json.loads(ln)
+        out[rec["job_id"]] = _ckpt_result_from_json(rec["result"])
+    return out
+
+
+class CheckpointWriter:
+    """Crash-safe append log of phase-C value-jobs (one JSON object per line, flush+fsync).
+    A fresh writer truncates the file and (re)writes the header; an append writer keeps a
+    matching checkpoint's completed lines and adds to them."""
+
+    def __init__(self, path, digest: str, fingerprint: dict, append: bool):
+        self.path = pathlib.Path(path)
+        self.digest = digest
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._fh = open(self.path, "a" if append else "w")
+        if not append:
+            self._writeline({"header": {"config_digest": digest, "config": fingerprint}})
+
+    def _writeline(self, obj: dict) -> None:
+        self._fh.write(json.dumps(obj, default=_json_default) + "\n")
+        self._fh.flush()
+        os.fsync(self._fh.fileno())
+
+    def append(self, job_id: str, result: dict) -> None:
+        self._writeline({"job_id": job_id, "result": _ckpt_result_to_json(result)})
+
+    def close(self) -> None:
+        if self._fh is not None:
+            self._fh.close()
+            self._fh = None
+
+
+# ---------------------------------------------------------------------------------------
 # The build
 # ---------------------------------------------------------------------------------------
 
@@ -533,8 +689,16 @@ def sources(tcs, deltas, workflows, settings, jobs: int, progress=say) -> dict:
 
 
 def build(*, tcs, deltas, workflows=None, settings: dict, jobs: int = 1, split: str = DEV,
-          progress=say) -> tuple:
-    """Phases A-C.  Returns (Line5Table, report dict)."""
+          progress=say, out=None, resume: bool = False, checkpoint=None) -> tuple:
+    """Phases A-C.  Returns (Line5Table, report dict).
+
+    Phase C is checkpointed (line5-table-resume) when a checkpoint path is known -- either
+    `checkpoint` explicitly, or derived from `out`.  Each value-job's result is appended
+    crash-safely as it is collected.  `resume=True` reloads a MATCHING checkpoint's completed
+    value-jobs and recomputes only the rest; a mismatched checkpoint is refused (ValueError).
+    A fresh (non-resume) build truncates and rewrites the checkpoint header first, so a crash
+    is always recoverable.  With neither `out` nor `checkpoint` (the low-level test path), no
+    checkpoint is written and behaviour is exactly as before."""
     require_dev(split)
     workflows = dev_workflows() if workflows is None else list(workflows)
     check_dev(workflows)
@@ -546,8 +710,28 @@ def build(*, tcs, deltas, workflows=None, settings: dict, jobs: int = 1, split: 
     vjobs = [(s["tc"], dh, h, b, sts) for cid, s in sorted(src.items())
              for (dh, h, b), sts in sorted(s["keys"].items())]
     vjobs.sort(key=lambda j: (-j[2], j[1], j[3], tc_id(j[0])))    # long rollouts first
+    # ---- phase-C checkpoint / resume (line5-table-resume, 28/09/2026) -------------------
+    ckpt = checkpoint if checkpoint is not None else (
+        checkpoint_path(out) if out is not None else None)
+    loaded: dict = {}
+    writer = None
+    if ckpt is not None:
+        fp = config_fingerprint(tcs=tcs, deltas=deltas, settings=settings)
+        dg = config_digest(fp)
+        append = bool(resume and pathlib.Path(ckpt).exists())
+        if append:
+            loaded = load_checkpoint(ckpt, dg) or {}          # refuses a config mismatch
+        writer = CheckpointWriter(ckpt, dg, fp, append=append)
+    todo = [j for j in vjobs if value_job_id_of_job(j) not in loaded]
+    if progress and loaded:
+        progress(f"  values: resuming, {len(loaded)} done, {len(todo)} to compute")
     t1 = time.perf_counter()
-    vals = run_pool(value_job, vjobs, jobs, settings, progress, "values")
+    on_result = ((lambda job, res: writer.append(value_job_id_of_job(job), res))
+                 if writer is not None else None)
+    fresh = run_pool(value_job, todo, jobs, settings, progress, "values", on_result)
+    if writer is not None:
+        writer.close()
+    vals = list(loaded.values()) + fresh          # assembly matches by (cell, key), not order
     t_val = time.perf_counter() - t1
     members, classes = settings["members"], settings["classes"]
     cells, meta_cells = {}, {}
@@ -758,6 +942,13 @@ def make_parser() -> argparse.ArgumentParser:
                          "keyed draws at the SAME diff-SE gate (0.15): same precision, ~half "
                          "the draw budget. Draw budget only -- the Sentinel policy is unchanged")
     ap.add_argument("--out", type=pathlib.Path, default=None)
+    ap.add_argument("--resume", action="store_true",
+                    help="line5-table-resume (28/09/2026): resume phase C from the checkpoint "
+                         "beside --out (spikes/v3-table/*.ckpt.jsonl) -- reload the value-jobs "
+                         "already done and recompute only the rest. Refuses a checkpoint whose "
+                         "config (tuned/base_r/diff_se_max/grid/version) differs. Without it, "
+                         "a fresh build still writes the checkpoint as it goes (always "
+                         "recoverable), overwriting any stale one")
     ap.add_argument("--report", type=pathlib.Path, default=None)
     ap.add_argument("--fidelity", type=int, default=0, metavar="N",
                     help="no build: table vs rollout on N fresh dev states of the built table")
@@ -825,7 +1016,8 @@ def main(argv=None) -> int:
               f"{len(tcs) * len(a.deltas) * T.H_MAX * T.N_BINS}")
         return 0
     t0 = time.perf_counter()
-    table, rep = build(tcs=tcs, deltas=a.deltas, settings=settings, jobs=a.jobs)
+    table, rep = build(tcs=tcs, deltas=a.deltas, settings=settings, jobs=a.jobs,
+                       out=out, resume=a.resume)
     digest = table.save(out)
     rep.update(digest=digest, path=str(out), wall_total_s=time.perf_counter() - t0,
                summary=table.summary())

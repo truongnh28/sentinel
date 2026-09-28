@@ -7,6 +7,7 @@ members, 2 attacker classes, R = 2): they check the plumbing, not a table value.
 auditgame/.
 """
 import inspect
+import json
 import pathlib
 import random
 import tempfile
@@ -264,6 +265,67 @@ class TestAlg1Line5Table(unittest.TestCase):
         self.assertEqual(v16a["L"].tolist(), B._stats(d16, TINY_MEMBERS, TINY_CLASSES)[0].tolist())
         # the base R also travels in the table meta (build writes settings["r"]/["r_max"])
         self.assertEqual((m["r"], m["r_max"]), (2, 2))        # this tiny build's declared R
+        # ---- line5-table-resume (28/09/2026): a build completed via checkpoint + resume is
+        #      a function of dev and the declared settings just as a single-shot build is, so
+        #      it produces the byte-identical content digest; because every value-job is keyed
+        #      (CRN), resume recomputes ONLY the jobs a crash left unfinished, and a checkpoint
+        #      whose config differs is refused, never silently mixed. --------------------------
+
+        def rbuild(resume=False, checkpoint=None, diff_se_max=None):
+            kw = dict(rhos=[0.25], pilot=True, members=TINY_MEMBERS, classes=TINY_CLASSES,
+                      r=2, r_max=2, rollout_fn=_loss_low)      # stubbed rollouts: tiny, keyed
+            if diff_se_max is not None:
+                kw["diff_se_max"] = diff_se_max
+            return B.build(tcs=[B.table_cell(0.25)], deltas=[4],
+                           workflows=B.dev_workflows()[:2], settings=B.settings_of(**kw),
+                           jobs=1, progress=None, resume=resume, checkpoint=checkpoint)
+
+        with tempfile.TemporaryDirectory() as d:
+            d = pathlib.Path(d)
+            # (a) single-shot build -> digest D1; its checkpoint records every value-job
+            c1 = d / "one.ckpt.jsonl"
+            t_single, _ = rbuild(checkpoint=c1)
+            d1 = t_single.digest()
+            lines = c1.read_text().splitlines()
+            self.assertIn("header", json.loads(lines[0]))            # first line = config header
+            job_ids = [json.loads(x)["job_id"] for x in lines[1:]]
+            self.assertGreaterEqual(len(job_ids), 2)
+            self.assertEqual(len(set(job_ids)), len(job_ids))        # ids are unique per job
+            # (b) simulate a crash after k value-jobs: header + first k results only, then
+            #     resume to completion -> digest D2, and a spy proves only the missing jobs run
+            k = len(job_ids) // 2
+            c2 = d / "two.ckpt.jsonl"
+            c2.write_text("\n".join(lines[:1 + k]) + "\n")
+            recomputed = []
+            orig = B.value_job
+            B.value_job = lambda job: (recomputed.append(B.value_job_id_of_job(job))
+                                       or orig(job))
+            try:
+                t_resume, _ = rbuild(resume=True, checkpoint=c2)
+            finally:
+                B.value_job = orig
+            self.assertEqual(t_resume.digest(), d1)                  # D1 == D2, byte-identical
+            self.assertEqual(set(recomputed), set(job_ids[k:]))      # only the missing jobs
+            self.assertEqual(len(recomputed), len(job_ids) - k)      # each once, none re-done
+            self.assertTrue(set(recomputed).isdisjoint(job_ids[:k]))  # loaded jobs never re-run
+            # the resumed checkpoint now holds every value-job (recoverable again)
+            self.assertEqual({json.loads(x)["job_id"] for x in c2.read_text().splitlines()[1:]},
+                             set(job_ids))
+            # (c) the config-digest guard refuses a mismatched checkpoint, never silently mixes
+            bad = c1.read_text().splitlines()
+            hdr = json.loads(bad[0])
+            hdr["header"]["config_digest"] = "sha256:" + "0" * 64
+            c3 = d / "bad.ckpt.jsonl"
+            c3.write_text(json.dumps(hdr) + "\n" + "\n".join(bad[1:]) + "\n")
+            with self.assertRaisesRegex(ValueError, "does not match"):
+                rbuild(resume=True, checkpoint=c3)
+            # a run whose config differs from a VALID checkpoint's header is refused too
+            with self.assertRaisesRegex(ValueError, "does not match"):
+                rbuild(resume=True, checkpoint=c1, diff_se_max=0.99)
+            # load_checkpoint round-trips a result to the SAME value the table stores (float32)
+            loaded = B.load_checkpoint(c1, json.loads(c1.read_text().splitlines()[0])
+                                       ["header"]["config_digest"])
+            self.assertEqual(set(loaded), set(job_ids))
 
     def test_empty_bins_fall_back_with_a_reason(self):
         """DA1.l5 -- "at ← arg minπ ∈Π maxπA ∈ΠA b L(π, πA | bt , Bt ) ⊲ robust over a
