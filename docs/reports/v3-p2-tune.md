@@ -51,3 +51,37 @@ Lượt kiểm chứng đầu-cuối: 2 workflow dev, 1 seed, ρ ∈ {0; 0,25}, 
 - `../.venv/bin/python tests/run_v3.py`: **mọi cổng xanh** (Gate 0 3/3, Gate 1 66/66, Gate 2 155/155; 0 hàng P2 pending).
 - `../.venv/bin/python tools/v3_dcm.py --check`: **0 vấn đề**.
 - `tests/v3/test_s5_tuning.py`: 4/4 xanh (chưa đổi test; wiring thật là hoàn thiện hành vi đã khai, không đổi hành vi đã khai, nên không sửa hàng DCM T18).
+
+## Lượt đầy đủ — bản cắt an toàn (28/09/2026)
+
+**Quyết định giảm compute (người dùng chốt): "cắt an toàn, không đổi Sentinel".** Lượt đầy đủ đầu chạy `--real --jobs 8` trên 100 workflow + cả `--nominal-only` (~104 + ~35 CPU-giờ, ~17 giờ thực) bị hủy giữa chừng. Thay bằng bản cắt:
+
+- **Subsample tuning 100 → 40 workflow** (`--n-workflows 40`). Lý do: tinh chỉnh là **argmax trên lưới nhỏ** — cần đủ dữ liệu để *xếp hạng* (τ, η_Q, τ5, sw), không phải để ước lượng giá trị tuyệt đối. Không đổi bản Sentinel đang đo (vẫn 2048 particle, đủ 3 kernel, đủ lưới).
+- **Hoãn `--nominal-only`** (ablation −transition) sang sau lõi.
+- Kết quả: `--jobs 8`, xong trong **~2,5 giờ** (9.154,7 s), 10.483.200 line-8 episode ở 6,96 ms/episode (~50 CPU-giờ). `reference/v3_tuned.json` + `reference/v3_tuned.log.jsonl`, `log_sha256` `36550dae6ba0a2e7e6da023026ed1e4b7d1150ed0093259986cb8f704e8f936e`; `check_tuned` chấp nhận; git_head `300cd7e`.
+
+### Giá trị tinh chỉnh (thật)
+
+| ρ | τ5 | sw_weights | τ | η_Q | worst-case L (minimax) |
+|---|---|---|---|---|---|
+| 0 | 0,0 | nomemory | 0,9 | 0,0 | 0,5703 |
+| 0,25 | 0,0 | nomemory | 0,9 | 0,0 | 0,5703 |
+| 0,5 | 0,0 | nomemory | 0,7 | 0,0 | 0,5400 |
+| 1 | 0,0 | nomemory | 0,7 | 0,0 | 0,4901 |
+
+### Kiểm ổn định lựa chọn (biên so với á quân, đọc từ log)
+
+Vì subsample chỉ đe dọa các lựa chọn có **biên hẹp**, đo biên giữa quán quân và á quân theo từng knob:
+
+| Knob | Quán quân | Biên tới á quân | Đánh giá |
+|---|---|---|---|
+| sw_weights | nomemory | **0,49–0,53** | rất vững |
+| τ5 | 0,0 | **0,03–0,18** | vững |
+| τ (dòng 8) | 0,9 / 0,7 | **0,006–0,017** | gần phẳng |
+| η_Q | (bất kỳ) | **0,0** | không định danh |
+
+- **sw_weights và τ5**: biên lớn → subsample 40 không đe dọa; chọn giống lượt đầy đủ gần như chắc chắn.
+- **τ**: nằm trong **lòng chảo gần phẳng** — các τ đầu bảng cách nhau ≤ 0,017 trong hàm mục tiêu. τ chính xác **định danh yếu**, nhưng chính vì phẳng nên **loss đạt được ít nhạy với τ**: dù lượt 100-workflow chọn τ khác, chênh loss bị chặn bởi biên (< 0,017). Ta cam kết một τ (0,9 cho ρ ≤ 0,25; 0,7 cho ρ ≥ 0,5) **trước** eval, đúng thủ tục.
+- **η_Q hoàn toàn trơ**: L **giống hệt** trên toàn lưới η_Q (0,0 → 0,5) ở mọi ρ (biên 0,0000). Ở τ cao đã chọn, `expected_harm` luôn vượt mọi η_Q trong lưới khi cổng xác suất `p_poisoned > τ` kích, nên cổng hại của dòng 8 **thừa** tại điểm vận hành. Đây là **phát hiện thật** (không phải lỗi): với τ đã tinh chỉnh, dòng 8 rút gọn về một cổng xác suất đơn. η_Q = 0 mang `edge_declaration` đúng luật; nhưng phát biểu mạnh hơn là η_Q **không định danh trên cả lưới**, không chỉ "không chặn dưới".
+
+**Kết luận:** nhận bản tinh chỉnh 40-workflow. sw/τ5 vững; τ gần phẳng (tác động loss < 0,017); η_Q trơ. `--nominal-only` sẽ chạy sau lõi.
