@@ -227,6 +227,102 @@ class TestS5Tuning(unittest.TestCase):
         self.assertEqual(inspect.signature(T.tune).parameters["jobs"].default, 1)
         self.assertIsNone(inspect.signature(T.tune_rho).parameters["cache"].default)
 
+        # CHECKPOINT / RESUME (v3-tune-resume, 28/09/2026).  The hash is over the SELECTION
+        # LOG, so a run finished from a checkpoint must reproduce the same evidence: every
+        # per-candidate measurement is appended by its content key as it completes, --resume
+        # loads the completed ones and computes only the rest, and the control flow that
+        # assembles the log is unchanged.  So the tuned JSON and log_sha256 come out
+        # byte-identical to a single-shot run (only the wall-clock `timing` differs).
+        self.assertFalse(inspect.signature(T.tune).parameters["resume"].default)
+        # the checkpoint is a run artefact: never beside the tracked reference/ output
+        self.assertEqual(T.checkpoint_path(T.TUNED_NOMINAL_PATH).name,
+                         "v3_tuned_nominal.ckpt.jsonl")
+        self.assertEqual(T.checkpoint_path(T.TUNED_NOMINAL_PATH).parent, T.CKPT_DIR)
+        self.assertNotIn("reference", T.CKPT_DIR.parts)
+        with tempfile.TemporaryDirectory() as d:
+            ck = pathlib.Path(d) / "tiny.ckpt.jsonl"
+            single = tiny(checkpoint=ck, **kw)                   # a fresh run checkpoints
+            lines = ck.read_text().splitlines()
+            head = json.loads(lines[0])["header"]
+            self.assertIn("config_digest", head)
+            # the digest covers what would change a measurement
+            self.assertLessEqual(
+                {"code_version", "schema", "belief", "line8", "kernels", "rhos", "deltas",
+                 "seeds", "grids", "n_workflows", "fq_cap", "members", "band", "world",
+                 "lambda_Q", "lambda_T"}, set(head["config"]))
+            keys = [T.measure_key_of_id(json.loads(x)["job_id"]) for x in lines[1:]]
+            self.assertEqual(len(keys), len(set(keys)))
+            self.assertEqual(set(keys), {j[0] for j in T._enumerate_jobs(
+                kw["rhos"], (0.0, 0.3), ("commit3",), kw["tau_grid"], kw["eta_grid"],
+                kw["members"], kw["belief_factory"])})
+            # a checkpoint holding only SOME measurements (a kill mid-run)
+            keep = 1 + len(keys) // 2
+            ck.write_text("\n".join(lines[:keep]) + "\n")
+            calls, orig = [], T.measure
+
+            def spy(*a, **k):                        # noqa: ANN002
+                calls.append(1)
+                return orig(*a, **k)
+            T.measure = spy
+            try:
+                back = tiny(checkpoint=ck, resume=True, **kw)
+            finally:
+                T.measure = orig
+            # ONLY the missing measurements were recomputed
+            self.assertEqual(len(calls), len(keys) - (keep - 1))
+            self.assertGreater(keep - 1, 0)
+            # ... and the finished run is byte-identical (log, its hash, the tuned JSON)
+            self.assertEqual(single["log"], back["log"])
+            self.assertEqual(single["tuned"]["log_sha256"], back["tuned"]["log_sha256"])
+            self.assertEqual(strip(single["tuned"]), strip(back["tuned"]))
+            self.assertEqual(json.dumps(strip(single["tuned"]), indent=2, sort_keys=True),
+                             json.dumps(strip(back["tuned"]), indent=2, sort_keys=True))
+            # the resumed run appended the recomputed ones: the checkpoint is whole again
+            self.assertEqual(len(ck.read_text().splitlines()) - 1, len(keys))
+            # a header from a DIFFERENT config is REFUSED, never silently mixed
+            with self.assertRaises(ValueError):
+                T.load_checkpoint(ck, "sha256:not-this-run")
+            bad = ck.read_text().splitlines()
+            bad[0] = json.dumps({"header": {"config_digest": "sha256:stale",
+                                            "config": head["config"]}})
+            ck.write_text("\n".join(bad) + "\n")
+            with self.assertRaisesRegex(ValueError, "without --resume"):
+                tiny(checkpoint=ck, resume=True, **kw)
+            # the fingerprint really moves with the config (here: the eta_Q grid)
+            fp = dict(rhos=(0.0,), seeds=(1,), workflows=T.dev_workflows(1), attacks=("a",),
+                      deltas=(4,), kernels=T.KERNELS, members={"m": None},
+                      belief_label=None, line8=T.line8_rule, band=None, tau5_grid=(0.0,),
+                      sw_grid=("commit3",), tau_grid=(0.3,), eta_grid=(0.0,),
+                      world=C.PRIMARY, fq_cap=None, delta_hat="cell")
+            self.assertNotEqual(T.config_digest(T.config_fingerprint(**fp)),
+                                T.config_digest(T.config_fingerprint(
+                                    **{**fp, "eta_grid": (0.0, 0.1)})))
+            # the same under --jobs N (the path the real run uses): the pool is handed ONLY
+            # the missing jobs, the loaded ones fill the same content-keyed cache
+            ck2 = pathlib.Path(d) / "tiny-jobs.ckpt.jsonl"
+            tiny(jobs=4, checkpoint=ck2, **kw)
+            ln2 = ck2.read_text().splitlines()
+            self.assertEqual(len(ln2) - 1, len(keys))
+            ck2.write_text("\n".join(ln2[:keep]) + "\n")
+            sent, orig_pool = [], T._run_measure_pool
+
+            def spy_pool(jobs_list, *a, **k):         # noqa: ANN002
+                sent.append(len(jobs_list))
+                return orig_pool(jobs_list, *a, **k)
+            T._run_measure_pool = spy_pool
+            try:
+                back4 = tiny(jobs=4, checkpoint=ck2, resume=True, **kw)
+            finally:
+                T._run_measure_pool = orig_pool
+            self.assertEqual(sent, [len(keys) - (keep - 1)])
+            self.assertEqual(single["log"], back4["log"])
+            self.assertEqual(strip(single["tuned"]), strip(back4["tuned"]))
+            # without --resume a run truncates and rewrites the header, so it stays recoverable
+            tiny(checkpoint=ck, **kw)
+            self.assertEqual(json.loads(ck.read_text().splitlines()[0])["header"][
+                "config_digest"], head["config_digest"])
+            self.assertEqual(len(ck.read_text().splitlines()) - 1, len(keys))
+
 
 if __name__ == "__main__":
     unittest.main()

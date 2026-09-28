@@ -30,6 +30,13 @@ THE SELECTION LOG.  Every candidate's measurement and every choice is one entry;
 is written next to the output (<out>.log.jsonl) and its sha256 over the canonical JSON is
 pinned in the output (`log_sha256`), so a tuned value can be traced to its evidence.
 
+CHECKPOINT / RESUME (v3-tune-resume).  Every per-candidate measurement is appended to
+spikes/v3-tune/<out stem>.ckpt.jsonl (flush + fsync) the instant it is in hand, keyed by its
+content key, so a run killed mid-way loses at most the in-flight measurements.  --resume
+loads the completed ones and computes only the rest; the tuned JSON and its log_sha256 come
+out byte-identical to a single-shot run (only the wall-clock `timing` block differs).  The
+checkpoint's header pins a config digest and a mismatched one is refused, never mixed.
+
 DEV ONLY (plan S6: "tools/v3_tune.py khong co duong nao toi eval").  Workflows come from
 v3.corpus.dev_workflows() and nowhere else; `require_dev` refuses any other split with
 seal.SealedSplit and the tool never holds a seal token.  Only members and baselines run --
@@ -60,12 +67,13 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import pathlib
 import subprocess
 import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from dataclasses import replace
+from dataclasses import asdict, replace
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
@@ -493,22 +501,183 @@ def _measure_job(job: tuple) -> dict:
                    kernels=st["kernels"])
 
 
-def _run_measure_pool(jobs: list, n_jobs: int, settings: dict, progress=print) -> dict:
+def _run_measure_pool(jobs: list, n_jobs: int, settings: dict, progress=print,
+                      on_result=None) -> dict:
     """Run every measurement across n_jobs processes; return {key -> measure result}.
     Results are placed by job index (not completion order), so the cache is identical for
-    any n_jobs."""
+    any n_jobs.  `on_result(key, result)`, when given, is called in the MAIN process as each
+    future is collected -- the hook the checkpoint uses to persist a measurement the instant
+    it is in hand (completion order only; it never touches the returned mapping)."""
     out: list = [None] * len(jobs)
     t0 = time.perf_counter()
     with ProcessPoolExecutor(n_jobs, initializer=_init_worker, initargs=(settings,)) as ex:
         futs = {ex.submit(_measure_job, jobs[i]): i for i in range(len(jobs))}
         done = 0
         for f in as_completed(futs):
-            out[futs[f]] = f.result()
+            i = futs[f]
+            out[i] = f.result()
+            if on_result is not None:
+                on_result(jobs[i][0], out[i])
             done += 1
             if progress and (done == len(jobs) or done % max(1, len(jobs) // 20) == 0):
                 progress(f"  measure: {done}/{len(jobs)} jobs, "
                          f"{time.perf_counter() - t0:.0f} s")
     return {jobs[i][0]: out[i] for i in range(len(jobs))}
+
+
+# ---------------------------------------------------------------------------------------
+# Checkpoint / resume (v3-tune-resume, 28/09/2026)
+# ---------------------------------------------------------------------------------------
+#
+# A full --real tuning is ~2 h (--jobs 8, 40 dev workflows) and the output was written only
+# at the very end, so a machine shutdown lost the whole run.  The unit of work is ONE
+# per-candidate measurement -- one `measure(build, rho, ...)` call, already identified by its
+# content key `_mkey(step, rho, candidate)` -- and it is a pure function of the config (every
+# draw goes through core.seed_of).  So each measurement is appended to <ckpt> the instant it
+# is in hand IN THE MAIN PROCESS (one JSON object per line, flush + os.fsync), and a crash
+# loses at most the measurements still in flight.  --resume reloads the completed ones into
+# the same content-keyed cache and dispatches only the missing ones.
+#
+# DETERMINISM (the hard requirement; test_selection_log_is_hashed).  A loaded measurement
+# EQUALS its recomputation (content key + keyed seeds + JSON float round-trip), and the
+# selection log, the minimax LP and `choose` (the unchanged tie rule: value at 4 dp, then
+# lower FQ, then the earlier grid value) are still assembled by the unchanged single-process
+# control flow (tune / tune_rho) in the same canonical order.  So a run completed via
+# checkpoint + resume yields a byte-identical tuned JSON and the identical `log_sha256` as a
+# single-shot run -- except the wall-clock `timing` block, which is not part of log_sha256
+# and never was reproducible.
+
+#: The checkpoint format / measurement-code version.  Part of the header config digest, so a
+#: code change that could alter a measurement should bump this to refuse a stale resume.
+CKPT_VERSION = "v3-tune-ckpt-1"
+#: The checkpoint record schema.
+CKPT_SCHEMA = "v3-tune-ckpt/1"
+#: Where checkpoints live.  NOT beside the output: reference/ is tracked, and a checkpoint is
+#: a run artefact that must never be committed (add `auditgame/spikes/v3-tune/` to .gitignore).
+CKPT_DIR = ROOT / "spikes" / "v3-tune"
+
+
+def checkpoint_path(out) -> pathlib.Path:
+    """The checkpoint for the tuning whose output is <out>: spikes/v3-tune/<stem>.ckpt.jsonl."""
+    return CKPT_DIR / (pathlib.Path(out).stem + ".ckpt.jsonl")
+
+
+def measure_job_id(key: tuple) -> str:
+    """A stable, canonical id for one measurement's content key (`_mkey`)."""
+    return C.canonical_json(list(key))
+
+
+def measure_key_of_id(job_id: str) -> tuple:
+    """The inverse of `measure_job_id`: the content key back, exactly (JSON round-trips the
+    floats of the grids and the str candidate names)."""
+    return tuple(json.loads(job_id))
+
+
+def _line8_id(line8) -> str:
+    """The identity of the pluggable line 8, as the tuned output's setup records it."""
+    return getattr(line8, "__module__", "?") + "." + getattr(line8, "__qualname__", "?")
+
+
+def config_fingerprint(*, rhos, seeds, workflows, attacks, deltas, kernels, members,
+                       belief_label, line8, band, tau5_grid, sw_grid, tau_grid, eta_grid,
+                       world, fq_cap, delta_hat) -> dict:
+    """Everything a checkpointed measurement depends on.  A resume onto a DIFFERENT
+    fingerprint is REFUSED, never silently mixed."""
+    return {"code_version": CKPT_VERSION,
+            "schema": CKPT_SCHEMA,
+            "belief": belief_label,
+            "line8": _line8_id(line8),
+            "kernels": list(kernels),
+            "rhos": [float(r) for r in rhos],
+            "deltas": [int(d) for d in deltas],
+            "seeds": [int(s) for s in seeds],
+            "attacks": list(attacks),
+            "grids": {"tau5": list(tau5_grid), "sw_weights": list(sw_grid),
+                      "tau": list(tau_grid), "eta_q": list(eta_grid)},
+            "n_workflows": len(workflows),
+            "workflows": [w.wf_id for w in workflows],
+            "fq_cap": None if fq_cap is None else float(fq_cap),
+            "members": sorted(members),
+            # the base settings a measurement's loss is computed with
+            "band": None if band is None else asdict(band),
+            "delta_hat": delta_hat,
+            "world": world.as_dict(),
+            "lambda_Q": R.LAMBDA_Q, "lambda_T": R.LAMBDA_T}
+
+
+def config_digest(fingerprint: dict) -> str:
+    return "sha256:" + hashlib.sha256(
+        C.canonical_json(fingerprint).encode("ascii")).hexdigest()
+
+
+def _ckpt_result_to_json(m: dict) -> dict:
+    """One `measure` result -> plain JSON.  float repr round-trips exactly, so a loaded
+    measurement is identical to its recomputation."""
+    return {"L": {k: {c: float(v) for c, v in sorted(d.items())} for k, d in m["L"].items()},
+            "fq": {k: float(v) for k, v in m["fq"].items()},
+            "episodes": int(m["episodes"]), "seconds": float(m["seconds"])}
+
+
+def _ckpt_result_from_json(d: dict) -> dict:
+    return {"L": {k: dict(v) for k, v in d["L"].items()}, "fq": dict(d["fq"]),
+            "episodes": int(d["episodes"]), "seconds": float(d["seconds"])}
+
+
+def load_checkpoint(path, digest: str) -> dict | None:
+    """The completed measurements {content key -> measure result} of a MATCHING checkpoint,
+    or None if the file is absent/empty.  A present checkpoint whose header config digest
+    differs from `digest` is REFUSED (ValueError) -- never silently mixed."""
+    path = pathlib.Path(path)
+    if not path.exists():
+        return None
+    lines = [ln for ln in path.read_text().splitlines() if ln.strip()]
+    if not lines:
+        return None
+    head = json.loads(lines[0]).get("header")
+    if not head or "config_digest" not in head:
+        raise ValueError(f"{path}: not a v3-tune checkpoint (no header). Delete the stale "
+                         f"checkpoint or run without --resume.")
+    if head["config_digest"] != digest:
+        raise ValueError(
+            f"{path}: checkpoint config {head['config_digest']} does not match this run's "
+            f"config {digest} (belief / line 8 / kernels / rhos / deltas / seeds / grids / "
+            f"n_workflows / fq_cap / members / band / world / lambda differ). Delete the "
+            f"stale checkpoint or run without --resume.")
+    out = {}
+    for ln in lines[1:]:
+        rec = json.loads(ln)
+        out[measure_key_of_id(rec["job_id"])] = _ckpt_result_from_json(rec["result"])
+    return out
+
+
+class CheckpointWriter:
+    """Crash-safe append log of completed per-candidate measurements (one JSON object per
+    line, flush + os.fsync).  A fresh writer truncates the file and (re)writes the header; an
+    append writer keeps a matching checkpoint's completed lines and adds to them."""
+
+    def __init__(self, path, digest: str, fingerprint: dict, append: bool):
+        self.path = pathlib.Path(path)
+        self.digest = digest
+        self.n = 0
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._fh = open(self.path, "a" if append else "w")
+        if not append:
+            self._writeline({"header": {"config_digest": digest, "config": fingerprint}})
+
+    def _writeline(self, obj: dict) -> None:
+        self._fh.write(C.canonical_json(obj) + "\n")
+        self._fh.flush()
+        os.fsync(self._fh.fileno())
+
+    def append(self, key: tuple, result: dict) -> None:
+        self._writeline({"job_id": measure_job_id(key),
+                         "result": _ckpt_result_to_json(result)})
+        self.n += 1
+
+    def close(self) -> None:
+        if self._fh is not None:
+            self._fh.close()
+            self._fh = None
 
 
 # ---------------------------------------------------------------------------------------
@@ -581,18 +750,26 @@ def _entry(step, rho, param, m, kernels=KERNELS) -> dict:
 
 def tune_rho(rho, workflows, seeds, *, attacks, members, belief_factory, line8, tau5_grid,
              sw_grid, tau_grid, eta_grid, deltas, world, fq_cap, delta_hat, log, timing,
-             progress=print, kernels=KERNELS, cache=None) -> dict:
+             progress=print, kernels=KERNELS, cache=None, loaded=None, writer=None) -> dict:
     plans = Plans()
     blk: dict = {}
+    loaded = {} if loaded is None else loaded
     kw = dict(attacks=attacks, deltas=deltas, world=world, plans=plans, kernels=kernels)
 
     def run(step, param, build):
         # --jobs N: the measurement was already computed in a worker; read it by content key
-        # (identical for any N).  Otherwise measure here, exactly as the single-process tool.
+        # (identical for any N).  Otherwise measure here, exactly as the single-process tool
+        # -- unless --resume already has it (`loaded`, same content key); either way a freshly
+        # measured one is checkpointed the instant it is in hand (v3-tune-resume).
+        key = _mkey(step, rho, param)
         if cache is not None:
-            m = cache[_mkey(step, rho, param)]
+            m = cache[key]
+        elif key in loaded:
+            m = loaded[key]
         else:
             m = measure(build, rho, workflows, seeds, **kw)
+            if writer is not None:
+                writer.append(key, m)
         e = _entry(step, rho, param, m, kernels)
         log.append(e)
         tm = timing.setdefault(step, {"episodes": 0, "seconds": 0.0})
@@ -667,12 +844,20 @@ def tune(*, workflows=None, seeds=TUNE_SEEDS, rhos=C.RHO_GRID, split: str = DEV,
          sw_grid=SW_CANDIDATES, tau_grid=TAU_Q_GRID, eta_grid=ETA_Q_GRID,
          deltas=TUNE_DELTAS, world: C.WorldV3 = C.PRIMARY, fq_cap: float | None = None,
          delta_hat: str = "cell", smoke: bool = False, belief_label: str | None = None,
-         progress=print, kernels=KERNELS, jobs: int = 1) -> dict:
+         progress=print, kernels=KERNELS, jobs: int = 1, out=None, resume: bool = False,
+         checkpoint=None) -> dict:
     """The whole tuning.  Returns {"tuned": ..., "log": [...]}; tuned["log_sha256"] pins
     the log.  `delta_hat` = "cell" gives the belief the cell's Delta (v2's tuning passed
     the regime, D9b), "prior" gives None (O3's prior).  `kernels` = NOMINAL_ONLY is the
     -transition uncertainty ablation's tuning (the worst case over the nominal kernel
-    only); the result records its kernels (tuned["kernels"])."""
+    only); the result records its kernels (tuned["kernels"]).
+
+    Per-candidate measurements are checkpointed (v3-tune-resume) when a checkpoint path is
+    known -- either `checkpoint` explicitly, or `checkpoint_path(out)`.  `resume=True`
+    reloads a MATCHING checkpoint's completed measurements and computes only the rest; a
+    mismatched header is refused (ValueError).  A fresh (non-resume) run truncates and
+    rewrites the header first, so any run is recoverable.  With neither `out` nor
+    `checkpoint` (the library / test path) nothing is written and behaviour is unchanged."""
     require_dev(split)
     kernels = tuple(kernels)
     if not kernels or any(k not in KERNELS for k in kernels):
@@ -693,23 +878,57 @@ def tune(*, workflows=None, seeds=TUNE_SEEDS, rhos=C.RHO_GRID, split: str = DEV,
     # --jobs N > 1: measure every candidate across N processes into a content-keyed cache,
     # then assemble the log and choices below by the same single-process control flow (the
     # tuned JSON and log_sha256 do not depend on N; only the wall-clock timing does).
+    # Checkpoint / resume (v3-tune-resume): the completed measurements of a MATCHING
+    # checkpoint are loaded into the same content-keyed cache; only the missing ones run.
+    ckpt = checkpoint if checkpoint is not None else (
+        checkpoint_path(out) if out is not None else None)
+    loaded: dict = {}
+    writer = None
+    if ckpt is not None:
+        fp = config_fingerprint(
+            rhos=rhos, seeds=seeds, workflows=workflows, attacks=attacks, deltas=deltas,
+            kernels=kernels, members=members, belief_label=belief_label, line8=line8,
+            band=band, tau5_grid=tau5_grid, sw_grid=sw_grid, tau_grid=tau_grid,
+            eta_grid=eta_grid, world=world, fq_cap=fq_cap, delta_hat=delta_hat)
+        dg = config_digest(fp)
+        append = bool(resume and pathlib.Path(ckpt).exists())
+        if append:
+            loaded = load_checkpoint(ckpt, dg) or {}       # refuses a config mismatch
+        writer = CheckpointWriter(ckpt, dg, fp, append=append)
     cache = None
-    if jobs and jobs > 1:
-        jobs_list = _enumerate_jobs(rhos, tuple(tau5_grid), tuple(sw_grid), tuple(tau_grid),
-                                    tuple(eta_grid), members, belief_factory)
-        if jobs_list:
-            settings = {"wf_ids": [w.wf_id for w in workflows], "seeds": tuple(seeds),
-                        "attacks": attacks, "deltas": tuple(deltas), "world": world,
-                        "kernels": kernels, "belief_factory": belief_factory, "line8": line8,
-                        "delta_hat": delta_hat, "band": band}
-            cache = _run_measure_pool(jobs_list, jobs, settings, progress)
-    for rho in rhos:
-        out_rho[f"{rho:g}"] = tune_rho(
-            float(rho), workflows, tuple(seeds), attacks=attacks, members=members,
-            belief_factory=belief_factory, line8=line8, tau5_grid=tuple(tau5_grid),
-            sw_grid=tuple(sw_grid), tau_grid=tuple(tau_grid), eta_grid=tuple(eta_grid),
-            deltas=tuple(deltas), world=world, fq_cap=fq_cap, delta_hat=delta_hat, log=log,
-            timing=timing, progress=progress, kernels=kernels, cache=cache)
+    try:
+        if jobs and jobs > 1:
+            jobs_list = _enumerate_jobs(rhos, tuple(tau5_grid), tuple(sw_grid),
+                                        tuple(tau_grid), tuple(eta_grid), members,
+                                        belief_factory)
+            if jobs_list:
+                settings = {"wf_ids": [w.wf_id for w in workflows], "seeds": tuple(seeds),
+                            "attacks": attacks, "deltas": tuple(deltas), "world": world,
+                            "kernels": kernels, "belief_factory": belief_factory,
+                            "line8": line8, "delta_hat": delta_hat, "band": band}
+                todo = [j for j in jobs_list if j[0] not in loaded]
+                if progress and loaded:
+                    progress(f"  measure: resuming, {len(loaded)} done, {len(todo)} to "
+                             f"compute")
+                on_result = (None if writer is None
+                             else (lambda key, m: writer.append(key, m)))
+                fresh = (_run_measure_pool(todo, jobs, settings, progress, on_result)
+                         if todo else {})
+                # placed by content key over the ENUMERATED order: KeyError if anything is
+                # missing, so a resumed cache is never silently partial.
+                cache = {j[0]: (fresh[j[0]] if j[0] in fresh else loaded[j[0]])
+                         for j in jobs_list}
+        for rho in rhos:
+            out_rho[f"{rho:g}"] = tune_rho(
+                float(rho), workflows, tuple(seeds), attacks=attacks, members=members,
+                belief_factory=belief_factory, line8=line8, tau5_grid=tuple(tau5_grid),
+                sw_grid=tuple(sw_grid), tau_grid=tuple(tau_grid), eta_grid=tuple(eta_grid),
+                deltas=tuple(deltas), world=world, fq_cap=fq_cap, delta_hat=delta_hat,
+                log=log, timing=timing, progress=progress, kernels=kernels, cache=cache,
+                loaded=loaded, writer=writer)
+    finally:
+        if writer is not None:
+            writer.close()
     for tm in timing.values():
         tm["ms_per_episode"] = (1000.0 * tm["seconds"] / tm["episodes"]
                                 if tm["episodes"] else None)
@@ -822,6 +1041,12 @@ def main(argv=None) -> int:
                          "log_sha256 are identical for any N; only the wall-clock timing "
                          "differs.  A full --real run is ~104 CPU-h; --jobs 8 finishes in "
                          "~13 h on this 10-core machine.")
+    ap.add_argument("--resume", action="store_true",
+                    help="v3-tune-resume (28/09/2026): resume from the checkpoint beside "
+                         f"{CKPT_DIR.name}/<out stem>.ckpt.jsonl -- load the per-candidate "
+                         "measurements already done and compute only the rest.  Refuses a "
+                         "checkpoint whose config digest differs from this run's.  Not "
+                         "needed for crash-safety: any run writes the checkpoint as it goes.")
     ap.add_argument("--nominal-only", action="store_true",
                     help="the -transition uncertainty ablation's tuning: worst case over the "
                          f"nominal kernel only, written to {TUNED_NOMINAL_PATH.name}")
@@ -862,10 +1087,12 @@ def main(argv=None) -> int:
         band = band_of(bf(ctx0, ctx0.cell.delta))
     res = tune(workflows=dev_workflows(n), seeds=seeds, rhos=a.rhos, belief_factory=bf,
                band=band, line8=line8, fq_cap=a.fq_cap, smoke=a.smoke,
-               belief_label=belief_label, kernels=kernels, jobs=a.jobs)
+               belief_label=belief_label, kernels=kernels, jobs=a.jobs, out=a.out,
+               resume=a.resume)
     out, lp = write(res, a.out)
     t = res["tuned"]
     print(f"\nwrote {out} and {lp}; log sha256 {t['log_sha256']}")
+    print(f"checkpoint {checkpoint_path(a.out)} (a run artefact; not committed)")
     print(f"total {t['timing']['total_seconds']:.1f} s")
     for step, tm in t["timing"]["steps"].items():
         print(f"  {step:11} {tm['episodes']:>8} episodes  {tm['seconds']:8.1f} s  "
