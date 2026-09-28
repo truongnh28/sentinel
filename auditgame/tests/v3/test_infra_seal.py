@@ -71,8 +71,19 @@ class TestInfraSeal(unittest.TestCase):
             with self.assertRaises(S.SealedSplit) as cm:
                 S.unseal(meta)
             msg = str(cm.exception)
+            # The Gate-4 file is the human gate no tool can pass -- the invariant that holds
+            # from P2 through P5 until the user signs it.  (freeze_v3 is a check too, but once
+            # the P4 manifest is built it is clean and drops out of the reasons; the refusal
+            # then rests on the Gate-4 file above.  Its coverage is asserted below with an
+            # unbuilt freeze_v3, so it does not depend on the ambient manifest state.)
             self.assertIn("Gate-4", msg)
-            self.assertIn("freeze_v3", msg)
+
+        def _unbuilt_freeze(mod, fn):
+            return (None, "freeze_v3 is not built") if fn == "header_line" else ("x", None)
+        with mock.patch.object(S, "_live", side_effect=_unbuilt_freeze):
+            why_unbuilt = S.reasons({"split": "eval"})
+        self.assertTrue(any("freeze_v3" in w for w in why_unbuilt), why_unbuilt)
+
         why = S.reasons({"split": "dev"})
         self.assertTrue(any("split='eval'" in w for w in why), why)
 
