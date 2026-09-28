@@ -461,3 +461,327 @@ Bốn dòng ablation còn lại của `tab:ablations` (dòng 108–110, 112) cũ
 - **Mọi ô eval (P5)**: chưa có lượt eval; `frozen/V3-GATE4.json` chưa được người dùng ký. Không ô nào của paper được lấp bằng số **dev** mà không ghi rõ là dev.
 
 **Số máy đọc được:** `spikes/v3-run/table2_3_full.json` (không commit — `spikes/` trong `.gitignore`, D33).
+
+## 10. H-verdict từ các block còn lại (H18, H19, H20, thế giới độ nhạy)
+
+Mục này **bổ sung** mục 0–9: nó chấm bảng điểm H1–H20 (`v3/scorecard.py`) trên **các block còn lại** của lượt dev — ngân sách (H18), trục K_d (H19), cột attacker chọn Δ (H20), sáu thế giới độ nhạy và khối hai carrier có hạt — và đọc **cả hai metric** như tiền đăng ký `docs/preregistration/TIEN-DANG-KY-metric-headline-V.md` yêu cầu (**L của Định nghĩa 1 là headline, V = harm in kèm**). Không lượt mô phỏng nào được chạy lại; không metric, CI hay luật nào được viết lại.
+
+### 10.0 Xuất xứ và cách đọc
+
+| Khối | Tệp | sha256 | Số dòng | Nội dung đọc được |
+|---|---|---|---|---|
+| h18 | `dev-headline-rest/h18.jsonl` | `e76d222e88fa…` | 81.918 | B1 / B2 / Sentinel; **chỉ** 2×B_min, 1×B_min, 0,5×B_min; ρ ∈ {0; 0,25; 0,5} |
+| h18-br | `dev-headline-rest-br/h18-br.jsonl` | `74bf548f9fdc…` | 212.832 | cột BR, **chỉ** mức 2×B_min |
+| kd | `dev-headline-rest/kd.jsonl` | `16d19cdb997d…` | 62.416 | B1 + Sentinel, K_d ∈ {1, 3}, mọi Δ, mọi ρ |
+| kd-br | `dev-headline-rest-br/kd-br.jsonl` | `7556c0793ec5…` | 107.456 | cột BR, K_d ∈ {1, 3}, Δ ∈ {4, 8} |
+| attacker-delta | `dev-headline-rest/attacker-delta.jsonl` | `fec41c53e1e9…` | 849.312 | **chỉ lớp Sentinel** (6 hệ), cột BR, Δ = `attacker` |
+| sens:* (6) | `dev-headline-rest/sens_*.jsonl` | `xem records.sha256` | 234.060 mỗi thế giới | 15 hệ, 7 cột held-out, mọi Δ, mọi ρ |
+| sens-br:* (5) | `dev-headline-rest-br/sens-br_*.jsonl` | `xem records.sha256` | 53.728 / 107.456 | **chỉ B1 + Sentinel**, cột BR, Δ ∈ {4, 8} |
+| sens-attacker-delta:reversible | `dev-headline-rest-br/sens-attacker-delta_reversible.jsonl` | `a9994b3b8090…` | 141.552 | **chỉ Sentinel**, cột BR, Δ = `attacker` |
+| seed2-pairs | `dev-headline-rest/seed2-pairs.jsonl` | `59c425a9ced7…` | 80.592 | B1 + Sentinel, cột BR, Δ ∈ {4, 8}, thế giới hai carrier có hạt |
+| main (đọc lại) | `dev-headline-main/main.jsonl` | `e1db94d590f3…` | 218.456 | **mức b1** của H18 và ô K_d = 2 của H19 (xem lệch dưới đây) |
+
+**Cách tính (không viết lại gì).** `v3/metrics.table`, `boot_values`, `interval`, `p_value`, `gain_ci`, `h18_miss_change` và `v3/scorecard.Estimate` / `score_all` / `rule_*` nguyên bản; bootstrap wild cluster (Webb) theo họ repo, N = 10.000, α = 0,05, re-max qua cột trong từng lần rút, một bộ rút họ dùng chung cho mọi hệ của cùng một lời gọi.
+
+- **V(harm)**: `field="harm"`. **V(L)**: gắn `r["loss"] = runner.loss_of(r)` rồi `field="loss"`.
+- **gain vs B1 theo L**: dùng **chính** `metrics.gain_ci` (hàm cứng `field="harm"`) sau khi **đặt L vào đúng trường mà `gain_ci` cho điểm** — đây là đổi nhãn trường được cho điểm, không phải bản sao hàm. Đã kiểm: `table(..., field="loss").value` và đường đổi nhãn cho **cùng một float** (0,8981, so sánh `==`).
+- **V_BR**: `metrics_v2.crossfit_value` (D27) gọi **theo từng workflow**, các giá trị cross-fit đó xếp thành một `metrics.Table` một cột rồi đưa qua đúng bootstrap họ của module này; điểm của bảng bằng đúng `crossfit_value` trên toàn bộ hàng. Giá trị **naive** in kèm (R6, mục 9.4): dấu của exploitability lật theo bộ estimator.
+- **Họ BH**: `score_all` chạy **một lần cho mỗi (metric, ρ)** — `HEAD` của khung ghi "each rho", nên mỗi ρ là một thể hiện riêng của cùng một check; họ D của một lần chạy gồm các check D có estimate ở ρ đó (ở lượt này m = 2: H18 và H19). `rules_digest` = `21b8c093254a…`.
+
+**Lệch phải khai (N3):**
+
+1. **Khối `h18` không có mức b1.** `grid.py` chỉ phát sinh unit b1 (không price-only) cho `BlockSchedule` — hệ duy nhất của `H18_POLICIES` không nằm trong `SYSTEMS` — còn B1 / B2 / Sentinel ở b1 thuộc khối `main`. Lượt này chạy 15 hệ, **không có `BlockSchedule`**, nên khối `h18` **rỗng ở b1**. `H18_CRITERION` lại khai `fixed_level = "b1"`. Vì vậy mức b1 được đọc từ `dev-headline-main/main.jsonl` (cùng `grid_digest` `acbe9bdc48fd`, khác manifest — đúng cảnh báo xuyên-lượt của mục 9.0), và **biên (frontier) chỉ lấy trên 3 trong 4 hệ H18**.
+2. **`h18-br` chỉ có mức 2×B_min** (luật `attackers.br_systems` cho ô ngân sách), nên không có exploitability ở b1 hay ở các mức B_min thấp hơn.
+3. **ρ = 1 bị loại khỏi khối `h18`** ở mọi mức ≠ b1 (`_bmin_hole` → `FLAG_COMMIT_SUFFICES`): khai trước, không phải lỗi.
+4. **O15**: các thế giới độ nhạy và K_d ≠ 2 **cố ý dùng lại bảng dòng 5 của thế giới chính** (misspecification đã khai). Mọi số Sentinel ở mục 10.2 và 10.4 phải đọc kèm điều đó: chúng đo một chính sách bị đặt lệch bảng, không phải một chính sách được tinh chỉnh lại cho thế giới đó.
+5. **Bộ nhớ.** Mỗi tệp được **stream từng dòng** một lần, `json.loads` rồi chiếu ngay xuống 21 trường mà metric đọc (`policy, wf, repo, seed, split, attack, delta, harm, fq, t_lost, placement, sigma, H, missed_before_sigma` + 6 trường ô + `loss`), chuỗi `sys.intern`; các trường nặng (`c_traj`, `audits`, `quarantines`, `world`, `decision_log_sha256`) **không bao giờ** vào bộ nhớ. Không lúc nào có cả tệp trong RAM. **Đỉnh RSS 1,75 GB**, ở bước H20 (khối `attacker-delta`: 849.312 bản ghi đã chiếu cùng lúc trong RAM); bước chiếu thì O(1).
+
+### 10.1 H18 — hướng của ngân sách theo Δ (khai báo 27/09)
+
+Thống kê chính của H18 là **tỉ lệ bỏ lọt trước σ** (`missed_before_sigma`), nên nó **không phụ thuộc việc chọn L hay harm**: hai metric cho **cùng một verdict** ở mục này. Biên = tỉ lệ bỏ lọt thấp nhất trên các hệ H18 có mặt, lấy lại trong từng lần rút; cột held-out xấu nhất; chỉ workflow có H ≥ 9 (giữ cả Δ = 4 và 8).
+
+**Hình dạng đường cong theo mức ngân sách** (biên, ρ = 0; `metrics.h18_miss_curve`):
+
+| Mức ngân sách | biên ở Δ = 4 | biên ở Δ = 8 | B1 | B2 | Sentinel (Δ4 / Δ8) |
+|---|---|---|---|---|---|
+| b1 *(từ khối main)* | 0,189 | 0,012 | 1,00 / 1,00 | 0,189 / 0,012 | 0,361 / 0,038 |
+| 2×B_min | 0,836 | 0,844 | 1,00 / 1,00 | 0,836 / 0,844 | 0,955 / 0,878 |
+| 1×B_min | 0,852 | 0,906 | 1,00 / 1,00 | 0,964 / 0,906 | 0,852 / 1,000 |
+| 0,5×B_min | 1,000 | 1,000 | 1,00 / 1,00 | 1,000 / 1,000 | 1,000 / 1,000 |
+
+Đọc được ngay: **B1 bỏ lọt 100% ở mọi mức và mọi Δ** (nó chỉ audit ở commit, nên không bao giờ bắt trước σ), nên biên luôn do B2 hoặc Sentinel giữ. Ở **0,5×B_min mọi hệ bỏ lọt 100%** — mức đó không mua được gì. Từ 1×B_min lên b1 tỉ lệ bỏ lọt sập từ ~0,85–0,91 xuống 0,189 (Δ=4) và 0,012 (Δ=8).
+
+**Kiểm định đã khai** (rule D trên V_miss(Δ=8) − V_miss(Δ=4) tại **b1**; `metrics.h18_miss_change`):
+
+| ρ | biên Δ=4 | biên Δ=8 | thay đổi | CI 95% | p | verdict vế **draft** (+1) | verdict vế **note** (−1) |
+|---|---|---|---|---|---|---|---|
+| 0 | 0,189 | 0,012 | **−0,176** | [−0,260; −0,117] | 0,0000 | **bác** | **khớp** |
+| 0,25 | 0,189 | 0,012 | **−0,176** | [−0,260; −0,117] | 0,0000 | **bác** | **khớp** |
+| 0,5 | 0,189 | 0,012 | **−0,176** | [−0,257; −0,117] | 0,0000 | **bác** | **khớp** |
+| 1 | 0,189 | 0,012 | **−0,176** | [−0,253; −0,117] | 0,0000 | **bác** | **khớp** |
+
+(n = 65 workflow trên 13 họ repo; BH q = 0,05, hai vế dùng **một** kiểm định vì cùng `quantity`.)
+
+Biên ở b1 giống nhau ở cả 4 ρ vì nó do **B2 uniform random** giữ, và tỉ lệ bỏ lọt của B2 không đổi theo ρ ở ô này (ρ chỉ mở kênh review ở commit, thứ B2 không dùng). Thay đổi theo từng hệ ở ρ = 0: B1 0,000 · B2 −0,176 · Sentinel −0,324.
+
+**Kết luận H18 (cả hai metric):** ở mức ngân sách đã khai b1, tỉ lệ bỏ lọt **giảm** khi Δ đi từ 4 lên 8, khoảng tin cậy loại 0, ở **mọi ρ** → **vế note (Thm 5.6: ngân sách tối thiểu rơi như H/Δ) khớp; vế draft (Định lý 4 như in: ngân sách phải tăng theo Δ) bị bác.** Đây là lần đầu một vế của H18 được chấm; nó cùng chiều với phát hiện của rà soát lý thuyết 27/09 rằng **Định lý 4 bị đảo hướng**.
+
+Ngoài mức đã khai, cùng thống kê ở **2×B_min** thì **không kết luận** ở cả 3 ρ có mặt (ρ=0: 0,007 [−0,062; 0,080], p = 0,8442; ρ=0,25: −0,094 [−0,173; 0,009], p = 0,0696; ρ=0,5: −0,043 [−0,122; 0,022], p = 0,1592) — in ở đây để không ai đọc verdict b1 như một phát biểu về mọi mức ngân sách.
+
+**Vẫn TBD trong H18:** vế χ (`bmin_diff_chi_price_only`, rule E) — khối `h18` của lượt này **không có arm price-only** và chỉ có χ = 1,33, nên không có gì để so; ngoài ra Q12 **không** khai δ cho đại lượng kiểu ngân sách, nên check đó sẽ INCONCLUSIVE ngay cả khi có số (N3).
+
+### 10.2 H19 — độ dốc của gain theo K_d
+
+`gain_slope_in_kd` = gain(K_d = 3) − gain(K_d = 1) so với B1, ô headline Δ ∈ {4, 8}, cùng một bộ rút họ cho cả bốn bảng (B1/Sentinel × K_d ∈ {1,3}), nên hiệu số được rút **theo cặp**. K_d = 2 lấy từ khối `main` để thấy đủ ba điểm; **K_d ≠ 2 dùng lại bảng dòng 5 của K_d = 2 (O15)**.
+
+Theo **L** (headline) — gain % [CI]:
+
+| ρ | K_d = 1 | K_d = 2 *(main)* | K_d = 3 | độ dốc (3 − 1) | CI 95% | p | verdict draft (+1) | verdict note (−1) |
+|---|---|---|---|---|---|---|---|---|
+| 0 | +27,3 [+20,4; +35,7] | +22,6 | +23,9 [+16,9; +34,6] | **−3,5** | [−6,9; +1,1] | 0,1820 | không kết luận | không kết luận |
+| 0,25 | +19,2 [+11,0; +35,0] | +20,9 | +22,6 [+12,1; +37,6] | **+3,4** | [−2,1; +5,5] | 0,3396 | không kết luận | không kết luận |
+| 0,5 | +14,0 [+3,2; +26,7] | +14,0 | +14,8 [+4,2; +23,4] | **+0,8** | [−5,8; +3,5] | 0,7730 | không kết luận | không kết luận |
+| 1 | −50,7 [−96,5; −14,7] | −47,2 | −46,2 [−90,2; −11,7] | **+4,6** | [−1,0; +11,4] | 0,1214 | không kết luận | không kết luận |
+
+Theo **harm** — gain % [CI]:
+
+| ρ | K_d = 1 | K_d = 2 *(main)* | K_d = 3 | độ dốc (3 − 1) | CI 95% | p | verdict draft (+1) | verdict note (−1) |
+|---|---|---|---|---|---|---|---|---|
+| 0 | −1,1 [−7,3; +8,1] | −4,3 | −4,3 [−11,2; +4,7] | **−3,2** | [−8,7; +2,0] | 0,1746 | không kết luận | không kết luận |
+| 0,25 | −23,4 [−35,5; −3,1] | −22,6 | −21,6 [−31,7; −1,8] | **+1,8** | [−4,3; +8,6] | 0,7138 | không kết luận | không kết luận |
+| 0,5 | −44,1 [−59,0; −23,8] | −46,4 | −46,4 [−62,3; −26,1] | **−2,3** | [−10,3; +0,3] | 0,0574 | không kết luận | không kết luận |
+| 1 | −292,9 [−480,2; −181,9] | −292,9 | −292,9 [−490,7; −175,6] | **+0,0** | [−16,2; +11,3] | 1,0000 | không kết luận | không kết luận |
+
+**Kết luận H19 (cả hai metric):** **không kết luận ở mọi ρ và cả hai vế.** Khoảng tin cậy của độ dốc chứa 0 ở tất cả 8 ô (p nhỏ nhất là 0,0574, ρ = 0,5 theo harm), và BH ở q = 0,05 không bác 0. Trục K_d ∈ {1, 3} trên dev **không tách được** "commit càng thiếu khi carrier nhân lên" (draft, +1) khỏi "gain co lại khi K tăng" (note Cor. 6.1, −1). Đáng ghi thêm: độ dốc không chỉ nhỏ mà còn **không cùng dấu theo ρ** (theo L: −3,5 ở ρ = 0 nhưng +4,6 ở ρ = 1), tức hình dạng theo K_d **phụ thuộc ρ**, điều mà cả hai vế đều không phát biểu.
+
+**Kiểm chéo quan trọng:** cột K_d = 2 đọc từ khối `main` cho **đúng** các số của mục 2 (theo L: +22,6 / +20,9 / +14,0 / −47,2; theo harm: −4,3 / −22,6 / −46,4 / −292,9), nên đường tính của mục 10 và của mục 2 khớp nhau.
+
+Exploitability trên trục K_d (`kd-br`, B1 + Sentinel, Δ ∈ {4, 8}) **chưa** đưa vào mục này: nó không phải một check nào của khung H, và không có hệ nào khác để so — giữ như số phụ trong `spikes/v3-run/h_verdicts.json`.
+
+### 10.3 H20 — cột "attacker chọn Δ": vẫn TBD, và vì sao
+
+H20 là một check **rule N** trên `v_sentinel_minus_b1_attacker_delta` = V_S − V_B1 trong cột attacker chọn Δ, với δ = 0,10 (harm). **Không tính được ở lượt này:** luật trim của khung (`attackers.br_systems`: ở Δ = `attacker` trong thế giới chính trả về `"sentinel"`) cho cột đó **chỉ cho lớp Sentinel**. Khối `attacker-delta` đúng như vậy — 6 hệ (S, S -alarm memory, S -benign-drift, S -randomization, S -transition uncertainty, S [dhat=oracle]), **không có bản ghi B1 nào** — và khối `sens-attacker-delta:reversible` chỉ có Sentinel. Không có V_B1 thì không lập được hiệu số mà rule N đọc → **TBD (N3)**. Không được thay V_B1 của cột này bằng V_B1 của cột held-out: hai bên khác bộ estimator (mục 9.4).
+
+Những gì khối này **có** trả lời, in ra để không mất thông tin:
+
+**(a) Menu của attacker có Δ = 0, và Δ nhỏ chiếm phần lớn nó.** Đếm Δ = σ − ι trên các placement được chạy (mỗi ρ giống nhau, cùng menu): Δ=0: 11.740 · Δ=1: 9.244 · Δ=2: 7.688 · Δ=4: 5.056 · Δ=8: 1.660. Tức tiền đề của Prop. 6.3(a) ("có 0 trong menu") **đúng** trong thiết kế lượt chạy.
+
+**(b) V_BR (cross-fit, D27) của lớp Sentinel khi attacker được chọn Δ**, hai metric:
+
+| ρ | metric | Sentinel | −alarm memory | −benign-drift | −randomization | −transition | [dhat=oracle] |
+|---|---|---|---|---|---|---|---|
+| 0 | L | 0,8048 [0,717; 0,893] | 0,8012 [0,706; 0,896] | 0,9791 [0,857; 1,101] | 0,8201 [0,753; 0,888] | 1,0391 [0,971; 1,108] | 0,8319 [0,752; 0,911] |
+| 0 | harm | 0,7442 [0,666; 0,821] | 0,7442 [0,666; 0,821] | 0,7442 [0,666; 0,821] | 0,7442 [0,668; 0,820] | 0,6919 [0,637; 0,746] | 0,7471 [0,672; 0,821] |
+| 0,25 | L | 0,7961 [0,711; 0,881] | 0,7324 [0,644; 0,818] | 0,9874 [0,902; 1,075] | 0,7761 [0,691; 0,861] | 0,7961 [0,711; 0,881] | 0,8022 [0,671; 0,932] |
+| 0,25 | harm | 0,7616 [0,687; 0,835] | 0,7381 [0,659; 0,816] | 0,7500 [0,679; 0,820] | 0,7500 [0,680; 0,819] | 0,7616 [0,687; 0,835] | 0,7442 [0,661; 0,827] |
+| 0,5 | L | 0,7600 [0,665; 0,854] | 0,7758 [0,705; 0,845] | 0,9766 [0,867; 1,087] | 0,8375 [0,762; 0,913] | 0,7600 [0,665; 0,854] | 0,8325 [0,779; 0,886] |
+| 0,5 | harm | 0,6882 [0,635; 0,741] | 0,7093 [0,631; 0,787] | 0,6845 [0,632; 0,737] | 0,7267 [0,656; 0,798] | 0,6882 [0,635; 0,741] | 0,7326 [0,678; 0,787] |
+| 1 | L | 0,7515 [0,679; 0,822] | 0,7347 [0,672; 0,796] | 1,0092 [0,904; 1,116] | 0,8647 [0,780; 0,949] | 0,7883 [0,721; 0,853] | 0,8109 [0,743; 0,876] |
+| 1 | harm | 0,7619 [0,693; 0,829] | 0,7440 [0,668; 0,819] | 0,7619 [0,688; 0,833] | 0,7412 [0,657; 0,825] | 0,7619 [0,688; 0,833] | 0,7471 [0,675; 0,818] |
+
+So với mục 9.2 (cùng bộ estimator cross-fit, thế giới chính): ở ρ = 0 theo L, V_BR của Sentinel là **0,8048** khi attacker chọn Δ, so với 0,8042 ở Δ = 4 và 0,6152 ở Δ = 8. Nghĩa là **cho attacker quyền chọn Δ đưa giá trị về gần đúng cột Δ khó nhất**, không cao hơn — đúng điều một max trên menu phải làm, và đúng cơ chế C11 (Δ nhỏ thì harm khoá trong cửa sổ trễ, mục 6). Cùng kết luận ở cả 4 ρ và cả hai metric. Giá trị **naive** in kèm trong `h_verdicts.json` (ví dụ ρ=0 theo L: 1,5089 so với 0,8048 cross-fit) — mục 9.4 vẫn áp dụng.
+
+**(c) Thế giới reversible là nơi duy nhất so được trực tiếp** cột attacker-Δ với cột Δ ∈ {4, 8} *trong cùng một lượt* (có cả `sens-attacker-delta:reversible` và `sens-br:reversible`), cho Sentinel:
+
+| ρ | metric | V_BR(attacker chọn Δ) | V_BR(Δ ∈ {4,8}) | hiệu | CI 95% | p |
+|---|---|---|---|---|---|---|
+| 0 | L | 0,5252 | 0,5118 | 0,0134 | [−0,082; 0,110] | 0,8004 |
+| 0 | harm | 0,4583 | 0,4125 | 0,0458 | [−0,117; 0,211] | 0,6110 |
+| 0,25 | L | 0,5692 | 0,5459 | 0,0233 | [−0,063; 0,111] | 0,6254 |
+| 0,25 | harm | 0,4118 | 0,5000 | −0,0882 | [−0,264; 0,087] | 0,3556 |
+| 0,5 | L | 0,4520 | 0,4266 | 0,0253 | [−0,077; 0,126] | 0,6568 |
+| 0,5 | harm | 0,3512 | 0,2938 | 0,0574 | [−0,042; 0,158] | 0,3124 |
+| 1 | L | 0,4125 | 0,3980 | 0,0144 | [−0,042; 0,072] | 0,6318 |
+| 1 | harm | 0,4136 | 0,2468 | 0,1667 | [0,073; 0,260] | 0,0000 |
+
+Cột attacker-Δ cao hơn cột Δ ∈ {4, 8} ở **7 trong 8 ô** (ô còn lại, ρ = 0,25 theo harm, thấp hơn 0,088 nhưng CI chứa 0), và **cao hơn có ý nghĩa** ở đúng một ô: ρ = 1 theo harm (+0,167 [+0,073; +0,260], p = 0). Đọc trung thực: quyền chọn Δ có giá trị cho attacker, rõ nhất ở chỗ Sentinel đã yếu nhất (ρ = 1). Đây **không** là verdict H20 — H20 cần so với B1.
+
+### 10.4 Sáu thế giới độ nhạy một nhân tố
+
+Mỗi thế giới đổi **đúng một** công tắc so với thế giới chính (`config.sensitivities`), mọi trục khác giữ ô headline (χ = 1,33; d′ = 2,21; K_d = 2; b1; Δ ∈ {4, 8}; 7 cột held-out). **O15 áp dụng: bảng dòng 5 vẫn là bảng của thế giới chính.**
+
+#### 10.4.1 Đối chứng D28 trước đã — và thế giới `stage` KHÔNG ĐẠT
+
+| Thế giới | đối chứng (+) Oracle @ Δ∈{4,8} | (−) B1 @ Δ=0 | sweeper @ Δ=0 (B3 / B4 / B6) | ok |
+|---|---|---|---|---|
+| A7 | 0,0000 | 0,7614 | 0,8506 / 0,8506 / 0,8506 | **ĐẠT** |
+| drift-persistent | 0,0000 | 0,7614 | 0,8506 / 0,8506 / 0,8506 | **ĐẠT** |
+| ingress-hidden | 0,0000 | 0,7614 | 0,8506 / 0,8506 / 0,8506 | **ĐẠT** |
+| reversible | 0,0000 | 0,7614 | 0,8506 / 0,8506 / 0,8506 | **ĐẠT** |
+| seed-2 | 0,0000 | 0,7614 | 0,8506 / 0,8506 / 0,8506 | **ĐẠT** |
+| stage | 0,8415 | 0,7614 | 0,0120 / 0,0640 / 0,2622 | **KHÔNG ĐẠT** |
+
+Năm thế giới đầu **đạt ở cả 4 ρ**. Thế giới **`stage` (audit đọc theo stage) không đạt, sai cả hai vế**: Oracle (+) lên **0,841** thay vì 0 (nó không còn cách ly được carrier bị nhiễm khi audit đọc theo stage), và vế (−) đổ hoàn toàn — ở Δ = 0 ba sweeper đạt 0,012 / 0,064 / 0,262, **tốt hơn B1 (0,761)**, tức một sweep chạy sau agent lại chặn được thứ mà theo thiết kế nó không thể chặn.
+
+Theo **D28 / M1** ("the controls were read and failed: fix the world, do not read Sentinel"), **không đọc số Sentinel của thế giới `stage`** trong báo cáo này — `metrics.Readout` cũng sẽ ném `ControlsFailed`. Chỉ ghi lại: V_B1(L) ở `stage` là 2,1339 / 2,0132 / 1,8408 / 1,4788 theo ρ (so với 1,236 / 1,086 / 0,951 / 0,604 ở thế giới chính) — audit theo stage làm B1 mất thêm rất nhiều task sạch, và FQ/episode của B1 nhảy từ 0,000 lên 1,207. **Đây là một việc cần sửa thế giới, không phải một kết quả.**
+
+#### 10.4.2 gain của Sentinel so với B1 trong từng thế giới đọc được, hai metric
+
+| Thế giới | ρ | V_B1(L) | V_S(L) | **gain L %** [CI] | V_B1(harm) | V_S(harm) | gain harm % [CI] |
+|---|---|---|---|---|---|---|---|
+| A7 | 0 | 1,2358 | 0,9408 | **+23,9** [+17,4; +33,6] | 0,7874 | 0,7857 | +0,2 [−6,2; +10,4] |
+| A7 | 0,25 | 1,0862 | 0,8616 | **+20,7** [+12,4; +36,8] | 0,6463 | 0,7560 | −17,0 [−26,5; +5,7] |
+| A7 | 0,5 | 0,9512 | 0,8248 | **+13,3** [+2,4; +20,7] | 0,5122 | 0,7321 | −42,9 [−60,1; −21,2] |
+| A7 | 1 | 0,6038 | 0,9102 | **−50,7** [−97,4; −15,8] | 0,1970 | 0,7679 | −289,8 [−481,9; −174,9] |
+| drift-persistent | 0 | 1,2358 | 0,9953 | **+19,5** [+11,8; +26,4] | 0,7874 | 0,8538 | −8,4 [−18,9; +0,6] |
+| drift-persistent | 0,25 | 1,0862 | 0,9486 | **+12,7** [+2,9; +27,9] | 0,6463 | 0,8095 | −25,2 [−38,0; −7,1] |
+| drift-persistent | 0,5 | 0,9512 | 0,9946 | **−4,6** [−11,9; +3,5] | 0,5122 | 0,7500 | −46,4 [−72,2; −23,9] |
+| drift-persistent | 1 | 0,6038 | 0,9989 | **−65,4** [−124,8; −27,4] | 0,1970 | 0,7798 | −295,9 [−493,2; −183,9] |
+| ingress-hidden | 0 | 1,2358 | 0,9206 | **+25,5** [+14,1; +31,9] | 0,7874 | 0,8214 | −4,3 [−15,1; +2,7] |
+| ingress-hidden | 0,25 | 1,0862 | 0,9016 | **+17,0** [+7,2; +30,8] | 0,6463 | 0,8103 | −25,4 [−37,0; −13,3] |
+| ingress-hidden | 0,5 | 0,9512 | 0,8822 | **+7,3** [−7,6; +20,0] | 0,5122 | 0,7560 | −47,6 [−71,1; −29,7] |
+| ingress-hidden | 1 | 0,6038 | 0,8668 | **−43,6** [−91,4; −12,3] | 0,1970 | 0,7560 | −283,8 [−479,6; −180,5] |
+| reversible | 0 | 1,2358 | 0,7008 | **+43,3** [+35,8; +50,2] | 0,7874 | 0,6264 | +20,4 [+13,9; +28,4] |
+| reversible | 0,25 | 1,0862 | 0,6810 | **+37,3** [+29,0; +48,0] | 0,6463 | 0,5846 | +9,6 [−4,7; +23,0] |
+| reversible | 0,5 | 0,9512 | 0,7105 | **+25,3** [+18,7; +33,7] | 0,5122 | 0,5538 | −8,1 [−34,3; +6,0] |
+| reversible | 1 | 0,6038 | 0,5605 | **+7,2** [−43,7; +33,3] | 0,1970 | 0,4598 | −133,4 [−291,7; −60,9] |
+| seed-2 | 0 | 1,2358 | 0,8820 | **+28,6** [+20,1; +39,2] | 0,7874 | 0,7917 | −0,5 [−8,1; +10,1] |
+| seed-2 | 0,25 | 1,0862 | 0,8320 | **+23,4** [+19,0; +34,0] | 0,6463 | 0,7500 | −16,0 [−27,9; +3,5] |
+| seed-2 | 0,5 | 0,9512 | 0,8214 | **+13,6** [+0,9; +28,7] | 0,5122 | 0,6726 | −31,3 [−50,2; −13,2] |
+| seed-2 | 1 | 0,6038 | 0,7682 | **−27,2** [−65,6; −1,1] | 0,1970 | 0,6369 | −223,4 [−375,2; −144,4] |
+
+**Bản đồ chế độ của mục 4 sống sót cả năm thế giới đọc được, theo L**: gain dương và CI loại 0 ở ρ ≤ 0,25 trong **5/5** thế giới; ở ρ = 1 âm và CI loại 0 trong 4/5 (reversible thì không kết luận: +7,2 [−43,7; +33,3]). Ranh giới **dịch** theo thế giới, đúng chỗ đáng kể nhất:
+
+- **`drift-persistent` đẩy ranh giới sớm lên:** ở ρ = 0,5 gain theo L là **−4,6 [−11,9; +3,5]** (không kết luận) thay vì +14,0 của thế giới chính, và ở ρ = 0,25 chỉ còn +12,7 [+2,9; +27,9]. Drift lành dai dẳng là công tắc đắt nhất cho Sentinel — cùng chiều với mục 5 (mô hình hoá drift lành là thành phần chịu tải chính).
+- **`ingress-hidden`** cũng làm ρ = 0,5 mất ý nghĩa (+7,3 [−7,6; +20,0]).
+- **`reversible` là thế giới thuận nhất, và là thế giới duy nhất Sentinel thắng B1 *theo cả harm*:** ρ = 0 gain harm **+20,4% [+13,9; +28,4]** (và L +43,3% [+35,8; +50,2]). Khi harm hoàn lại được sau σ, việc cách ly muộn của Sentinel vẫn cứu được harm, nên lỗ hổng đo lường của metric harm-only (mục 3) tự khép lại.
+- **`A7` và `seed-2`** gần thế giới chính (gain L +23,9 / +28,6 ở ρ = 0).
+
+Theo **harm**, ngoài `reversible` thì gain âm hoặc không kết luận ở mọi thế giới và mọi ρ — đúng dự đoán ghim số 4 của tiền đăng ký.
+
+**Một quan sát phải khai (N3):** V và các số phụ của **B1 giống hệt thế giới chính** (bit-wise trên trung bình harm 0,42399384773135 và t_lost 0,70494744937196 mỗi episode) ở **A7, drift-persistent, ingress-hidden, reversible và stage**; chỉ `seed-2` đổi harm của B1 (0,4619) và `stage` đổi FQ của B1. Đây **đúng như khai**, không phải lỗi: bốn công tắc kia chỉ đổi kênh quan sát hoặc niềm tin, thứ B1 không dùng, và `v3/observe.py` ghi rõ *"A7 READING (L2, fix-a7 27/09): provenance is an EXTRA observation channel … a plain policy (B1, …) behaves identically in A0 and A7"*. Hệ **duy nhất** đọc kênh A7 là `B1-prov` (`v3/baselines.py:212`), và **`B1-prov` không nằm trong 15 hệ của lượt này** → thế giới A7 ở đây chỉ đo tác động lên Sentinel, **không** đo điều A7 được dựng để đo. Cần một lượt có `B1-prov` trước khi phát biểu bất cứ điều gì về A7.
+
+#### 10.4.3 Ablation trong từng thế giới (theo L, ρ = 0,5)
+
+| Thế giới | Sentinel | [dhat=oracle] | −randomization | −alarm memory | −benign-drift | −transition |
+|---|---|---|---|---|---|---|
+| A7 | +13,3 | +13,3 | +10,4 | +8,1 | −8,9 | +13,3 |
+| drift-persistent | −4,6 | −5,0 | −13,2 | −0,6 | −36,2 | −4,6 |
+| ingress-hidden | +7,3 | +3,6 | +2,2 | +13,1 | −18,8 | +7,3 |
+| reversible | +25,3 | +26,1 | +33,9 | +13,9 | +5,6 | +25,3 |
+| seed-2 | +13,6 | +13,6 | +14,7 | +8,2 | −16,6 | +13,6 |
+
+`−benign-drift` là cánh tệ nhất trong **5/5** thế giới đọc được (rơi 20–32 điểm so với bản đầy đủ), khớp mục 5. `−transition uncertainty` **bằng đúng** bản đầy đủ ở cả 5 thế giới tại ρ = 0,5 (outcome-identical ở ô này, đúng cảnh báo "outcome-identical is not inactive" của paper). `−randomization` lật dấu theo thế giới: **tốt hơn** bản đầy đủ ở `reversible` (+33,9 so với +25,3) và ở `seed-2` (+14,7 so với +13,6), nhưng tệ hơn ở `A7`, `drift-persistent`, `ingress-hidden`.
+
+#### 10.4.4 Exploitability trong từng thế giới (cross-fit D27, in kèm naive)
+
+| Thế giới | ρ | metric | V_held-out | V_BR cross-fit | exploit [CI] | exploit naive |
+|---|---|---|---|---|---|---|
+| A7 | 0 | L | 0,9408 | 0,7359 | −0,205 [−0,336; −0,127] | 0,389 |
+| A7 | 0 | harm | 0,7857 | 0,6772 | −0,108 [−0,194; −0,031] | 0,179 |
+| A7 | 0,25 | L | 0,8616 | 0,7601 | −0,101 [−0,187; −0,019] | 0,507 |
+| A7 | 0,25 | harm | 0,7560 | 0,6875 | −0,068 [−0,148; 0,012] | 0,209 |
+| A7 | 0,5 | L | 0,8248 | 0,6374 | −0,187 [−0,323; −0,137] | 0,639 |
+| A7 | 0,5 | harm | 0,7321 | 0,5833 | −0,149 [−0,294; −0,014] | 0,243 |
+| A7 | 1 | L | 0,9102 | 0,6920 | −0,218 [−0,303; −0,145] | 0,528 |
+| A7 | 1 | harm | 0,7679 | 0,6312 | −0,137 [−0,225; −0,047] | 0,207 |
+| drift-persistent | 0 | L | 0,9953 | 0,8585 | −0,137 [−0,263; −0,081] | 0,413 |
+| drift-persistent | 0 | harm | 0,8538 | 0,7722 | −0,082 [−0,220; 0,000] | 0,121 |
+| drift-persistent | 0,25 | L | 0,9486 | 0,8370 | −0,112 [−0,214; −0,055] | 0,453 |
+| drift-persistent | 0,25 | harm | 0,8095 | 0,7405 | −0,069 [−0,174; 0,009] | 0,155 |
+| drift-persistent | 0,5 | L | 0,9946 | 0,7163 | −0,278 [−0,412; −0,215] | 0,608 |
+| drift-persistent | 0,5 | harm | 0,7500 | 0,6420 | −0,108 [−0,227; −0,050] | 0,215 |
+| drift-persistent | 1 | L | 0,9989 | 0,7475 | −0,251 [−0,367; −0,187] | 0,585 |
+| drift-persistent | 1 | harm | 0,7798 | 0,6173 | −0,162 [−0,251; −0,083] | 0,180 |
+| ingress-hidden | 0 | L | 0,9206 | 0,8461 | −0,074 [−0,222; −0,053] | 0,391 |
+| ingress-hidden | 0 | harm | 0,8214 | 0,7438 | −0,078 [−0,208; −0,034] | 0,153 |
+| ingress-hidden | 0,25 | L | 0,9016 | 0,7743 | −0,127 [−0,293; −0,012] | 0,410 |
+| ingress-hidden | 0,25 | harm | 0,8103 | 0,7688 | −0,042 [−0,188; 0,011] | 0,164 |
+| ingress-hidden | 0,5 | L | 0,8822 | 0,7240 | −0,158 [−0,294; −0,098] | 0,615 |
+| ingress-hidden | 0,5 | harm | 0,7560 | 0,6203 | −0,136 [−0,254; −0,054] | 0,219 |
+| ingress-hidden | 1 | L | 0,8668 | 0,7280 | −0,139 [−0,251; −0,072] | 0,635 |
+| ingress-hidden | 1 | harm | 0,7560 | 0,6076 | −0,148 [−0,254; −0,064] | 0,219 |
+| reversible | 0 | L | 0,7008 | 0,5118 | −0,189 [−0,313; −0,088] | 0,533 |
+| reversible | 0 | harm | 0,6264 | 0,4125 | −0,214 [−0,352; −0,087] | 0,343 |
+| reversible | 0,25 | L | 0,6810 | 0,5459 | −0,135 [−0,276; −0,016] | 0,571 |
+| reversible | 0,25 | harm | 0,5846 | 0,5000 | −0,085 [−0,214; 0,002] | 0,380 |
+| reversible | 0,5 | L | 0,7105 | 0,4266 | −0,284 [−0,383; −0,203] | 0,592 |
+| reversible | 0,5 | harm | 0,5538 | 0,2938 | −0,260 [−0,396; −0,201] | 0,375 |
+| reversible | 1 | L | 0,5605 | 0,3980 | −0,162 [−0,266; −0,109] | 0,726 |
+| reversible | 1 | harm | 0,4598 | 0,2468 | −0,213 [−0,322; −0,130] | 0,444 |
+| seed-2 | 0 | L | 0,8820 | 0,7431 | −0,139 [−0,300; −0,026] | 0,572 |
+| seed-2 | 0 | harm | 0,7917 | 0,7244 | −0,067 [−0,167; 0,010] | 0,183 |
+| seed-2 | 0,25 | L | 0,8320 | 0,6972 | −0,135 [−0,268; −0,019] | 0,635 |
+| seed-2 | 0,25 | harm | 0,7500 | 0,6776 | −0,072 [−0,189; 0,022] | 0,225 |
+| seed-2 | 0,5 | L | 0,8214 | 0,6616 | −0,160 [−0,265; −0,063] | 0,729 |
+| seed-2 | 0,5 | harm | 0,6726 | 0,6218 | −0,051 [−0,152; 0,030] | 0,302 |
+| seed-2 | 1 | L | 0,7682 | 0,7156 | −0,053 [−0,171; 0,020] | 0,739 |
+| seed-2 | 1 | harm | 0,6369 | 0,5823 | −0,055 [−0,195; 0,035] | 0,333 |
+
+Dấu **âm ở mọi thế giới, mọi ρ, cả hai metric** theo cross-fit và **dương ở mọi ô** theo naive — y như mục 9.4 trên thế giới chính, nên kết luận của mục 9.4 giữ nguyên và **không mở rộng**: cột held-out xấu nhất đã khó bằng hoặc hơn attacker best-response ước lượng không chệch; "không khai thác được" thì **vẫn TBD**. Với `seed-2`, V_BR lấy từ khối `seed2-pairs` (khối ngoài core, luật `br_systems(..., core=False)`), là khối duy nhất trong nhóm này có **cả B1**.
+
+#### 10.4.5 H8 trong các thế giới độ nhạy: "B3 là tệ nhất" **chỉ đúng theo L**
+
+`v_b3_minus_worst_other` = V(B3) − max V trên các hệ còn lại (bỏ Oracle), cùng bộ rút họ, re-max qua cột trong từng lần rút. Ô đã khai của H8 là **thế giới ingress-visible** (= thế giới chính, khối `main`) nên **verdict khung vẫn TBD**; đây là bản đọc trong 5 thế giới độ nhạy:
+
+| Thế giới | ρ | theo L | theo harm |
+|---|---|---|---|
+| A7 | 0 | 1,611 [1,474; 1,780] (so với cost-greedy) | −0,021 [−0,084; 0,007] (so với B4 audit-on-retrieval) |
+| A7 | 0,5 | 1,639 [1,508; 1,802] (so với cost-greedy) | −0,021 [−0,084; 0,007] (so với B4 audit-on-retrieval) |
+| drift-persistent | 0 | 1,366 [1,191; 1,577] (so với cost-greedy) | −0,021 [−0,085; 0,004] (so với B4 audit-on-retrieval) |
+| drift-persistent | 0,5 | 1,394 [1,226; 1,598] (so với cost-greedy) | −0,021 [−0,085; 0,007] (so với B4 audit-on-retrieval) |
+| ingress-hidden | 0 | 0,798 [0,676; 0,926] (so với cost-greedy) | −0,017 [−0,046; 0,006] (so với B4 audit-on-retrieval) |
+| ingress-hidden | 0,5 | 0,826 [0,711; 0,948] (so với cost-greedy) | −0,017 [−0,046; 0,006] (so với B4 audit-on-retrieval) |
+| reversible | 0 | 1,611 [1,474; 1,780] (so với cost-greedy) | −0,021 [−0,084; 0,007] (so với B4 audit-on-retrieval) |
+| reversible | 0,5 | 1,639 [1,508; 1,802] (so với cost-greedy) | −0,021 [−0,084; 0,007] (so với B4 audit-on-retrieval) |
+| seed-2 | 0 | 1,561 [1,436; 1,761] (so với cost-greedy) | 0,000 [−0,022; 0,000] (so với B4 audit-on-retrieval) |
+| seed-2 | 0,5 | 1,589 [1,472; 1,780] (so với cost-greedy) | 0,000 [−0,022; 0,000] (so với B4 audit-on-retrieval) |
+
+Theo **L**, B3 tệ hơn hệ tệ thứ hai (cost-greedy) từ **+0,80 đến +1,67** với CI loại 0 ở mọi ô — "B3 là tệ nhất" **đúng và rất rõ**. Theo **harm**, B3 **không** tệ nhất: hiệu số là −0,021 đến 0,000, CI chứa 0 (p ≈ 0,77–1,00), và hệ ngang nó là B4 audit-on-retrieval. Lý do đọc thẳng từ mục 5, nơi B3 cách ly sai 4,38 lần mỗi episode ở thế giới chính: đó là thứ L phạt và harm-only không thấy. Đây là **ví dụ thứ hai** (sau mục 2) cho thấy việc chọn metric headline đổi kết luận của một hypothesis.
+
+### 10.5 Bảng điểm sau mục 10: chấm được gì, TBD vì sao (N3)
+
+| H | Rule | Trạng thái sau mục 10 | theo L | theo harm | Lý do nếu TBD |
+|---|---|---|---|---|---|
+| **H18** | D (+ E cho vế χ) | **CHẤM ĐƯỢC** (vế Δ) | vế draft **bác**, vế note **khớp** ở cả 4 ρ | **y như L** (thống kê là tỉ lệ bỏ lọt, không phụ thuộc metric) | vế χ TBD: không có arm price-only, và Q12 không khai δ cho ngân sách |
+| **H19** | D | **CHẤM ĐƯỢC** | **không kết luận** cả hai vế, mọi ρ | **không kết luận** cả hai vế, mọi ρ | — |
+| H1 | G + P | TBD | — | — | cần ô HEAD của thế giới chính (khối `main`, đã đọc ở mục 2–9 nhưng không phải nhiệm vụ của mục này) và lượt eval P5 cho `gain_heldout` |
+| H2 | P | TBD | — | — | cần cả gain dev và gain held-out của **eval** (P5): chưa có lượt eval |
+| H3 | P + D; E | TBD | — | — | cần trục χ (χ = 0 / 1,34) và **arm price-only**: lượt này chạy `--headline` nên chỉ có χ = 1,33, và khối `h18` không có arm price-only |
+| H4 | P | TBD | — | — | `gain_delta0` ở ô Δ = 0 của thế giới chính — khối `main`, ngoài phạm vi mục này |
+| H5 | D | TBD | — | — | cần gain ở χ uniform so với χ heterogeneous: không có trục χ trong lượt này |
+| H6 | D | TBD | — | — | cần B2 và cost-greedy trong ô HEAD của thế giới chính (khối `main`) |
+| H7 | P | TBD | — | — | cần 240 small game và **B7** (T21 chưa cài) |
+| H8 | D | TBD | — | — | ô đã khai là thế giới **ingress-visible** (= thế giới chính); mục 10.4.5 chỉ đọc được trong 5 thế giới độ nhạy |
+| H9 | P | TBD | — | — | `exploitability_*` ở ô HEAD thế giới chính (mục 9.2 có số; verdict cần P5 và cùng bộ estimator hai vế — mục 9.4) |
+| H10 | P | TBD | — | — | clean completion và FQ % ở ô HEAD thế giới chính; ngoài ra Q12 **không** khai δ cho đại lượng phần trăm → sẽ INCONCLUSIVE |
+| H11 | P + D | TBD | — | — | cần attacker LLM (addendum chưa chạy) |
+| H12 | P + D | TBD | — | — | V tuyệt đối của các cánh ở ô HEAD thế giới chính; mục 10.4.3 chỉ là bản đọc trong thế giới độ nhạy |
+| H13 | D | TBD | — | — | cần trục d′ (weak / strong detector): lượt này chỉ có d′ = 2,21 |
+| H14 | D | TBD | — | — | cần sweep η_Q: không có block nào |
+| H15 | D | TBD | — | — | `fq_pct_b5_minus_b1` ở ô HEAD thế giới chính |
+| H16 | D | TBD | — | — | `br_carrier_spread_sentinel_minus_b1`: **không có estimator nào trong `v3/metrics.py`** cho "độ tản qua carrier"; T17 không tự đặt định nghĩa (N3) |
+| H17 | D | TBD | — | — | `sw_random_benefit_minus_half_sentinel_benefit` ở ô HEAD thế giới chính |
+| H20 | N | TBD | — | — | cột attacker chọn Δ **không có bản ghi B1** (luật trim `br_systems` → `"sentinel"`): không lập được V_S − V_B1 (mục 10.3) |
+
+**Không có ô nào ghi 0 cho một đại lượng chưa đo.** Mọi TBD ở trên là `NOT_RUN` của `scorecard.score_all` (quantity không có `Estimate`), chứ không phải một outcome.
+
+**Số máy đọc được:** `spikes/v3-run/h_verdicts.json` (không commit — `spikes/` trong `.gitignore`, D33): đủ verdict theo (metric, ρ), toàn bộ số H18 / H19 / H20, sáu thế giới độ nhạy, exploitability cross-fit và naive, và đối chứng D28 từng thế giới.
+
+### 10.6 Ô nào của paper lấp được sau mục 10
+
+Mục này **không sửa paper**; đây là bản đồ ô.
+
+**Lấp được ngay — `sections/hypotheses.tex`, hai cột "Measured" và "Verdict":**
+
+| Dòng | H | Measured | Verdict |
+|---|---|---|---|
+| 44 (ô cuối dòng H18) | **H18** | b1: tỉ lệ bỏ lọt của biên rơi 0,189 → 0,012 từ Δ=4 sang Δ=8; thay đổi −0,176 [−0,260; −0,117], p = 0, ở cả 4 ρ (cùng số cho L và harm) | **bác** vế draft · **khớp** vế note (Thm 5.6). Vế χ (rule E) giữ `\tbd` |
+| 47 | **H19** | độ dốc gain(K=3) − gain(K=1): theo L −3,5 / +3,4 / +0,8 / +4,6 theo ρ, CI chứa 0 ở mọi ρ; theo harm −3,2 / +1,8 / −2,3 / 0,0, CI chứa 0 | **không kết luận** (cả hai vế, cả hai metric) |
+| 50 | **H20** | — | giữ `\tbd`: cột attacker-Δ không có B1 (nêu lý do, đừng để trống) |
+
+**Lấp được ngay — `sections/extra-tables.tex`, `tab:bounds`:**
+
+| Dòng | Ô | Giá trị |
+|---|---|---|
+| 26 | H18 Measured + Verdict | như trên; "$\chi$-free on the price-only arm" giữ `\tbd` (không có arm price-only trong lượt) |
+| 27 | H19 Measured + Verdict | như trên |
+| 29 | H20 Measured + Verdict | giữ `\tbd` + lý do |
+
+**Lấp được một phần — `sections/results.tex`:**
+
+- **dòng 289–292** (`\TBD{...direction of the minimum budget on the budget grid (H18); gain along $\Kd$ (H19); the attacker-chooses-$\Dl$ column (H20)}`): lấp **H18** và **H19** bằng mục 10.1 và 10.2; **H3 / H4 / H7 / H20** trong cùng câu đó giữ `\TBD` (lý do ở mục 10.5).
+- **dòng 472–477** (`\TBD{world A7 …; stage audits; harm reversible after $\sigma$; hidden ingress; persistent drift; two seeded carriers; $\Kd \in \{1, 3\}$; …}`): lấp bằng mục 10.4 cho **reversible, hidden ingress, persistent drift, two seeded carriers** và **K_d ∈ {1,3}**. **`stage` không được lấp bằng số** — phải viết là đối chứng D28 không đạt (mục 10.4.1). **A7 không được lấp** như một kết quả về A7: hệ đọc kênh A7 (`B1-prov`) không có trong lượt (mục 10.4.2). "the secondary 26-workflow split" và các addendum vẫn `\TBD`.
+
+**Không lấp được (và vì sao):** `tab:rq1` (mọi dòng Measured — cần trục χ), `tab:detector` (cần trục d′), `tab:rq3` (cần LLM, B7), `tab:refarms` (cần rollout và `-regime estimate`), `results.tex:410` (ablation ở ô HEAD), và toàn bộ ô eval — chưa có lượt P5, `frozen/V3-GATE4.json` chưa được ký.
+
