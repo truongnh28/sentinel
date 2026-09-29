@@ -48,3 +48,19 @@ Nếu chọn cách trung thực nhất thì nên chạy một lệnh 22 giờ. V
 ## 5. Không đổi kết luận đã có
 
 Số headline (Table 2, ô tiêu đề, Δ ∈ {4,8}) đến từ block `main` **đã chạy xong bằng một lệnh đơn trước khai bổ sung này**. Sáu lệnh chỉ thêm: exploitability (`br`), H18/H19 phía eval (`h18`, `kd`), bốn thế giới độ nhạy, và cột attacker-chọn-Δ. Không lệnh nào tính lại số của `main`.
+
+## 6. Thu hẹp lượt 1 xuống `h18` + `kd` (quyết 29/09 ~08:3x, TRƯỚC khi có kết quả của chúng)
+
+Sáu lệnh song song ở mục 2 **không được chạy**. Thay vào đó lượt 1 chỉ chạy thêm **một lệnh: `h18` và `kd`** (13.160 chain, lần cấp thứ hai trong `frozen/v3-unseal-log.jsonl`). Quyết định này được ghi **trước khi lệnh đó cho bất kỳ số nào**.
+
+**Lý do, theo giá trị thêm so với chi phí:**
+
+- `h18` là món giá trị nhất còn lại: nó đưa **H18 — bác Định lý 4 bản in và xác nhận bản đã sửa** — từ bằng chứng *dev* lên *held-out*. Đó là đóng góp mạnh nhất của nghiên cứu.
+- `kd` đi kèm rẻ (cùng lệnh) và cho H19.
+- `br` bị bỏ: vấn đề của exploitability **không phải thiếu dữ liệu** mà là hai bộ ước lượng lệch chiều theo kiến tạo (V giữ-ngoài là một cực đại nên phồng; V_BR có cross-fit nên nén). Có thêm `br` vẫn không phát biểu được "không thể bị khai thác". Bài báo vì vậy **không báo cáo exploitability**, kèm lý do.
+- Bốn thế giới độ nhạy bị bỏ: bằng chứng *dev* đã có (bản đồ chế độ sống ở 5/5 thế giới đọc được) và được dán nhãn **dev** rõ ràng trong bài.
+- `attacker-delta` bị bỏ: cột đó **không có bản ghi B1 nào**, nên `V_S − V_B1` không lập được — y như trên dev.
+
+**Hệ quả, ghi theo N3:** trên eval, **không đo** exploitability, bốn thế giới độ nhạy, và cột attacker-chọn-Δ. Không cell nào ghi 0 cho chúng, và **không suy diễn** từ dev sang eval.
+
+**Lượt 2 (32 ô ngoài tiêu đề) cũng được quyết KHÔNG chạy**, vì lưới χ đã khai ({1,04; 1,33; 2,11}) **không tới được ở các giá audit đo thật** (đo được 2,58 / 3,10 / 3,15; `docs/reports/v3-p3-kappa.md`): trục χ thu được sẽ mang các mức không tương ứng nhãn đã khai. H3, H5, H13 vì vậy ghi là **không đo**, kèm lý do này. Nếu về sau chạy lượt 2 thì nó vẫn là lượt đã tiền đăng ký ở D-v3-7 mục 6b, nhưng quyết định hiện tại là không chạy.
