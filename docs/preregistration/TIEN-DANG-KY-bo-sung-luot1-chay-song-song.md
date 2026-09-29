@@ -32,7 +32,9 @@ Block `main` (22.400 chain) **đã chạy xong** trước khai bổ sung này, b
 **KHÔNG đổi:**
 
 1. **Phạm vi.** Tập hợp các block và ô đúng như D-v3-7 đã khai. Không thêm một ô, một block, một hệ thống nào.
-2. **Không có phép nhìn-rồi-quyết.** Sáu lệnh được **phóng cùng lúc, trước khi bất kỳ kết quả nào của chúng được xem**. Việc chia block là chia theo chi phí tính toán, quyết định trước khi chạy, ghi ở mục 2.
+2. **Không có phép nhìn-rồi-quyết.** Sáu lệnh được phóng **trong vòng vài phút, liên tiếp, trước khi bất kỳ kết quả nào của chúng được xem**. Việc chia block là chia theo chi phí tính toán, quyết định trước khi chạy, ghi ở mục 2.
+
+   **Vì sao không phóng đồng thời được (một tính chất của thiết kế, ghi lại để người sau biết).** `seal.unseal` **tự ghi** một dòng vào `frozen/v3-unseal-log.jsonl` ở mỗi lần thử, và điều kiện (e) của Cổng 4 đòi `git status --porcelain` của `auditgame/` phải **rỗng**. Log chưa commit vì vậy làm bẩn cây và **chặn lần unseal kế tiếp**. Nghĩa là thiết kế buộc phải **commit bằng chứng của lần cấp trước mới xin được lần sau** — mỗi lần cấp đều bị ghim vào lịch sử git trước khi có lần tiếp theo. Thủ tục thực tế vì vậy là: commit log → phóng lệnh kế → chờ nó unseal và ghi log → commit → phóng lệnh kế… Sáu lần cấp tương ứng sáu commit liên tiếp của log, mỗi commit ghi lại đúng lần cấp trước nó. Đây là **tuân thủ** cơ chế, không phải lách nó.
 3. **Policy bị digest chặn.** Cổng 4 ghim manifest, luật scorecard và bảng dòng 5; nếu bất kỳ thứ nào đổi giữa các lệnh thì `seal.reasons` từ chối. Sáu lệnh vì vậy chạy đúng một policy đã đóng băng.
 4. **Kết quả không phụ thuộc cách chia.** Mọi rút ngẫu nhiên đi qua seed keyed (`core.seed_of`); post-mortem của dòng 1 chỉ mang trong cùng `(cell, system, column, seed)`; không có trạng thái chia sẻ giữa các block. Nên số thu được **giống hệt** lượt chạy một lệnh, và điều này **kiểm được**: block `main` đã chạy đơn lệnh và các block khác không đọc gì của nó.
 5. **Vẫn là lượt 1.** Lượt 2 (32 ô ngoài tiêu đề) vẫn như D-v3-7 đã khai: đã tiền đăng ký, chưa chạy.
