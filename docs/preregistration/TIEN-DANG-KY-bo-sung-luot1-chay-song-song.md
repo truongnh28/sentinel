@@ -85,3 +85,18 @@ Lệnh lần 1 và 2 truyền `--systems` tường minh nên log ghi đủ 15 t�
 **Vì sao có lần cấp thứ 3.** Lần cấp thứ 2 (2026-09-29T01:10:43Z) là lệnh `h18`+`kd`, bị kill lúc ~08:42 khi tắt máy, để lại `h18.jsonl` / `kd.jsonl` dở (≈ 290 / 274 MB). Hai tệp dở đó **không được đọc**; runner mở tệp đầu ra ở mode `"w"` nên lần 3 ghi đè sạch chúng. Lần 3 chạy **đúng cùng phạm vi** lần 2 — cùng block, cùng seeds, cùng cờ headline, cùng policy bị Gate 4 ghim (`freeze-v3: clean sha256:9c4c0d018b18`). Đây là **chạy lại một lệnh bị gián đoạn**, không phải một lượt mới, và không mở rộng phạm vi.
 
 **Vì sao không có checkpoint/resume.** Tệp Cổng 4 ghim `v3_manifest`, và manifest băm `tools/v3_run.py`. Thêm resume vào tệp đó sẽ đổi digest và `seal.reasons` sẽ **từ chối** mọi lượt eval sau. Tác giả vì vậy chọn chạy lại từ đầu thay vì sửa mã và ký lại cổng — ký lại sau khi đã thấy số eval sẽ phá đúng cái bảo đảm mà cổng dựng ra. Mã resume được viết trên một nhánh **chưa merge** (`v3-run-resume`), chỉ merge sau khi mọi lượt eval dưới cổng hiện tại đã xong.
+
+## 8. Rút lại mục 7(b) và 7(c): chúng sai, mục 6 đúng (ghi 29/09 ~09:5x, TRƯỚC khi lệnh lần 4 cho số nào)
+
+Mục 7 được viết dựa trên một suy luận sai của tác giả, phát hiện ngay sau đó bằng cách đếm thật. Ghi lại nguyên trạng, không xóa mục 7.
+
+**Sai ở đâu.** Tác giả cho rằng bỏ cờ `--systems` là vô hại vì "tập mặc định đúng bằng 15 hệ thống". Đếm thật cho thấy không phải: với block `h18` + `kd`, `systems=None` cho **4** hệ thống — `B1 audit-at-commit`, `B2 uniform random`, `Sentinel`, và `block-schedule` — trong đó **`block-schedule` KHÔNG nằm trong danh sách 15 đã khai**. Vì vậy:
+
+- **7(b) sai.** 16.800 là số chain của một tập hệ thống **rộng hơn**. Với đúng 15 hệ thống đã khai, số chain là **13.160** — tức con số ở mục 6 **đúng ngay từ đầu**. Kiểm được: `grid.chains(['h18','kd'], seeds=SEEDS[:10], systems=<15 tên>)` lọc ô tiêu đề cho đúng 13.160.
+- **7(c) sai.** `systems: null` **không** bằng danh sách 15. Nó là một tập khác, rộng hơn một hệ thống.
+
+**Hệ quả nghiêm trọng và cách xử lý.** Lần cấp thứ 3 (2026-09-29T02:39:40Z) vì vậy đã phóng một phạm vi **rộng hơn phạm vi đã khai**, và phóng sau khi tác giả đã thấy kết quả dev. Mở rộng tập hệ thống sau khi thấy kết quả là điều không được phép, bất kể hệ thống thêm vào có được báo cáo hay không.
+
+Tác giả **kill lệnh lần 3 sau ~4 phút, khi nó chưa cho bất kỳ số nào được đọc**, và phóng lại thành **lần cấp thứ 4** (2026-09-29T02:43:00Z, `git_head` 1b7f77a) với `--systems` truyền tường minh đúng 15 tên của dòng 1 và 2, cho đúng **13.160 chain**. Đầu ra dở của lần 3 bị lần 4 ghi đè (mode `"w"`).
+
+**Ghi theo N3:** không một số nào của lần cấp 3 được đọc, báo cáo, hay dùng để quyết định gì. `block-schedule` **không có mặt** trên eval, và được ghi là **không đo** trên eval. Bốn dòng trong `frozen/v3-unseal-log.jsonl` vì vậy là: (1) `main` + `br` dở, (2) `h18`+`kd` bị kill khi tắt máy, (3) `h18`+`kd` phạm vi sai, kill sau 4 phút, không đọc, (4) `h18`+`kd` đúng phạm vi. Lần 3 được để lại trong log **cố ý** — nó là bằng chứng của sai sót, và xóa nó sẽ là điều tệ hơn chính sai sót.
