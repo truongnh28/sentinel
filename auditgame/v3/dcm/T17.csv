@@ -1,0 +1,4 @@
+# draft-pdf-sha256: c37643f0971c3457c176c39607e1be6782007c85988c053e4b5ab0aa8be7263a
+id,where,quote,level,c_ref,decision,module,test,phase,result_ref
+D9.metrics,§9.3 p.6,Clean completion and false quarantine. Audit cost (CPUminutes) and detection delay. Exploitability: best-response gain against the deployed policy. Empirical regret against B7 on small games.,L0,,"the seven S9.3 metrics, weighted by workflow",v3/metrics.py,tests/v3/test_s9_metrics.py::TestS9Metrics::test_seven_metrics_of_section_9_3,P2,Table 2 columns
+D9.ci,§12 p.8 Conclusion validity,intervals are cluster-bootstrapped by repository,L2,R6,"wild cluster bootstrap over families (Webb weights, 18 clusters), re-taking the max over columns in every draw",v3/metrics.py,tests/v3/test_s9_metrics.py::TestS9Metrics::test_wild_cluster_bootstrap_resamples_families_and_remaxes_columns,P2,Table 2 CIs

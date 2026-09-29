@@ -1,0 +1,3 @@
+# draft-pdf-sha256: c37643f0971c3457c176c39607e1be6782007c85988c053e4b5ab0aa8be7263a
+id,where,quote,level,c_ref,decision,module,test,phase,result_ref
+DA1.l2,Alg. 1 lines 2-3 p.3; §7 p.5 Game solver,Small games (KH ≤ 40 belief-state discretisation) are solved exactly by backward induction over a discretised belief simplex.,L0+L2,R1,"exact sequence-form minimax when KH <= 40 and within 10^6 sequences / 60 s; otherwise log 'line23: infeasible, states=..., runtime=...' and fall back to line 5 (L2)",v3/exact.py,tests/v3/test_alg1_line23.py::TestAlg1Line23::test_line2_exact_when_KH_le_40_or_logs_infeasibility,P2,

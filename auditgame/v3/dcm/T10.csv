@@ -1,0 +1,3 @@
+# draft-pdf-sha256: c37643f0971c3457c176c39607e1be6782007c85988c053e4b5ab0aa8be7263a
+id,where,quote,level,c_ref,decision,module,test,phase,result_ref
+DA1.l1,Alg. 1 line 1 p.3,"Δ, χb ← estimate delay and heterogeneity from history",L1,C12; O3; O4,"Delta-hat = the q = 0.1 quantile of same-cell post-mortem delays (pinned workflow order), prior 1 before the first post-mortem, rounded down to the grid",v3/delta_hat.py,tests/v3/test_alg1_line1.py::TestAlg1Line1::test_line1_delta_hat_is_low_quantile_of_same_cell_postmortems,P2,"record delta_hat, n_incidents_seen"

@@ -1,0 +1,3 @@
+# draft-pdf-sha256: c37643f0971c3457c176c39607e1be6782007c85988c053e4b5ab0aa8be7263a
+id,where,quote,level,c_ref,decision,module,test,phase,result_ref
+D5.3.rand,§5.3 p.4,a deterministic allocation is trivially defeated: the attacker seeds the carrier the defender is not currently inspecting.,L1,H12,"the -randomization ablation is the best deterministic policy against best response, not a frozen member",v3/sentinel.py,tests/v3/test_alg1_sentinel.py::TestAlg1Sentinel::test_minus_randomization_is_best_deterministic_policy,P2,Table 3 '- randomization'
