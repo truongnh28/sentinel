@@ -450,6 +450,7 @@ Mọi đường dẫn tương đối với `auditgame/`. Mỗi task sở hữu m
 | T21 | `v3/smallgame_v3.py`; `tools/v3_small_games.py`; `tests/v3/test_s8_smallgames.py` |
 | T22 | `v3/grid.py`; `v3/freeze_v3.py`; `tools/v3_run.py`; `tests/v3/test_infra_grid.py`; `tests/v3/test_infra_freeze.py`; `../docs/reports/v3-p2-cost.md` |
 | T23 | `../docs/reports/v3-p2.md`; `../docs/v3/DCM.md` (sinh lại) |
+| T24 | Cổng benign-corpus P3 (mã mới, không dùng lại T23): `v3/benign.py`; `tools/v3_benign.py`; `tests/v3/test_s8_benign.py`; `reference/v3_benign.json`; `../docs/preregistration/lech-chuan-P3-benign.md`; `../docs/reports/v3-p3-benign.md`. Sửa thêm `v3/payload.py` của T3 (hàm rút độ dài payload, lệch chuẩn D-v3-3) |
 
 **Không task nào sửa:**
 - file v2 (mục 2);

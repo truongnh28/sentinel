@@ -172,6 +172,11 @@ def reasons(run_meta: dict) -> list:
         live, why = _live(module, func)
         if why:
             out.append(f"{key}: {why}")
+        elif live is None:
+            # table_digest() etc. return None until something is actually built (T14).
+            # A Gate-4 file that also says null must not pass by null == null: the point
+            # of this check is that a REAL artifact exists, not that no one built one.
+            out.append(f"{key}: the live digest is None (nothing built yet)")
         elif gate is not None and gate.get(key) != live:
             out.append(f"{key}: the Gate-4 file's digest is not the live one")
 

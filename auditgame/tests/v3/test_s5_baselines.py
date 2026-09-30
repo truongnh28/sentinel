@@ -11,6 +11,7 @@ import carrier_policies as CP
 from v3 import api as A
 from v3 import baselines as BL
 from v3 import config as C
+from v3 import observe as O
 
 HS = range(6, 15)                                       # draft S8: H ~ U{6..14}
 
@@ -133,16 +134,19 @@ class TestS5Baselines(unittest.TestCase):
         or continue."  D4.drift: "This is what makes the belief update non-trivial and what
         prevents “quarantine on any anomaly” from being optimal."
 
-        A baseline quarantines on any anomaly: the whole audited carrier -- the branch for
-        a commit alarm.  No alarm, nothing bought, or a stale o_t: no quarantine.  B6
-        quarantines on its confirmation only."""
+        A baseline quarantines on any anomaly of a SWEEP: the whole audited carrier.  A
+        commit alarm quarantines nothing -- the runner blocks that task's patch only (M1
+        fix 27/09; tests/v3/test_s4_runner.py test_commit_alarm_blocks_that_patch_only).
+        No alarm, nothing bought, or a stale o_t: no quarantine.  B6 quarantines on its
+        confirmation only."""
         ctx = ctx_for(H=12)
         for name in BL.BASELINES:
             if name == "B6 two-stage":
                 continue
             steps, _ = drive(BL.make_baseline(name, ctx), ctx, alarm_at=lambda t, a: t % 2 == 0)
             for t, _req, bought, q in steps:
-                want = C.CARRIER_OF_TARGET[bought.target] if t % 2 == 0 else None
+                want = (C.CARRIER_OF_TARGET[bought.target]
+                        if t % 2 == 0 and bought.target != "commit" else None)
                 self.assertEqual(q, want, (name, t, bought))
             pol = BL.make_baseline(name, ctx)
             a = pol.act(0, ctx.budget)
@@ -150,7 +154,14 @@ class TestS5Baselines(unittest.TestCase):
             self.assertIsNone(pol.quarantine(0), f"{name}: nothing bought")
             pol.observe(0, obs(0, a, alarm=True))
             self.assertIsNone(pol.quarantine(1), f"{name}: o_t is from another task")
-            self.assertEqual(pol.quarantine(0), C.CARRIER_OF_TARGET[a.target])
+            want = None if a.target == "commit" else C.CARRIER_OF_TARGET[a.target]
+            self.assertEqual(pol.quarantine(0), want, name)
+        # no baseline ever names the branch
+        for name in BL.BASELINES:
+            for seed in range(6):
+                c = ctx_for(H=12, rng_seed=seed)
+                steps, _ = drive(BL.make_baseline(name, c), c, alarm_at=lambda t, a: True)
+                self.assertNotIn("branch", [s[3] for s in steps], name)
         # B6: the screen alarm asks for a confirmation of the same carrier; its alarm quarantines
         pol = BL.make_baseline("B6 two-stage", ctx)
         a0 = pol.act(0, ctx.budget)
@@ -314,38 +325,63 @@ class TestS5Baselines(unittest.TestCase):
 
         B1-prov is B1 whose commit alarm also reads the provenance score of the
         contributing skills (A7) against the cell detector's threshold (O9).  In A0 there
-        is no provenance and B1-prov behaves as B1."""
+        is no provenance and B1-prov behaves as B1.  A commit alarm quarantines nothing:
+        the runner blocks that task's patch (M1 fix 27/09), so the rule shows in
+        alarmed_target, and quarantine() stays None.  B1-prov is the only baseline that
+        declares it reads the channel (L2, fix-a7): the runner blocks on its provenance
+        alarm, never on another baseline's."""
+        readers = [n for n, cls in BL.ALL.items() if O.reads_provenance(cls)]
+        self.assertEqual(readers, ["B1-prov"])
         a7 = C.sensitivities()[0][1]
         self.assertEqual(a7.provenance, "A7")
         for cell in every_cell():
             tau = cell.detector().tau_det
             for world, prov in ((a7, tau + 0.5), (C.PRIMARY, None)):
                 ctx = ctx_for(cell, H=8, world=world)
-                p_steps, _ = drive(BL.make_baseline("B1-prov", ctx), ctx,
-                                   provenance_at=lambda t: prov if t == 4 else None)
-                b_steps, _ = drive(BL.make_baseline("B1 audit-at-commit", ctx), ctx,
-                                   provenance_at=lambda t: prov if t == 4 else None)
+                pp = BL.make_baseline("B1-prov", ctx)
+                bb = BL.make_baseline("B1 audit-at-commit", ctx)
+                p_steps, _ = drive(pp, ctx, provenance_at=lambda t: prov if t == 4 else None)
+                b_steps, _ = drive(bb, ctx, provenance_at=lambda t: prov if t == 4 else None)
                 self.assertEqual([s[1] for s in p_steps], [s[1] for s in b_steps])
-                self.assertTrue(all(s[3] is None for s in b_steps), "B1 ignores provenance")
-                want = "branch" if prov is not None else None
-                self.assertEqual(p_steps[4][3], want, world.provenance)
-                self.assertTrue(all(s[3] is None for s in p_steps if s[0] != 4))
+                self.assertTrue(all(s[3] is None for s in b_steps + p_steps),
+                                "a commit alarm blocks the patch; it never quarantines")
+                want = "commit" if prov is not None else None
+                for pol in (pp, bb):
+                    pol.observe(4, obs(4, A.AuditAction("commit", 1), provenance=prov))
+                self.assertEqual(pp.provenance_alarm(4), prov is not None, world.provenance)
+                self.assertEqual(pp.alarmed_target(4), want, world.provenance)
+                self.assertIsNone(bb.alarmed_target(4), "B1 ignores provenance")
+                self.assertIsNone(pp.quarantine(4), "the runner blocks the patch instead")
             # below the threshold, no provenance alarm
             ctx = ctx_for(cell, H=8, world=a7)
-            steps, _ = drive(BL.make_baseline("B1-prov", ctx), ctx,
-                             provenance_at=lambda t: tau - 0.5)
+            pp = BL.make_baseline("B1-prov", ctx)
+            steps, _ = drive(pp, ctx, provenance_at=lambda t: tau - 0.5)
             self.assertTrue(all(s[3] is None for s in steps))
+            self.assertFalse(pp.provenance_alarm(ctx.H - 1))
 
     # ---- controls (D28) ------------------------------------------------------------------
 
-    def test_oracle_control_is_told_the_attacked_carrier_only(self):
+    def test_oracle_control_is_told_the_carrier_state_only(self):
         """D1.oracle (D28): "evaluator-known carrier/trigger state"
 
-        The positive control is given the seeded carrier(s) and nothing else of the
-        evaluator's state (no iota, sigma, payload), audits it every task, and is a
-        control, not a competitor."""
+        The positive control is a control, not a competitor.  It audits the seeded
+        carrier(s) every task, and after each task's audit it is handed the evaluator-known
+        carrier state c_t (by the runner, to this class only) and quarantines every carrier
+        whose bit is 1, without needing an audit (L2, M1 fix 27/09).  It is never told
+        iota, sigma or the payload; its own alarms quarantine nothing."""
         params = list(inspect.signature(BL.OracleControl.__init__).parameters)
         self.assertEqual(params, ["self", "ctx", "attacked"])
+        self.assertEqual(list(inspect.signature(BL.OracleControl.quarantine_state).parameters),
+                         ["self", "t", "c"])
+        pol = BL.make_baseline("Oracle (+)", ctx_for(H=10), attacked=("memory",))
+        for bits in range(16):
+            c = tuple((bits >> i) & 1 for i in range(len(C.CARRIERS)))
+            want = tuple(k for k, b in zip(C.CARRIERS, c) if b)
+            self.assertEqual(pol.quarantine_state(bits, c), want)
+        with self.assertRaises(ValueError):
+            pol.quarantine_state(0, (1, 0, 1))
+        pol.observe(0, obs(0, pol.act(0, 1e9), alarm=True))
+        self.assertIsNone(pol.quarantine(0), "its alarms quarantine nothing: c_t decides")
         self.assertNotIn("Oracle (+)", BL.BASELINES)
         self.assertIn("Oracle (+)", BL.CONTROLS)
         ctx = ctx_for(H=10)

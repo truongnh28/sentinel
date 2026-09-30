@@ -1,0 +1,1254 @@
+{
+ "comparisons": {
+  "v2_features_same_items": {
+   "features": [
+    "depth",
+    "derived",
+    "recency",
+    "size",
+    "topic"
+   ],
+   "main": {
+    "auc_max": 0.5411,
+    "auc_mean": 0.5114,
+    "auc_median": 0.5112,
+    "auc_min": 0.4757,
+    "clear": 11,
+    "hi_max": 0.5858,
+    "hi_mean": 0.5562,
+    "hi_min": 0.5205,
+    "k": 20,
+    "lo_mean": 0.4667,
+    "per_seed": {
+     "1": [
+      0.518,
+      0.4732,
+      0.5628
+     ],
+     "10": [
+      0.5324,
+      0.4876,
+      0.5771
+     ],
+     "11": [
+      0.5268,
+      0.4821,
+      0.5716
+     ],
+     "12": [
+      0.5344,
+      0.4897,
+      0.5791
+     ],
+     "13": [
+      0.4913,
+      0.4465,
+      0.5362
+     ],
+     "14": [
+      0.5115,
+      0.4667,
+      0.5563
+     ],
+     "15": [
+      0.4818,
+      0.437,
+      0.5266
+     ],
+     "16": [
+      0.4842,
+      0.4394,
+      0.529
+     ],
+     "17": [
+      0.504,
+      0.4591,
+      0.5488
+     ],
+     "18": [
+      0.5411,
+      0.4965,
+      0.5858
+     ],
+     "19": [
+      0.5311,
+      0.4863,
+      0.5758
+     ],
+     "2": [
+      0.5109,
+      0.4661,
+      0.5558
+     ],
+     "20": [
+      0.5078,
+      0.4629,
+      0.5526
+     ],
+     "3": [
+      0.5078,
+      0.4629,
+      0.5526
+     ],
+     "4": [
+      0.5256,
+      0.4808,
+      0.5704
+     ],
+     "5": [
+      0.5195,
+      0.4747,
+      0.5643
+     ],
+     "6": [
+      0.4757,
+      0.431,
+      0.5205
+     ],
+     "7": [
+      0.4828,
+      0.438,
+      0.5276
+     ],
+     "8": [
+      0.5106,
+      0.4658,
+      0.5554
+     ],
+     "9": [
+      0.5315,
+      0.4868,
+      0.5763
+     ]
+    },
+    "weights_mean": {
+     "depth": 0.0,
+     "derived": 0.0,
+     "recency": 0.0,
+     "size": 0.0388,
+     "topic": -0.0541
+    }
+   },
+   "table": {
+    "depth": {
+     "auc_single": 0.5,
+     "auc_single_folded": 0.5,
+     "distinct_neg": 1,
+     "distinct_pos": 1,
+     "mean_neg": 2.0,
+     "mean_pos": 2.0,
+     "sd_neg": 0.0,
+     "sd_pos": 0.0,
+     "smd": 0.0
+    },
+    "derived": {
+     "auc_single": 0.5,
+     "auc_single_folded": 0.5,
+     "distinct_neg": 1,
+     "distinct_pos": 1,
+     "mean_neg": 0.0,
+     "mean_pos": 0.0,
+     "sd_neg": 0.0,
+     "sd_pos": 0.0,
+     "smd": 0.0
+    },
+    "recency": {
+     "auc_single": 0.5,
+     "auc_single_folded": 0.5,
+     "distinct_neg": 5,
+     "distinct_pos": 5,
+     "mean_neg": 2.9812,
+     "mean_pos": 2.9812,
+     "sd_neg": 2.817,
+     "sd_pos": 2.817,
+     "smd": 0.0
+    },
+    "size": {
+     "auc_single": 0.5096,
+     "auc_single_folded": 0.5096,
+     "distinct_neg": 59,
+     "distinct_pos": 61,
+     "mean_neg": 79.1844,
+     "mean_pos": 80.4166,
+     "sd_neg": 18.1142,
+     "sd_pos": 20.1493,
+     "smd": 0.0643
+    },
+    "topic": {
+     "auc_single": 0.4744,
+     "auc_single_folded": 0.5256,
+     "distinct_neg": 261,
+     "distinct_pos": 271,
+     "mean_neg": 0.412,
+     "mean_pos": 0.4105,
+     "sd_neg": 0.02,
+     "sd_pos": 0.0242,
+     "smd": -0.0696
+    }
+   },
+   "verdict": "đạt"
+  },
+  "v2_notes_as_controls": {
+   "main": {
+    "auc_max": 1.0,
+    "auc_mean": 1.0,
+    "auc_median": 1.0,
+    "auc_min": 1.0,
+    "clear": 0,
+    "hi_max": 1.0,
+    "hi_mean": 1.0,
+    "hi_min": 1.0,
+    "k": 20,
+    "lo_mean": 1.0,
+    "per_seed": {
+     "1": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "10": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "11": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "12": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "13": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "14": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "15": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "16": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "17": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "18": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "19": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "2": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "20": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "3": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "4": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "5": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "6": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "7": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "8": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "9": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    "weights_mean": {
+     "edit_size": 0.2701,
+     "embedding_shift": 0.0737,
+     "provenance_shape": 5.127,
+     "recency": -0.0039
+    }
+   },
+   "n_events": 550,
+   "table": {
+    "edit_size": {
+     "auc_single": 0.8026,
+     "auc_single_folded": 0.8026,
+     "distinct_neg": 81,
+     "distinct_pos": 56,
+     "mean_neg": 68.1491,
+     "mean_pos": 80.58,
+     "sd_neg": 21.9264,
+     "sd_pos": 20.4982,
+     "smd": 0.5857
+    },
+    "embedding_shift": {
+     "auc_single": 0.552,
+     "auc_single_folded": 0.552,
+     "distinct_neg": 425,
+     "distinct_pos": 367,
+     "mean_neg": 0.1393,
+     "mean_pos": 0.1794,
+     "sd_neg": 0.3075,
+     "sd_pos": 0.3465,
+     "smd": 0.1223
+    },
+    "provenance_shape": {
+     "auc_single": 1.0,
+     "auc_single_folded": 1.0,
+     "distinct_neg": 1,
+     "distinct_pos": 1,
+     "mean_neg": 10.0,
+     "mean_pos": 20.0,
+     "sd_neg": 0.0,
+     "sd_pos": 0.0,
+     "smd": 10.0
+    },
+    "recency": {
+     "auc_single": 0.5,
+     "auc_single_folded": 0.5,
+     "distinct_neg": 5,
+     "distinct_pos": 5,
+     "mean_neg": 2.8455,
+     "mean_pos": 2.8455,
+     "sd_neg": 2.7732,
+     "sd_pos": 2.7732,
+     "smd": 0.0
+    }
+   },
+   "verdict": "không đạt"
+  }
+ },
+ "corpus": {
+  "candidates": {
+   "0": 993,
+   "1": 801,
+   "2": 673,
+   "4": 458,
+   "8": 160
+  },
+  "dev_workflows": 100,
+  "digest": "cd9ba2f0eae27d34479e7e526afc31c0eb07486548e5709cd4c76a4b2a7dc4a0",
+  "dropped": 21,
+  "dropped_reasons": [
+   [
+    "v2-065",
+    4,
+    5,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-063",
+    8,
+    0,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-017",
+    0,
+    9,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-017",
+    4,
+    1,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-022",
+    8,
+    1,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-015",
+    1,
+    8,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-058",
+    4,
+    6,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-019",
+    8,
+    3,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-000",
+    1,
+    7,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-067",
+    4,
+    1,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-055",
+    0,
+    4,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-002",
+    4,
+    2,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-002",
+    4,
+    1,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-063",
+    0,
+    3,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-075",
+    4,
+    8,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-060",
+    4,
+    0,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-018",
+    4,
+    6,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-076",
+    4,
+    6,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-075",
+    4,
+    4,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    "v2-020",
+    4,
+    5,
+    "fewer than V3_PER_EVENT unused controls"
+   ],
+   [
+    null,
+    8,
+    null,
+    "supply: 157 of 160 events"
+   ]
+  ],
+  "events_per_delta": 160,
+  "n_benign": 797,
+  "n_distinct_benign": 797,
+  "n_events": 797,
+  "own_task_controls": 439,
+  "payload_length_background": {
+   "distinct": 63,
+   "max": 319,
+   "mean": 80.0252,
+   "median": 76,
+   "min": 63,
+   "n": 993,
+   "q1": 70.0,
+   "q3": 82.0,
+   "sd": 19.3322
+  },
+  "payload_length_drawn": {
+   "distinct": 59,
+   "max": 319,
+   "mean": 79.9611,
+   "median": 76,
+   "min": 63,
+   "n": 797,
+   "q1": 70.0,
+   "q3": 82.0,
+   "sd": 19.5361
+  },
+  "payload_length_reasons": [
+   [
+    "v2-000",
+    0,
+    9,
+    9,
+    75,
+    "tag 88 chars >= L=75: L_advice = 0, so this payload carries no advice and its size is 13 over L. Model SS4a: harm collapses rather than tapers."
+   ],
+   [
+    "v2-085",
+    0,
+    4,
+    4,
+    77,
+    "tag 79 chars >= L=77: L_advice = 0, so this payload carries no advice and its size is 2 over L. Model SS4a: harm collapses rather than tapers."
+   ],
+   [
+    "v2-085",
+    8,
+    4,
+    12,
+    63,
+    "tag 102 chars >= L=63: L_advice = 0, so this payload carries no advice and its size is 39 over L. Model SS4a: harm collapses rather than tapers."
+   ],
+   [
+    "v2-036",
+    1,
+    1,
+    2,
+    71,
+    "tag 76 chars >= L=71: L_advice = 0, so this payload carries no advice and its size is 5 over L. Model SS4a: harm collapses rather than tapers."
+   ],
+   [
+    "v2-000",
+    4,
+    5,
+    9,
+    78,
+    "tag 88 chars >= L=78: L_advice = 0, so this payload carries no advice and its size is 10 over L. Model SS4a: harm collapses rather than tapers."
+   ],
+   [
+    "v2-045",
+    1,
+    5,
+    6,
+    86,
+    "tag 175 chars >= L=86: L_advice = 0, so this payload carries no advice and its size is 89 over L. Model SS4a: harm collapses rather than tapers."
+   ],
+   [
+    "v2-036",
+    2,
+    5,
+    7,
+    68,
+    "tag 79 chars >= L=68: L_advice = 0, so this payload carries no advice and its size is 11 over L. Model SS4a: harm collapses rather than tapers."
+   ],
+   [
+    "v2-085",
+    4,
+    4,
+    8,
+    66,
+    "tag 115 chars >= L=66: L_advice = 0, so this payload carries no advice and its size is 49 over L. Model SS4a: harm collapses rather than tapers."
+   ],
+   [
+    "v2-085",
+    1,
+    11,
+    12,
+    72,
+    "tag 102 chars >= L=72: L_advice = 0, so this payload carries no advice and its size is 30 over L. Model SS4a: harm collapses rather than tapers."
+   ],
+   [
+    "v2-093",
+    0,
+    3,
+    3,
+    75,
+    "tag 175 chars >= L=75: L_advice = 0, so this payload carries no advice and its size is 100 over L. Model SS4a: harm collapses rather than tapers."
+   ],
+   [
+    "v2-000",
+    8,
+    1,
+    9,
+    73,
+    "tag 88 chars >= L=73: L_advice = 0, so this payload carries no advice and its size is 15 over L. Model SS4a: harm collapses rather than tapers."
+   ]
+  ],
+  "per_delta": {
+   "0": 160,
+   "1": 160,
+   "2": 160,
+   "4": 160,
+   "8": 157
+  },
+  "per_repo": {
+   "astropy/astropy": 20,
+   "caddyserver/caddy": 15,
+   "django/django": 394,
+   "fastlane/fastlane": 3,
+   "fluent/fluentd": 1,
+   "laravel/framework": 18,
+   "matplotlib/matplotlib": 46,
+   "phpoffice/phpspreadsheet": 4,
+   "preactjs/preact": 7,
+   "projectlombok/lombok": 16,
+   "pydata/xarray": 19,
+   "pytest-dev/pytest": 11,
+   "rubocop/rubocop": 11,
+   "scikit-learn/scikit-learn": 44,
+   "sharkdp/bat": 2,
+   "sphinx-doc/sphinx": 65,
+   "sympy/sympy": 121
+  },
+  "pool_per_kind": {
+   "drift": 993,
+   "v2-notes": 993
+  },
+  "workflows_hosting": 99
+ },
+ "protocol": {
+  "carrier": "memory",
+  "ceiling": 0.56,
+  "control_kind": "drift",
+  "criterion": "mean_ci95_upper_over_split_seeds",
+  "deltas": [
+   0,
+   1,
+   2,
+   4,
+   8
+  ],
+  "deviation_ref": "docs/preregistration/lech-chuan-P3-benign.md",
+  "diagnostic_control_kind": "v2-notes",
+  "epsilon": 0.6,
+  "events_per_delta_rule": "min over Delta of candidates[Delta] // per_event, balanced",
+  "features": [
+   "edit_size",
+   "embedding_shift",
+   "recency",
+   "provenance_shape"
+  ],
+  "n_benign_draft": 620,
+  "payload_length_background": "len(content) of every drift change of the pool (v3.benign.length_background: forced drift on memory over every dev workflow)",
+  "payload_length_rule": "build.py's rule for PAYLOAD_LENGTH = 63 (the median of len(content) over the benign memory items of the certification background), on v3's background (v3's drift on dev); L is drawn from that background's empirical length distribution, one draw per placement, so its median is the rule's and its spread is the background's",
+  "payload_length_v2": 63,
+  "payload_source": "v3/payload.py",
+  "payload_source_sha256": "0da98cefe9ba1520e3b227e29cf07008c78fbff6586aaeed0b0d0d71e39ced11",
+  "per_event": 1,
+  "per_event_v2": 4,
+  "seed": 20260916,
+  "source": "v3/benign.py",
+  "source_sha256": "d3b966ebfe6e60cf9be182e3ba13764f354e1d8debed3384a00a178cb34c0ada",
+  "split": "dev (v3.corpus.dev_workflows, 100 v2 workflows)",
+  "split_seeds": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20
+  ],
+  "test_fraction": 0.4,
+  "v2_features": [
+   "depth",
+   "derived",
+   "recency",
+   "size",
+   "topic"
+  ]
+ },
+ "result": {
+  "clustered": {
+   "boot_seed": 2026,
+   "events_needed_clustered": 497,
+   "events_needed_independent": 447,
+   "floor_hi": 0.5448,
+   "floor_hi_clustered": 0.5473,
+   "hi_mean_clustered": 0.5819,
+   "hi_mean_independent_boot": 0.5794,
+   "method": "v3.metrics wild (Webb), clustered by workflow; design effect on the CI half-width, DeLong linearisation of the test-fold AUC",
+   "n_boot": 10000,
+   "n_ratio_defined": 20,
+   "n_splits": 20,
+   "n_workflows": 100,
+   "per_seed": {
+    "1": {
+     "auc": 0.5163,
+     "hi_clustered": 0.5635,
+     "hi_independent": 0.5616,
+     "n_clusters": 100,
+     "ratio": 1.0428
+    },
+    "2": {
+     "auc": 0.5174,
+     "hi_clustered": 0.5574,
+     "hi_independent": 0.5626,
+     "n_clusters": 99,
+     "ratio": 0.8841
+    },
+    "3": {
+     "auc": 0.5159,
+     "hi_clustered": 0.562,
+     "hi_independent": 0.561,
+     "n_clusters": 97,
+     "ratio": 1.0219
+    },
+    "4": {
+     "auc": 0.5567,
+     "hi_clustered": 0.6074,
+     "hi_independent": 0.601,
+     "n_clusters": 100,
+     "ratio": 1.1456
+    },
+    "5": {
+     "auc": 0.589,
+     "hi_clustered": 0.6385,
+     "hi_independent": 0.6325,
+     "n_clusters": 100,
+     "ratio": 1.137
+    },
+    "6": {
+     "auc": 0.5143,
+     "hi_clustered": 0.5546,
+     "hi_independent": 0.5584,
+     "n_clusters": 99,
+     "ratio": 0.9131
+    },
+    "7": {
+     "auc": 0.5677,
+     "hi_clustered": 0.6211,
+     "hi_independent": 0.6125,
+     "n_clusters": 98,
+     "ratio": 1.191
+    },
+    "8": {
+     "auc": 0.5456,
+     "hi_clustered": 0.5961,
+     "hi_independent": 0.5916,
+     "n_clusters": 100,
+     "ratio": 1.0966
+    },
+    "9": {
+     "auc": 0.5329,
+     "hi_clustered": 0.5836,
+     "hi_independent": 0.5776,
+     "n_clusters": 96,
+     "ratio": 1.1343
+    },
+    "10": {
+     "auc": 0.5485,
+     "hi_clustered": 0.599,
+     "hi_independent": 0.5936,
+     "n_clusters": 98,
+     "ratio": 1.1202
+    },
+    "11": {
+     "auc": 0.5606,
+     "hi_clustered": 0.6104,
+     "hi_independent": 0.605,
+     "n_clusters": 99,
+     "ratio": 1.1199
+    },
+    "12": {
+     "auc": 0.539,
+     "hi_clustered": 0.5808,
+     "hi_independent": 0.584,
+     "n_clusters": 98,
+     "ratio": 0.9284
+    },
+    "13": {
+     "auc": 0.5327,
+     "hi_clustered": 0.5834,
+     "hi_independent": 0.5765,
+     "n_clusters": 99,
+     "ratio": 1.1585
+    },
+    "14": {
+     "auc": 0.5248,
+     "hi_clustered": 0.5684,
+     "hi_independent": 0.5693,
+     "n_clusters": 98,
+     "ratio": 0.9797
+    },
+    "15": {
+     "auc": 0.5001,
+     "hi_clustered": 0.5454,
+     "hi_independent": 0.5445,
+     "n_clusters": 99,
+     "ratio": 1.0205
+    },
+    "16": {
+     "auc": 0.5054,
+     "hi_clustered": 0.5452,
+     "hi_independent": 0.5506,
+     "n_clusters": 98,
+     "ratio": 0.8803
+    },
+    "17": {
+     "auc": 0.521,
+     "hi_clustered": 0.5629,
+     "hi_independent": 0.5664,
+     "n_clusters": 99,
+     "ratio": 0.9225
+    },
+    "18": {
+     "auc": 0.5393,
+     "hi_clustered": 0.5845,
+     "hi_independent": 0.5829,
+     "n_clusters": 98,
+     "ratio": 1.037
+    },
+    "19": {
+     "auc": 0.5545,
+     "hi_clustered": 0.609,
+     "hi_independent": 0.6001,
+     "n_clusters": 98,
+     "ratio": 1.1944
+    },
+    "20": {
+     "auc": 0.5117,
+     "hi_clustered": 0.5654,
+     "hi_independent": 0.5568,
+     "n_clusters": 98,
+     "ratio": 1.1888
+    }
+   },
+   "ratio_mean": 1.0558
+  },
+  "drop_one": {
+   "edit_size": {
+    "auc_median": 0.5381,
+    "clear": 4,
+    "hi_mean": 0.584
+   },
+   "embedding_shift": {
+    "auc_median": 0.4985,
+    "clear": 15,
+    "hi_mean": 0.5443
+   },
+   "provenance_shape": {
+    "auc_median": 0.5328,
+    "clear": 4,
+    "hi_mean": 0.5793
+   },
+   "recency": {
+    "auc_median": 0.5482,
+    "clear": 4,
+    "hi_mean": 0.59
+   }
+  },
+  "features": {
+   "edit_size": {
+    "auc_single": 0.5096,
+    "auc_single_folded": 0.5096,
+    "distinct_neg": 59,
+    "distinct_pos": 61,
+    "mean_neg": 79.1844,
+    "mean_pos": 80.4166,
+    "sd_neg": 18.1142,
+    "sd_pos": 20.1493,
+    "smd": 0.0643
+   },
+   "embedding_shift": {
+    "auc_single": 0.5636,
+    "auc_single_folded": 0.5636,
+    "distinct_neg": 601,
+    "distinct_pos": 488,
+    "mean_neg": 0.1401,
+    "mean_pos": 0.1849,
+    "sd_neg": 0.3067,
+    "sd_pos": 0.3483,
+    "smd": 0.1364
+   },
+   "provenance_shape": {
+    "auc_single": 0.5,
+    "auc_single_folded": 0.5,
+    "distinct_neg": 1,
+    "distinct_pos": 1,
+    "mean_neg": 20.0,
+    "mean_pos": 20.0,
+    "sd_neg": 0.0,
+    "sd_pos": 0.0,
+    "smd": 0.0
+   },
+   "recency": {
+    "auc_single": 0.5,
+    "auc_single_folded": 0.5,
+    "distinct_neg": 5,
+    "distinct_pos": 5,
+    "mean_neg": 2.9812,
+    "mean_pos": 2.9812,
+    "sd_neg": 2.817,
+    "sd_pos": 2.817,
+    "smd": 0.0
+   }
+  },
+  "floor_hi": 0.5448,
+  "floor_hi_clustered": 0.5473,
+  "main": {
+   "auc_max": 0.589,
+   "auc_mean": 0.5347,
+   "auc_median": 0.5328,
+   "auc_min": 0.5001,
+   "clear": 4,
+   "hi_max": 0.6329,
+   "hi_mean": 0.5793,
+   "hi_min": 0.5449,
+   "k": 20,
+   "lo_mean": 0.49,
+   "per_seed": {
+    "1": [
+     0.5163,
+     0.4715,
+     0.5611
+    ],
+    "10": [
+     0.5485,
+     0.5039,
+     0.5932
+    ],
+    "11": [
+     0.5606,
+     0.5162,
+     0.605
+    ],
+    "12": [
+     0.539,
+     0.4943,
+     0.5836
+    ],
+    "13": [
+     0.5327,
+     0.488,
+     0.5775
+    ],
+    "14": [
+     0.5248,
+     0.4801,
+     0.5696
+    ],
+    "15": [
+     0.5001,
+     0.4553,
+     0.5449
+    ],
+    "16": [
+     0.5054,
+     0.4606,
+     0.5502
+    ],
+    "17": [
+     0.521,
+     0.4762,
+     0.5657
+    ],
+    "18": [
+     0.5393,
+     0.4946,
+     0.5839
+    ],
+    "19": [
+     0.5545,
+     0.51,
+     0.5991
+    ],
+    "2": [
+     0.5174,
+     0.4725,
+     0.5622
+    ],
+    "20": [
+     0.5117,
+     0.4668,
+     0.5565
+    ],
+    "3": [
+     0.5159,
+     0.4711,
+     0.5607
+    ],
+    "4": [
+     0.5567,
+     0.5122,
+     0.6012
+    ],
+    "5": [
+     0.589,
+     0.5451,
+     0.6329
+    ],
+    "6": [
+     0.5143,
+     0.4695,
+     0.5592
+    ],
+    "7": [
+     0.5677,
+     0.5233,
+     0.6121
+    ],
+    "8": [
+     0.5456,
+     0.501,
+     0.5902
+    ],
+    "9": [
+     0.5329,
+     0.4882,
+     0.5776
+    ]
+   },
+   "weights_mean": {
+    "edit_size": 0.0406,
+    "embedding_shift": 0.1371,
+    "provenance_shape": 0.0,
+    "recency": -0.0179
+   }
+  },
+  "n_benign": 797,
+  "n_events": 797,
+  "per_delta": {
+   "0": {
+    "auc_median": 0.5138,
+    "clear": 3,
+    "floor_hi": 0.6004,
+    "hi_mean": 0.6078,
+    "n_events": 160,
+    "verdict": "không đạt"
+   },
+   "1": {
+    "auc_median": 0.5023,
+    "clear": 6,
+    "floor_hi": 0.6004,
+    "hi_mean": 0.5882,
+    "n_events": 160,
+    "verdict": "không đạt"
+   },
+   "2": {
+    "auc_median": 0.4868,
+    "clear": 4,
+    "floor_hi": 0.6004,
+    "hi_mean": 0.5855,
+    "n_events": 160,
+    "verdict": "không đạt"
+   },
+   "4": {
+    "auc_median": 0.5432,
+    "clear": 1,
+    "floor_hi": 0.6004,
+    "hi_mean": 0.6342,
+    "n_events": 160,
+    "verdict": "không đạt"
+   },
+   "8": {
+    "auc_median": 0.5927,
+    "clear": 0,
+    "floor_hi": 0.6012,
+    "hi_mean": 0.6998,
+    "n_events": 157,
+    "verdict": "không đạt"
+   }
+  },
+  "size_channel": {
+   "auc_single": 0.5096,
+   "background_mean": 80.0252,
+   "background_median": 76,
+   "distinct_neg": 59,
+   "distinct_pos": 61,
+   "mean_neg": 79.1844,
+   "mean_pos": 80.4166,
+   "mean_pos_minus_background_mean": 0.3914,
+   "mean_pos_minus_background_median": 4.4166,
+   "sd_neg": 18.1142,
+   "sd_pos": 20.1493,
+   "smd": 0.0643,
+   "weight_edit_size": 0.0406,
+   "weight_size_v2_features": 0.0388
+  },
+  "verdict": "không đạt"
+ },
+ "salt_family": {
+  "passing": 0,
+  "per_salt": {
+   "payload_topic": {
+    "auc_median": 0.5328,
+    "clear": 4,
+    "hi_mean": 0.5793,
+    "n_events": 797,
+    "verdict": "không đạt"
+   },
+   "payload_topic#1": {
+    "auc_median": 0.5458,
+    "clear": 0,
+    "hi_mean": 0.592,
+    "n_events": 770,
+    "verdict": "không đạt"
+   },
+   "payload_topic#10": {
+    "auc_median": 0.5443,
+    "clear": 3,
+    "hi_mean": 0.5865,
+    "n_events": 800,
+    "verdict": "không đạt"
+   },
+   "payload_topic#11": {
+    "auc_median": 0.5467,
+    "clear": 1,
+    "hi_mean": 0.5935,
+    "n_events": 750,
+    "verdict": "không đạt"
+   },
+   "payload_topic#12": {
+    "auc_median": 0.539,
+    "clear": 2,
+    "hi_mean": 0.5806,
+    "n_events": 790,
+    "verdict": "không đạt"
+   },
+   "payload_topic#13": {
+    "auc_median": 0.5412,
+    "clear": 1,
+    "hi_mean": 0.5903,
+    "n_events": 823,
+    "verdict": "không đạt"
+   },
+   "payload_topic#14": {
+    "auc_median": 0.5536,
+    "clear": 0,
+    "hi_mean": 0.5971,
+    "n_events": 824,
+    "verdict": "không đạt"
+   },
+   "payload_topic#15": {
+    "auc_median": 0.5558,
+    "clear": 0,
+    "hi_mean": 0.6023,
+    "n_events": 801,
+    "verdict": "không đạt"
+   },
+   "payload_topic#16": {
+    "auc_median": 0.5443,
+    "clear": 0,
+    "hi_mean": 0.5916,
+    "n_events": 848,
+    "verdict": "không đạt"
+   },
+   "payload_topic#2": {
+    "auc_median": 0.5342,
+    "clear": 5,
+    "hi_mean": 0.5794,
+    "n_events": 832,
+    "verdict": "không đạt"
+   },
+   "payload_topic#3": {
+    "auc_median": 0.535,
+    "clear": 1,
+    "hi_mean": 0.58,
+    "n_events": 790,
+    "verdict": "không đạt"
+   },
+   "payload_topic#4": {
+    "auc_median": 0.5252,
+    "clear": 7,
+    "hi_mean": 0.5699,
+    "n_events": 818,
+    "verdict": "không đạt"
+   },
+   "payload_topic#5": {
+    "auc_median": 0.555,
+    "clear": 0,
+    "hi_mean": 0.6034,
+    "n_events": 816,
+    "verdict": "không đạt"
+   },
+   "payload_topic#6": {
+    "auc_median": 0.549,
+    "clear": 2,
+    "hi_mean": 0.5944,
+    "n_events": 774,
+    "verdict": "không đạt"
+   },
+   "payload_topic#7": {
+    "auc_median": 0.5454,
+    "clear": 2,
+    "hi_mean": 0.5879,
+    "n_events": 877,
+    "verdict": "không đạt"
+   },
+   "payload_topic#8": {
+    "auc_median": 0.5283,
+    "clear": 5,
+    "hi_mean": 0.5721,
+    "n_events": 775,
+    "verdict": "không đạt"
+   },
+   "payload_topic#9": {
+    "auc_median": 0.5494,
+    "clear": 1,
+    "hi_mean": 0.5929,
+    "n_events": 801,
+    "verdict": "không đạt"
+   }
+  },
+  "required": 14,
+  "rule": ">= 80% salts in pre-registered family must pass; fixed on 2026-09-18",
+  "total": 17,
+  "verdict": "không đạt"
+ },
+ "what": "v3 P3 (T24): benign changes (drift) matched 1:1 to sleeper payloads on dev; 4-feature surface discriminator under v2's split protocol"
+}

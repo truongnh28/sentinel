@@ -71,8 +71,19 @@ class TestInfraSeal(unittest.TestCase):
             with self.assertRaises(S.SealedSplit) as cm:
                 S.unseal(meta)
             msg = str(cm.exception)
+            # The Gate-4 file is the human gate no tool can pass -- the invariant that holds
+            # from P2 through P5 until the user signs it.  (freeze_v3 is a check too, but once
+            # the P4 manifest is built it is clean and drops out of the reasons; the refusal
+            # then rests on the Gate-4 file above.  Its coverage is asserted below with an
+            # unbuilt freeze_v3, so it does not depend on the ambient manifest state.)
             self.assertIn("Gate-4", msg)
-            self.assertIn("freeze_v3", msg)
+
+        def _unbuilt_freeze(mod, fn):
+            return (None, "freeze_v3 is not built") if fn == "header_line" else ("x", None)
+        with mock.patch.object(S, "_live", side_effect=_unbuilt_freeze):
+            why_unbuilt = S.reasons({"split": "eval"})
+        self.assertTrue(any("freeze_v3" in w for w in why_unbuilt), why_unbuilt)
+
         why = S.reasons({"split": "dev"})
         self.assertTrue(any("split='eval'" in w for w in why), why)
 
@@ -110,6 +121,24 @@ class TestInfraSeal(unittest.TestCase):
         with mock.patch.object(K, "EVAL_SPLIT_SHA256", "0" * 64):
             with self.assertRaises(S.SealedSplit):
                 S.eval_workflows(token, "primary")
+
+    def test_a_gate4_file_of_null_never_matches_an_unbuilt_live_digest(self):
+        """Layer 2d, correctness: a LIVE_DIGESTS entry that returns None (nothing built,
+        e.g. line5_table.table_digest() before a table exists) must refuse even when the
+        Gate-4 file also carries null for that key.  null == null must never be read as
+        "the digests match": the check exists to require a REAL built artifact, not to
+        tolerate the absence of one on both sides."""
+        gate = {f: "x" for f in S.GATE_FIELDS}
+        gate["line5_table"] = None          # the exact shape T14's build produces pre-table
+        self.gate.write_text(json.dumps(gate), encoding="utf-8")
+        with mock.patch.object(K, "EVAL_SPLIT_SHA256", "x"), \
+             mock.patch.object(K, "SECONDARY_SPLIT_SHA256", "x"), \
+             mock.patch.object(S, "_v2_freeze_header", return_value="freeze: clean x"), \
+             mock.patch.object(S, "_live", side_effect=lambda mod, fn:
+                                (None, None) if fn == "table_digest" else ("x", None)), \
+             mock.patch.object(S, "_git_status", return_value=""):
+            why = S.reasons({"split": "eval"})
+        self.assertTrue(any("line5_table" in r and "None" in r for r in why), why)
 
     def test_every_unseal_attempt_is_logged(self):
         """Plan S6 layer 3: every unseal() call appends one line to the unseal log, with

@@ -1,0 +1,511 @@
+{
+  "attackers": {
+    "br_eps": [
+      0.3,
+      0.6,
+      1.0
+    ],
+    "delta_classes": [
+      "delta-fixed-0",
+      "delta-fixed-1",
+      "delta-fixed-2",
+      "delta-fixed-4",
+      "delta-fixed-8",
+      "delta-mix-uniform"
+    ],
+    "development": [
+      "branch-last-ingress-e0.6",
+      "branch-last-write-e0.6",
+      "branch-mid-ingress-e0.6",
+      "memory-first-write-e0.6",
+      "memory-last-ingress-e0.6",
+      "queue-first-write-e0.6",
+      "skill-first-write-e0.6",
+      "skill-last-ingress-e0.6",
+      "skill-last-write-e0.6",
+      "uniform-last-ingress-e0.6",
+      "uniform-mid-write-e0.6"
+    ],
+    "eps_max": 1.0,
+    "held_out": [
+      "branch-first-write-e0.6",
+      "memory-last-ingress-e0.3",
+      "memory-last-write-e0.6",
+      "memory-mid-write-e0.3",
+      "queue-last-ingress-e0.6",
+      "queue-mid-write-e0.6",
+      "skill-last-write-e1.0"
+    ],
+    "rule_br": [
+      "br:memory:write:first",
+      "br:memory:write:last",
+      "br:memory:ingress:first",
+      "br:memory:ingress:last",
+      "br:skill:write:first",
+      "br:skill:write:last",
+      "br:skill:ingress:first",
+      "br:skill:ingress:last",
+      "br:queue:write:first",
+      "br:queue:write:last",
+      "br:queue:ingress:first",
+      "br:queue:ingress:last",
+      "br:branch:write:first",
+      "br:branch:write:last",
+      "br:branch:ingress:first",
+      "br:branch:ingress:last"
+    ],
+    "scripted": [
+      "branch-first-write-e0.6",
+      "branch-last-ingress-e0.6",
+      "branch-last-write-e0.6",
+      "branch-mid-ingress-e0.6",
+      "memory-first-write-e0.6",
+      "memory-last-ingress-e0.3",
+      "memory-last-ingress-e0.6",
+      "memory-last-write-e0.6",
+      "memory-mid-write-e0.3",
+      "queue-first-write-e0.6",
+      "queue-last-ingress-e0.6",
+      "queue-mid-write-e0.6",
+      "skill-first-write-e0.6",
+      "skill-last-ingress-e0.6",
+      "skill-last-write-e0.6",
+      "skill-last-write-e1.0",
+      "uniform-last-ingress-e0.6",
+      "uniform-mid-write-e0.6"
+    ],
+    "tuning": [
+      "branch-last-ingress-e0.6",
+      "branch-mid-ingress-e0.6",
+      "memory-first-write-e0.6",
+      "queue-first-write-e0.6",
+      "skill-first-write-e0.6",
+      "skill-last-ingress-e0.6"
+    ]
+  },
+  "base": {
+    "d35": "e46f8a5c2f946bcf0b33595bc7babb6ce6417f8018e9bee13c3bbce303822c43",
+    "v2": "c789fa7362e0a5a20b00fa7b896213cb82283c65e079742111534cb1f8e1d408"
+  },
+  "config": {
+    "decided_o": {
+      "O1": {
+        "delegated_by_kd": {
+          "1": [
+            "skill"
+          ],
+          "2": [
+            "skill",
+            "queue"
+          ],
+          "3": [
+            "skill",
+            "queue",
+            "memory"
+          ]
+        },
+        "k_d_primary": 2
+      },
+      "O10": {
+        "ro_axis": [
+          "random-phase",
+          "start-at-highest-posterior-carrier"
+        ]
+      },
+      "O11": {
+        "beta_base": "dev-clean-runs",
+        "beta_update": "same-cell-postmortems"
+      },
+      "O12": {
+        "rollout_se_is_gate": false,
+        "table_diff_se_max": 0.15,
+        "table_r": 32,
+        "table_se_max": 0.09,
+        "top_up_gate": "crn_pairwise_diff_se (line5-se-diff, 27/09/2026)"
+      },
+      "O13": {
+        "n_a_shared_rollout": false
+      },
+      "O14": {
+        "line5_action_when_none_affordable": "none",
+        "line5_skip_unaffordable": true,
+        "table_has_budget_key": false
+      },
+      "O15": {
+        "table_world": "primary"
+      },
+      "O16": {
+        "delegated_mass_threshold": 0.5,
+        "empty_fallback": "nearest-bin-same-h-with-reason",
+        "n_bins": 40,
+        "p_attack_levels": 5,
+        "top_carrier_levels": 4
+      },
+      "O2": {
+        "no_early_target": true,
+        "retrieval": "every-task-after-iota",
+        "target_predicate": "v2-theta-on-sigma-topic"
+      },
+      "O3": {
+        "min_postmortems": 1,
+        "off_grid": "round-down-to-grid",
+        "prior": 1,
+        "q": 0.1
+      },
+      "O4": {
+        "postmortem_always": true
+      },
+      "O5": {
+        "classes": [
+          "fixed-delta-per-sequence",
+          "uniform-delta-mix-per-workflow"
+        ]
+      },
+      "O6": {
+        "b1_binding_rule": [
+          "lower-depth-evenly-while-above-1",
+          "drop-commit-at-evenly-spaced-tasks"
+        ]
+      },
+      "O7": {
+        "branch_quarantine_loses_clean_patches": false,
+        "branch_quarantine_removes": "poisoned-lineage",
+        "fq_unit": "carrier-quarantine-with-c_t[k]=0"
+      },
+      "O8": {
+        "checkpoint_psi_equals_phi": true
+      },
+      "O9": {
+        "a7_provenance_dprime": "cell-detector-dprime"
+      }
+    },
+    "primary": {
+      "audit_reading": "carrier",
+      "drift": "transient",
+      "harm": "locked",
+      "ingress_visible": true,
+      "kernel": "nominal",
+      "line5": "table",
+      "n_seeded": 1,
+      "provenance": "A0"
+    },
+    "sensitivities": {
+      "A7": {
+        "audit_reading": "carrier",
+        "drift": "transient",
+        "harm": "locked",
+        "ingress_visible": true,
+        "kernel": "nominal",
+        "line5": "table",
+        "n_seeded": 1,
+        "provenance": "A7"
+      },
+      "drift-persistent": {
+        "audit_reading": "carrier",
+        "drift": "persistent",
+        "harm": "locked",
+        "ingress_visible": true,
+        "kernel": "nominal",
+        "line5": "table",
+        "n_seeded": 1,
+        "provenance": "A0"
+      },
+      "ingress-hidden": {
+        "audit_reading": "carrier",
+        "drift": "transient",
+        "harm": "locked",
+        "ingress_visible": false,
+        "kernel": "nominal",
+        "line5": "table",
+        "n_seeded": 1,
+        "provenance": "A0"
+      },
+      "reversible": {
+        "audit_reading": "carrier",
+        "drift": "transient",
+        "harm": "reversible",
+        "ingress_visible": true,
+        "kernel": "nominal",
+        "line5": "table",
+        "n_seeded": 1,
+        "provenance": "A0"
+      },
+      "seed-2": {
+        "audit_reading": "carrier",
+        "drift": "transient",
+        "harm": "locked",
+        "ingress_visible": true,
+        "kernel": "nominal",
+        "line5": "table",
+        "n_seeded": 2,
+        "provenance": "A0"
+      },
+      "stage": {
+        "audit_reading": "stage",
+        "drift": "transient",
+        "harm": "locked",
+        "ingress_visible": true,
+        "kernel": "nominal",
+        "line5": "table",
+        "n_seeded": 1,
+        "provenance": "A0"
+      }
+    }
+  },
+  "dcm": {
+    "README.md": "0c26ac532e9e2fd83b44f14bdbe2dc9470f96ca451b5bc6cc7e9a32727d3cb78",
+    "T01.csv": "a8841af8060061c208c14236ba8f184b7875df0e067fdf8877ba3833d0d2cbc2",
+    "T02.csv": "5c2edc3b844ba18ff497a1c509dcad40b0086c09b28403c4955cf7244f97ca93",
+    "T03.csv": "887fd001b43bfb7f7b8ec8fbfa6dbe268423a35eb3db46134c3d5e0e306d038b",
+    "T04.csv": "8f7eed7bf7972d6e580cee1a960ec182aef7ac401baf81c3dd4312000cd05789",
+    "T05.csv": "8694361796aae125439e26ccf9960f9ca2561c913b975336de4035b5f9608bbf",
+    "T06.csv": "0d49cc5134638d775a1fed83ba031892e72f1e42614baa3cf0bbaa98d8f15ec9",
+    "T07.csv": "551718f58ab0edb4a63456e4857a595f2409ed3af61ddac70cb4eb52cc1b4d2c",
+    "T08.csv": "f9c408be843b3b527409a7e05532ebd728b50d0c4a0f0d34b990711a70ce5f8f",
+    "T09.csv": "fe3e9bfbfe9f8c4ba00cf3c6dd6be596a3738cf340c1bb648b813a7602cacaf6",
+    "T10.csv": "d913fc113b29a49f3ef99864742f080d72b221857aa7d52c4841d07e53e583a7",
+    "T11.csv": "3b7a3ea3800a3e36e50a32ab5d0325ec8506e706085ddba3658789c33c14ee37",
+    "T12.csv": "a1abaa56b690532fdd7eb7636926707b41c57b7ae9794ccbee7d41502fc68bee",
+    "T13.csv": "246db2fabea0819e8bb05fc148a46fc6a9cb467014d3999846a774fa375b1c8c",
+    "T14.csv": "556375e0a670bd99f2bfb2d7dbad6e97df8364f45c75b231f54b95679f555b8c",
+    "T15.csv": "18af65d02a84ecddb9d3884cc5a556f5c1b9ec9a6740f621878f8790d2922292",
+    "T16.csv": "56a849f2811cf5fcd7926e1a730b06fad380aba784b1a510fe39ab4a12ccb76d",
+    "T17.csv": "307e03e9ae434cb2d11069d58b96dca3f2bdd2d5264186b3cbd3cc3bec301a49",
+    "T18.csv": "19d450db99dc7f9434e4e15b5421fe8231eb073cbcc4c67d895304b5c0fc3e9a",
+    "T20.csv": "ec3247218c6e4d8101c5c54424e9fdbccb5bf050ca299f5456288bb676468577",
+    "T21.csv": "b2ee3081c89669a439353b9830566838ff280862fe62fcba65df317a72daca49",
+    "T22.csv": "bfe591b288d3ab40853d9590036f7cbb5b6ce0da49324f19c243ca58ff7347d8",
+    "T24.csv": "05a3ad85e67f2a350f975e61f8ab2cb3713344239f80bd9d22807f9ddce847b9"
+  },
+  "digest": "9c4c0d018b1869941e35e5fe1ebe54bfa3f872b7d4adfb4194c66a2ef5c0eeb6",
+  "files": {
+    "reference/v3_tuned.json": "b50145586c5c2c1bdc056de2a1f47d1b55eb4c1affc6a1ba989f1faa953db7a5",
+    "tools/v3_build_table.py": "be2b133dcf4f578dd6f7d4a6bd736322e5ffe5313b01c9a434ce9863c476e6b1",
+    "tools/v3_headline_rollout.py": null,
+    "tools/v3_run.py": "804ab3daa4741897f5c1510312dadd3c721eb8911a84682ad0be28ca14752ffb",
+    "tools/v3_tune.py": "7f180ab2994e2e090751876122031e0627075493d9dd6724286f24e23e5aa33e"
+  },
+  "grid": "acbe9bdc48fd49a6f49e76f9cbc003a4d50b3341d27d3ca0ede6d85d62fd4e64",
+  "line5_table": "sha256:83ecff91b36983809f148aa0057f7a3d06f05ac689826c8f63f7566d83ebf368",
+  "registries": {
+    "baselines": [
+      "B1 audit-at-commit",
+      "B1 audit-at-commit (exhaust)",
+      "B1-prov",
+      "B2 uniform random",
+      "B3 audit-on-insertion",
+      "B4 audit-on-retrieval",
+      "B5 risk-score",
+      "B6 two-stage",
+      "Oracle (+)",
+      "SW randomised",
+      "cost-greedy"
+    ],
+    "budget": [
+      "block-schedule"
+    ],
+    "grid_systems": [
+      "B1 audit-at-commit",
+      "B2 uniform random",
+      "B3 audit-on-insertion",
+      "B4 audit-on-retrieval",
+      "B5 risk-score",
+      "B6 two-stage",
+      "B7",
+      "Oracle (+)",
+      "SW randomised",
+      "Sentinel",
+      "Sentinel -alarm memory",
+      "Sentinel -benign-drift",
+      "Sentinel -randomization",
+      "Sentinel -transition uncertainty",
+      "Sentinel [dhat=oracle]",
+      "Sentinel [dhat=prior]",
+      "Sentinel-rollout",
+      "block-schedule",
+      "cost-greedy"
+    ],
+    "library": [
+      "L-BT-u0.3-f0",
+      "L-BT-u0.3-f1",
+      "L-BT-u0.3-f2",
+      "L-BT-u0.5-f0",
+      "L-BT-u0.5-f1",
+      "L-BT-u0.5-f2",
+      "L-BT-u0.7-f0",
+      "L-BT-u0.7-f1",
+      "L-BT-u0.7-f2",
+      "L-BT-u0.9-f0",
+      "L-BT-u0.9-f1",
+      "L-BT-u0.9-f2",
+      "L-RO-c3-p1-posterior",
+      "L-RO-c3-p1-random",
+      "L-RO-c3-p2-posterior",
+      "L-RO-c3-p2-random",
+      "L-RO-c4-p1-posterior",
+      "L-RO-c4-p1-random",
+      "L-RO-c4-p2-posterior",
+      "L-RO-c4-p2-random",
+      "L-SW-commit",
+      "L-SW-commit3",
+      "L-SW-memory",
+      "L-SW-nomemory",
+      "L-SW-queue",
+      "L-SW-skill",
+      "L-SW-sweeps",
+      "L-SW-uniform"
+    ],
+    "sentinel": [
+      "Sentinel",
+      "Sentinel -alarm memory",
+      "Sentinel -benign-drift",
+      "Sentinel -randomization",
+      "Sentinel -transition uncertainty",
+      "Sentinel [dhat=oracle]",
+      "Sentinel [dhat=prior]",
+      "Sentinel-rollout"
+    ]
+  },
+  "scorecard": "21b8c093254abbff09876db07b5b5eca19034b71457434a56f270dea171c840c",
+  "source": {
+    "__init__.py": "882f9b50121d6a8f8ebd21df2c845ae3a598e46206b9b734012617447dfe0d21",
+    "agent.py": "abfc28ef8e72f200bac082a4289fc4e0834699b0fad5f5a223c099b7c1f3a254",
+    "api.py": "9eeaf53a31b09817c73567edbe1fad5ecfeb3d72a12b38128bfc16d9e1b01543",
+    "attackers.py": "7f050dc136ee1432f919a28a55f8ebd574662716310605bac6550d514e6b20b6",
+    "audit_checks.py": "2bfb24a9e7d8afe9219fd820485f5197b03bf3a0469ea599e1cb035ab532a256",
+    "baselines.py": "6f9ba067e35e485bf99868fb0cb3926dc2d59c8151fda571d7dcf7aee424438e",
+    "belief_exact.py": "8c1991a123e00b4da6f998f392777b8976f9cbc21c602c8de4446ac561accb56",
+    "belief_pf.py": "35be771c0d9c8b40c48e1b51b0c3e25ac0028bf3ca384dfdfe9dcfca058d9b11",
+    "benign.py": "d3b966ebfe6e60cf9be182e3ba13764f354e1d8debed3384a00a178cb34c0ada",
+    "budget.py": "aed103cb861f3f0d6b386ebd68927cc68731733179a600eba872894324310017",
+    "config.py": "8db2830e32597df8c3521d0e33b51cadf5ca44727699bde46acabacc84c97136",
+    "corpus.py": "2559f6dde34e540eb2662488805e9698b8edd6b0900b72b99c6b89f11615e6bd",
+    "delta_hat.py": "6483c197d491103359b2d2eb96b92e4c4a5908ff7e6f6638b35be8f3899de4e6",
+    "exact.py": "15c671f7f7bbf3e09083170d5a08fb2807fd5910c99091c451d91d7927626b0a",
+    "freeze_v3.py": "0c2adbb1f604fc0404960f57330c429fee7ab735ae80d6e8fc1fe3180aa304ec",
+    "grid.py": "4915df148b258e2b28a9170ca1836b68375e98d5fb7e1f8c3d10f042b38262d4",
+    "library.py": "f41effee556f43bda9a2eb1b5bbdc73c19add5d1f812affda7e9a42cf062ed62",
+    "line5.py": "81cd7143e94ccab2e4ec24fc7dd1ceee725c4a88e442bcbbf13d8b428d861d28",
+    "line5_table.py": "374af99d02bc833c45654959f1f6a2c0b7fcff471931ee6d1e98f857e430091f",
+    "line8.py": "e5defbf1457789d7db55ba66d88d5ab27adcced834a6054bc657e5a32e113b74",
+    "metrics.py": "6716c054d7d44126a812fa3bb282c60042cf9316c7870b6ec757f1e82db113f8",
+    "observe.py": "ad3e92ae819f520ea3506bb8857d5f1a9aec4be73656858d774708ab7e8ed01e",
+    "oracle.py": "d4aef11c255455605b7a44c7d3e0c5c9e6158039de0362895a3fb5a57dc09db3",
+    "payload.py": "0da98cefe9ba1520e3b227e29cf07008c78fbff6586aaeed0b0d0d71e39ced11",
+    "rollout.py": "9cf704a89535d207a8f7b99a0004b94d8af478a34277178477c7a9a1a5aab551",
+    "runner.py": "b6dc52d7cd7a92aef92614c5e3e162198b081989418f835f671726a0e9946d10",
+    "scorecard.py": "5ca2fe67d48ae54252af2a207bbc80200bafcfd0fd158953814b6ef5627af71f",
+    "seal.py": "a095bc79def65a48ebf8f735cd5e80744f821ce14a7f7c27d7d348ef877a1a57",
+    "sentinel.py": "86b7a7c8108b589a1ee35540cd35049b6032fd1621cc431f730cb4223000529e",
+    "sequence.py": "37d61bf2f5e5693afa2128f5536282d6c3a4c7a680fec0a6d412a461fd408d0e",
+    "smallgame_v3.py": "ef57a5fec917e1b6556057a727fd333dcf661199735594ae99825a50fa72c639",
+    "stage_world.py": "3a467b8435821e11d014eb273989c05ecb00011077d3b1dfbe355e55669ae7ce",
+    "state.py": "61d7b79cb440e5644dc1bed9cf58cbac94718287c05f2440f7161a4177200595"
+  },
+  "splits": {
+    "dev_order": [
+      "v2-000",
+      "v2-001",
+      "v2-002",
+      "v2-003",
+      "v2-004",
+      "v2-005",
+      "v2-006",
+      "v2-007",
+      "v2-008",
+      "v2-009",
+      "v2-010",
+      "v2-011",
+      "v2-012",
+      "v2-013",
+      "v2-014",
+      "v2-015",
+      "v2-016",
+      "v2-017",
+      "v2-018",
+      "v2-019",
+      "v2-020",
+      "v2-021",
+      "v2-022",
+      "v2-023",
+      "v2-024",
+      "v2-025",
+      "v2-026",
+      "v2-027",
+      "v2-028",
+      "v2-029",
+      "v2-030",
+      "v2-031",
+      "v2-032",
+      "v2-033",
+      "v2-034",
+      "v2-035",
+      "v2-036",
+      "v2-037",
+      "v2-038",
+      "v2-039",
+      "v2-040",
+      "v2-041",
+      "v2-042",
+      "v2-043",
+      "v2-044",
+      "v2-045",
+      "v2-046",
+      "v2-047",
+      "v2-048",
+      "v2-049",
+      "v2-050",
+      "v2-051",
+      "v2-052",
+      "v2-053",
+      "v2-054",
+      "v2-055",
+      "v2-056",
+      "v2-057",
+      "v2-058",
+      "v2-059",
+      "v2-060",
+      "v2-061",
+      "v2-062",
+      "v2-063",
+      "v2-064",
+      "v2-065",
+      "v2-066",
+      "v2-067",
+      "v2-068",
+      "v2-069",
+      "v2-070",
+      "v2-071",
+      "v2-072",
+      "v2-073",
+      "v2-074",
+      "v2-075",
+      "v2-076",
+      "v2-077",
+      "v2-078",
+      "v2-079",
+      "v2-080",
+      "v2-081",
+      "v2-082",
+      "v2-083",
+      "v2-084",
+      "v2-085",
+      "v2-086",
+      "v2-087",
+      "v2-088",
+      "v2-089",
+      "v2-090",
+      "v2-091",
+      "v2-092",
+      "v2-093",
+      "v2-094",
+      "v2-095",
+      "v2-096",
+      "v2-097",
+      "v2-098",
+      "v2-099"
+    ],
+    "eval_split_sha256": "e34e747c36f1581941b7fad46c82a3f64475bb73522a4eb95cf6458c7e820fa0",
+    "secondary_split_sha256": "ed4e3dcb55e757b73d81bf8b7005e88f1f56685c396c745acd6dc0cfb71f5123"
+  }
+}

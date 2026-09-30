@@ -48,7 +48,7 @@ def from_bits(s: str) -> tuple:
     return tuple(int(ch) for ch in s)
 
 
-def _index(store: CarrierStore) -> dict:
+def _items_by_id(store: CarrierStore) -> dict:
     """item_id -> Item over EVERY item ever written, quarantined ones included: the
     trail of a live copy may run through a removed source."""
     return {it.item_id: it for k in CARRIERS for it in store.items[k]}
@@ -58,7 +58,7 @@ def lineage(store: CarrierStore, item: Item) -> tuple:
     """The carriers the poison crossed to reach `item`, root first, e.g.
     ("memory", "skill", "branch") for note -> skill -> patch.  Follows the first
     poisoned parent in derived_from at each hop; a root is its own lineage."""
-    idx = _index(store)
+    idx = _items_by_id(store)
     path, cur, seen = [item.carrier], item, {item.item_id}
     while cur.derived_from:
         parents = [idx[p] for p in cur.derived_from if p in idx and idx[p].poisoned]
@@ -74,7 +74,7 @@ def trail_problems(store: CarrierStore) -> list:
     """Poisoned items whose derived_from trail does not hold: a parent id that is not in
     the store, or a parent that is not poisoned.  Empty when the propagation trail is
     consistent (every derived poisoned item came from poison)."""
-    idx = _index(store)
+    idx = _items_by_id(store)
     out = []
     for k in CARRIERS:
         for it in store.items[k]:
@@ -103,7 +103,7 @@ class CarrierState:
 
     @classmethod
     def of(cls, store: CarrierStore) -> "CarrierState":
-        idx = _index(store)
+        idx = _items_by_id(store)
         seeded, edges = set(), set()
         for it in store.live():
             if not it.poisoned:

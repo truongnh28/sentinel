@@ -118,9 +118,14 @@ POSTMORTEM_ALWAYS = True
 ATTACKER_DELTA_CLASSES = ("fixed-delta-per-sequence", "uniform-delta-mix-per-workflow")
 # O6: B1 when the budget binds and commit is already at depth 1.
 B1_BINDING_RULE = ("lower-depth-evenly-while-above-1", "drop-commit-at-evenly-spaced-tasks")
-# O7: accounting of whole-carrier quarantine.
+# O7: accounting of a carrier quarantine.  Author decision 27/09 (L1), after T13's finding
+# (docs/reports/v3-p2-line23.md: with whole-branch removal the best loss equals the no-audit
+# loss): a BRANCH quarantine removes only the poisoned lineage (marked patches and items
+# whose derived_from chain reaches a poisoned item); clean patches stay.  memory, skill and
+# queue keep whole-carrier removal.
 FQ_UNIT = "carrier-quarantine-with-c_t[k]=0"
-BRANCH_QUARANTINE_LOSES_CLEAN_PATCHES = True          # they count as clean tasks lost
+BRANCH_QUARANTINE_REMOVES = "poisoned-lineage"        # was "every-live-item" before 27/09
+BRANCH_QUARANTINE_LOSES_CLEAN_PATCHES = False         # only a clean item derived from poison
 # O8: the executable checkpoint carries no information about poison (t6 of Fig. 1).
 CHECKPOINT_PSI_EQUALS_PHI = True
 # O9: A7 provenance d' is a placeholder equal to the cell's detector d' (measured in P3).
@@ -132,9 +137,17 @@ BETA_BASE = "dev-clean-runs"
 BETA_UPDATE = "same-cell-postmortems"                 # alarms outside (k, [iota, sigma)) = drift
 # O12: Monte Carlo error of line 5.
 TABLE_R = 32
-TABLE_SE_MAX = 0.09
+TABLE_SE_MAX = 0.09                                   # kept as a secondary diagnostic only
 ROLLOUT_SE_IS_GATE = False                            # headline rollout: SE printed, not gated
 ROLLOUT_R_GRID = (16, 32, 64)                         # Q13 / T19
+# line5-se-diff (27/09/2026, @truong): T14's pilot found TABLE_SE_MAX unreachable at R =
+# 32-64 (loss unbounded by lambda_Q FQ + lambda_T clean-lost; 88% of cells stayed over even
+# after topping up).  The top-up GATE moves from the absolute SE of a cell's loss estimate
+# to the SE of the CRN-paired DIFFERENCE between the argmin member and its closest
+# competitor (v3/rollout.py shares one hypothesis, one world seed and one member-randomisation
+# seed across every (member, class) of a draw r -- confirmed, not partial).  TABLE_SE_MAX
+# stays as a reported diagnostic; it no longer gates a top-up.
+TABLE_DIFF_SE_MAX = 0.15                              # measured basis: docs/reports/v3-p2-table.md
 # O13: one rollout per particle shared by every attacker class -- NOT used.
 N_A_SHARED_ROLLOUT = False
 # O14: the table has no budget key; line 5 drops members whose action at t exceeds B_t.
@@ -162,13 +175,16 @@ DECIDED_O = {
     "O5": {"classes": list(ATTACKER_DELTA_CLASSES)},
     "O6": {"b1_binding_rule": list(B1_BINDING_RULE)},
     "O7": {"fq_unit": FQ_UNIT,
+           "branch_quarantine_removes": BRANCH_QUARANTINE_REMOVES,
            "branch_quarantine_loses_clean_patches": BRANCH_QUARANTINE_LOSES_CLEAN_PATCHES},
     "O8": {"checkpoint_psi_equals_phi": CHECKPOINT_PSI_EQUALS_PHI},
     "O9": {"a7_provenance_dprime": A7_PROVENANCE_DPRIME},
     "O10": {"ro_axis": list(RO_AXIS)},
     "O11": {"beta_base": BETA_BASE, "beta_update": BETA_UPDATE},
     "O12": {"table_r": TABLE_R, "table_se_max": TABLE_SE_MAX,
-            "rollout_se_is_gate": ROLLOUT_SE_IS_GATE},
+            "rollout_se_is_gate": ROLLOUT_SE_IS_GATE,
+            "table_diff_se_max": TABLE_DIFF_SE_MAX,
+            "top_up_gate": "crn_pairwise_diff_se (line5-se-diff, 27/09/2026)"},
     "O13": {"n_a_shared_rollout": N_A_SHARED_ROLLOUT},
     "O14": {"table_has_budget_key": TABLE_HAS_BUDGET_KEY,
             "line5_skip_unaffordable": LINE5_SKIP_UNAFFORDABLE,

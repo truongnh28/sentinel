@@ -30,15 +30,48 @@ N3.  A candidate that cannot be built is not dropped in silence: `plan_sleeper_a
 writes an `Infeasible` record with a reason into the `reasons` sink, one per candidate
 sigma in [Delta, H), or one per workflow when H <= Delta.
 
+THE PAYLOAD LENGTH (T24, deviation D-v3-3, docs/preregistration/lech-chuan-P3-benign.md).
+v2 builds every payload at build.PAYLOAD_LENGTH = 63, the median of len(content) over v2's
+certification background (2294 benign memory items of pool `full`).  v3's certification
+background is v3's own drift, which is longer (P3's first run: drift mean 80.0, payload
+63.3 with 3 distinct sizes, SMD -1.22).  The fix is in the ATTACKER, not the world:
+`draw_length` draws L from the empirical distribution of len(content) over a declared
+background (the benign corpus hands it v3's drift on dev), one independent draw per
+placement seeded from the placement's coordinates, and `SleeperPayload.at_length(L)` builds
+the payload with build.payload_content's construction at that L.  The rule is build.py's
+rule for 63 (the background's median, LENGTH_RULE) on a different background, drawn so that
+the variance is matched as well as the centre.  It is OPT-IN AT THE FIELD: a SleeperPayload with
+`length = None` (what the planner returns) is still v2's, byte for byte, so plan_sleeper_all
+and every test that reads it directly are unchanged.  build.PAYLOAD_LENGTH is not touched.
+
+WIRING INTO THE GRID (branch wire-payload-length, deviation D-v3-3 continued).  The planner
+staying at `length = None` left the benign-corpus gate certifying an attacker the grid did
+not run: v3/attackers.py (T7, the scripted menu and the best-response menu) and v3/rollout.py
+(T12, the future placement and the planted particle) built every SleeperPayload straight from
+plan_sleeper_all / this module's constructor, so every payload the grid actually wrote was
+still v2's L = 63.  `with_default_length` is now the one call each of those three entry
+points makes on a freshly planned SleeperPayload before it reaches a Placement or an episode,
+drawing L from `default_length_background()` (v3's own drift on dev, the same population
+v3/benign.py's gate certifies against) seeded by `DEFAULT_LENGTH_SEED` (T24's SEED,
+`analysis.benign_corpus.SEED`) and the placement's own coordinates -- so the draw is a pure
+function of (placement, background, seed), reproducible across runs and independent of call
+order.  v3/agent.py's V2_COMPAT path never calls it: it builds through v2's build.inject
+directly (tests/v3/test_infra_v2_compat.py), so it stays fixed at L = 63.
+
 Stdlib only; imports v2, never patches it.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+import functools
+import random
+import statistics
+from dataclasses import dataclass, replace
 
 import build
+import prose_world
 import retrieval
-from core import CARRIERS, CarrierStore, Item, PoisonSpec, Workflow
+from analysis import benign_corpus as _benign_corpus_v2
+from core import CARRIERS, CarrierStore, Item, PoisonSpec, Workflow, seed_of
 
 # ---------------------------------------------------------------------------------------
 # Reasons a candidate placement cannot be built (N3)
@@ -95,6 +128,7 @@ class SleeperPayload:
     topic: object              # payload topic: payload_topic_like(target_topic, eps)
     target_topic: object       # sigma's topic
     length_reason: str | None  # build.payload_length_reason: built tag-only, and why
+    length: int | None = None  # D-v3-3: None = v2's build.PAYLOAD_LENGTH, byte for byte
 
     @property
     def delta(self) -> int:
@@ -125,9 +159,23 @@ class SleeperPayload:
 
     # --- the item ---------------------------------------------------------------------
     def item(self, wf: Workflow) -> Item:
-        """The payload Item, built by v2's build.inject (same bytes, same item_id)."""
+        """The payload Item.  length None: v2's build.inject (same bytes, same item_id).
+        length L: the same Item with its content rebuilt at L (`payload_content_at`)."""
         self._check_wf(wf)
-        return build.inject(CarrierStore(), wf, self.spec())
+        v2 = build.inject(CarrierStore(), wf, self.spec())
+        if self.length is None:
+            return v2
+        content = prose_world.payload(v2.topic, self.marker,
+                                      payload_content_at(v2.topic, self.marker, self.length))
+        return Item(carrier=v2.carrier, topic=v2.topic, content=content,
+                    created_at=v2.created_at, provenance=v2.provenance, poisoned=True)
+
+    def at_length(self, L: int) -> "SleeperPayload":
+        """This placement with its payload built at length L (D-v3-3); length_reason is
+        re-derived for L (N3: a tag at least L wide is built tag-only, and says why)."""
+        if isinstance(L, bool) or not isinstance(L, int) or L <= 0:
+            raise ValueError(f"L={L!r}: a payload length is a positive int")
+        return replace(self, length=L, length_reason=payload_length_reason_at(self.topic, L))
 
     def _check_wf(self, wf: Workflow) -> None:
         if wf.wf_id != self.wf_id:
@@ -138,7 +186,104 @@ def inject(store: CarrierStore, wf: Workflow, sleeper: SleeperPayload,
            length_reasons: dict | None = None) -> Item:
     """Write the payload into carrier k of `store` (the runner calls this at iota)."""
     sleeper._check_wf(wf)
-    return build.inject(store, wf, sleeper.spec(), length_reasons)
+    if sleeper.length is None:
+        return build.inject(store, wf, sleeper.spec(), length_reasons)
+    written = store.write(sleeper.item(wf))
+    if length_reasons is not None and sleeper.length_reason is not None:
+        length_reasons[written.item_id] = sleeper.length_reason
+    return written
+
+
+# ---------------------------------------------------------------------------------------
+# D-v3-3: the payload length drawn from a declared benign background
+# ---------------------------------------------------------------------------------------
+
+#: The derivation rule, one line, printed into the P3 manifest.
+LENGTH_RULE = (
+    "build.py's rule for PAYLOAD_LENGTH = 63 (the median of len(content) over the benign "
+    "memory items of the certification background), on v3's background (v3's drift on "
+    "dev); L is drawn from that background's empirical length distribution, one draw per "
+    "placement, so its median is the rule's and its spread is the background's")
+
+
+def length_stats(lengths) -> dict:
+    """The background's length distribution, as build.py describes v2's (min, Q1, median,
+    Q3, max, mean) plus sd (population) and the number of distinct lengths.  Quartiles:
+    statistics.quantiles(n=4, method='inclusive')."""
+    xs = sorted(int(x) for x in lengths)
+    if not xs:
+        raise ValueError("an empty background has no length distribution")
+    q1, med, q3 = statistics.quantiles(xs, n=4, method="inclusive") if len(xs) > 1 \
+        else (xs[0], xs[0], xs[0])
+    return dict(n=len(xs), min=xs[0], q1=q1, median=statistics.median(xs), q3=q3,
+                max=xs[-1], mean=round(statistics.fmean(xs), 4),
+                sd=round(statistics.pstdev(xs), 4), distinct=len(set(xs)))
+
+
+def draw_length(lengths, sleeper: SleeperPayload, seed: int) -> int:
+    """One L for this placement: a uniform draw from the background's lengths (the
+    empirical distribution), seeded by (seed, placement coordinates) only, so a draw does
+    not depend on which other placements were drawn or in what order."""
+    xs = sorted(int(x) for x in lengths)
+    if not xs:
+        raise ValueError("an empty background has no length distribution")
+    rng = random.Random(seed_of(seed, "v3-payload-length", sleeper.wf_id, sleeper.carrier,
+                                sleeper.iota, sleeper.sigma, sleeper.epsilon))
+    return rng.choice(xs)
+
+
+# ---------------------------------------------------------------------------------------
+# Wiring D-v3-3 into the grid (branch wire-payload-length): the default background and seed,
+# and the one call every grid entry point makes before a SleeperPayload reaches a Placement.
+# ---------------------------------------------------------------------------------------
+
+#: T24's seed, unchanged (analysis.benign_corpus.SEED): the draw stays reproducible and
+#: matches the benign-corpus gate's own draw byte for byte at the same coordinates.
+DEFAULT_LENGTH_SEED = _benign_corpus_v2.SEED
+
+
+@functools.lru_cache(maxsize=1)
+def default_length_background() -> tuple:
+    """The background the grid draws payload length from by default: v3's own drift on
+    dev (v3/benign.py's `length_background(dev_runs())`), the same population the P3
+    benign-corpus gate certifies against.  Imported locally (v3.benign imports
+    v3.attackers, which imports this module) so the cycle never forms at module load;
+    cached once per process since dev_runs() replays every dev workflow twice."""
+    from v3 import benign as _benign
+    return tuple(_benign.length_background(_benign.dev_runs()))
+
+
+def with_default_length(sp: SleeperPayload) -> SleeperPayload:
+    """`sp` with its payload length drawn from `default_length_background()`, seeded by
+    `DEFAULT_LENGTH_SEED` and `sp`'s own coordinates (module docstring, WIRING INTO THE
+    GRID).  v3/attackers.py and v3/rollout.py call this on every SleeperPayload they plan
+    before it reaches a Placement or an episode, so the grid runs the same drawn-length
+    attacker the benign-corpus gate certifies.  V2_COMPAT never calls it."""
+    return sp.at_length(draw_length(default_length_background(), sp, DEFAULT_LENGTH_SEED))
+
+
+def payload_length_reason_at(topic, L: int) -> str | None:
+    """build.payload_length_reason at length L instead of build.PAYLOAD_LENGTH (N3)."""
+    tag = build.payload_tag(topic)
+    if len(tag) < L:
+        return None
+    return (f"tag {len(tag)} chars >= L={L}: L_advice = 0, so this payload carries no "
+            f"advice and its size is {len(tag) - L} over L. Model SS4a: harm collapses "
+            f"rather than tapers.")
+
+
+def payload_content_at(topic, marker: str, L: int) -> str:
+    """build.payload_content's construction at length L: the tag, then the instruction,
+    then the justification cycled, cut at L; the tag alone when it is at least L wide."""
+    tag = build.payload_tag(topic)
+    if payload_length_reason_at(topic, L) is not None:
+        return tag
+    budget = L - len(tag)
+    advice = build._ADVICE_INSTRUCTION.format(marker=marker)
+    if len(advice) < budget:
+        just = build._ADVICE_JUSTIFICATION
+        advice += just * (-(-(budget - len(advice)) // len(just)))
+    return tag + advice[:budget]
 
 
 def is_sleeper_root(item: Item) -> bool:

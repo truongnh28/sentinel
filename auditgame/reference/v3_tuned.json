@@ -1,0 +1,225 @@
+{
+  "grids": {
+    "eta_q": [
+      0.0,
+      0.01,
+      0.02,
+      0.05,
+      0.1,
+      0.2,
+      0.3543,
+      0.5
+    ],
+    "sw_weights": [
+      "sweeps",
+      "memory",
+      "queue",
+      "skill",
+      "commit3",
+      "nomemory"
+    ],
+    "tau": [
+      0.1,
+      0.3,
+      0.5,
+      0.7,
+      0.9
+    ],
+    "tau5": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.5,
+      0.7
+    ]
+  },
+  "kernels": [
+    "nominal",
+    "low",
+    "high"
+  ],
+  "log_sha256": "36550dae6ba0a2e7e6da023026ed1e4b7d1150ed0093259986cb8f704e8f936e",
+  "objective": "worst-case L over kernels ['nominal', 'low', 'high'] (zeta = 0.1) and tuning columns (C6, D5.robust)",
+  "rho": {
+    "0": {
+      "eta_q": 0.0,
+      "eta_q_edge": "eta_Q = 0 is the LOWER edge of the grid [0.0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3543, 0.5]: the dev objective does not bound eta_Q from below; kept as chosen, not re-tuned on a wider grid",
+      "line8_mixture": {
+        "L-RO-c3-p1-random": 0.019973,
+        "L-RO-c3-p2-posterior": 0.980027
+      },
+      "line8_value": 0.570268372954,
+      "sw_weights": "nomemory",
+      "tau": 0.9,
+      "tau5": 0.0
+    },
+    "0.25": {
+      "eta_q": 0.0,
+      "eta_q_edge": "eta_Q = 0 is the LOWER edge of the grid [0.0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3543, 0.5]: the dev objective does not bound eta_Q from below; kept as chosen, not re-tuned on a wider grid",
+      "line8_mixture": {
+        "L-RO-c3-p1-random": 0.019973,
+        "L-RO-c3-p2-posterior": 0.980027
+      },
+      "line8_value": 0.570268372954,
+      "sw_weights": "nomemory",
+      "tau": 0.9,
+      "tau5": 0.0
+    },
+    "0.5": {
+      "eta_q": 0.0,
+      "eta_q_edge": "eta_Q = 0 is the LOWER edge of the grid [0.0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3543, 0.5]: the dev objective does not bound eta_Q from below; kept as chosen, not re-tuned on a wider grid",
+      "line8_mixture": {
+        "L-BT-u0.3-f1": 0.090825,
+        "L-BT-u0.5-f0": 0.895905,
+        "L-RO-c3-p2-random": 0.011477,
+        "L-SW-skill": 0.001792
+      },
+      "line8_value": 0.539971209081,
+      "sw_weights": "nomemory",
+      "tau": 0.7,
+      "tau5": 0.0
+    },
+    "1": {
+      "eta_q": 0.0,
+      "eta_q_edge": "eta_Q = 0 is the LOWER edge of the grid [0.0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3543, 0.5]: the dev objective does not bound eta_Q from below; kept as chosen, not re-tuned on a wider grid",
+      "line8_mixture": {
+        "L-BT-u0.7-f0": 0.499274,
+        "L-RO-c3-p1-random": 0.500725
+      },
+      "line8_value": 0.490123786047,
+      "sw_weights": "nomemory",
+      "tau": 0.7,
+      "tau5": 0.0
+    }
+  },
+  "setup": {
+    "attacks": [
+      "branch-last-ingress-e0.6",
+      "branch-mid-ingress-e0.6",
+      "memory-first-write-e0.6",
+      "queue-first-write-e0.6",
+      "skill-first-write-e0.6",
+      "skill-last-ingress-e0.6"
+    ],
+    "belief": "ParticleBelief (v3.belief_pf, N = 2048 particles, Delta prior 'at-least' from line 1's Delta-hat)",
+    "delta_hat": "cell",
+    "deltas": [
+      4,
+      8
+    ],
+    "fq_cap": null,
+    "git_head": "300cd7e71abd45864e485674f0c50d6b44172aa6",
+    "lambda_Q": 0.54865,
+    "lambda_T": 0.5,
+    "line8": "__main__.line8_real",
+    "members": [
+      "L-BT-u0.3-f0",
+      "L-BT-u0.3-f1",
+      "L-BT-u0.3-f2",
+      "L-BT-u0.5-f0",
+      "L-BT-u0.5-f1",
+      "L-BT-u0.5-f2",
+      "L-BT-u0.7-f0",
+      "L-BT-u0.7-f1",
+      "L-BT-u0.7-f2",
+      "L-BT-u0.9-f0",
+      "L-BT-u0.9-f1",
+      "L-BT-u0.9-f2",
+      "L-RO-c3-p1-posterior",
+      "L-RO-c3-p1-random",
+      "L-RO-c3-p2-posterior",
+      "L-RO-c3-p2-random",
+      "L-RO-c4-p1-posterior",
+      "L-RO-c4-p1-random",
+      "L-RO-c4-p2-posterior",
+      "L-RO-c4-p2-random",
+      "L-SW-commit",
+      "L-SW-commit3",
+      "L-SW-memory",
+      "L-SW-nomemory",
+      "L-SW-queue",
+      "L-SW-skill",
+      "L-SW-sweeps",
+      "L-SW-uniform"
+    ],
+    "seeds": [
+      1,
+      2
+    ],
+    "workflows": [
+      "v2-000",
+      "v2-001",
+      "v2-002",
+      "v2-003",
+      "v2-004",
+      "v2-005",
+      "v2-006",
+      "v2-007",
+      "v2-008",
+      "v2-009",
+      "v2-010",
+      "v2-011",
+      "v2-012",
+      "v2-013",
+      "v2-014",
+      "v2-015",
+      "v2-016",
+      "v2-017",
+      "v2-018",
+      "v2-019",
+      "v2-020",
+      "v2-021",
+      "v2-022",
+      "v2-023",
+      "v2-024",
+      "v2-025",
+      "v2-026",
+      "v2-027",
+      "v2-028",
+      "v2-029",
+      "v2-030",
+      "v2-031",
+      "v2-032",
+      "v2-033",
+      "v2-034",
+      "v2-035",
+      "v2-036",
+      "v2-037",
+      "v2-038",
+      "v2-039"
+    ],
+    "world": {
+      "audit_reading": "carrier",
+      "drift": "transient",
+      "harm": "locked",
+      "ingress_visible": true,
+      "kernel": "nominal",
+      "line5": "table",
+      "n_seeded": 1,
+      "provenance": "A0"
+    }
+  },
+  "smoke": false,
+  "split": "dev",
+  "timing": {
+    "steps": {
+      "line8": {
+        "episodes": 10483200,
+        "ms_per_episode": 6.963610799412109,
+        "seconds": 73000.92473239702
+      },
+      "sw_weights": {
+        "episodes": 56160,
+        "ms_per_episode": 1.5891472875531603,
+        "seconds": 89.24651166898548
+      },
+      "tau5": {
+        "episodes": 56160,
+        "ms_per_episode": 1.5728488915602867,
+        "seconds": 88.3311937500257
+      }
+    },
+    "total_seconds": 9154.696787292021
+  }
+}
