@@ -5,7 +5,7 @@
 ## Kết luận trước
 
 - **Pilot:** 3 ô bảng headline (ρ ∈ {0; 0,5; 1}, χ = 1,33, detector mid) × Δ̂ = 4 × mọi h. Dựng được 822 khoá có trạng thái nguồn, trong 58 phút thật với `--jobs 8`, tốn **7,09 CPU-giờ**. Máy đang chạy tải khác song song: load average khoảng 25 trên 10 nhân. Vì vậy giá mỗi rollout đo được trong pilot cao hơn đo đơn luồng lúc máy rảnh khoảng 1,85 lần: 2,97 so với 1,61 ms ở h = 6.
-- **SE không đạt ngưỡng O12:** chỉ 12% số khoá có SE lớn nhất ≤ 0,09. Có 92% khoá phải bù lên R = 64, và 88% vẫn vượt ngưỡng sau khi bù. SE trung vị là 0,20; theo h, SE tăng từ 0,07 (h = 1) lên 0,28 (h = 14). Nguyên nhân: loss của Định nghĩa 1 không bị chặn bởi 1, vì còn λ_Q·FQ và λ_T·số patch sạch bị mất khi gỡ branch. Muốn SE ≤ 0,09 ở h ≥ 6 cần R khoảng 300–600, tức giá gấp 5–10 lần. **Đây là quyết định của người dùng, không phải của T14:** nâng R, nới ngưỡng, hay dùng SE của hiệu giữa các member (số ngẫu nhiên chung).
+- **SE không đạt ngưỡng O12:** chỉ 12% số khoá có SE lớn nhất ≤ 0,09. Có 92% khoá phải bù lên R = 64, và 88% vẫn vượt ngưỡng sau khi bù. SE trung vị là 0,20; theo h, SE tăng từ 0,07 (h = 1) lên 0,28 (h = 14). Nguyên nhân: loss của Định nghĩa 1 không bị chặn bởi 1, vì còn λ_Q·FQ và λ_T·số patch sạch bị mất khi gỡ branch. Muốn SE ≤ 0,09 ở h ≥ 6 cần R khoảng 300–600, tức giá gấp 5–10 lần. **Đây là quyết định của tác giả, không phải của T14:** nâng R, nới ngưỡng, hay dùng SE của hiệu giữa các member (số ngẫu nhiên chung).
 - **Ngăn rỗng:** 51% khoá (858 trên 1.680 của các Δ̂ đã dựng) không có trạng thái nguồn và dùng ngăn gần nhất cùng h. Không khoá nào phải lùi sang h khác.
 - **Ngoại suy cho bản đầy đủ** (36 ô × 5 Δ̂; phase A chạy thật trên cả 36 ô, được 51.366 khoá có trạng thái):
   - theo giá đo trong pilot, có bù R: **453 CPU-giờ**; chỉ R = 32: 230 CPU-giờ;
@@ -77,7 +77,7 @@ cd auditgame
 ../.venv/bin/python tools/v3_build_table.py --pilot --fidelity 24 --jobs 8
 ```
 
-## Việc còn mở cho người dùng / các task sau
+## Việc còn mở
 
 1. ~~**O12 không đạt ở R = 32–64**~~ — đã chốt 27/09/2026, xem mục dưới (line5-se-diff).
 2. Dòng 8–9 trong pilot dùng giá tạm. Bản cuối đọc `reference/v3_tuned.json` của T18.
@@ -85,7 +85,7 @@ cd auditgame
 
 ## 27/09/2026 — line5-se-diff: đổi cổng O12 sang SE của hiệu giữa các member
 
-Quyết định của người dùng (không phải T14): pilot ở trên cho thấy ngưỡng SE tuyệt đối 0,09 không đạt được ở R = 32–64 (88% khoá vẫn vượt sau khi bù). Cổng bù đổi sang **SE của HIỆU giữa hai member gần nhau nhất** (member đạt argmin theo ước lượng điểm và đối thủ gần nhất), tính từ hiệu từng cặp lượt rút (không gộp hai SE độc lập) — đây đúng là đại lượng dòng 5 cần (member nào tốt hơn), không phải giá trị loss tuyệt đối.
+Quyết định của tác giả (không phải T14): pilot ở trên cho thấy ngưỡng SE tuyệt đối 0,09 không đạt được ở R = 32–64 (88% khoá vẫn vượt sau khi bù). Cổng bù đổi sang **SE của HIỆU giữa hai member gần nhau nhất** (member đạt argmin theo ước lượng điểm và đối thủ gần nhất), tính từ hiệu từng cặp lượt rút (không gộp hai SE độc lập) — đây đúng là đại lượng dòng 5 cần (member nào tốt hơn), không phải giá trị loss tuyệt đối.
 
 **Xác nhận số ngẫu nhiên chung (CRN).** Đọc `v3/rollout.py` và `tools/v3_build_table.py::draws()`: trong một lượt rút r, MỌI (member, lớp) dùng chung một giả thuyết hạt (`hyp = belief.sample(1, seed_of(DRAW_TAG, ..., r))`, rút một lần cho cả 6 lớp), một seed thế giới (`seed_of(WORLD_TAG, wf_id, seed, t, r)` — không phụ thuộc member lẫn lớp) và một seed ngẫu nhiên hoá riêng của member (`seed_of(MEMBER_TAG, wf_id, seed, t, r)` — không phụ thuộc tên member). CRN được chia sẻ **đầy đủ**, không phải một phần. Đo thực nghiệm trên một trạng thái dev thật (4–6 member, 2 lớp, R = 32, nhiều h): tỉ lệ SE(hiệu cặp) / sqrt(SE_i² + SE_j²) (mức giảm so với gộp hai SE độc lập) trung bình **0,86** ở h thấp và giảm dần còn **0,6–0,7** ở h ≈ 7, nghĩa là mức giảm phương sai từ CRN **khiêm tốn** (14–40%), không phải gần triệt tiêu như lý thuyết CRN lý tưởng — vì các member có chính sách khác nhau, hành động khác nhau làm kho lưu trữ rẽ nhánh sớm dù cùng seed. Quyết định "đổi cổng sang SE hiệu" vẫn hợp lý vì đại lượng liên quan (khoảng cách giữa hai member gần nhất trong xếp hạng minimax) có quy mô khác hẳn SE tuyệt đối của một loss không bị chặn, không phải vì CRN triệt tiêu gần hết nhiễu.
 

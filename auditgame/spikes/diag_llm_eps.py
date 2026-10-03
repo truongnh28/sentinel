@@ -1,7 +1,6 @@
 """
 diag_llm_eps.py -- Task 3: payload do LLM sinh nam o dau tren thang AUC cua Gate 2.
 
-Brief: .superpowers/sdd/2026-09-20-ssg-gate4c/task-3-brief.md
 
 Cau hoi: truc `epsilon` cua `attacks.MatchedAttack` la mot num TONG HOP (khoang
 cach so voi phan bo item cua chinh agent). Attacker that dung LLM viet payload,

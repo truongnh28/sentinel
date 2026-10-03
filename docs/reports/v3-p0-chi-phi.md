@@ -154,7 +154,7 @@ Chi tiết khối 7: (b) η_Q tốn 0,97 CPU-giờ, (c) hỗn hợp 2,98, (d) �
 
 ## Tái lập
 
-Các script nằm trong thư mục scratchpad của phiên này, không nằm trong repo. Cả ba chỉ đọc code và `corpus.json`, và không ghi gì vào `spikes/`.
+Các script là script tạm, không nằm trong repo. Cả ba chỉ đọc code và `corpus.json`, và không ghi gì vào `spikes/`.
 
 - `time_v2_dev.py` → `timing_v2_dev.json`: đo thời gian các hàm của `run_draft_eval.py` trên split dev, mất khoảng 3 phút.
 - `time_pf_rollout.py` → `timing_pf.json`: đo particle filter, clone trạng thái, rollout và LP.

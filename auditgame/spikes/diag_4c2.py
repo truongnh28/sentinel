@@ -3,7 +3,6 @@ diag_4c2.py -- Cong 4c task 2: phan dinh 77,8% con lai (0.094595) cua khoang cac
 hoi quy SSG-up (receding) vs B7U (static), sau khi task 1 da cat nghia 22,2% do C
 (_log_audit / done-crediting).
 
-Brief: .superpowers/sdd/2026-09-20-ssg-gate4c/task-2-brief.md
 
 Diem dung: task 1 (spikes/diag_4c.py) da chung minh nhanh KHONG-C (done=None,
 "receding_SSGup_noC") van hoi quy so voi tinh (harm 0.545045 > 0.450450), va

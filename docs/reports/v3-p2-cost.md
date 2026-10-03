@@ -6,8 +6,8 @@
 
 - **Mô hình đếm tái lập đúng P0.** Tính bằng thiết kế của P0 (không cắt, không loại ô) trên đơn vị workflow của P0 (split phụ, 26 workflow), cả 6 khối khớp bảng §3 của `v3-p0-chi-phi.md` tới từng episode. Rollout headline khớp §6.2: 7.638 + 18.650 episode, 47 / 129 CPU-giờ ở R = 16. Test `test_p0_model_reproduces_the_p0_cost_table` khoá điều này.
 - **Sau khi cắt theo mục 8, lõi đạt nghiệm thu T22 trên đơn vị của P0: 11,48 triệu ≤ 16,39 triệu (−30%).** Khối H18 giảm 78%, nhiều hơn mức "khoảng 70%" plan ghi, vì các ô ρ = 1 ở ba mức B_min bị loại. Khối K_d giảm 62%, khối độ nhạy giảm 20%.
-- **Hai thứ làm số thật lớn hơn đơn vị của P0. Chúng không phải phần cắt, và cần người dùng biết:**
-  1. **Lưới ε của BR giữ {0,3; 0,6; 1,0}** (quyết định tác giả, chờ người dùng). P0 đếm mỗi vị trí (k, ι) một lần. `br_menu` của T7 thì đếm mọi ε khả thi. Trên dev, số phần tử menu khả thi gấp 1,42 (ở Δ = 8) tới 2,31 lần (ở Δ = 0) số vị trí. Với hệ số đó, lõi đã cắt tăng lên 17,2 triệu, **vượt P0 5%**. Cận trên (mọi ε đều khả thi) là 23,7 triệu.
+- **Hai thứ làm số thật lớn hơn đơn vị của P0. Chúng không phải phần cắt, và cần lưu ý:**
+  1. **Lưới ε của BR giữ {0,3; 0,6; 1,0}** (quyết định tác giả). P0 đếm mỗi vị trí (k, ι) một lần. `br_menu` của T7 thì đếm mọi ε khả thi. Trên dev, số phần tử menu khả thi gấp 1,42 (ở Δ = 8) tới 2,31 lần (ở Δ = 0) số vị trí. Với hệ số đó, lõi đã cắt tăng lên 17,2 triệu, **vượt P0 5%**. Cận trên (mọi ε đều khả thi) là 23,7 triệu.
   2. **Tập eval chính đã đổi sang SWE-rebench-V2, 96 workflow (D-v3-1), sau khi P0 tính.** Trên tập này, lõi đã cắt là 43,3 triệu episode theo đơn vị P0, và 65,5 triệu nếu hiệu chỉnh ε theo dev. Phần mô phỏng vẫn rẻ: 9,5–20 CPU-giờ. Cái đắt lên là **rollout headline, vì nó tỉ lệ với số workflow**: ở R = 16 là 797 CPU-giờ (P0 tính 176); ở R = 64 là 3.189 CPU-giờ (P0 tính 706). Ngân sách lõi 509–1.039 CPU-giờ của Q13 vì vậy chỉ còn đúng cho split phụ. Trên split chính, cần chọn giữa ba hướng: R nhỏ hơn, rollout một mẫu con workflow, hoặc nới ngân sách.
 - Chưa tính (như P0): dựng bảng dòng 5 (77–309 CPU-giờ, chạy trên dev, không phụ thuộc số workflow eval) và tinh chỉnh trên dev.
 
@@ -66,7 +66,7 @@ Phần cắt đọc từ `attackers.br_systems` / `BR_TRIMS` của T7, import ch
 
 Ở H18, ô b1 với χ độ sâu trông giống ô lưới chính đối với `br_systems`. Vì vậy `grid.h18_br` áp luật H18 cho ô đó: chỉ lịch khối mới được thêm BR ở χ = 1,33. Còn B1, Sentinel và B2 ở b1 thì đã có trong khối BR chính.
 
-**Hai quyết định của tác giả (Claude đề xuất, chờ người dùng):**
+**Hai quyết định của tác giả:**
 1. **Lưới ε của BR giữ {0,3; 0,6; 1,0}.** Giá của nó là hai cột "menu" ở trên.
 2. **Không cắt BR ở cột "attacker chọn Δ" của thế giới tổn hại gỡ được.** `br_systems` trả "none" cho ô này. Lưới vì vậy giữ nó như một ngoại lệ khai báo, `UNTRIMMED_ATTACKER_DELTA = {"reversible": ("Sentinel",)}`, theo GĐ 9 của P0. Khối này có 84.122 episode trên đơn vị P0 và 328.451 trên split chính.
 
@@ -168,4 +168,4 @@ cd auditgame
 ../.venv/bin/python tools/v3_build_table.py --pilot --extrapolate                           # 225,1 CPU-giờ (jobs 10)
 ```
 
-So sánh đơn luồng vs `--jobs 10` (hệ số phồng song song trên CPU-time) làm bằng vi chuẩn tạm trong scratchpad (không commit); phương pháp: lấy tập con khoá cố định, chạy `value_job` một lần đơn luồng rồi một lần qua `ProcessPoolExecutor(10)`, so `cpu_s / rollouts` của hai lần.
+So sánh đơn luồng vs `--jobs 10` (hệ số phồng song song trên CPU-time) làm bằng vi chuẩn tạm (không commit); phương pháp: lấy tập con khoá cố định, chạy `value_job` một lần đơn luồng rồi một lần qua `ProcessPoolExecutor(10)`, so `cpu_s / rollouts` của hai lần.

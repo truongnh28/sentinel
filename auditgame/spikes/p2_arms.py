@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 p2_arms.py -- P2 THREE ARMS: CONTROL, CEILING, AND SECOND MODEL.
-Spec: docs/superpowers/plans/2026-09-18-phan-con-lai-FSE-2027.md Priority 4 (Tasks P1-P4).
 
 Without a control arm, 0/14 adoptions in the P2 pilot cannot separate three distinct
 explanations for why an agent produced no poisoned patch:

@@ -32,7 +32,7 @@
   - Chỉ **một lượt** (offset 0), nên không có instance nào được dùng lại.
   - Chạy 300 seed. Chọn F họ lớn nhất và giới hạn mỗi họ tối đa c workflow ("cap").
   - Kish = (Σw)²/Σw². Khi mọi họ đều chạm cap thì Kish = F.
-- **Đọc dữ liệu.** Chỉ các cột nhỏ (repo, id, created_at, base_commit, image, language, license, số F2P) được đọc bằng column projection. Không tải patch. Script tạm nằm trong scratchpad và không được commit.
+- **Đọc dữ liệu.** Chỉ các cột nhỏ (repo, id, created_at, base_commit, image, language, license, số F2P) được đọc bằng column projection. Không tải patch. Script tạm không được commit.
 
 ## 2. Bảng tổng hợp theo nguồn
 

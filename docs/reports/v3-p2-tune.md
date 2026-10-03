@@ -54,7 +54,7 @@ Lượt kiểm chứng đầu-cuối: 2 workflow dev, 1 seed, ρ ∈ {0; 0,25}, 
 
 ## Lượt đầy đủ — bản cắt an toàn (28/09/2026)
 
-**Quyết định giảm compute (người dùng chốt): "cắt an toàn, không đổi Sentinel".** Lượt đầy đủ đầu chạy `--real --jobs 8` trên 100 workflow + cả `--nominal-only` (~104 + ~35 CPU-giờ, ~17 giờ thực) bị hủy giữa chừng. Thay bằng bản cắt:
+**Quyết định giảm compute (tác giả chốt): "cắt an toàn, không đổi Sentinel".** Lượt đầy đủ đầu chạy `--real --jobs 8` trên 100 workflow + cả `--nominal-only` (~104 + ~35 CPU-giờ, ~17 giờ thực) bị hủy giữa chừng. Thay bằng bản cắt:
 
 - **Subsample tuning 100 → 40 workflow** (`--n-workflows 40`). Lý do: tinh chỉnh là **argmax trên lưới nhỏ** — cần đủ dữ liệu để *xếp hạng* (τ, η_Q, τ5, sw), không phải để ước lượng giá trị tuyệt đối. Không đổi bản Sentinel đang đo (vẫn 2048 particle, đủ 3 kernel, đủ lưới).
 - **Hoãn `--nominal-only`** (ablation −transition) sang sau lõi.

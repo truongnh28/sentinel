@@ -1,6 +1,6 @@
 # Sentinel v3 P2 — kiểm tra tái lập các số rẻ, tất định (D19)
 
-27/09/2026, nhánh `worktree-agent-af9ecc4898a606a70`, tách từ `int-p2` (`4be2744`). Đây là **phụ lục tái lập** cho báo cáo #8: chạy lại **chỉ các bộ sinh rẻ, tất định** và đối chiếu từng số đã ghim trong các báo cáo P2/P3 với giá trị sinh lại. Mục tiêu là bắt hồi quy âm thầm sau các lượt merge gần đây (M1 6 seed, `--jobs`, cost, wiring). **Không** chạy grid/rollout/tuning/build-table nặng, **không** chạm eval split, chỉ đọc mã (read-only trên mọi `.py`).
+27/09/2026, nhánh tạm tách từ `int-p2` (`4be2744`). Đây là **phụ lục tái lập** cho báo cáo #8: chạy lại **chỉ các bộ sinh rẻ, tất định** và đối chiếu từng số đã ghim trong các báo cáo P2/P3 với giá trị sinh lại. Mục tiêu là bắt hồi quy âm thầm sau các lượt merge gần đây (M1 6 seed, `--jobs`, cost, wiring). **Không** chạy grid/rollout/tuning/build-table nặng, **không** chạm eval split, chỉ đọc mã (read-only trên mọi `.py`).
 
 Lệnh dùng (đều < 1 phút, chạy từ `auditgame/` với `../.venv/bin/python`):
 - `../.venv/bin/python -m v3.grid --report` (2,9 s CPU) — mô hình chi phí P0 + sau cắt.

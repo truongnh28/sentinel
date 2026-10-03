@@ -120,7 +120,7 @@ Bộ attacker tinh chỉnh (D18) **rời hoàn toàn** bộ held-out: `tuning_at
 
 1. **Metric headline là gì?** Lập luận cho **L (Định nghĩa 1)**: chính paper định nghĩa nó là mục tiêu; policy được tinh chỉnh theo nó; bỏ qua thiệt hại kèm sẽ làm "audit hết ở commit" đẹp giả tạo (B1 phá 10% task sạch mà harm-only không tính). Nhưng **draft khai V = harm là primary (S9.3)**, nên đổi headline **phải khai một lệch chuẩn**. Khuyến nghị: báo cáo **cả hai**, lấy L làm headline, khai lệch chuẩn, và giữ V = harm như một cột của Table 2.
 2. **Định khung kết quả.** Không phải "Sentinel thắng tuyệt đối", mà **bản đồ chế độ**: thắng ở ρ ≤ 0,5 (mạnh nhất khi Δ lớn), thua ở ρ = 1 — và **lý thuyết đã sửa tiên đoán đúng ranh giới này**. Đây là phát biểu mạnh hơn và trung thực hơn dự phóng +27,6% của draft.
-3. **Chưa chốt được** cho tới khi có: block `br` (exploitability, RQ3), B7 (T21), lượt `--nominal-only` (cột −transition), và **P5 eval held-out** (cần người dùng ký `frozen/V3-GATE4.json`).
+3. **Chưa chốt được** cho tới khi có: block `br` (exploitability, RQ3), B7 (T21), lượt `--nominal-only` (cột −transition), và **P5 eval held-out** (cần tác giả ký `frozen/V3-GATE4.json`).
 
 ## 8. Tái lập
 
@@ -279,7 +279,7 @@ Cách đọc tệp `br.jsonl` 2,08 GB: **stream từng dòng**, `json.loads` r�
 
 - **B7** — không có bản ghi B7 trong bất kỳ block nào; T21 chưa cài. Cả dòng B7 và cột `regret vs B7` của mọi hệ đều TBD.
 - **Độ trung thực bảng-vs-rollout** — cần thế giới headline-rollout, lượt này không có.
-- **Toàn bộ số eval (P5)** — chưa có lượt eval nào; `frozen/V3-GATE4.json` chưa được người dùng ký. Mọi con số ở đây là **dev**.
+- **Toàn bộ số eval (P5)** — chưa có lượt eval nào; `frozen/V3-GATE4.json` chưa được tác giả ký. Mọi con số ở đây là **dev**.
 
 ### 9.3 Table 3 — ablation, có cả cánh −transition
 
@@ -458,7 +458,7 @@ Bốn dòng ablation còn lại của `tab:ablations` (dòng 108–110, 112) cũ
 - `results.tex:267` — độ trung thực bảng-vs-rollout: cần thế giới headline-rollout.
 - `results.tex:291` — "effect of removing …" cho ô **không được thực thi** (*not exercised*): lượt này không đo cờ đó.
 - `discussion.tex:14, 21, 25, 26, 30, 36`, `conclusion.tex:31`, `abstract.tex:46`, `theory.tex:300` (H7), `approach.tex:116, 155` — phần lớn cần **lượt eval P5** hoặc H7/H8/H11/H14 chưa chạy.
-- **Mọi ô eval (P5)**: chưa có lượt eval; `frozen/V3-GATE4.json` chưa được người dùng ký. Không ô nào của paper được lấp bằng số **dev** mà không ghi rõ là dev.
+- **Mọi ô eval (P5)**: chưa có lượt eval; `frozen/V3-GATE4.json` chưa được tác giả ký. Không ô nào của paper được lấp bằng số **dev** mà không ghi rõ là dev.
 
 **Số máy đọc được:** `spikes/v3-run/table2_3_full.json` (không commit — `spikes/` trong `.gitignore`, D33).
 

@@ -27,7 +27,7 @@ Mỗi con số cuối cùng phải đi qua đủ sáu công cụ dưới đây; 
 | T2 | Ma trận tuân thủ draft (DCM) | Mỗi câu quy định của draft có một ID (ví dụ `D4.def1`, `D7.pf2048`), nối tới module, test và kết quả; mỗi dòng mang một mức L0/L1/L2 | DCM trong repo; 100% dòng có test |
 | T3 | Test đặt tên theo câu draft | Tên test là chính câu nó bảo vệ; có test kịch bản Figure 1 chạy đủ 7 bước t1–t7 | Log test |
 | T4 | Bảng điểm dự đoán | Mỗi số dự phóng là một giả thuyết; luật khớp/bác khóa trước lượt chạy | Luật đã hash |
-| T5 | Chứng minh hoặc phản ví dụ | Không bỏ định lý nào; kiểm số trên 240 game nhỏ | Chứng minh có người kiểm, không chỉ AI |
+| T5 | Chứng minh hoặc phản ví dụ | Không bỏ định lý nào; kiểm số trên 240 game nhỏ | Chứng minh được kiểm độc lập |
 | T6 | Một lượt trên tập mới | Tập eval chưa ai chạm, freeze, đối chứng đọc trước, từ chối có lý do, nhật ký sai lệch so với draft; người ngoài dựng lại số từ record thô | Manifest, log, báo cáo kiểm độc lập |
 
 Mức tuân thủ dùng trong toàn bộ doc:
@@ -443,7 +443,7 @@ Lõi đi qua P3 ở phần giá đo thật, 620 thay đổi lành và payload, n
 
 Ghi các quyết định và phát hiện trong lúc dựng P2 theo `docs/plans/v3-p2-plan.md`. Mọi số ở đây là số sim trên **dev** hoặc trên game nhỏ, chưa hiệu chuẩn; không số nào là kết quả eval, và không lượt eval nào đã chạy. Quyết định đã chốt được thêm vào bảng "Quyết định đã chốt"; phần chưa chốt nằm ở "Chờ quyết định" cuối mục.
 
-**Cách làm việc.** P2 được phát triển trên nhánh tích hợp `int-p2`; mỗi task một nhánh riêng, merge vào `int-p2`. Người dùng tự merge `int-p2` vào `v3`.
+**Cách làm việc.** P2 được phát triển trên nhánh tích hợp `int-p2`; mỗi task một nhánh riêng, merge vào `int-p2`. Tác giả tự merge `int-p2` vào `v3`.
 
 ### M1: thế giới v3 với baseline (`docs/reports/v3-p2-m1.md`)
 
@@ -532,7 +532,7 @@ Rủi ro lớn nhất không phải số xấu mà là số xấu bị đọc sa
 | Agent thật không làm theo lời khuyên độc | Pilot: 0/7 | Đưa lượt hiệu chuẩn lên trước P5; nếu vẫn gần 0 thì in là kết quả |
 | Payload không qua cổng AUC 0,56 | v2: cổng hợp lệ đỏ, 203/205 test đạt | Payload theo mô hình ε ba chiều; không đạt thì mọi số harm mang nhãn |
 | Thư viện belief vẫn bị khoá | v2: 12/12 member belief-threshold khoá | Kiểm Prop. 6.1 của paper v2 là cổng trước tinh chỉnh |
-| Tập eval bị nhiễm | v2: D30, D35 | Dựng và hash tập mới trước mọi tinh chỉnh; không để trợ lý AI tự thiết kế lần chạm thứ hai |
+| Tập eval bị nhiễm | v2: D30, D35 | Dựng và hash tập mới trước mọi tinh chỉnh; không thiết kế lần chạm thứ hai khi chưa khai trước |
 | Chứng minh có lỗ hổng | Ghi chú đã qua một vòng soát bằng agent (4 lỗi, đã sửa) | Người kiểm độc lập là con người; phần sai in thành phản ví dụ |
 | Model LLM từ chối | Pilot có trường refusals | In tỉ lệ từ chối; luật thay model khai trước |
 | Khối lượng tính toán vượt dự kiến | Rollout mỗi task không tính nổi (đã chuyển sang bảng tính trước); giải chính xác belief MDP chỉ khả thi tới H = 5 ở K = 4 (T13 đã đo); rollout headline trên split chính tốn 797 CPU-giờ ở R = 16 (T22); 4 thế giới nhân khối lượng lên 4; trục ρ nhân thêm 4 | Lõi tối thiểu chỉ chạy một thế giới provenance (A0) nhưng giữ đủ 4 mức ρ; dòng 5 chạy rollout, bảng tính trước là phương án dự phòng L1 đã khai, kèm đo sai số; đo thời gian chạy trên dev trước khi chốt lưới |

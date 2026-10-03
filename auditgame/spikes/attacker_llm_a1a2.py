@@ -2,7 +2,6 @@
 """
 attacker_llm_a1a2.py -- Task 4: do A1 `llm-informed` va A2 `llm-hybrid`.
 
-Brief: .superpowers/sdd/2026-09-20-ssg-gate4c/task-4-brief.md
 Tien-dang-ky (dong bang TRUOC khi chay, khong sua tieu chi sau khi thay so):
 docs/preregistration/TIEN-DANG-KY-Attacker-LLM.md
 

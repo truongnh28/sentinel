@@ -2,7 +2,6 @@
 diag_4c.py -- Cong 4c: phan dinh vi sao SSGRecedingUpstream (SSG-up) hoi quy so
 voi MinimaxLPUpstream (B7U) tren o (Delta=4, d'=2.2), lop (2,4).
 
-Brief: .superpowers/sdd/2026-09-20-ssg-gate4c/task-1-brief.md
 
 KHONG sua lp.py / policies.py. Cac lop chan doan la BAN SAO cuc bo, dang ky vao
 policies.REGISTRY luc runtime (khong sua file), roi do bang dprime_sweep.measure_cell

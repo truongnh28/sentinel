@@ -53,7 +53,7 @@ DCM đánh số dòng Algorithm 1 theo draft, gồm 10 dòng. "Dòng 8" trong `s
 
 ## 1. Quyết định đã chốt
 
-Người dùng chốt ngày 27/09. Không có chữ ký của thầy; người dùng là người quyết.
+Tác giả chốt ngày 27/09. Không có chữ ký của thầy; tác giả là người quyết.
 
 | # | Quyết định | Điểm | Task |
 |---|---|---|---|
@@ -108,7 +108,7 @@ Commit ở độ sâu 1 trong **cả ba** ô χ. Vì vậy:
 | O10 | Trục thay cho độ sâu trong họ RO | Độ sâu cố định theo ô làm RO-d2 và RO-d3 trùng nhau. Thay bằng trục pha: pha ngẫu nhiên, hoặc bắt đầu ở carrier có hậu nghiệm cao nhất | T11 |
 | O11 | β online | β nền lấy từ lượt sạch trên dev; cập nhật bằng post-mortem cùng ô (báo động nằm ngoài (k, [ι, σ)) tính là drift) | T9, T10 |
 | O12 | Sai số Monte Carlo của dòng 5 | Bảng: SE mỗi ô bảng ≤ 0,09 (R = 32). Rollout headline: in SE, không lấy SE làm cổng | T14, T19 |
-| O13 | N_A = 1 (mỗi hạt mang sẵn (k, ι, σ), dùng chung rollout cho mọi lớp attacker) | **Không dùng**: giữ nghĩa của "max theo π_A". Chỉ bật khi người dùng quyết, và phải khai | T12 |
+| O13 | N_A = 1 (mỗi hạt mang sẵn (k, ι, σ), dùng chung rollout cho mọi lớp attacker) | **Không dùng**: giữ nghĩa của "max theo π_A". Chỉ bật khi tác giả quyết, và phải khai | T12 |
 | O14 | Ngân sách chặn (H18) trong chế độ bảng | Bảng không có khoá ngân sách. Dòng 5 loại member có hành động ở t vượt B_t; không còn member nào thì chọn "none" | T12, T16 |
 | O15 | Bảng dùng ở thế giới độ nhạy và ở K_d ≠ 2 | Dùng bảng của thế giới chính, khai là "mô hình của Sentinel sai lệch một yếu tố". Bảng riêng cho từng thế giới là tuỳ chọn, có giá (R16) | T14, T20 |
 | O16 | Đặc trưng của ngăn belief | p_attack chia 5 mức theo phân vị trên dev × carrier có hậu nghiệm cao nhất (4) × cờ "khối lượng trên carrier uỷ nhiệm > ½" (2) = 40 ngăn. Ngăn rỗng thì dùng ngăn gần nhất cùng h và ghi lý do (N3) | T14 |
@@ -131,7 +131,7 @@ Commit ở độ sâu 1 trong **cả ba** ô χ. Vì vậy:
 
 **Tinh chỉnh.** Không tinh chỉnh theo số dự phóng của draft. P2 chỉ chạy smoke trên dev.
 
-**Eval.** Không chạm eval (mục 6). Lượt P5 do người dùng tự gọi; trợ lý AI không tự chạy (D30, D35).
+**Eval.** Không chạm eval (mục 6). Lượt P5 chỉ do tác giả tự gọi, không chạy tự động (D30, D35).
 
 **Seed và N3.**
 - Seed chỉ lấy từ `core.seed_of(...)`. Không dùng `hash()`, không dùng `random` ở cấp module. Numpy `Generator` được seed từ `seed_of`.
@@ -215,7 +215,7 @@ auditgame/v3/
 | `smallgame.py`, `lp.py` | `games`, `solve`, `tv`, `feasible`, `simplex_max` | Chuẩn chính xác, B7, H7, LP của dòng 5 |
 | `tools/v3_p0_corpus.py` | `cut`, luật "H = cỡ họ" | Viết lại trong `v3/corpus.py`; test so digest với `spikes/v3-p0/corpus.json` |
 | `theory/checks/thm4_budget.py`, `coverage.py` | Công thức Định lý 5.6, `block_schedule` (Mệnh đề 5.7), `minimax` | Port sang `v3/budget.py`; test so số với script |
-| Script đo của `v3-p0-chi-phi.md` (scratchpad) | Cách đo clone + rollout (7,4 ms mỗi bộ) | Ý tưởng cho `runner.resume` và `tools/v3_build_table.py` |
+| Script đo của `v3-p0-chi-phi.md` (script tạm, không commit) | Cách đo clone + rollout (7,4 ms mỗi bộ) | Ý tưởng cho `runner.resume` và `tools/v3_build_table.py` |
 
 ---
 
@@ -309,7 +309,7 @@ Tập eval là danh sách instance, không phải kết quả. Thứ cần niêm
    - freeze v2 clean và không có PIN CONFLICT;
    - `freeze_v3.header_line()` clean;
    - `git status --porcelain auditgame/` rỗng;
-   - có `frozen/V3-GATE4.json` do người dùng ghi ở Cổng 4, chứa digest manifest v3, digest luật bảng điểm và digest bảng dòng 5, và các digest này khớp bản sống;
+   - có `frozen/V3-GATE4.json` do tác giả ghi ở Cổng 4, chứa digest manifest v3, digest luật bảng điểm và digest bảng dòng 5, và các digest này khớp bản sống;
    - `split == "eval"` được truyền tường minh.
 
    Thiếu một điều thì raise `SealedSplit` kèm lý do.
@@ -375,7 +375,7 @@ Số liệu từ `v3-p0-chi-phi.md`. Máy M5, 10 nhân; thời gian thật = CPU
 | Mô phỏng mọi khối, Sentinel dùng bảng (giá tra bảng ≈ 0,94 ms mỗi episode) | P5 (smoke dev ở P2) | ≈ 24; sau khi cắt BR còn ít hơn |
 | Dựng bảng dòng 5: 36 ô (4 ρ × 3 χ × 3 detector) × 5 Δ̂ × 14 độ dài còn lại × 20–40 ngăn × 28 member × 6 lớp attacker × R = 32–64 | Bản cuối ở P4, sau tinh chỉnh. P2 dựng pilot ở ô headline (≈ 4/36 khối lượng, khoảng 9–34 CPU-giờ) | 77–309 |
 | Rollout thật ở ô headline (Sentinel; 7 held-out + BR; R = 16–64) | P5, in cạnh bản bảng. P2 chỉ smoke trên dev (≈ 8 CPU-giờ) | 176–706 |
-| Tuỳ chọn: ablation và Δ-oracle bằng rollout ở headline, R = 16 | P5, chỉ khi người dùng bật | +235 |
+| Tuỳ chọn: ablation và Δ-oracle bằng rollout ở headline, R = 16 | P5, chỉ khi tác giả bật | +235 |
 | **Lõi** | | **509–1.039**, tức 3,7–7,6 ngày với `--jobs 10` |
 
 ### Phần cắt best response
@@ -463,7 +463,7 @@ Mọi đường dẫn tương đối với `auditgame/`. Mỗi task sở hữu m
 
 ## 10. Danh sách task
 
-Công sức tính bằng ngày công, có trợ lý AI, làm TDD. Mỗi test là một dòng DCM có `phase=P2`, trừ test ghi "hạ tầng".
+Công sức tính bằng ngày công, làm TDD. Mỗi test là một dòng DCM có `phase=P2`, trừ test ghi "hạ tầng".
 
 ### T0 — Khung v3, DCM theo mảnh, bộ chạy test (W0; 1 ngày)
 
@@ -983,5 +983,5 @@ Công sức tính bằng ngày công, có trợ lý AI, làm TDD. Mỗi test là
 - **Algorithm 1.**
   - Doc ghi "tám dòng" và "dòng 8"; draft có 10 dòng, và quarantine ở dòng 8–9.
   - Doc gọi bảng dòng 5 là "dự phòng, chỉ dùng khi rollout không tính nổi". Q13 biến nó thành phương án chính, có bằng chứng ở `v3-p0-chi-phi.md`.
-- **Người ký.** Cổng 0 và Cổng 4 ghi "thầy ký". Theo quyết định 27/09, người dùng quyết, và `frozen/V3-GATE4.json` do người dùng ghi.
+- **Người ký.** Cổng 0 và Cổng 4 ghi "thầy ký". Theo quyết định 27/09, tác giả quyết, và `frozen/V3-GATE4.json` do tác giả ghi.
 - **Lõi tối thiểu.** Doc chưa nói K_d của cấu hình chính; O1 đề xuất 2. P0 chi phí (GĐ 10) cũng giả định 2.

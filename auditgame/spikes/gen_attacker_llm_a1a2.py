@@ -3,7 +3,6 @@
 gen_attacker_llm_a1a2.py -- OFFLINE, ONE-TIME generator for task 4
 (A1 `llm-informed`, A2 `llm-hybrid`).
 
-Brief: .superpowers/sdd/2026-09-20-ssg-gate4c/task-4-brief.md
 Tien-dang-ky: docs/preregistration/TIEN-DANG-KY-Attacker-LLM.md
 
 CHAY DUNG MOT LAN, THAT TIEN.  Giong het tinh than payloads/generate.py va

@@ -124,7 +124,7 @@ Nguồn: `docs/reports/v3-p2-cost.md` + `../.venv/bin/python -m v3.grid --report
 
 - **Mô hình đếm tái lập đúng P0** trên đơn vị của P0 (split phụ 26 wf): cả 6 khối khớp `v3-p0-chi-phi.md` §3 tới từng episode (`test_p0_model_reproduces_the_p0_cost_table`).
 - **Sau khi cắt BR (mục 8), lõi = 11,48 triệu ≤ 16,39 triệu (−30%)** trên đơn vị P0 — đạt nghiệm thu T22. Khối H18 giảm 78%, K_d giảm 62%, độ nhạy giảm 20%.
-- **Hai thứ làm số thật lớn hơn đơn vị P0 (không phải cắt, cần người dùng biết):**
+- **Hai thứ làm số thật lớn hơn đơn vị P0 (không phải cắt, cần lưu ý):**
   1. Lưới ε của BR giữ {0,3; 0,6; 1,0} → lõi đã cắt lên **17,2 triệu (vượt P0 5%)**; cận trên 23,7 triệu.
   2. Eval chính đổi sang SWE-rebench-V2 96 wf (D-v3-1) → lõi 43,3 triệu (đơn vị P0), 65,5 triệu (hiệu chỉnh ε). Mô phỏng vẫn rẻ (9,5–20 CPU-giờ); cái đắt là **rollout headline** vì tỉ lệ với số workflow: R = 16 → 797 CPU-giờ (P0 tính 176). Ngân sách lõi 509–1.039 CPU-giờ của Q13 vì vậy chỉ còn đúng cho split phụ.
 - **Giá bảng dòng 5 (đo lại dưới tải chuẩn):** hằng số đề nghị **≈ 2,9 ms/rollout (CPU, `--jobs 10`) ≈ 225 CPU-giờ** cho bản đầy đủ, tái lập ước lượng line5-se-diff 223,7 CPU-giờ (lệch 0,6%); nằm trong khoảng P0/plan 77–309 CPU-giờ. Hệ số phồng song song trên CPU-time chỉ 1,05× (1,85× cũ là của **wall-clock**, không vào CPU-giờ).
@@ -141,7 +141,7 @@ Nguồn: `docs/reports/v3-p2-line23.md`. K = 4 nên KH ≤ 40 ⇔ H ≤ 10; eval
 ### 5.4. Niêm phong eval
 
 - `frozen/v3-unseal-log.jsonl`: **chưa tồn tại → nhật ký mở niêm phong RỖNG** (đúng cho P2: không lượt eval nào chạy).
-- `frozen/V3-GATE4.json`: **vắng** (đúng — do người dùng ghi ở Cổng 4, chưa tới).
+- `frozen/V3-GATE4.json`: **vắng** (đúng — do tác giả ghi ở Cổng 4, chưa tới).
 - Freeze v2 và D35 sạch; không file v2 nào bị sửa.
 
 ---
@@ -154,7 +154,7 @@ Từ `sentinel-v3.md` §12 của plan và các quyết định 27/09:
 - **Bảng điểm.** δ cũ ±5 điểm / ±0,03 → **Q12: 10 điểm / 0,10** (mức giảm tương đối / harm).
 - **Algorithm 1.** Doc gọi "tám dòng"/"dòng 8"; draft có **10 dòng**, quarantine ở **dòng 8–9**. DCM đánh số theo draft (10 dòng).
 - **Bảng dòng 5.** Doc gọi là "dự phòng"; **Q13** biến nó thành phương án **chính** ở mọi ô (rollout thật chỉ ở ô headline), có bằng chứng chi phí ở `v3-p0-chi-phi.md`.
-- **Người ký.** Cổng 0 / Cổng 4 ghi "thầy ký"; theo quyết định 27/09 **người dùng quyết**, `frozen/V3-GATE4.json` do người dùng ghi.
+- **Người ký.** Cổng 0 / Cổng 4 ghi "thầy ký"; theo quyết định 27/09 **tác giả quyết**, `frozen/V3-GATE4.json` do tác giả ghi.
 - **Cổng benign P3 (T24).** Verdict **không đạt** (`hi_mean` 0,5793 > trần 0,56) sau khi đóng kênh kích thước bằng kiến tạo; nguyên nhân còn lại là `embedding_shift` — đọc là **bằng chứng ủng hộ cần detector đọc nội dung (C15)**, không phải lỗi benchmark.
 
 ---

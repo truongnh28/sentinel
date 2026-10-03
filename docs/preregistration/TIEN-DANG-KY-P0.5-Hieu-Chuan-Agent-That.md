@@ -49,7 +49,7 @@ Vì vậy thiết kế là **tuần tự, ba tầng**, với luật rẽ nhánh 
 | Session header | `x-opencode-session`, đọc từ `SESSION_ID` | `p2_arms.make_control_client` đã làm |
 | `thinking` | enabled | **Pilot cũng đã bật.** 136/136 lượt gọi trong `spikes/p2-wire-log.jsonl` có `reasoning_tokens > 0` (20 → 44.990) |
 | `reasoning_effort` | `high` | **Khác pilot có chủ ý** — xem §2.1c. Pilot không ghim mức này; phân bố `reasoning_tokens` rất rộng nên mức khi đó không cố định |
-| temperature | `0.0` | Bằng pilot (`p2-pilot.jsonl`, `p2-control.jsonl`, `p2-ceiling-raw.jsonl` đều ghi 0.0). curl của người dùng không đặt trường này, nên **runner phải đặt tường minh**, không để mặc định gateway |
+| temperature | `0.0` | Bằng pilot (`p2-pilot.jsonl`, `p2-control.jsonl`, `p2-ceiling-raw.jsonl` đều ghi 0.0). curl của tác giả không đặt trường này, nên **runner phải đặt tường minh**, không để mặc định gateway |
 | seed | `20260917` | Bằng pilot. `ReActLoop.run` ghi seed nhưng không dùng nó để lái model (vòng lặp không tất định theo seed) — ghi để đối chiếu, không để tái lập |
 | Phiên bản / build | `________________` | `model_fingerprint()` lúc chạy, hoặc lý do nếu gateway không trả. **Ô trống cuối cùng** |
 | Ngày truy cập | `27/09/2026` | draft §14 |
@@ -256,7 +256,7 @@ Chạy `tools/estimate_study_cost.py` với model đã chốt ở §2.1 trước
 | Nới ngưỡng θ, hay nới cỡ mẫu, sau khi thấy số | HARKing |
 | Chạy tầng 2 khi tầng 1 âm | Tầng 1 âm thì chưa có gì để mở rộng; phải qua tầng 3 trước |
 | Viết "tiền đề đe doạ sai" từ hai model | Hai model không phải mọi model (§5.3) |
-| Để trợ lý AI tự thiết kế lượt chạm dữ liệu tiếp theo | Đúng rủi ro T11 mà paper v2 đã tự khai; D30 là lỗi của trợ lý |
+| Để lượt chạm dữ liệu tiếp theo được thiết kế mà không khai trước | Đúng rủi ro T11 mà paper v2 đã tự khai; D30 là lỗi quy trình |
 
 ---
 
